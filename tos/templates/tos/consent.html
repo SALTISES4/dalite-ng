@@ -1,0 +1,41 @@
+{% extends 'tos/base.html' %}
+{% block content %}
+
+<form id="tos-container" action="{% url 'tos:update' role version %}" method="post">
+
+  {% csrf_token %}
+
+  <h1 class="mdc-typography--display3">Terms of Service</h1>
+
+  {% if role == "student" %}
+  <p>Would you be willing to share your answers so that other students may 
+    learn from them? They will be kept anonymous and you may change your mind 
+    at any time.</p>
+  {% elif role == "teacher" %}
+  <p>Would you be willing to share your questions so that other teachers may 
+    benefit from them? You may change your mind at any time.</p>
+  {% endif %}
+
+  <div id="tos-text">{{ tos_text|safe }}</div>
+
+  {% if current %}
+  <div id="tos-version">Version: {{ version }} (current)</div>
+  {% else %}
+  <div id="tos-version">Version: {{ version }}</div>
+  {% endif %}
+
+  <button type="submit" name="accepted" value="true" id="tos-accept" class="mdc-button mdc-button--raised">
+    <i class="material-icons mdc-button__icon" aria-hidden="true">done</i>
+    Accept
+  </button>
+
+  <button type="submit" name="accepted" value="false" id="tos-refuse" class="mdc-button mdc-button--outlined">
+    <i class="material-icons mdc-button__icon" aria-hidden="true">clear</i>
+    Refuse
+  </button>
+
+  <input type="hidden" name="redirect_to" value="{{ redirect_to }}"></input>
+
+</form>
+
+{% endblock %}

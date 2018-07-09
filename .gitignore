@@ -11,3 +11,7 @@ locust*
 /node_modules
 /CACHE
 partner*.png
+.pytest_cache/
+.venv
+tags
+*.mypy_cache/

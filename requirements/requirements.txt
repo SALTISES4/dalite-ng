@@ -6,6 +6,9 @@ django-htmlmin==0.10.0
 python-memcached==1.59
 mysql-python
 pillow
+pytest
+pytest-django
+pytz
 
 # need an unreleased SNI fix from httplib2 lib TODO: remove after it is released to PyPi
 -e git+https://github.com/httplib2/httplib2.git@5ccd260911e2db802fa97498ae92558fac8c8057#egg=httplib2-0.9.2_dev

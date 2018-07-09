@@ -1,0 +1,56 @@
+$mdc-typography-font-family: 'Montserrat';
+$mdc-theme-primary: #54c0db;
+$mdc-theme-secondary: #004266;
+$mdc-theme-background: #f4f4f4;
+$radius: 10px;
+
+@import '@material/typography/mdc-typography';
+@import '@material/button/mdc-button';
+
+body {
+  background-color: $mdc-theme-background;
+  color: $mdc-theme-secondary;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 12pt;
+  margin: 0pt;
+}
+
+h1 {
+  color: $mdc-theme-primary;
+}
+
+header {
+  background-image: linear-gradient(
+    90deg,
+    $mdc-theme-primary 0%,
+    $mdc-theme-secondary 100%
+  );
+  color: white;
+  padding: 4pt;
+  font-size: 18pt;
+}
+
+header a {
+  color: white;
+}
+
+a {
+  text-decoration: none;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  align-items: center;
+}
+
+.header-right {
+  text-align: right;
+  font-size: 10pt;
+  line-height: 1.2;
+}
+
+.bold {
+  font-weight: bold;
+}
