@@ -51,6 +51,21 @@
     </span>
     <span class="mdc-list-item__meta"><i class="material-icons md-24">settings</i></span>
   </li>
+  <li class="mdc-list-item" onclick="window.location.href='{% url 'tos:modify' 'teacher' %}?next={{ request.path }}'" style="cursor:pointer;">
+    <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-48">assignment</i></span>
+      {% if tos_accepted %}
+      <span class="mdc-list-item__text mdc-theme--secondary">
+      Willing to share questions
+      {% else %}
+      <span class="mdc-list-item__text mdc-theme--secondary bold">
+      Unwilling to share questions
+      {% endif %}
+      {% for i in object.institutions.all %}
+        {{ i.name }}{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </span>
+    <span class="mdc-list-item__meta"><i class="material-icons md-24">settings</i></span>
+  </li>
   <li role="separator" class="mdc-list-divider"></li>
 </ul>
 
