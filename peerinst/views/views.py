@@ -10,6 +10,7 @@ import itertools
 import re
 from collections import defaultdict, Counter
 import urllib
+import pprint
 
 from django.conf import settings
 from django.contrib import messages
@@ -62,7 +63,7 @@ from ..util import (
     int_or_none,
     roundrobin,
     student_list_from_student_groups,
-    question_search_function,
+    question_search_function
 )
 from ..admin_views import (
     get_question_rationale_aggregates,
@@ -285,12 +286,10 @@ def sign_up(request):
                         request=request,
                     ),
                 )
-                mail_admins("", "")
             except:
                 response = TemplateResponse(request, "500.html")
                 return HttpResponseServerError(response.render())
 
-            print(4)
             return TemplateResponse(request, "registration/sign_up_done.html")
         else:
             context["form"] = form
@@ -1310,8 +1309,7 @@ class QuestionReviewView(QuestionReviewBaseView):
             second_answer_choice=self.second_answer_choice,
             chosen_rationale=chosen_rationale,
             user_token=self.user_token,
-            #  time=datetime.datetime.now().isoformat(),
-            time=timezone.now(),
+            time=datetime.datetime.now().isoformat(),
         )
         self.answer.save()
         if chosen_rationale is not None:
@@ -1487,6 +1485,8 @@ class AnswerSummaryChartView(View):
         ]
         # Transform the rationales we got from the other function into a format we can easily
         # draw in the page using a template
+        # import pprint
+        # pprint.pprint(answers)
         answer_rationales = [
             {
                 "label": each["label"],
@@ -2220,6 +2220,7 @@ def blink_get_next(request, pk):
                 # Teacher to new summary page
                 # Check existence of teacher (exception thrown otherwise)
                 user_role = Teacher.objects.get(user__username=request.user)
+                print(blinkassignment.blinkassignmentquestion_set.all())
                 return HttpResponseRedirect(
                     reverse(
                         "blink-summary",
@@ -2346,7 +2347,7 @@ def question_search(request):
         # All matching questions
         search_string_split_list = search_string.split()
         search_terms = [search_string]
-        if len(search_string_split_list) > 1:
+        if len(search_string_split_list)>1:
             search_terms.extend(search_string_split_list)
 
         query = []
@@ -2360,28 +2361,20 @@ def question_search(request):
             query_term = question_search_function(term)
 
             if limit_search == "true":
-                query_term = query_term.filter(
-                    discipline__in=request.user.teacher.disciplines.all()
-                )
+                query_term = query_term.filter(discipline__in=request.user.teacher.disciplines.all())
 
             query_term = query_term.exclude(id__in=q_qs).distinct()
 
             query_term = [q for q in query_term if q not in query_all]
 
-            if (len(query_term) + len(query_all)) < n_search_limit:
-                query_dict["term"] = term
-                query_dict["questions"] = query_term
-                query_dict["count"] = str(len(query_term)) + " results."
+            if  (len(query_term) + len(query_all)) < n_search_limit:
+                query_dict['term'] = term
+                query_dict['questions'] = query_term
+                query_dict['count'] = str(len(query_term)) + ' results.'
             else:
-                query_dict["term"] = term
-                query_dict["questions"] = query_term[
-                    : (n_search_limit - len(query_all))
-                ]
-                query_dict["count"] = (
-                    "only "
-                    + str(n_search_limit - len(query_all))
-                    + " results shown. Search limit exceeded."
-                )
+                query_dict['term'] = term
+                query_dict['questions'] = query_term[:(n_search_limit-len(query_all))]
+                query_dict['count'] = 'only '+ str(n_search_limit-len(query_all)) +' results shown. Search limit exceeded.'
             query_all.extend(query_term)
             query.append(query_dict)
 
@@ -2389,11 +2382,11 @@ def question_search(request):
             request,
             "peerinst/question_search_results.html",
             context={
-                "search_results": query,  # [:50],
+                "search_results": query,#[:50],
                 "form_field_name": form_field_name,
                 "count": len(query_all),
-                "previous_search_string": search_terms,
-                "n_search_limit": n_search_limit,
+                "previous_search_string":search_terms,
+                "n_search_limit":n_search_limit,
             },
         )
     else:
@@ -2719,7 +2712,7 @@ def report(request, assignment_id="", group_id=""):
     teacher = get_object_or_404(Teacher, user=request.user)
 
     if not request.GET:
-        return HttpResponseRedirect(reverse("report_selector"))
+        return HttpResponseRedirect(reverse('report_selector'))
 
     if request.GET.getlist("student_groups"):
         student_groups = request.GET.getlist("student_groups")
@@ -2730,6 +2723,8 @@ def report(request, assignment_id="", group_id=""):
     else:
         student_groups = teacher.current_groups.all().values_list("pk")
 
+    print(student_groups)
+
     if request.GET.getlist("assignments"):
         assignment_list = request.GET.getlist("assignments")
     elif assignment_id:
@@ -2738,6 +2733,8 @@ def report(request, assignment_id="", group_id=""):
         assignment_list = teacher.assignments.all().values_list(
             "identifier", flat=True
         )
+
+    print(assignment_list)
 
     student_id_list = student_list_from_student_groups(student_groups)
     answer_qs = Answer.objects.filter(

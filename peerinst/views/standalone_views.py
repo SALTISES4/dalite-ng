@@ -36,11 +36,7 @@ from ..models import (
     StudentGroupAssignment,
     Teacher,
 )
-from ..students import (
-    authenticate_student,
-    send_missing_assignments,
-    verify_student_token,
-)
+from ..students import authenticate_student, verify_student_token
 from ..util import get_object_or_none
 
 
@@ -111,7 +107,6 @@ def confirm_signup_through_link(request, group_hash, token):
         student.student.is_active = True
         student.groups.add(group)
         student.save()
-        send_missing_assignments(student, group, request.get_host())
 
         return TemplateResponse(
             request,
@@ -167,7 +162,7 @@ def navigate_assignment(request, assignment_id, question_id, direction, index):
         current_question = get_object_or_404(Question, pk=question_id)
         idx = questions.index(current_question)
 
-        if direction == "next":
+        if direction == 'next':
             if idx < len(questions) - 1:
                 new_question = questions[idx + 1]
             else:
@@ -191,7 +186,7 @@ def navigate_assignment(request, assignment_id, question_id, direction, index):
     assignment = StudentGroupAssignment.get(hash)
     question = get_object_or_404(Question, id=question_id)
 
-    if index != "x":
+    if index != 'x':
         idx = int(index)
     else:
         idx = None

@@ -80,6 +80,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "dalite.wsgi.application"
 
+
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
@@ -260,3 +261,5 @@ except ImportError:
         "File local_settings.py not found.  You probably want to add it -- see README.md."
     )
     pass
+
+

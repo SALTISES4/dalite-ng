@@ -9,12 +9,6 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 
 from .utils import create_token, verify_token
-from .models import (
-    Student,
-    StudentAssignment,
-    StudentGroup,
-    StudentGroupAssignment,
-)
 
 
 def create_student_token(username, email, exp=timedelta(weeks=16)):
@@ -229,20 +223,3 @@ def get_student_progress(assignment):
 
     output = progress
     return output
-
-
-def send_missing_assignments(student, group, host):
-    assert isinstance(student, Student), "Precondition failed for `student`"
-    assert isinstance(group, StudentGroup), "Precondition failed for `group`"
-
-    assignments = StudentGroupAssignment.objects.filter(group=group)
-
-    for assignment in assignments:
-        if not assignment.is_expired():
-            if not StudentAssignment.objects.filter(
-                student=student, group_assignment=assignment
-            ).exists():
-                assignment_ = StudentAssignment.objects.create(
-                    student=student, group_assignment=assignment
-                )
-                assignment_.send_email(host, "new_assignment")

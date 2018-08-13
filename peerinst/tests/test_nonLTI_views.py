@@ -3,7 +3,6 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest
 from django.test import TestCase, TransactionTestCase
-from django.test.utils import override_settings
 
 from ..models import Discipline, Question, Assignment, Teacher, Student
 from tos.models import Consent, Role, Tos
@@ -101,8 +100,8 @@ class SignUpTest(TestCase):
                 },
                 follow=True,
             )
-        self.assertEqual(response.status_code, 500)
-        self.assertTemplateUsed(response, "500.html")
+            self.assertEqual(response.status_code, 500)
+            self.assertTemplateUsed(response, "500.html")
 
 
 class AdminTest(TestCase):
@@ -898,8 +897,12 @@ class StudentTest(TestCase):
 
 
 class CustomMiddlewareTest(TestCase):
+
     def test_405_response(self):
-        response = self.client.post(reverse("landing_page"), follow=True)
+        response = self.client.post(
+            reverse("landing_page"),
+            follow=True,
+        )
         print(response)
 
         self.assertEqual(response.status_code, 405)

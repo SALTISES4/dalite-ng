@@ -152,9 +152,9 @@ def new_students(n):
 
 def new_student_assignments(n, group_assignments, students):
     def generator(combinations):
+        choice = random.choice(list(combinations))
+        combinations = combinations - set(choice)
         while True:
-            choice = random.choice(list(combinations))
-            combinations = combinations - set([choice])
             yield {"student": choice[0], "group_assignment": choice[1]}
 
     combinations = [
@@ -171,9 +171,12 @@ def new_student_group_assignments(n, groups, assignments, due_date=None):
     def generator(groups, assignments, due_date):
         while True:
             if due_date is None:
-                due_date = datetime.now(pytz.utc) + timedelta(
-                    days=random.randint(1, 60)
-                )
+                if random.random() > 0.5:
+                    due_date = datetime.now(pytz.utc) + timedelta(
+                        days=random.randint(1, 60)
+                    )
+                else:
+                    due_date = None
             yield {
                 "group": random.choice(groups),
                 "assignment": random.choice(assignments),

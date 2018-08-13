@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 from datetime import datetime
 
 from django.contrib.auth.hashers import make_password
@@ -9,10 +9,8 @@ from django.test import TestCase, TransactionTestCase
 
 from django.contrib.auth.models import User
 from tos.models import Consent, Role, Tos
-from ..models import StudentGroup
 
 from .generators import *
-
 
 def ready_user(pk):
     user = User.objects.get(pk=pk)
@@ -21,9 +19,8 @@ def ready_user(pk):
     user.save()
     return user
 
-
 class StandaloneTest(TransactionTestCase):
-    fixtures = ("test_users.yaml",)
+    fixture = ['test_users.yaml']
 
     def setUp(self):
         self.validated_teacher = ready_user(1)
@@ -44,16 +41,17 @@ class StandaloneTest(TransactionTestCase):
 
         questions = add_questions(new_questions(n_questions))
         groups = add_groups(new_groups(n_groups))
-        self.assignments = add_assignments(
+        assignments = add_assignments(
             new_assignments(n_assignments, questions)
         )
         students = add_students(new_students(n_students))
 
-        self.group = StudentGroup.objects.first()
+        self.group = StudentGroups.objects.first()
         for student in students:
-            student.groups.add(self.group)
+            student.groups.add(group)
 
-        self.assertEqual(self.group.student_set.count(), n_students)
+        self.assertEqual(group.student_set.count(), n_students)
+
 
     def test_create_group_assignment(self):
         logged_in = self.client.login(
@@ -62,22 +60,15 @@ class StandaloneTest(TransactionTestCase):
         )
         self.assertTrue(logged_in)
 
-        response = self.client.post(
-            reverse(
-                "student-group-assignment-create",
-                args=(self.assignments[0].identifier,),
-            ),
-            {
-                "assignment_id": self.assignments[0].identifier,
-                "group_id": self.group,
-                "due_date": datetime.now,
-            },
+        response = self.client.post(reverse('create-group-assignment'), {
+            'assignment_id' : 'Assignment2',
+            'group_id' : self.group,
+            'due_date' : datetime.now},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
+            )
 
-        self.assertEqual(response.status_code, 200)
         self.assertTrue(StudentGroupAssignment.objects.count(), 1)
-        self.assertEqual(len(mail.outbox), self.group.student_set.count())
+        self.assertEqual(len(mail.outbox), self.groups.student_set.count())
         self.assertEqual(
             mail.outbox[0].subject, "A new assignment is available"
         )

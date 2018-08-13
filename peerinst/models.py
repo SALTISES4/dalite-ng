@@ -965,9 +965,11 @@ class StudentGroupAssignment(models.Model):
         assert isinstance(host, basestring), "Precondition failed for `host`"
 
         for student in Student.objects.filter(groups=self.group):
-            assignment = StudentAssignment.objects.get_or_create(
+            # TODO Add try except
+            assignment = StudentAssignment.objects.create(
                 student=student, group_assignment=self
             )
+            assignment.save()
             assignment.send_email(
                 host, mail_type="new_assignment", assignment_hash=self.hash
             )
