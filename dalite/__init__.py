@@ -122,9 +122,12 @@ class ApplicationHookManager(AbstractApplicationHookManager):
 
         email = email if email else user_id + "@localhost"
 
-        user, err = authenticate_student(email)
+        user = authenticate_student(email)
 
-        if not err:
+        if user and self.is_user_staff(extra_params):
+            self.update_staff_user(user)
+
+        if user:
             login(request, user)
 
         # LTI sessions are created implicitly, and are not terminated when

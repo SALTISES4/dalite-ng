@@ -48,14 +48,9 @@ def authenticate_student(email):
                     "race condition: %s",
                     e.message,
                 )
-                err = (
-                    "IntegrityError creating user - assuming result of "
-                    "race condition: {}".format(e.message)
-                )
                 user = None
 
     if user is None:
         logger.error("The user couldn't be authenticated.")
-        err = "The user couldn't be authenticated."
 
-    return user, err
+    return user
