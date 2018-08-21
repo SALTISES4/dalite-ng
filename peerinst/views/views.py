@@ -993,30 +993,20 @@ class QuestionFormView(QuestionMixin, FormView):
         lti_event.save()
 
         if self.lti_data:
-            # Automatically keep track of student, student groups and their relationships based on lti data
-            user = User.objects.get(username=self.user_token)
-
-            try:
-                student = Student.objects.get(student=user)
-            except:
-                student = Student(student=user)
-                student.save()
-
             course_title = self.lti_data.edx_lti_parameters.get(
                 "context_title"
             )
-            if course_title:
-                group, created_group = StudentGroup.objects.get_or_create(
-                    name=course_id, title=course_title
-                )
-            else:
-                group, created_group = StudentGroup.objects.get_or_create(
-                    name=course_id, title=""
-                )
 
-            if created_group:
+            try:
+                group = StudentGroup.objects.get(name=course_id)
+            except StudentGroup.DoesNotExist:
+                if course_title:
+                    group = StudentGroup(name=course_id,title=course_title)
+                else:
+                    group = StudentGroup(name=course_id)
                 group.save()
 
+            # If teacher_id specified, add teacher to group
             teacher_hash = self.lti_data.edx_lti_parameters.get(
                 "custom_teacher_id"
             )
@@ -1025,8 +1015,9 @@ class QuestionFormView(QuestionMixin, FormView):
                 if teacher not in group.teacher.all():
                     group.teacher.add(teacher)
 
-            student.groups.add(group)
-            student.save()
+            # If this user is a student, add group to student
+            if hasattr(self.request.user, 'student'):
+                self.request.user.student.groups.add(group)
 
     def submission_error(self):
         messages.error(

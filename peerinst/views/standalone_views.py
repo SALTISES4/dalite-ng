@@ -105,8 +105,8 @@ def confirm_signup_through_link(request, group_hash, token):
     if username is not None:
         student = get_object_or_404(Student, student__username=username)
         student.student.is_active = True
+        student.student.save()
         student.groups.add(group)
-        student.save()
         student.send_missing_assignments(group, request.get_host())
 
         return TemplateResponse(

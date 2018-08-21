@@ -110,7 +110,7 @@
     {% endif %}
 
     <div style='position:absolute;bottom:50%;left:50%;transform:translate(-50%,50%);'>
-      {% for q in group_assignment.get_questions %}
+      {% for q in group_assignment.questions %}
       <a href="{% url 'navigate-assignment' assignment_id=assignment.pk question_id=q.id direction='goto' index=forloop.counter0 %}">
         <svg height="12" width="20">
           {% if q.id == question.id %}
