@@ -129,7 +129,7 @@ def group_assignment_page(req, assignment_hash, teacher, group, assignment):
         "teacher_id": teacher.id,
         "group": group,
         "assignment": assignment,
-        "questions": assignment.questions(),
+        "questions": assignment.questions,
         "students_with_answers": assignment.assignment.answer_set.values_list('user_token', flat=True),
     }
 
