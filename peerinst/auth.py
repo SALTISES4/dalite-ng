@@ -13,7 +13,7 @@ from .students import (
 logger = logging.getLogger(__name__)
 
 
-def authenticate_student(email):
+def authenticate_student(email, user_id=None):
 
     err = None
 
@@ -33,7 +33,8 @@ def authenticate_student(email):
 
     else:
         # old way of generating student login
-        user_id = "@".join(email.split("@")[:-1])
+        if user_id is None:
+            user_id = "@".join(email.split("@")[:-1])
         old_username, old_password = get_old_lti_student_username_and_password(
             user_id
         )
