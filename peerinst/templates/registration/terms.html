@@ -14,7 +14,7 @@
     <a href="{% url 'sign_up' %}">Back to sign up</a>
   </div>
 
-  {{ tos.text }}
+  {{ tos.text|safe }}
 </section>
 </main>
 {% endblock %}
