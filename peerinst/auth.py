@@ -17,6 +17,9 @@ def authenticate_student(email):
 
     err = None
 
+    if Teacher.objects.filter(user__email=email).exists():
+        email = email + "-lti"
+
     username, password = get_student_username_and_password(email)
 
     if User.objects.filter(username=username).exists():
@@ -50,7 +53,10 @@ def authenticate_student(email):
                     username=username, email=email, password=password
                 )
                 user = authenticate(username=username, password=password)
-                if user and not Teacher.objects.filter(user__email=email).exists():
+                if (
+                    user
+                    and not Teacher.objects.filter(user__email=email).exists()
+                ):
                     Student.objects.create(student=user)
             except IntegrityError as e:
                 logger.error(
