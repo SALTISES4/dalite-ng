@@ -572,17 +572,14 @@ class Student(models.Model):
             )
         except Student.DoesNotExist:
 
-            try:
-                user = User.objects.create_user(
-                    username=username, email=email, password=password
-                )
+            user = User.objects.create_user(
+                username=username, email=email, password=password
+            )
 
-                # Set inactive until confirmed by user
-                user.is_active = False
-                user.save()
-                student = Student.objects.create(student=user)
-            except IntegrityError:
-                student = None
+            # Set inactive until confirmed by user
+            user.is_active = False
+            user.save()
+            student = Student.objects.create(student=user)
 
         output = student
         assert output is None or isinstance(

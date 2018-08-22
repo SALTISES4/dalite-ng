@@ -124,7 +124,7 @@ class ApplicationHookManager(AbstractApplicationHookManager):
 
         user = authenticate_student(email)
 
-        if user:
+        if user is not None:
             login(request, user)
 
         # LTI sessions are created implicitly, and are not terminated when
