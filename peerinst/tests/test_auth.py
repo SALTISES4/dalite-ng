@@ -139,6 +139,14 @@ class TestAuthenticateStudent(TestCase):
 
             user = authenticate_student(**test)
             self.assertIsInstance(user, User)
+            self.assertTrue(
+                User.objects.filter(email=test["email"] + "-lti").exists()
+            )
+            self.assertFalse(
+                Student.objects.filter(
+                    student__email=test["email"] + "-lti"
+                ).exists()
+            )
             self.assertFalse(
                 Student.objects.filter(student__email=test["email"]).exists()
             )
