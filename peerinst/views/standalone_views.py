@@ -152,7 +152,7 @@ def live(request, token, assignment_hash):
 
     request.session["assignment_first"] = idx == 0
     request.session["assignment_last"] = idx == len(questions) - 1
-    request.session["assignment_expired"] = idx == len(questions) - 1
+    request.session["assignment_expired"] = has_expired
 
     # Redirect to view
     return HttpResponseRedirect(
