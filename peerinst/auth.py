@@ -17,13 +17,16 @@ def authenticate_student(email, user_id=None):
 
     err = None
 
+    if Teacher.objects.filter(user__email=email).exists():
+        email = email + "-lti"
+
     username, password = get_student_username_and_password(email)
 
     if User.objects.filter(username=username).exists():
         user = authenticate(username=username, password=password)
         if (
             user
-            and not Teacher.objects.filter(user__email=email).exists()
+            and not email.endswith("-lti")
             and not Student.objects.filter(student=user).exists()
         ):
             Student.objects.create(student=user)
@@ -36,11 +39,14 @@ def authenticate_student(email, user_id=None):
             user_id
         )
 
-        if User.objects.filter(username=old_username).exists():
+        if (
+            not email.endswith("-lti")
+            and User.objects.filter(username=old_username).exists()
+        ):
             user = authenticate(username=old_username, password=old_password)
             if (
                 user
-                and not Teacher.objects.filter(user__email=email).exists()
+                and not email.endswith("-lti")
                 and not Student.objects.filter(student=user).exists()
             ):
                 Student.objects.create(student=user)
@@ -51,7 +57,7 @@ def authenticate_student(email, user_id=None):
                     username=username, email=email, password=password
                 )
                 user = authenticate(username=username, password=password)
-                if user and not Teacher.objects.filter(user__email=email).exists():
+                if user and not email.endswith("-lti"):
                     Student.objects.create(student=user)
             except IntegrityError as e:
                 logger.error(
