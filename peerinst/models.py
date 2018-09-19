@@ -389,6 +389,15 @@ class Assignment(models.Model):
         verbose_name = _("assignment")
         verbose_name_plural = _("assignments")
 
+    @property
+    def editable(self):
+        return (
+            not self.answer_set.exclude(user_token__exact="").count()
+            and not StudentGroupAssignment.objects.filter(
+                assignment=self
+            ).exists()
+        )
+
 
 class Answer(models.Model):
     question = models.ForeignKey(Question)

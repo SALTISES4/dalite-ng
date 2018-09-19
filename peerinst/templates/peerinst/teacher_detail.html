@@ -210,7 +210,7 @@
               <a href="{% url 'report-all-groups' assignment_id=a.identifier|urlencode:"" %}">
                 <i class="material-icons md-24 mdc-ripple-surface icon-list">bar_chart</i>
               </a>
-              {% if object.user in a.owner.all and a.answer_set.count == 0 %}
+              {% if object.user in a.owner.all and a.editable %}
                 <a  id="edit-assignment-{{ a.pk|slugify }}" href="{% url 'assignment-update' a.pk %}">
                   <i class="material-icons md-24 mdc-ripple-surface icon-list">mode_edit</i>
                 </a>
