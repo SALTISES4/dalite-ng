@@ -27,13 +27,25 @@
 {% if not group_assignment or group_assignment.show_correct_answers %}
 <p class='mdc-typography--body1'>
   Correct answer(s):
-    {% for answer in correct %}
-      <blockquote>{{ answer.text|safe }}</blockquote>
+  {% for label, choice in answer_choices %}
+    {% for c in question.answerchoice_set.all %}
+      {% if forloop.counter == forloop.parentloop.counter %}
+        {% if c.correct %}
+          <blockquote><strong>{{ label }}. {{ choice|safe }}</strong></blockquote>
+        {% endif %}
+      {% endif %}
     {% endfor %}
+  {% endfor %}
+
+  <!-- Replaced to include label
+  {% for answer in correct %}
+    <blockquote>{{ answer.text|safe }}</blockquote>
+  {% endfor %}
+  -->
 </p>
 {% endif %}
 
-<!--
+<!-- Remove 'expert' rationales for now
 {% if experts %}
 <p class='mdc-typography--body1'>
   Expert rationale(s):

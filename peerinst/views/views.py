@@ -845,7 +845,7 @@ class QuestionMixin(object):
         )
 
         # Pass hints so that template knows context
-        if self.lti_data:
+        if self.request.session.get("LTI"):
             context.update(lti=True)
         else:
             context.update(lti=False)
@@ -1001,7 +1001,7 @@ class QuestionFormView(QuestionMixin, FormView):
                 group = StudentGroup.objects.get(name=course_id)
             except StudentGroup.DoesNotExist:
                 if course_title:
-                    group = StudentGroup(name=course_id,title=course_title)
+                    group = StudentGroup(name=course_id, title=course_title)
                 else:
                     group = StudentGroup(name=course_id)
                 group.save()
@@ -1016,7 +1016,7 @@ class QuestionFormView(QuestionMixin, FormView):
                     group.teacher.add(teacher)
 
             # If this user is a student, add group to student
-            if hasattr(self.request.user, 'student'):
+            if hasattr(self.request.user, "student"):
                 self.request.user.student.groups.add(group)
 
     def submission_error(self):
@@ -1376,6 +1376,10 @@ class QuestionSummaryView(QuestionMixin, TemplateView):
         )
         self.send_grade()
         return context
+
+    # If we get here via POST, it is likely from submitting an answer to a question that has already been answered.  Simply redirect here as GET.
+    def post(self, request, *args, **kwargs):
+        return redirect(request.path)
 
 
 class HeartBeatUrl(View):

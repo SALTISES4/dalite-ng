@@ -398,6 +398,7 @@ def report_data_by_assignment(assignment_list,student_groups):
             d_q = {}
             d_q["text"] = q.text
             d_q["title"] = q.title
+            d_q["answer_choices"] = q.answerchoice_set.all()
             question_list.append(q)
             
             try:

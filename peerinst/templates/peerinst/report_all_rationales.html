@@ -107,12 +107,21 @@ ul {
                         <div class="admin-link">
                             <a href="#question_gradebook">Back to top</a>
                         </div>
-                        {{ question.text|striptags }}
+                        {{ question.text|safe }}
                         {% if question.question_image %}
                             <div>
                               <img style="display:block;margin:auto;padding-top:10pt;padding-bottom:10pt;"  src="{{ question.question_image.url }}" alt="g.question.image_alt_text">
                             </div>
                         {% endif %}
+                        <ol type='A'>
+                        {% for a in question.answer_choices %}
+                        <li>{{ a.text | safe}}
+                            {% if a.correct %}
+                              <em>(Correct)</em>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                        </ol>
                     </span>
 
                     <span>

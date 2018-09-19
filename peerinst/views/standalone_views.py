@@ -142,7 +142,7 @@ def live(request, token, assignment_hash):
     login(request, user)
 
     # Register access type
-    request.session["nonLTI"] = True
+    request.session["LTI"] = False
 
     # Get assignment for this token and current question
     group_assignment = StudentGroupAssignment.get(assignment_hash)

@@ -21,6 +21,7 @@
 
   <!-- Local resources -->
   <link href="{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" rel="icon">
+  <link href="{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" rel="apple-touch-icon">
   {% compress css %}
   <link href="{% static 'peerinst/css/main.min.css' %}" rel="stylesheet">
   {% endcompress %}
@@ -33,6 +34,7 @@
   {% include 'peerinst/custom-instance-head.html' %}
 
   {% block stylesheets %}{% endblock %}
+
 </head>
 
 <body>
@@ -50,7 +52,7 @@
   <header>
     <div class="wrapper">
       <div>
-        <a href="{% include 'peerinst/custom-instance-link.html' %}"><img src="{% static 'peerinst/img/SALTISE-favicon.gif' %}" alt="site-logo" id="logo"></a>
+        <a href="{% url 'landing_page' %}"><img src="{% static 'peerinst/img/SALTISE-favicon.gif' %}" alt="site-logo" id="logo"></a>
         {% if not user.student and not lti %}
         <a href="{% url 'assignment-list' %}">{% include 'peerinst/custom-instance-header.html' %}</a>
         {% else %}
@@ -60,14 +62,12 @@
       <div class="header-right">
         {% if user.is_authenticated %}
           {% if user.teacher %}
-            {% trans 'Teacher' %}: <a class="bold" href="{% url 'teacher' pk=user.teacher.pk %}">{{ request.user.username }}</a>
-            <br>
-            <a class="bold" href="{% url 'logout' %}">{% trans 'Logout' %}</a>
+            <a href="{% url 'teacher' pk=user.teacher.pk %}" title="{% trans 'Account' %}"><i class="icon ion-md-settings"></i></a>
+            <a href="{% url 'logout' %}" title="{% trans 'Logout' %}"><i class="icon ion-md-log-out"></i></a>
           {% else %}
-            <a class="bold" href="{% url 'tos:tos_modify' 'student' %}?next={{ request.path }}">{% trans 'Terms of Service' %}</a>
-            {% if request.session.nonLTI %}
-            <br>
-            <a class="bold" href="{% url 'logout' %}">{% trans 'Logout' %}</a>
+            <a href="{% url 'tos:tos_modify' 'student' %}?next={{ request.path }}" title="{% trans 'Terms of Service' %}"><i class="icon ion-md-settings"></i></a>
+            {% if not request.session.LTI %}
+            <a href="{% url 'logout' %}" title="{% trans 'Logout' %}"><i class="icon ion-md-log-out"></i></a>
             {% endif %}
           {% endif %}
         {% endif %}

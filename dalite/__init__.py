@@ -138,6 +138,7 @@ class ApplicationHookManager(AbstractApplicationHookManager):
 
         # TL; DR; Sets session expiry on browser close.
         request.session.set_expiry(0)
+        request.session["LTI"] = True
 
     def is_user_staff(self, extra_params):
         """

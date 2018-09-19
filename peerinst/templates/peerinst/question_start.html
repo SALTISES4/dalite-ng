@@ -10,7 +10,7 @@
     <div class="container">
 
       {% block pretext %}{% endblock %}
-      <h1 class="mdc-typography--display3" style="position:sticky;">{% trans 'Question' %}
+      <h1 class="mdc-typography--display3">{% trans 'Question' %}
         <svg class="underline" width=150 height=4></svg>
       </h1>
 
@@ -88,8 +88,8 @@
         </div>
         {% endblock %}
         {% if lti or not assignment_expired %}
-        <div style="margin-top:20px;">
-          <input class="mdc-button mdc-button--raised" type="submit" value="{% block submit_button %}{% trans 'Next' %}{% endblock %}" />
+        <div>
+          <input class="mdc-button mdc-button--raised padded-top" onclick="this.form.submit();this.disabled=true;" type="submit" value="{% block submit_button %}{% trans 'Next' %}{% endblock %}" />
         </div>
         {% endif %}
       </form>

@@ -33,6 +33,7 @@
 /* Stylesheet */
 /* - Layout */
 main {
+  display: block;
   max-width: 800px;
   margin: auto;
 }
@@ -99,6 +100,10 @@ header {
 }
 header a {
   color: white;
+}
+header .icon {
+  font-size: 28px;
+  margin-right: 10px;
 }
 footer {
   background-image: linear-gradient(
