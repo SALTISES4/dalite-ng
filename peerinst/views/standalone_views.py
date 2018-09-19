@@ -54,7 +54,7 @@ def signup_through_link(request, group_hash):
             "404.html",
             context={
                 "message": _(
-                    "The group couldn't be bound. Bear in mind that the URL "
+                    "The group couldn't be found. Bear in mind that the URL "
                     "is case-sensitive."
                 )
             },
