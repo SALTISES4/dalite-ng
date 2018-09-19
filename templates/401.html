@@ -1,0 +1,14 @@
+{% extends './errors.html' %}
+
+{% load i18n %}
+
+{% block body %}
+<h1>401 Unauthorized</h1>
+
+<p>
+  {% trans 'You need to be logged in to access this page.' %}
+</p>
+
+<i class="corner-icon material-icons" style="vertical-align:middle;">help_outline</i>
+
+{% endblock %}

@@ -136,7 +136,9 @@ def live(request, token, assignment_hash):
     logout(request)
 
     # Login through token
-    user = authenticate_student(token)
+    user = authenticate_student(request, token)
+    if isinstance(user, HttpResponse):
+        return user
     login(request, user)
 
     # Register access type

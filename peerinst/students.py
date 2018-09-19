@@ -6,7 +6,9 @@ import pytz
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
+from django.template.response import TemplateResponse
+from django.utils.translation import ugettext_lazy as _
 
 from .utils import create_token, verify_token
 
@@ -49,7 +51,8 @@ def verify_student_token(token):
     return output
 
 
-def authenticate_student(token):
+def authenticate_student(req, token):
+    assert isinstance(req, HttpRequest), "Precondition failed for `req`"
     assert isinstance(token, basestring), "Precondition failed for `token`"
 
     resp = None
@@ -93,7 +96,7 @@ def authenticate_student(token):
                     "message": _("The account hasn't been verified yet.")
                 },
             )
-            output = HttpResponseUnauthorized(resp.render())
+            output = HttpResponse(resp.render(), status=401)
         else:
             output = user
 
