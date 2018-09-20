@@ -10,6 +10,7 @@ from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseForbidden,
+    HttpResponseNotFound,
     HttpResponseRedirect,
     HttpResponseServerError,
     JsonResponse,
@@ -48,7 +49,17 @@ def signup_through_link(request, group_hash):
     group = StudentGroup.get(group_hash)
 
     if group is None:
-        raise Http404()
+        resp = TemplateResponse(
+            request,
+            "404.html",
+            context={
+                "message": _(
+                    "The group couldn't be found. Bear in mind that the URL "
+                    "is case-sensitive."
+                )
+            },
+        )
+        return HttpResponseNotFound(resp.render())
     else:
         if request.method == "POST":
             form = EmailForm(request.POST)
@@ -125,7 +136,9 @@ def live(request, token, assignment_hash):
     logout(request)
 
     # Login through token
-    user = authenticate_student(token)
+    user = authenticate_student(request, token)
+    if isinstance(user, HttpResponse):
+        return user
     login(request, user)
 
     # Register access type
