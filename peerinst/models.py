@@ -93,15 +93,10 @@ class Question(models.Model):
         _("Question title"),
         unique=True,
         max_length=100,
-        help_text=_(
-            "A title for the question."
-        ),
+        help_text=_("A title for the question."),
     )
     text = models.TextField(
-        _("Question text"),
-        help_text=_(
-            "Enter the question text."
-        ),
+        _("Question text"), help_text=_("Enter the question text.")
     )
     parent = models.ForeignKey(
         "Question", blank=True, null=True, on_delete=models.SET_NULL
