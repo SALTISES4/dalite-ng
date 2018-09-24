@@ -1,9 +1,11 @@
 {% extends 'peerinst/base.html' %}
 
-{% load staticfiles i18n %}
+{% load staticfiles compress i18n %}
 
 {% block stylesheets %}
+{% compress css %}
 <link href="{% static 'peerinst/css/search.min.css' %}" rel="stylesheet">
+{% endcompress %}
 {% endblock %}
 
 {% block body %}
@@ -103,6 +105,7 @@
 
 {% block scripts %}
 <script src="{% static 'peerinst/js/search.min.js' %}"></script>
+{% compress js inline %}
 <script>
 bundle.toggleImages();
 bundle.toggleAnswers();
@@ -137,4 +140,5 @@ function toggleFavourite(pk) {
   })
 }
 </script>
+{% endcompress %}
 {% endblock %}

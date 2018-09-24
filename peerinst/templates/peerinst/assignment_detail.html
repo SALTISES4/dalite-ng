@@ -3,7 +3,9 @@
 {% load staticfiles compress i18n %}
 
 {% block stylesheets %}
+{% compress css %}
 <link href="{% static 'peerinst/css/search.min.css' %}" rel="stylesheet">
+{% endcompress %}
 {% compress js %}
 <script src="{% static 'peerinst/js/ajax.min.js' %}"></script>
 <script src="{% static 'peerinst/js/search.min.js' %}"></script>
@@ -113,7 +115,7 @@
 
     <div id="favourite-questions" class="foldable">
       <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">{% trans 'My favourite questions' %}</h2>
-      <div class="foldable--body">
+      <div class="foldable--body" style="margin-top:20px;">
       {% for g in teacher.favourite_questions.all %}
       {% if g not in object.questions.all %}
       {% if g not in teacher.deleted_questions.all %}
@@ -260,6 +262,7 @@
 {% endblock %}
 
 {% block scripts %}
+{% compress js inline %}
 <script>
 bundle.toggleImages();
 bundle.toggleAnswers();
@@ -297,7 +300,7 @@ function toggleFavourite(pk) {
     console.info(data);
   });
   $('#favourite-questions').find($('#'+pk).remove());
-
 }
 </script>
+{% endcompress %}
 {% endblock %}

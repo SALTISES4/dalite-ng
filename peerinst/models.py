@@ -93,19 +93,10 @@ class Question(models.Model):
         _("Question title"),
         unique=True,
         max_length=100,
-        help_text=_(
-            "A title for the question. Used for lookup when creating "
-            "assignments, but not presented to the student."
-        ),
+        help_text=_("A title for the question."),
     )
     text = models.TextField(
-        _("Question text"),
-        help_text=_(
-            "Enter the question text.  You can use HTML tags for formatting. "
-            'You can use the "Preview" button in the top right corner to '
-            "see what the question will look like for students.  The button "
-            "appears after saving the question for the first time."
-        ),
+        _("Question text"), help_text=_("Enter the question text.")
     )
     parent = models.ForeignKey(
         "Question", blank=True, null=True, on_delete=models.SET_NULL
@@ -531,8 +522,8 @@ class StudentGroup(models.Model):
             id_ = None
         if id_:
             try:
-                group = StudentGroupAssignment.objects.get(id=id_)
-            except StudentGroupAssignment.DoesNotExist:
+                group = StudentGroup.objects.get(id=id_)
+            except StudentGroup.DoesNotExist:
                 group = None
         else:
             group = None
@@ -805,10 +796,16 @@ class Teacher(models.Model):
     @staticmethod
     def get(hash_):
         assert isinstance(hash_, basestring), "Precondition failed for `hash_`"
-        username = str(base64.urlsafe_b64decode(hash_.encode()).decode())
         try:
-            teacher = Teacher.objects.get(user__username=username)
-        except Teacher.DoesNotExist:
+            username = str(base64.urlsafe_b64decode(hash_.encode()).decode())
+        except UnicodeDecodeError:
+            username = None
+        if username:
+            try:
+                teacher = Teacher.objects.get(user__username=username)
+            except Teacher.DoesNotExist:
+                teacher = None
+        else:
             teacher = None
 
         output = teacher

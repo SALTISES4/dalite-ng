@@ -2,6 +2,15 @@
 
 {% load staticfiles compress i18n %}
 
+{% block stylesheets %}
+{% compress css %}
+<link href="{% static 'peerinst/css/search.min.css' %}" rel="stylesheet">
+{% endcompress %}
+{% compress js %}
+<script src="{% static 'peerinst/js/search.min.js' %}"></script>
+{% endcompress %}
+{% endblock %}
+
 {% block body %}
 <main>
   <section>
@@ -16,7 +25,7 @@
     <h2 id="assignment" class="mdc-typography--display1 mdc-theme--secondary">{{object.title}}</h2>
 
     <div class="mdc-form-field">
-      <span class="mdc-theme--secondary">Show images</span>
+      <span class="mdc-theme--secondary">{% trans 'Show images' %}</span>
       <i class="mdc-icon-toggle material-icons toggle-images mdc-theme--secondary" role="button" aria-pressed="false"
       aria-label="Toggle images" tabindex="0"
       data-toggle-on='{"label": "Hide images", "content": "check_box"}'
@@ -26,7 +35,7 @@
     </div>
 
     <div class="mdc-form-field">
-      <span class="mdc-theme--secondary">Show answers</span>
+      <span class="mdc-theme--secondary">{% trans 'Show answers' %}</span>
       <i class="mdc-icon-toggle material-icons toggle-answers mdc-theme--secondary" role="button" aria-pressed="false"
       aria-label="Toggle answers" tabindex="0"
       data-toggle-on='{"label": "Hide images", "content": "check_box"}'
@@ -37,16 +46,16 @@
 
     {% for g in object.blinkassignmentquestion_set.all %}
     <div class="mdc-card" id={{g.blinkquestion.question.id|slugify}}>
-      <div class="mdc-typography--title bold" style="margin-bottom:5px;">
+      <div class="mdc-typography--title bold">
         {{g.blinkquestion.question.title|safe}}
       </div>
 
-      <div class="mdc-typography--body1">
+      <div class="mdc-typography--body1" style="margin-top:5px;">
         {{g.blinkquestion.question.text|safe}}
       </div>
 
       {% if g.blinkquestion.question.image %}
-      <img class="question-image" src="{{ g.blinkquestion.question.image.url }}" alt="g.blinkquestion.question.image_alt_text" style="display:none;">
+      <img class="question-image" style="display:none;" src="{{ g.blinkquestion.question.image.url }}" alt="g.blinkquestion.question.image_alt_text">
       {% endif %}
 
       <div class="question-answers" style="display:none;">
@@ -109,89 +118,90 @@
     </ul>
     {% endfor %}
 
-
-    <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'All your blinks' %}</h2>
-
-    <div class="admin-link">
-      <a href="#assignment">{% trans 'Return to top' %}</a>
-    </div>
-
-    <div class="search">
-      <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
-        <label class="mdc-floating-label" for="filter-bar">{% trans 'Filter' %}</label>
-        <input class="mdc-text-field__input" id="filter-bar">
-        <div class="mdc-notched-outline">
-          <svg>
-            <path class="mdc-notched-outline__path"/>
-          </svg>
+    <div class="foldable">
+      <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">{% trans 'All my blinks' %}</h2>
+      <div class="foldable--body">
+        <div class="admin-link">
+          <a href="#assignment">{% trans 'Return to top' %}</a>
         </div>
-        <div class="mdc-notched-outline__idle"></div>
-      </div>
-      <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
-        The list will be filtered to retain entries with content that contains the above string.
-      </p>
-    </div>
-
-    {% for g in teacher.blinkquestion_set.all %}
-    {% if not g in object.blinkquestions.all %}
-
-    <div class="mdc-card searchable" id={{g.question.id|slugify}}>
-      <div class="mdc-typography--title bold" style="margin-bottom:5px;">
-        {{g.question.title|safe}}
-      </div>
-
-      <div class="mdc-typography--body1">
-        {{g.question.text|safe}}
-      </div>
-
-      {% if g.question.image %}
-      <img class="question-image" src="{{ g.question.image.url }}" alt="g.question.image_alt_text" style="display:none;">
-      {% endif %}
-
-      <div class="question-answers" style="display:none;">
-        <ul>
-        {% for label, choice in g.question.get_choices %}
-        <li class="mdc-typography--body1">{{ label }}. {{ choice|safe }}</li>
-        {% endfor %}
-        <ul>
-      </div>
-
-      <div class="mdc-card__actions">
-
-        <div class="mdc-card__action-buttons" style="color:grey;">
-          <div class="mdc-typography--caption">
-            <div>
-              {% trans 'Discipline' %}: {{g.question.discipline}}
+        <div class="search">
+          <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+            <label class="mdc-floating-label" for="filter-bar">{% trans 'Filter' %}</label>
+            <input class="mdc-text-field__input" id="filter-bar">
+            <div class="mdc-notched-outline">
+              <svg>
+                <path class="mdc-notched-outline__path"/>
+              </svg>
             </div>
-            <div>
-              {% trans 'Categories' %}:
-              {% for c in g.question.category.all %}
-              {{ c.title|safe }}{% if not forloop.last %}, {% endif %}
-              {% empty %}
-              {% trans 'Uncategorized' %}
-              {% endfor %}
+            <div class="mdc-notched-outline__idle"></div>
+          </div>
+          <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
+            {% trans 'The list will be filtered to retain entries with content that contains the above string.' %}'
+          </p>
+        </div>
+
+        {% for g in teacher.blinkquestion_set.all %}
+        {% if not g in object.blinkquestions.all %}
+
+        <div class="mdc-card searchable" id={{g.question.id|slugify}}>
+          <div class="mdc-typography--title bold">
+            {{g.question.title|safe}}
+          </div>
+
+          <div class="mdc-typography--body1" style="margin-top:5px;">
+            {{g.question.text|safe}}
+          </div>
+
+          {% if g.question.image %}
+          <img class="question-image" style="display:none;" src="{{ g.question.image.url }}" alt="g.question.image_alt_text">
+          {% endif %}
+
+          <div class="question-answers" style="display:none;">
+            <ul>
+            {% for label, choice in g.question.get_choices %}
+            <li class="mdc-typography--body1">{{ label }}. {{ choice|safe }}</li>
+            {% endfor %}
+            <ul>
+          </div>
+
+          <div class="mdc-card__actions">
+
+            <div class="mdc-card__action-buttons" style="color:grey;">
+              <div class="mdc-typography--caption">
+                <div>
+                  {% trans 'Discipline' %}: {{g.question.discipline}}
+                </div>
+                <div>
+                  {% trans 'Categories' %}:
+                  {% for c in g.question.category.all %}
+                  {{ c.title|safe }}{% if not forloop.last %}, {% endif %}
+                  {% empty %}
+                  {% trans 'Uncategorized' %}
+                  {% endfor %}
+                </div>
+                <div>
+                  {% trans 'Student answers' %}: {{g.question.answer_set.count}}
+                </div>
+              </div>
             </div>
-            <div>
-              {% trans 'Student answers' %}: {{g.question.answer_set.all.count}}
+
+            <div class="mdc-card__action-icons">
+              <form style="display:inline" method="post" action="#{{g.question.id|slugify}}">
+                {% csrf_token %}
+                <input type="hidden" name="blink" value="{{g.pk}}" />
+                <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit" value="add" />
+              </form>
             </div>
           </div>
         </div>
-
-        <div class="mdc-card__action-icons">
-          <form style="display:inline" method="post" action="#{{g.question.id|slugify}}">
-            {% csrf_token %}
-            <input type="hidden" name="blink" value="{{g.pk}}" />
-            <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit" value="add" />
-          </form>
-        </div>
+        {% endif %}
+        {% empty %}
+        <ul>
+          <li><strong>Note:</strong> {% blocktrans %}You currently have no blink questions.  You can add them from the list below.{% endblocktrans %}</li>
+        </ul>
+        {% endfor %}
       </div>
     </div>
-    {% endif %}
-    {% empty %}
-    <ul>
-      <li><strong>Note:</strong> {% blocktrans %}You currently have no blink questions.  You can add them from the list below.{% endblocktrans %}</li>
-    </ul>
-    {% endfor %}
 
     <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Search database' %}</h2>
 
@@ -235,6 +245,29 @@
       </p>
     </div>
 
+    <div id="progressbar" role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate mdc-linear-progress--closed">
+      <div class="mdc-linear-progress__buffering-dots"></div>
+      <div class="mdc-linear-progress__buffer"></div>
+      <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+        <span class="mdc-linear-progress__bar-inner"></span>
+      </div>
+      <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
+        <span class="mdc-linear-progress__bar-inner"></span>
+      </div>
+    </div>
+
+    <div id="filters" style="display:none;">
+      <h2 class='mdc-typography--display1  mdc-theme--secondary'>{% trans 'Filters' %}</h2>
+
+      <div id="select-filters">
+        <div id="discipline-filters" style="display:none;"><div style="margin-bottom:5px;">{% trans 'Disciplines: ' %}</div><span id="filter-on-discipline"></span></div>
+
+        <div id="category-filters" style="margin-top:10px;display:none;"><div style="margin-bottom:5px;">{% trans 'Keywords: ' %}</div><span id="filter-on-category"></span></div>
+
+        <button id="reset-filters" type="button" class='mdc-button mdc-button--raised padded-top' disabled=true onclick='search.reset()'>{% trans 'Clear' %}</button>
+      </div>
+    </div>
+
     <div id="search_results"></div>
 
   </section>
@@ -242,30 +275,41 @@
 {% endblock %}
 
 {% block scripts %}
+{% compress js inline %}
 <script>
 bundle.toggleImages();
 bundle.toggleAnswers();
 
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", bundle.getCookie('csrftoken'));
+        }
+    }
+});
+
 var limitSearch = document.querySelector('#limit-search');
 bundle.iconToggle.MDCIconToggle.attachTo(limitSearch);
-var search = document.getElementById('search-bar');
 
 var filterBar = document.getElementById('filter-bar');
 filterBar.oninput = function() {
   bundle.search('.searchable', filterBar);
 }
 
-function processResponse(text, status, obj) {
-  location.href = "#limit-search";
-  bundle.toggleImages();
-  bundle.toggleAnswers();
-  search.value = "";
-  search.focus();
+var input = document.getElementById('search-bar');
+input.onchange = function() {
+  if (input.value != "") {
+    search.setupSearch();
+    console.info("Searching: "+input.value);
+    $('#search_results').load("{% url 'question-search' %}", "search_string="+input.value+"&type=blink&id={{ object.id|urlencode }}&limit_search="+limitSearch.checked, search.processResponse);
+  }
 }
 
-search.onchange = function() {
-  console.info("Searching: "+search.value);
-  $('#search_results').load("{% url 'question-search' %}", "search_string="+search.value+"&type=blink&id={{ object.id|urlencode }}&limit_search="+limitSearch.checked, processResponse);
+function pageNav(page) {
+  search.setupSearch();
+  console.info("Searching: "+input.value);
+  $('#search_results').load("{% url 'question-search' %}?page="+page, "search_string="+input.value+"&type=blink&id={{ object.id|urlencode }}&limit_search="+limitSearch.checked, search.processResponse);
 }
 </script>
+{% endcompress %}
 {% endblock %}

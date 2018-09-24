@@ -32,7 +32,7 @@
     <h3 class="mdc-theme--secondary-bg">
       "{{search_results_term.term}}"
       <i class="icon ion-ios-arrow-forward"></i>
-      <span class="filter-count">{{ search_results_term.count }}</span>/<span class="filter-count-total">{{ search_results_term.count }} {% trans 'results' %}</span>
+      <span class="filter-count">{{ search_results_term.count }}</span>/<span class="filter-count-total">{{ search_results_term.count }}</span> {% trans 'results' %}
     </h3>
 
     {% for g in search_results_term.questions|dictsortreversed:"answer_count"  %}
@@ -117,7 +117,7 @@
           <form style="display:inline" method="post" action="#{{g.id|slugify}}">
             {% csrf_token %}
             <input type="hidden" name="{{form_field_name}}" value="{{g.pk}}" />
-            <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit" value="add" />
+            <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" style="margin-left:20px;" type="submit" value="add" />
           </form>
           {% endif %}
         </div>

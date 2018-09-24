@@ -49,7 +49,17 @@ def signup_through_link(request, group_hash):
     group = StudentGroup.get(group_hash)
 
     if group is None:
-        raise Http404()
+        resp = TemplateResponse(
+            request,
+            "404.html",
+            context={
+                "message": _(
+                    "The group couldn't be found. Bear in mind that the URL "
+                    "is case-sensitive."
+                )
+            },
+        )
+        return HttpResponseNotFound(resp.render())
     else:
         if request.method == "POST":
             form = EmailForm(request.POST)
