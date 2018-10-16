@@ -150,13 +150,13 @@ def get_lti_passwords(hashed_username):
 
     key = settings.PASSWORD_GENERATOR_NONCE
 
-    if hashed_username.endsWith("++"):
+    if hashed_username.endswith("++"):
         usernames = [
             base64.urlsafe_b64decode(hashed_username[:-2] + i + j).encode()
             for i in ("+", "=")
             for j in ("+", "=")
         ]
-    elif hashed_username.endsWith("+"):
+    elif hashed_username.endswith("+"):
         usernames = [
             base64.urlsafe_b64decode(hashed_username[:-1] + i).encode()
             for i in ("+", "=")
