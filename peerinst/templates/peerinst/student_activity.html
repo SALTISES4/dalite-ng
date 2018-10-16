@@ -1,0 +1,263 @@
+{% extends 'peerinst/base.html' %}
+
+{% load i18n %}
+
+{% block stylesheets %}
+<style>
+.progress-chart {
+  display: block;
+  margin: 60px auto;
+  margin-bottom: 100px;
+  overflow: visible;
+}
+.progress-chart .area {
+  fill: #004266;
+  opacity: 0.3;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<main>
+  <section>
+    <h1 class="mdc-typography--display3">{% trans 'Student Activity' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
+
+    <div class="admin-link">
+      <a href="{% url 'teacher' user.teacher.id %}">{% trans 'Back to My Account' %}</a>
+    </div>
+
+    {% for group, dataset in data.items %}
+      {% for assignment, answers in dataset.items %}
+        {% if answers.answers|length > 0 %}
+        <h3 class="mdc-typography--headline mdc-theme--secondary">
+          {{ group.title }}
+          <i class="material-icons" style="vertical-align:middle;">keyboard_arrow_right</i>
+          {% if assignment.assignment %}
+          <a href="{% url 'group-assignment' assignment.hash %}">{{ assignment.assignment }}</a>
+          {% else %}
+          {{ assignment }}
+          {% endif %}
+        </h3>
+
+        <ul style='font-size:9pt;'>
+          <li>Answers submitted: {{ answers.answers|length }}</li>
+          <li>New answers since last login: {{ answers.new|length }} </li>
+          <li>Percent complete: {{ answers.percent_complete }}%</li>
+        </ul>
+
+        <svg class="progress-chart" group="{{group.name}}" assignment="{% if assignment.assignment %}{{assignment.assignment}}{% else %}{{ assignment }}{% endif %}" width=600 height=70></svg>
+
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+let data = {{ json|safe }};
+
+function draw() {
+  $('.progress-chart').each(function() {
+    let dataset = data[$(this).attr('group')][$(this).attr('assignment')];
+    plotTimeSeries(this, dataset);
+  });
+}
+draw();
+window.addEventListener('resize', draw);
+
+function plotTimeSeries(el, d) {
+  svg = d3.select(el);
+
+  let width = 0.8*$('main').innerWidth();
+  svg.attr('width', width);
+  let height = +svg.attr('height');
+
+  svg.selectAll('g').remove();
+
+  let x = d3.scaleTime().domain([new Date(d3.timeParse(d.distribution_date)), new Date( d3.timeParse(d.due_date))]).range([0, width]);
+  let y = d3.scaleLinear().domain([0, d.total]).range([height, 0]);
+
+  let xAxis = d3.axisBottom(x);
+  let xAxisTop = d3.axisTop(x).ticks('');
+  let yAxis = d3.axisLeft(y);
+
+  let g = svg.append('g');
+
+  g.append('rect')
+  .attr('fill', 'white')
+  .attr('x', 0)
+  .attr('y', 0)
+  .attr('width', width)//.attr('width', x(new Date(d3.timeParse(d.now))))
+  .attr('height', height);
+
+  g.append('g').attr('transform', 'translate(0,'+height+')').call(xAxis);
+  g.append('g').call(xAxisTop);
+
+  var format = d3.timeFormat("%c");
+
+  var f = d3.line()
+  .x(function(d){return x(new Date(d3.timeParse(d)));})
+  .y(function(d,i) { return y(i+1); })
+  .curve(d3.curveStepAfter);
+
+  g.append('g')
+  .selectAll('path')
+  .data([d.answers])
+  .enter().append('path')
+  .attr('stroke', '#004266')
+  .attr('stroke-width', '2px')
+  .attr('stroke-linecap', 'round')
+  .attr('fill', 'none')
+  .attr('d', f);
+
+  g.append('rect')
+  .attr('stroke', 'black')
+  .attr('stroke-width', '1px')
+  .attr('fill', 'gray')
+  .style('opacity', 0.2)
+  .attr('x', function() { return x(new Date(d3.timeParse(d.last_login))); })
+  .attr('y', function() { return 0; })
+  .attr('width', function() { return x(new Date(d3.timeParse(d.now))) - x(new Date(d3.timeParse(d.last_login))); })
+  .attr('height', height);
+
+  g.append('path')
+  .attr('class', 'slider')
+  .attr('stroke', 'gray')
+  .attr('stroke-width', '0.5px')
+  .attr('d', function() {
+    let path = d3.path();
+    path.moveTo(0, height+30);
+    path.lineTo(0, -6);
+    return path;
+  });
+
+  g.append('text')
+  .attr('x', width)
+  .attr('dx', -5)
+  .attr('y', -25)
+  .attr('text-anchor', 'end')
+  .style('font-size', '10px')
+  .style('font-family', 'sans-serif')
+  .text(format(new Date(d3.timeParse(d.due_date))));
+
+  g.append('text')
+  .attr('x', 0)
+  .attr('dx', 5)
+  .attr('y', -25)
+  .attr('text-anchor', 'start')
+  .style('font-size', '10px')
+  .style('font-family', 'sans-serif')
+  .text(format(new Date(d3.timeParse(d.distribution_date))));
+
+  g.append('path')
+  .attr('class', 'limit')
+  .attr('stroke', 'gray')
+  .attr('stroke-dasharray', 4)
+  .attr('stroke-width', '0.5px')
+  .attr('d', function() {
+    let path = d3.path();
+    path.moveTo(0, height);
+    path.lineTo(0, -30);
+    return path;
+  });
+
+  g.append('path')
+  .attr('class', 'limit')
+  .attr('stroke', 'gray')
+  .attr('stroke-dasharray', 4)
+  .attr('stroke-width', '0.5px')
+  .attr('d', function() {
+    let path = d3.path();
+    path.moveTo(width, height);
+    path.lineTo(width, -30);
+    return path;
+  });
+
+  g.append('text')
+  .attr('class', 'slider-label-bottom')
+  .attr('x', 0)
+  .attr('dx', 5)
+  .attr('y', height+25)
+  .attr('dy', 5)
+  .attr('text-anchor', 'start')
+  .style('font-size', '10px')
+  .style('font-family', 'sans-serif')
+  .text();
+
+  g.append('text')
+  .attr('class', 'slider-label-top')
+  .attr('x', 0)
+  .attr('y', -6)
+  .attr('dy', -5)
+  .attr('text-anchor', 'middle')
+  .style('font-size', '10px')
+  .style('font-family', 'sans-serif')
+  .text();
+
+  let area = d3.area()
+  .x0(f.x())
+  .y0(height)
+  .x1(f.x())
+  .y1(f.y())
+  .curve(d3.curveStepAfter);
+
+  svg.on('mousemove', function() {
+
+      let xValue = Math.min(d3.mouse(this)[0],1+x(d3.max(d.answers.map(x => new Date(d3.timeParse(x))))));
+
+      g.select('.slider').attr('d', function() {
+        let path = d3.path();
+        path.moveTo(xValue, height+30);
+        path.lineTo(xValue, -6);
+        return path
+      })
+
+      g.select('.slider-label-bottom').attr('text-anchor', function() {
+        if (xValue < width/2) {
+          return 'start';
+        }
+        else {
+          return 'end';
+        }
+      })
+      .attr('dx', function() {
+        if (xValue < width/2) {
+          return 5;
+        }
+        else {
+          return -5;
+        }
+      })
+      .attr('x', xValue)
+      .text(format(x.invert(xValue)));
+
+      g.select('.slider-label-top')
+      .attr('x', xValue)
+      .text(parseInt(100*d3.bisectLeft(d.answers.map(x => new Date(d3.timeParse(x))),x.invert(xValue))/d.total)+"%");
+
+      let data = d.answers.map(x => new Date(d3.timeParse(x)));
+      let index = d3.bisectLeft(data, x.invert(xValue));
+
+      data = data.slice(0,index);
+
+      if (data.length < d.answers.length) {
+        data.push(x.invert(xValue));
+      }
+
+      g.select(".area").remove();
+      g.append("path")
+      .datum(data)
+      .attr("class", "area")
+      .attr("d", area);
+
+  })
+
+}
+</script>
+{% endblock %}

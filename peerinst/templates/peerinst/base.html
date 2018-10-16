@@ -17,6 +17,7 @@
   <meta name="referrer" content="origin">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="myDALITE">
+  <meta name="theme-color" content="#54c0db">
 
   <!-- Polyfills for non-awesome browsers-->
   <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default,fetch,Array.prototype.includes"></script>
@@ -73,6 +74,16 @@
 
                   <a class="mdc-list-item" href="{% url 'browse-database' %}">
                     <i class="material-icons mdc-list-item__graphic mdc-theme--primary" aria-hidden="true">search</i>{% trans 'Search database' %}
+                  </a>
+
+                  <a class="mdc-list-item" href="{% url 'student-activity' %}">
+                    <i class="material-icons mdc-list-item__graphic mdc-theme--primary" aria-hidden="true">
+                      {% if user.teacher.student_activity %}
+                        star
+                      {% else %}
+                        star_border
+                      {% endif %}
+                    </i>{% trans 'Student activity ' %}({{ user.teacher.student_activity }})
                   </a>
 
                   <a class="mdc-list-item" href="{% url 'question-create' %}">

@@ -285,14 +285,14 @@ input.onchange = function() {
   if (input.value != "") {
     search.setupSearch();
     console.info("Searching: "+input.value);
-    $('#search_results').load("{% url 'question-search' %}", "search_string="+input.value+"&type=assignment&id={{object.pk|urlencode}}&limit_search="+limitSearch.checked+"&assignment_identifier={{object.identifier}}", search.processResponse);
+    $('#search_results').load("{% url 'question-search' %}", "search_string="+input.value+"&type=assignment&id={{object.pk|urlencode}}&limit_search="+limitSearch.checked+"&assignment_identifier={{object.identifier|urlencode}}", search.processResponse);
   }
 }
 
 function pageNav(page) {
   search.setupSearch();
   console.info("Searching: "+input.value);
-  $('#search_results').load("{% url 'question-search' %}?page="+page, "search_string="+input.value+"&type=assignment&id={{object.pk|urlencode}}&limit_search="+limitSearch.checked+"&assignment_identifier={{object.identifier}}", search.processResponse);
+  $('#search_results').load("{% url 'question-search' %}?page="+page, "search_string="+input.value+"&type=assignment&id={{object.pk|urlencode}}&limit_search="+limitSearch.checked+"&assignment_identifier={{object.identifier|urlencode}}", search.processResponse);
 }
 
 function toggleFavourite(pk) {

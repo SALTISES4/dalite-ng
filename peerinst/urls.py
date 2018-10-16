@@ -243,6 +243,11 @@ def old_patterns():
             name="group-assignments",
         ),
         url(
+            r"^teacher/student_activity/$",
+            views.student_activity,
+            name="student-activity",
+        ),
+        url(
             r"^teacher/report/all_groups/(?P<assignment_id>[^/]+)/$",
             views.report,
             name="report-all-groups",

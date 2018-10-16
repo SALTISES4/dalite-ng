@@ -796,6 +796,27 @@ class Teacher(models.Model):
     def get_absolute_url(self):
         return reverse("teacher", kwargs={"pk": self.pk})
 
+    def student_activity(self):
+        last_login = self.user.last_login
+        current_groups = self.current_groups.all()
+
+        all_current_students = Student.objects.filter(
+            groups__in=current_groups
+        ).values("student__username")
+
+        all_assignments = StudentGroupAssignment.objects.filter(
+            group__in=current_groups
+        ).values("assignment")
+
+        activity = (
+            Answer.objects.filter(assignment__in=all_assignments)
+            .filter(user_token__in=all_current_students)
+            .filter(time__gt=last_login)
+            .count()
+        )
+
+        return activity
+
     @staticmethod
     def get(hash_):
         assert isinstance(hash_, basestring), "Precondition failed for `hash_`"
