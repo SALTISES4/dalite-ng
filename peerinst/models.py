@@ -571,8 +571,6 @@ class Student(models.Model):
 
         student = None
 
-        email = email.lower()
-
         username, password = get_student_username_and_password(email)
 
         try:
@@ -582,6 +580,7 @@ class Student(models.Model):
         except Student.DoesNotExist:
 
             try:
+                email = email.lower()
                 user = User.objects.create_user(
                     username=username, email=email, password=password
                 )
