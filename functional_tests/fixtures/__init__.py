@@ -18,6 +18,9 @@ __all__ = [
     "questions",
     "realistic_questions",
     "second_browser",
+    "third_browser",
+    "fourth_browser",
+    "fifth_browser",
     "student",
     "student_group_assignment",
     "student_new",
@@ -55,4 +58,11 @@ from .peerinst_ import (
 )
 from .quality_ import min_words_criterion, min_words_rules, quality_min_words
 from .reputation_ import student_reputation_with_criteria
-from .utils import assert_, browser, second_browser
+from .utils import (
+    assert_,
+    browser,
+    second_browser,
+    third_browser,
+    fourth_browser,
+    fifth_browser,
+)

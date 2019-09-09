@@ -135,3 +135,6 @@ def browser(live_server):
 
 
 second_browser = browser
+third_browser = browser
+fourth_browser = browser
+fifth_browser = browser

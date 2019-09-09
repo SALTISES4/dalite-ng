@@ -137,3 +137,115 @@ def test_blink_script(
         in second_browser.find_element_by_tag_name("h2").text
     )
     assert "My Account" in browser.find_element_by_tag_name("h1").text
+
+
+def test_blink_multiple_students(
+    browser,
+    second_browser,
+    third_browser,
+    fourth_browser,
+    fifth_browser,
+    assert_,
+    realistic_questions,
+    teacher,
+):
+    browser.set_window_rect(0, 0, 800, 1000)
+    second_browser.set_window_rect(900, 0, 800, 1000)
+
+    blink_url = "{}{}".format(
+        browser.server_url,
+        reverse("blink-waiting", args=(teacher.user.username,)),
+    )
+    second_browser.get(blink_url)
+    third_browser.get(blink_url)
+    fourth_browser.get(blink_url)
+    fifth_browser.get(blink_url)
+    accept_cookies(second_browser)
+    accept_cookies(third_browser)
+    accept_cookies(fourth_browser)
+    accept_cookies(fifth_browser)
+    assert (
+        "Waiting for teacher"
+        in second_browser.find_element_by_tag_name("h2").text
+    )
+    assert (
+        "Waiting for teacher"
+        in third_browser.find_element_by_tag_name("h2").text
+    )
+    assert (
+        "Waiting for teacher"
+        in fourth_browser.find_element_by_tag_name("h2").text
+    )
+    assert (
+        "Waiting for teacher"
+        in fifth_browser.find_element_by_tag_name("h2").text
+    )
+    login(browser, teacher)
+    accept_cookies(browser)
+    go_to_account(browser)
+    make_blink_script(browser, realistic_questions[:2])
+    start_blink_script(browser)
+    validate_teacher_page(browser, realistic_questions[0])
+    validate_student_page(second_browser, realistic_questions[0])
+    validate_student_page(third_browser, realistic_questions[0])
+    validate_student_page(fourth_browser, realistic_questions[0])
+    validate_student_page(fifth_browser, realistic_questions[0])
+
+    answer_blink(second_browser, realistic_questions[0], 0)
+    answer_blink(third_browser, realistic_questions[0], 0)
+    answer_blink(fourth_browser, realistic_questions[0], 0)
+    answer_blink(fifth_browser, realistic_questions[0], 0)
+    assert browser.find_element_by_id("round").text == "1"
+    assert browser.find_element_by_id("counter").text == "4"
+
+    browser.find_element_by_id("reset_button").click()
+    validate_teacher_page(browser, realistic_questions[0])
+    validate_student_page(second_browser, realistic_questions[0])
+    validate_student_page(third_browser, realistic_questions[0])
+    validate_student_page(fourth_browser, realistic_questions[0])
+    validate_student_page(fifth_browser, realistic_questions[0])
+
+    answer_blink(second_browser, realistic_questions[0], 1)
+    answer_blink(third_browser, realistic_questions[0], 1)
+    answer_blink(fourth_browser, realistic_questions[0], 1)
+    answer_blink(fifth_browser, realistic_questions[0], 1)
+    assert browser.find_element_by_id("round").text == "2"
+    assert browser.find_element_by_id("counter").text == "4"
+
+    browser.find_element_by_id("next_button").click()
+    validate_teacher_page(browser, realistic_questions[1])
+    validate_student_page(second_browser, realistic_questions[1])
+    validate_student_page(third_browser, realistic_questions[1])
+    validate_student_page(fourth_browser, realistic_questions[1])
+    validate_student_page(fifth_browser, realistic_questions[1])
+
+    answer_blink(second_browser, realistic_questions[1], 2)
+    answer_blink(third_browser, realistic_questions[1], 2)
+    answer_blink(fourth_browser, realistic_questions[1], 2)
+    answer_blink(fifth_browser, realistic_questions[1], 2)
+    assert browser.find_element_by_id("round").text == "1"
+    assert browser.find_element_by_id("counter").text == "4"
+
+    browser.find_element_by_id("next_button").click()
+    time.sleep(2)
+    assert (
+        "Waiting for teacher"
+        in second_browser.find_element_by_tag_name("h2").text
+    )
+    assert (
+        "Waiting for teacher"
+        in third_browser.find_element_by_tag_name("h2").text
+    )
+    assert (
+        "Waiting for teacher"
+        in fourth_browser.find_element_by_tag_name("h2").text
+    )
+    assert (
+        "Waiting for teacher"
+        in fifth_browser.find_element_by_tag_name("h2").text
+    )
+    assert "My Account" in browser.find_element_by_tag_name("h1").text
+
+
+def test_blink_late_student():
+    pass
