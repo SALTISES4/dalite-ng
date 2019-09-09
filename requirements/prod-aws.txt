@@ -4,3 +4,4 @@ django-storages-redux==1.3
 sentry-sdk==0.7.2
 boto==2.38.0
 gunicorn==19.4.5
+watchtower

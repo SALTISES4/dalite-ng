@@ -1,0 +1,47 @@
+@import "../variables";
+
+.review-voting-btns {
+  display: flex;
+  justify-content: space-around;
+  margin: auto;
+  width: 150px;
+
+  & .review-voting-btn {
+    align-items: center;
+    background: $mdc-theme-primary;
+    border-radius: 25px;
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    margin: 10px;
+    padding: 0;
+    position: relative;
+    user-select: none;
+    width: 50px;
+
+    & i.material-icons {
+      color: white;
+      font-size: 30px;
+      height: 50px;
+      left: 0;
+      line-height: 50px;
+      position: absolute;
+      text-align: center;
+      top: 0;
+      width: 50px;
+    }
+
+    & input {
+      border: none;
+      cursor: pointer;
+      height: 100%;
+      left: 0;
+      opacity: 0;
+      padding: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+      z-index: 1;
+    }
+  }
+}

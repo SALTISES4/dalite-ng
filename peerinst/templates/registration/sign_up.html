@@ -1,4 +1,4 @@
-{% extends 'peerinst/base.html' %}
+{% extends 'peerinst/_base.html' %}
 
 {% load add_class i18n %}
 
@@ -15,7 +15,7 @@
 
     <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Welcome!' %}</h2>
 
-    <p class="mdc-typography--body1">{% trans 'To create an teacher account, provide a unique username, an e-mail address, and a password.' %}</p>
+    <p class="mdc-typography--body1">{% trans 'To create an teacher account, provide a unique username, and your e-mail address.' %}</p>
     <br>
     <p class="mdc-typography--body1">{% trans 'Only teachers can request an account using this form.  Student accounts are created by teachers.' %}</p>
     <br>
@@ -46,10 +46,24 @@
         {% trans "By clicking on 'Register' you agree to the " %}<a href="{% url 'terms_teacher' %}">{% trans 'Terms of Service' %}</a>.
       </p>
       <div>
-        <input class="mdc-button mdc-button--raised padded-top" onclick="this.form.submit();if (this.form.reportValidity()){this.disabled=true;}" type="submit" value="{% trans 'Register' %}"/>
+        <input id="submit-btn" class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Register' %}"/>
       </div>
     </form>
     <br>
   </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
+  window.addEventListener("load", function() {
+    document.getElementById("submit-btn").addEventListener("click", function() {
+      this.form.submit();
+      if (this.form.reportValidity()) {
+        this.disabled=true;
+      }
+    })
+  })
+</script>
 {% endblock %}

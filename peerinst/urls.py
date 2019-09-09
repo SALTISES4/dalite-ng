@@ -68,9 +68,9 @@ def old_patterns():
             name="discipline-form",
         ),
         url(
-            r"^disciplines/create$",
-            views.DisciplinesCreateView.as_view(),
-            name="disciplines-create",
+            r"^disciplines/form/(?P<pk>[0-9]+)$",
+            views.disciplines_select_form,
+            name="disciplines-form",
         ),
         url(
             r"^disciplines/form$",
@@ -128,11 +128,6 @@ def old_patterns():
             name="question-search",
         ),
         url(r"^heartbeat/$", views.HeartBeatUrl.as_view(), name="heartbeat"),
-        url(
-            r"^collection/create$",
-            views.CollectionCreateView.as_view(),
-            name="collection-create",
-        ),
         # Standalone
         url(
             r"^live/access/(?P<token>[0-9A-Za-z=_-]+)/(?P<assignment_hash>[0-9A-Za-z=_-]+)$",  # noqa
@@ -315,7 +310,7 @@ def old_patterns():
             name="password_reset_done",
         ),
         url(
-            r"^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",  # noqa
+            r"^reset/(?P<uidb64>[0-9A-Za-z_\-=]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",  # noqa
             password_views.password_reset_confirm,
             name="password_reset_confirm",
         ),
@@ -427,6 +422,11 @@ def old_patterns():
 def group_patterns():
     return [
         url(
+            r"^group/student-information/$",
+            views.group.get_student_reputation,
+            name="group-details--student-information",
+        ),
+        url(
             r"^group/(?P<group_hash>[0-9A-Za-z=_-]+)/$",
             views.group_details_page,
             name="group-details",
@@ -460,17 +460,6 @@ def group_patterns():
             r"^group-assignment/(?P<assignment_hash>[0-9A-Za-z=_-]+)/student-progress/$",  # noqa
             views.get_assignment_student_progress,
             name="get-assignment-student-progress",
-        ),
-        url(
-            r"^group/(?P<group_hash>[0-9A-Za-z=_-]+)/csv_gradebook/$",
-            views.csv_gradebook,
-            name="group-csv-gradebook",
-        ),
-        url(
-            r"^group/(?P<group_hash>[0-9A-Za-z=_-]+)/csv_gradebook/"
-            "(?P<assignment_hash>[0-9A-Za-z=_-]+)/$",
-            views.csv_assignment_gradebook,
-            name="group-assignment-gradebook",
         ),
         url(
             r"^group-assignment/(?P<assignment_hash>[0-9A-Za-z=_-]+)/"
@@ -607,13 +596,194 @@ def researcher_patterns():
     ]
 
 
+def collection_patterns():
+    return [
+        url(
+            r"^collection/create/$",
+            views.CollectionCreateView.as_view(),
+            name="collection-create",
+        ),
+        url(
+            r"^collection/(?P<pk>[0-9]+)$",
+            views.CollectionDetailView.as_view(),
+            name="collection-detail",
+        ),
+        url(
+            r"^collection/update/(?P<pk>[0-9]+)$",
+            views.CollectionUpdateView.as_view(),
+            name="collection-update",
+        ),
+        url(
+            r"^collection/delete/(?P<pk>[0-9]+)$",
+            views.CollectionDeleteView.as_view(),
+            name="collection-delete",
+        ),
+        url(
+            r"^collection/list/$",
+            views.CollectionListView.as_view(),
+            name="collection-list",
+        ),
+        url(
+            r"^collection/personal/$",
+            views.PersonalCollectionListView.as_view(),
+            name="personal-collection-list",
+        ),
+        url(
+            r"^collection/followed/$",
+            views.FollowedCollectionListView.as_view(),
+            name="followed-collection-list",
+        ),
+        url(
+            r"^collection/featured/$",
+            views.FeaturedCollectionListView.as_view(),
+            name="featured-collection-list",
+        ),
+        url(
+            r"^collection/distribute/(?P<pk>[0-9]+)$",
+            views.CollectionDistributeDetailView.as_view(),
+            name="collection-distribute",
+        ),
+        url(
+            r"^collection/follower",
+            views.teacher_toggle_follower,
+            name="teacher-toggle-follower",
+        ),
+        url(
+            r"^collection/assignment",
+            views.collection_toggle_assignment,
+            name="collection-toggle-assignment",
+        ),
+        url(
+            r"^collection/add/assignment",
+            views.collection_add_assignment,
+            name="collection-add-assignment",
+        ),
+        url(
+            r"^collection/assign",
+            views.collection_assign,
+            name="collection-assign",
+        ),
+        url(
+            r"^collection/unassign",
+            views.collection_unassign,
+            name="collection-unassign",
+        ),
+        url(
+            r"^collection/collection-statistics",
+            views.collection_statistics,
+            name="collection-statistics",
+        ),
+        url(
+            r"^collection/featured-data/$",
+            views.featured_collections,
+            name="collection-featured-data",
+        ),
+    ]
+
+
+def teacher_patterns():
+    return [
+        url(
+            r"^teacher/dashboard/$",
+            views.teacher.dashboard,
+            name="teacher-dashboard",
+        ),
+        url(
+            r"^teacher/dashboard/new-questions/$",
+            views.teacher.new_questions,
+            name="teacher-dashboard--new-questions",
+        ),
+        url(
+            r"^teacher/dashboard/rationales/evaluate$",
+            views.teacher.evaluate_rationale,
+            name="teacher-dashboard--evaluate-rationale",
+        ),
+        url(
+            r"^teacher/dashboard/rationales/$",
+            views.teacher.rationales_to_score,
+            name="teacher-dashboard--rationales",
+        ),
+        url(
+            r"^teacher/dashboard/collections/$",
+            views.teacher.collections,
+            name="teacher-dashboard--collections",
+        ),
+        url(
+            r"^teacher/dashboard/messages/$",
+            views.teacher.messages,
+            name="teacher-dashboard--messages",
+        ),
+        url(
+            r"^teacher/dashboard/dalite-messages/$",
+            views.teacher.dalite_messages,
+            name="teacher-dashboard--dalite-messages",
+        ),
+        url(
+            r"^teacher/dashboard/dalite-messages/remove$",
+            views.teacher.remove_dalite_message,
+            name="teacher-dashboard--dalite-messages--remove",
+        ),
+        url(
+            r"^teacher/dashboard/messages/read$",
+            views.teacher.mark_message_read,
+            name="teacher-dashboard--messages--read",
+        ),
+        url(
+            r"^teacher/dashboard/unsubscribe-thread/$",
+            views.teacher.unsubscribe_from_thread,
+            name="teacher-dashboard--unsubscribe-thread",
+        ),
+        url(
+            r"^teacher/gradebook/request/$",
+            views.teacher.request_gradebook,
+            name="teacher-gradebook--request",
+        ),
+        url(
+            r"^teacher/gradebook/result/$",
+            views.teacher.get_gradebook_task_result,
+            name="teacher-gradebook--result",
+        ),
+        url(
+            r"^teacher/gradebook/remove/$",
+            views.teacher.remove_gradebook_task,
+            name="teacher-gradebook--remove",
+        ),
+        url(
+            r"^teacher/gradebook/download/$",
+            views.teacher.download_gradebook,
+            name="teacher-gradebook--download",
+        ),
+        url(
+            r"^teacher/tasks/$", views.teacher.get_tasks, name="teacher-tasks"
+        ),
+    ]
+
+
+def question_patterns():
+    return [
+        url(
+            r"^question/flag/reasons$",
+            views.question_.get_flag_question_reasons,
+            name="question--flag--reasons",
+        ),
+        url(
+            r"^question/flag/flag$",
+            views.question_.flag_question,
+            name="question--flag--flag",
+        ),
+    ]
+
+
 urlpatterns = sum(
     [
-        old_patterns(),
+        collection_patterns(),
         group_patterns(),
-        student_patterns(),
-        search_patterns(),
+        old_patterns(),
+        question_patterns(),
         researcher_patterns(),
+        search_patterns(),
+        student_patterns(),
+        teacher_patterns(),
     ],
     [],
 )

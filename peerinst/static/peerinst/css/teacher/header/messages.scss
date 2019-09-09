@@ -1,0 +1,194 @@
+@import "../../variables";
+
+.messages {
+  color: $mdc-theme-secondary;
+  font-size: 0.8rem;
+  position: relative;
+
+  & .messages__icon {
+    background: none;
+    border-radius: 20px;
+    cursor: pointer;
+    height: 42px;
+    position: relative;
+    transition: background 300ms, border-radius 300ms;
+    width: 42px;
+    z-index: 3;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.25);
+
+      & svg:hover {
+        background: none;
+      }
+    }
+
+    & svg {
+      fill: #ffffff;
+      height: 28px;
+      padding: 7px;
+      transition: fill 300ms;
+      width: 28px;
+    }
+
+    & .messages__icon__badge {
+      align-items: center;
+      background: #b30000;
+      border-radius: 50%;
+      color: #ffffff;
+      display: none;
+      font-size: 10pt;
+      justify-content: center;
+      min-height: 12pt;
+      min-width: 12pt;
+      padding: 2pt;
+      position: absolute;
+      right: -1px;
+      top: -1px;
+      z-index: 4;
+    }
+  }
+
+  & .messages__list {
+    align-items: center;
+    background: #ffffff;
+    border-radius: 10px 0 10px 10px;
+    max-height: 70vh;
+    min-width: 150px;
+    overflow-y: scroll;
+    padding: 20px 10px;
+    position: absolute;
+    right: 21px;
+    text-align: center;
+    top: 21px;
+    transform: scale(0);
+    transform-origin: top right;
+    transition: transform 300ms, top 300ms, right 300ms;
+    width: 360px;
+    z-index: 2;
+
+    & .messages__messages {
+      height: 100%;
+      overflow-y: auto;
+
+      & .message {
+        align-items: center;
+        border-bottom: 1px solid rgba($mdc-theme-primary, 0.25);
+        border-top: none;
+        cursor: pointer;
+        min-height: 30px;
+        opacity: 0;
+        padding: 8px 10px;
+        text-align: start;
+        user-select: none;
+
+        &:first-child {
+          border-top: 1px solid rgba($mdc-theme-primary, 0.25);
+        }
+
+        &.message--new {
+          background: rgba($mdc-theme-primary, 0.05);
+        }
+
+        & .message__new {
+          color: $mdc-theme-secondary;
+          font-size: 0.65rem;
+        }
+
+        & .message__title {
+          font-weight: bold;
+          overflow: hidden;
+          padding: 2px 0px;
+        }
+
+        & .message__mark-read {
+          cursor: pointer;
+          font-family: "Material icons", sans-serif;
+          font-size: 1rem;
+          padding-left: 8px;
+          vertical-align: text-bottom;
+        }
+
+        & .message__last-reply {
+          font-size: 0.75rem;
+          font-style: italic;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+
+          & .message__last-reply__author {
+            color: $hint;
+            font-size: 0.65rem;
+            font-style: normal;
+            padding-top: 2px;
+            text-align: right;
+          }
+        }
+      }
+    }
+
+    & .messages__read-all-btn {
+      align-self: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+      justify-self: center;
+      padding-top: 10px;
+      text-align: center;
+    }
+  }
+
+  &[open] {
+    & .messages__icon {
+      background: #ffffff;
+      border-radius: 20px 20px 0 0;
+
+      &:hover {
+        background: #ffffff;
+      }
+
+      & svg {
+        fill: $mdc-theme-primary;
+      }
+    }
+
+    & .messages__list {
+      box-shadow: 0 1px 1px #bdbdbd;
+      right: 0;
+      top: 42px;
+      transform: scale(1);
+      z-index: 3;
+
+      & .message {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .messages {
+    position: static;
+
+    & .messages__list {
+      height: calc(100vh - 50px);
+      left: 0;
+      max-height: 100vh;
+      padding: 20px 0px;
+      right: 0;
+      top: 50px;
+      transform: scaleY(0);
+      transform-origin: top center;
+      width: 100vw;
+    }
+
+    &[open] {
+      & .messages__list {
+        border-radius: 0;
+        left: 0;
+        right: 0;
+        top: 50px;
+        transform: scaleY(1);
+      }
+    }
+  }
+}

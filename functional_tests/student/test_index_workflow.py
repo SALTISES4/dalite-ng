@@ -13,15 +13,12 @@ from selenium.webdriver.support.expected_conditions import (
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from functional_tests.fixtures import *  # noqa
-from peerinst.students import (
-    create_student_token,
-    get_student_username_and_password,
-)
+
 
 timeout = 1
 
 
-def signin(browser, student):
+def signin(browser, student, mailoutbox):
     email = student.student.email
 
     browser.get("{}{}".format(browser.server_url, reverse("login")))
@@ -34,12 +31,13 @@ def signin(browser, student):
     input_.send_keys(email)
     input_.send_keys(Keys.ENTER)
 
-    username, _ = get_student_username_and_password(email)
-    token = create_student_token(username, email)
+    assert len(mailoutbox) == 1
+    assert list(mailoutbox[0].to) == [email]
 
-    signin_link = "{}{}?token={}".format(
-        browser.server_url, reverse("student-page"), token
-    )
+    m = re.search(
+        "http[s]*://.*/student/\?token=.*", mailoutbox[0].body
+    )  # noqa W605
+    signin_link = m.group(0)
 
     browser.get(signin_link)
 
@@ -52,7 +50,9 @@ def join_group_with_link(browser, group):
         reverse("signup-through-link", kwargs={"group_hash": group.hash}),
     )
 
-    add_group = browser.find_element_by_xpath("//span[text()='Add group']")
+    add_group = browser.find_element_by_xpath(
+        "//span[contains(string(), 'Add group')]"
+    )
     add_group.click()
 
     input_ = browser.find_element_by_name("new-group")
@@ -81,51 +81,39 @@ def leave_group(browser, group):
     )
     leaveBtn.click()
 
-    try:
-        leave = WebDriverWait(browser, timeout).until(
-            presence_of_element_located((By.XPATH, "//button[text()='Leave']"))
-        )
-    except TimeoutException:
-        assert False
-
+    leave = browser.find_element_by_xpath("//button[text()='Leave']")
     leave.click()
 
-    try:
-        WebDriverWait(browser, timeout).until(
-            invisibility_of_element_located(
-                (
-                    By.XPATH,
-                    "//div[@class='student-group--title']/"
-                    "h3[text()='{}']".format(group.title),
-                )
-            )
-        )
-    except TimeoutException:
-        assert False
+    # try:
+    #     WebDriverWait(browser, timeout).until(
+    #         invisibility_of_element_located(
+    #             (
+    #                 By.XPATH,
+    #                 "//div[@class='student-group--title']/"
+    #                 "h3[text()='{}']".format(group.title),
+    #             )
+    #         )
+    #     )
+    # except TimeoutException:
+    #     assert False
 
 
 def join_old_group(browser, group):
-    add_group = browser.find_element_by_xpath("//span[text()='Add group']")
+    add_group = browser.find_element_by_xpath(
+        "//span[contains(string(), 'Add group')]"
+    )
     add_group.click()
 
     select = Select(browser.find_element_by_id("student-old-groups"))
     select.select_by_visible_text(group.title)
 
-    join = browser.find_element_by_xpath("//button[text()='Join']")
+    join = browser.find_element_by_id("join-group-btn")
     join.click()
 
-    try:
-        WebDriverWait(browser, timeout).until(
-            presence_of_element_located(
-                (
-                    By.XPATH,
-                    "//div[@class='student-group--title']/"
-                    "h3[text()='{}']".format(group.title),
-                )
-            )
-        )
-    except TimeoutException:
-        assert False
+    browser.find_element_by_xpath(
+        "//div[@class='student-group--title']/"
+        "h3[text()='{}']".format(group.title)
+    )
 
 
 def toggle_notification(browser):
@@ -364,10 +352,10 @@ def change_student_id(browser):
 #  assert bubble.text == "Copied to clipboard!"
 
 
-def test_index_workflow(browser, student, group):
+def test_index_workflow(browser, student, group, mailoutbox):
     group.student_id_needed = True
     group.save()
-    signin(browser, student)
+    signin(browser, student, mailoutbox)
     join_group_with_link(browser, group)
     leave_group(browser, group)
     join_old_group(browser, group)

@@ -5,10 +5,16 @@ from django.core.signals import request_started
 from django.db.models.signals import post_delete, post_migrate, post_save
 from django.dispatch import receiver
 from django.utils import timezone
-
-from .models import LastLogout, StudentNotificationType, TeacherNotification
 from pinax.forums.models import ForumReply, ThreadSubscription
 from pinax.forums.views import thread_visited
+
+from .models import (
+    LastLogout,
+    MessageType,
+    StudentNotificationType,
+    TeacherNotification,
+    UserType,
+)
 
 
 @receiver(request_started)
@@ -35,7 +41,7 @@ def logger_signal(sender, environ, **kwargs):
 
 
 @receiver(post_migrate)
-def student_notification_type_init_signal(sender, **kwargs):
+def init_student_notification_types(sender, **kwargs):
     notifications = [
         {"type": "new_assignment", "icon": "assignment"},
         {"type": "assignment_about_to_expire", "icon": "assignment_late"},
@@ -102,10 +108,34 @@ def update_forum_notifications(sender, user, thread, **kwarsg):
 
 
 @receiver(user_logged_out)
-def last_logout(sender, request, user, **kwargs):
+def update_last_logout(sender, request, user, **kwargs):
     if user and user.is_authenticated():
         try:
             last_logout = LastLogout.objects.get(user=user)
             last_logout.save()
         except ObjectDoesNotExist:
             last_logout = LastLogout.objects.create(user=user)
+
+
+@receiver(post_migrate)
+def init_message_types(sender, **kwargs):
+    types = [
+        {"type": "new_user", "removable": True, "colour": "#6600ff"},
+        {
+            "type": "saltise_annoncement",
+            "removable": False,
+            "colour": "#eaf7fb",
+        },
+        {"type": "dalite_annoncement", "removable": True, "colour": "#54c0db"},
+    ]
+    for type_ in types:
+        if not MessageType.objects.filter(type=type_["type"]).exists():
+            MessageType.objects.create(**type_)
+
+
+@receiver(post_migrate)
+def init_user_types(sender, **kwargs):
+    types = [{"type": "teacher"}, {"type": "student"}]
+    for type_ in types:
+        if not UserType.objects.filter(type=type_["type"]).exists():
+            UserType.objects.create(**type_)

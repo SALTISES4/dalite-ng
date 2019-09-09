@@ -3,6 +3,7 @@
 {% load static compress i18n %}
 
 {% block stylesheets %}
+{{ block.super }}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 {% compress css %}
@@ -11,6 +12,7 @@
 {% endblock %}
 
 {% block scripts %}
+{{ block.super }}
 {% compress js %}
 <script src="{% static 'peerinst/js/group.min.js' %}"></script>
 {% endcompress %}

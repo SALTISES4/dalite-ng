@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-16 04:19+0000\n"
+"POT-Creation-Date: 2019-06-13 14:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,19 +22,19 @@ msgstr ""
 msgid "Dalite NG administration"
 msgstr "Administration Dalite NG"
 
-#: peerinst/admin.py:56
+#: peerinst/admin.py:57
 msgid "There must be at least two answer choices."
 msgstr "Il doit y avoir au moins deux choix de réponses."
 
-#: peerinst/admin.py:62
+#: peerinst/admin.py:63
 msgid "At least one of the answers must be marked as correct."
 msgstr "Au moins une réponse doit être marquée comme exacte."
 
-#: peerinst/admin.py:79
+#: peerinst/admin.py:80
 msgid "Associated answer"
 msgstr "Réponse connexe"
 
-#: peerinst/admin.py:82
+#: peerinst/admin.py:83
 #, fuzzy
 #| msgid ""
 #| "An example rationale that will be shown to students during the answer "
@@ -46,7 +46,7 @@ msgstr ""
 "Exemple d'explication qui sera présentée aux étudiants lors de la révision "
 "des réponses."
 
-#: peerinst/admin.py:86
+#: peerinst/admin.py:87
 #, fuzzy
 #| msgid ""
 #| "The number of the associated answer; 1 = first answer, 2 = second answer "
@@ -58,15 +58,15 @@ msgstr ""
 "Le nombre associé à la réponse connexe; 1 = première réponse, 2 = deuxième "
 "réponse, etc."
 
-#: peerinst/admin.py:95
+#: peerinst/admin.py:96
 msgid "example answer"
 msgstr "Exemple de réponse"
 
-#: peerinst/admin.py:96
+#: peerinst/admin.py:97
 msgid "example answers"
 msgstr "Exemples de réponse"
 
-#: peerinst/admin.py:104
+#: peerinst/admin.py:105
 #, fuzzy
 #| msgid ""
 #| "You can add example answers more comfortably by using the \"Preview\" "
@@ -81,11 +81,11 @@ msgstr ""
 "bouton \"Aperçu\" dans le coin supérieur droit. Le bouton apparaît après "
 "avoir sauvegardé la question pour la première fois."
 
-#: peerinst/admin.py:137
+#: peerinst/admin.py:144
 msgid "Question image or video"
 msgstr "Image ou vidéo associée à la question"
 
-#: peerinst/admin.py:212
+#: peerinst/admin.py:235
 msgid "Show selected answers to students"
 msgstr "Montrer les réponses choisies aux étudiants"
 
@@ -113,7 +113,7 @@ msgstr ""
 msgid "Count"
 msgstr "Décompte"
 
-#: peerinst/admin_views.py:293 peerinst/models/answer.py:35
+#: peerinst/admin_views.py:293 peerinst/models/answer.py:55
 #: peerinst/templates/peerinst/report_all_rationales.html:206
 msgid "Rationale"
 msgstr "Explication"
@@ -270,32 +270,32 @@ msgstr "toutes"
 msgid "Dalite Peer Instruction"
 msgstr "Instructions sur Dalite Peer"
 
-#: peerinst/forms.py:47 peerinst/forms.py:251
+#: peerinst/forms.py:46 peerinst/forms.py:250
 msgid "Choose one of these answers:"
 msgstr "Choisissez l'une de ces réponses :"
 
-#: peerinst/forms.py:50
+#: peerinst/forms.py:49
 #, fuzzy
 #| msgid "There must be at least two answer choices."
 msgid "Please make sure to select an answer choice."
 msgstr "Il doit y avoir au moins deux choix de réponses."
 
-#: peerinst/forms.py:142
+#: peerinst/forms.py:141
 msgid "Please select exactly one rationale."
 msgstr "Veuillez sélectionner une explication exactement."
 
-#: peerinst/forms.py:161
+#: peerinst/forms.py:160
 msgid "Please vote up or down."
 msgstr "Veuillez voter positivement ou négativement."
 
-#: peerinst/forms.py:201 peerinst/templates/admin/peerinst/index.html:32
+#: peerinst/forms.py:200 peerinst/templates/admin/peerinst/index.html:32
 #: peerinst/templates/peerinst/group/details.html:183
 #: peerinst/templates/peerinst/question/list.html:88
 #: peerinst/templates/peerinst/teacher/details.html:65
 msgid "Assignments"
 msgstr "Questionnaires"
 
-#: peerinst/forms.py:203
+#: peerinst/forms.py:202
 msgid ""
 "Optional. Select assignments to add this question. You can select multiple "
 "assignments. Assignments that this question is already a part of will not "
@@ -304,15 +304,26 @@ msgstr ""
 "Facultatif. Choisssez les questionnaires où vous vouliez  ajouter cette "
 "question."
 
-#: peerinst/forms.py:241
+#: peerinst/forms.py:240
 msgid "Set the time limit to be used for each question."
 msgstr ""
 
-#: peerinst/forms.py:309
+#: peerinst/forms.py:307 tos/templates/tos/email_modify.html:27
+#, fuzzy
+#| msgid "Email: "
+msgid "Email address"
+msgstr "Courriel :"
+
+#: peerinst/forms.py:308
+#: peerinst/templates/registration/sign_up_admin_email_html.html:14
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+#: peerinst/forms.py:311
 msgid "Website"
 msgstr "Site Web"
 
-#: peerinst/forms.py:313
+#: peerinst/forms.py:315
 msgid ""
 "Please provide an institutional url listing yourself as a faculty member and "
 "showing your e-mail address."
@@ -321,79 +332,79 @@ msgstr ""
 "sur la liste des membres du corps professoral et indiquant votre adresse de "
 "courriel."
 
-#: peerinst/forms.py:373
+#: peerinst/forms.py:367
 #, fuzzy
 #| msgid "Choose which groups you would like your report to include:"
 msgid "Choose which groups to include in report:"
 msgstr "Choisissez quels groupes vous souhaitez inclure dans votre rapport :"
 
-#: peerinst/forms.py:379
+#: peerinst/forms.py:373
 msgid "Choose which assignments to include in report:"
 msgstr ""
 "Choisissez quels questionnaires vous souhaitez inclure dans votre rapport :"
 
-#: peerinst/models/answer.py:17
+#: peerinst/models/answer.py:34
 msgid "Text"
 msgstr "Texte"
 
-#: peerinst/models/answer.py:18
+#: peerinst/models/answer.py:35
 msgid "Correct?"
 msgstr "Exact?"
 
-#: peerinst/models/answer.py:25
+#: peerinst/models/answer.py:42
 msgid "answer choice"
 msgstr "choix de réponse"
 
-#: peerinst/models/answer.py:26
+#: peerinst/models/answer.py:43
 msgid "answer choices"
 msgstr "choix de réponses"
 
-#: peerinst/models/answer.py:33 peerinst/models/answer.py:82
+#: peerinst/models/answer.py:53 peerinst/models/answer.py:102
 msgid "First answer choice"
 msgstr "Premier choix de réponse"
 
-#: peerinst/models/answer.py:37 peerinst/models/answer.py:88
+#: peerinst/models/answer.py:57 peerinst/models/answer.py:108
 msgid "Second answer choice"
 msgstr "Deuxième choix de réponse"
 
-#: peerinst/models/answer.py:50
+#: peerinst/models/answer.py:70
 msgid "Corresponds to the user's username."
 msgstr ""
 
-#: peerinst/models/answer.py:52
+#: peerinst/models/answer.py:72
 msgid "Show to others?"
 msgstr "Montrer aux autres?"
 
-#: peerinst/models/answer.py:54
+#: peerinst/models/answer.py:74
 msgid "Expert rationale?"
 msgstr "Explication d'expert?"
 
-#: peerinst/models/answer.py:56
+#: peerinst/models/answer.py:76
 msgid "Whether this answer is a pre-seeded expert rationale."
 msgstr ""
 "Si cette réponse constitue une explication d'expert fournie préalablement."
 
-#: peerinst/models/answer.py:93
+#: peerinst/models/answer.py:113
 msgid "{} for question {}"
 msgstr "{} à la question {}"
 
-#: peerinst/models/answer.py:217
+#: peerinst/models/answer.py:237
 msgid "Vote type"
 msgstr "Type de vote"
 
-#: peerinst/models/answer.py:289
+#: peerinst/models/answer.py:309
 msgid "0-Never Show"
 msgstr ""
 
-#: peerinst/models/answer.py:290
+#: peerinst/models/answer.py:310
 msgid "1-Not Convincing"
 msgstr ""
 
-#: peerinst/models/answer.py:291
+#: peerinst/models/answer.py:311
 msgid "2-Somewhat Convincing"
 msgstr ""
 
-#: peerinst/models/answer.py:292
+#: peerinst/models/answer.py:312
 msgid "3-Very Convincing"
 msgstr ""
 
@@ -457,6 +468,18 @@ msgstr "exercice clignotant"
 msgid "blink assignments"
 msgstr "exercices clignotants"
 
+#: peerinst/models/collection.py:23
+msgid "Thumbnail image"
+msgstr ""
+
+#: peerinst/models/collection.py:28
+#, fuzzy
+#| msgid "An image to include after the question text."
+msgid ""
+"Optional. An image to include in collection thumbnail. Accepted formats: ."
+"jpg, .jpeg, .png, .gif"
+msgstr "Image à ajouter après le texte de la question"
+
 #: peerinst/models/group.py:30
 msgid "group"
 msgstr "groupe"
@@ -481,46 +504,52 @@ msgstr "faux pays"
 msgid "fake countries"
 msgstr "faux pays"
 
-#: peerinst/models/question.py:23
+#: peerinst/models/question.py:25
 msgid "Hyphens may not be used in this field."
 msgstr "Vous ne pouvez pas utiliser de traits d'union dans ce champ."
 
-#: peerinst/models/question.py:28
+#: peerinst/models/question.py:30
 msgid "Category Name"
 msgstr "Nom de la catégorie"
 
-#: peerinst/models/question.py:31
+#: peerinst/models/question.py:33
 msgid "Name of a category questions can be sorted into."
 msgstr ""
 "Le nom de la catégorie dans laquelle les questions peuvent être triées."
 
-#: peerinst/models/question.py:39
+#: peerinst/models/question.py:41
 msgid "category"
 msgstr "catégorie"
 
-#: peerinst/models/question.py:40
+#: peerinst/models/question.py:42
 msgid "categories"
 msgstr "catégories"
 
-#: peerinst/models/question.py:45
+#: peerinst/models/question.py:47
 #, fuzzy
 #| msgid "Discipline Name"
 msgid "Discipline name"
 msgstr "Nom de la discipline"
 
-#: peerinst/models/question.py:48
+#: peerinst/models/question.py:50
 msgid "Name of a discipline."
 msgstr "Nom d'une discipline."
 
-#: peerinst/models/question.py:56
+#: peerinst/models/question.py:58
 msgid "discipline"
 msgstr "discipline"
 
-#: peerinst/models/question.py:57
+#: peerinst/models/question.py:59
 msgid "disciplines"
 msgstr "disciplines"
 
-#: peerinst/models/question.py:79
+#: peerinst/models/question.py:90
+#, fuzzy
+#| msgid "Create question"
+msgid "flagged question"
+msgstr "Créer une question"
+
+#: peerinst/models/question.py:127
 msgid ""
 "Use this ID to refer to the question in the LMS. Note: The question will "
 "have to have been saved at least once before an ID is available."
@@ -529,13 +558,13 @@ msgstr ""
 "La question devra être sauvegardée au moins une fois avant que l'identifiant "
 "ne soit disponible."
 
-#: peerinst/models/question.py:85
+#: peerinst/models/question.py:133
 #, fuzzy
 #| msgid "Question text"
 msgid "Question type"
 msgstr "Texte associé à la question"
 
-#: peerinst/models/question.py:90
+#: peerinst/models/question.py:138
 msgid ""
 "Choose 'peer instruction' for two-step multiple choice with rationale or "
 "'rationale only' for a simple text response."
@@ -543,31 +572,31 @@ msgstr ""
 "Choisissez 'peer instruction' pour les questions à deux étapes, ou "
 "'rationale only' pour les questions à development. "
 
-#: peerinst/models/question.py:95
+#: peerinst/models/question.py:143
 msgid "Question title"
 msgstr "Titre de la question"
 
-#: peerinst/models/question.py:98
+#: peerinst/models/question.py:146
 msgid "A title for the question."
 msgstr "Titre pour la question"
 
-#: peerinst/models/question.py:101
+#: peerinst/models/question.py:149
 msgid "Question text"
 msgstr "Texte associé à la question"
 
-#: peerinst/models/question.py:101
+#: peerinst/models/question.py:149
 msgid "Enter the question text."
 msgstr "Texte associé à la question"
 
-#: peerinst/models/question.py:119
+#: peerinst/models/question.py:167
 msgid "Optional. Other users that may also edit this question."
 msgstr ""
 
-#: peerinst/models/question.py:125
+#: peerinst/models/question.py:173
 msgid "Question image"
 msgstr "Image associée à la question"
 
-#: peerinst/models/question.py:130
+#: peerinst/models/question.py:178
 #, fuzzy
 #| msgid "An image to include after the question text."
 msgid ""
@@ -575,11 +604,11 @@ msgid ""
 "jpg, .jpeg, .png, .gif"
 msgstr "Image à ajouter après le texte de la question"
 
-#: peerinst/models/question.py:135
+#: peerinst/models/question.py:183
 msgid "Image Alt Text"
 msgstr "Texte alternatif pour l'image"
 
-#: peerinst/models/question.py:139
+#: peerinst/models/question.py:187
 #, fuzzy
 #| msgid ""
 #| "Alternative text for accessibility. For instance, the student may be "
@@ -591,11 +620,11 @@ msgstr ""
 "Texte alternatif pour des raisons d'accessibilité. Par exemple, l'étudiant "
 "pourrait utiliser un lecteur d'écran."
 
-#: peerinst/models/question.py:145
+#: peerinst/models/question.py:193
 msgid "Question video URL"
 msgstr "Adresse URL de la vidéo associée à la question"
 
-#: peerinst/models/question.py:148
+#: peerinst/models/question.py:196
 #, fuzzy
 #| msgid ""
 #| "A video to include after the question text. All videos should include "
@@ -607,11 +636,11 @@ msgstr ""
 "Vidéo à ajouter après le texte de la question. Toutes les vidéos doivent "
 "comprendre une transcription."
 
-#: peerinst/models/question.py:157
+#: peerinst/models/question.py:205
 msgid "Answer style"
 msgstr "Style de réponse"
 
-#: peerinst/models/question.py:161
+#: peerinst/models/question.py:209
 #, fuzzy
 #| msgid ""
 #| "Whether the answers are annotated with letters (A, B, Câ¦) or numbers (1, "
@@ -623,7 +652,7 @@ msgstr ""
 "Que les réponses soient annotées avec des lettres (A, B, Câ¦) ou des "
 "chiffres (1, 2, 3â¦)."
 
-#: peerinst/models/question.py:167
+#: peerinst/models/question.py:215
 #: peerinst/templates/peerinst/assignment_detail.html:88
 #: peerinst/templates/peerinst/assignment_detail.html:164
 #: peerinst/templates/peerinst/blinkassignment_detail.html:76
@@ -634,22 +663,22 @@ msgstr ""
 msgid "Categories"
 msgstr "Catégories"
 
-#: peerinst/models/question.py:169
+#: peerinst/models/question.py:217
 msgid ""
 "Select at least one category for this question. You can select multiple "
 "categories."
 msgstr ""
 
-#: peerinst/models/question.py:178
+#: peerinst/models/question.py:226
 msgid ""
 "Optional. Select the discipline to which this question should be associated."
 msgstr ""
 
-#: peerinst/models/question.py:183
+#: peerinst/models/question.py:231
 msgid "Add fake attributions"
 msgstr "Ajouter de fausses attributions"
 
-#: peerinst/models/question.py:186
+#: peerinst/models/question.py:234
 #, fuzzy
 #| msgid ""
 #| "Add random fake attributions consisting of username and country to "
@@ -664,11 +693,11 @@ msgstr ""
 "explications. Vous pouvez configurer les listes de fausses valeurs et de "
 "faux pays à partir de la page d'accueil de l'interface administrateur."
 
-#: peerinst/models/question.py:192
+#: peerinst/models/question.py:240
 msgid "Sequential rationale review"
 msgstr "Examen séquentiel des explications"
 
-#: peerinst/models/question.py:195
+#: peerinst/models/question.py:243
 msgid ""
 "Show rationales sequentially and allow to vote on them before the final "
 "review."
@@ -676,11 +705,11 @@ msgstr ""
 "Présente les explications de façon séquentielle et permet de voter sur "
 "celles-ci avant la révision finale."
 
-#: peerinst/models/question.py:200
+#: peerinst/models/question.py:248
 msgid "Rationale selection algorithm"
 msgstr "Algorithme de sélection des explications"
 
-#: peerinst/models/question.py:205
+#: peerinst/models/question.py:253
 msgid ""
 "The algorithm to use for choosing the rationales presented to students "
 "during question review.  This option is ignored if you selected sequential "
@@ -690,19 +719,19 @@ msgstr ""
 "lors de la révision des questions. Cette option est ignorée si vous avez "
 "sélectionné l'examen séquentiel."
 
-#: peerinst/models/question.py:211
+#: peerinst/models/question.py:259
 msgid "Standard"
 msgstr "Standard"
 
-#: peerinst/models/question.py:212
+#: peerinst/models/question.py:260
 msgid "Advanced"
 msgstr "Avancé"
 
-#: peerinst/models/question.py:215
+#: peerinst/models/question.py:263
 msgid "Grading scheme"
 msgstr "Schéma de notation"
 
-#: peerinst/models/question.py:219
+#: peerinst/models/question.py:267
 msgid ""
 "Grading scheme to use. The \"Standard\" scheme awards 1 point if the "
 "student's final answer is correct, and 0 points otherwise. The \"Advanced\" "
@@ -715,24 +744,24 @@ msgstr ""
 "s'il s'en tient ensuite à la bonne réponse ou s'il change sa réponse pour la "
 "bonne réponse."
 
-#: peerinst/models/question.py:267
+#: peerinst/models/question.py:316
 msgid "You can only specify one of the image and video URL fields."
 msgstr ""
 "Vous pouvez seulement préciser une adresse URL pour une seule image ou une "
 "seule vidéo."
 
-#: peerinst/models/question.py:272
+#: peerinst/models/question.py:321
 msgid ""
 "You must provide alternative text for accessibility if providing an image."
 msgstr ""
 "Vous devez fournir un texte alternatif, pour des raisons d'accessibilité, si "
 "vous fournissez une image."
 
-#: peerinst/models/question.py:399
+#: peerinst/models/question.py:489
 msgid "question"
 msgstr "question"
 
-#: peerinst/models/question.py:400
+#: peerinst/models/question.py:490
 #: peerinst/templates/peerinst/teacher/assignments.html:71
 #: peerinst/templates/peerinst/teacher/assignments.html:120
 #: peerinst/templates/peerinst/teacher/assignments.html:162
@@ -740,31 +769,25 @@ msgstr "question"
 msgid "questions"
 msgstr "questions"
 
-#: peerinst/models/question.py:405
+#: peerinst/models/question.py:495
 msgid "Reason for flagging a question"
 msgstr ""
 
-#: peerinst/models/question.py:408
+#: peerinst/models/question.py:498
 msgid "Reason for flagging a question."
 msgstr ""
 
-#: peerinst/models/question.py:416
+#: peerinst/models/question.py:506
 #, fuzzy
 #| msgid "Question categories"
 msgid "Question flag reason"
 msgstr "Catégories de questions"
 
-#: peerinst/models/question.py:434
-#, fuzzy
-#| msgid "Create question"
-msgid "flagged question"
-msgstr "Créer une question"
-
-#: peerinst/models/student.py:42
+#: peerinst/models/student.py:41
 msgid "student"
 msgstr "étudiant(e)"
 
-#: peerinst/models/student.py:43
+#: peerinst/models/student.py:42
 #: peerinst/templates/peerinst/report_all_rationales.html:144
 msgid "students"
 msgstr "étudiants"
@@ -781,15 +804,15 @@ msgstr "établissement"
 msgid "institutions"
 msgstr "établissements"
 
-#: peerinst/models/teacher.py:106
+#: peerinst/models/teacher.py:109
 msgid "teacher"
 msgstr "professeur(e)"
 
-#: peerinst/models/teacher.py:107
+#: peerinst/models/teacher.py:110
 msgid "teachers"
 msgstr "professeurs"
 
-#: peerinst/models/teacher.py:142
+#: peerinst/models/teacher.py:145
 #, fuzzy
 #| msgid ""
 #| "Teacher-only email domain, if available.  Email addresses with these "
@@ -1531,6 +1554,29 @@ msgstr ""
 "utilisant les filtres (matière et catégorie).\n"
 "     "
 
+#: peerinst/templates/peerinst/collection/collection_form.html:7
+#, fuzzy
+#| msgid "Back to My Assignments"
+msgid "New Collection of Assignments"
+msgstr "Revenir à Mes exercices"
+
+#: peerinst/templates/peerinst/collection/collection_form.html:17
+#, fuzzy
+#| msgid "Create a new assignment"
+msgid "Create a new Collection of Assignments"
+msgstr "Créer un nouvel exercice"
+
+#: peerinst/templates/peerinst/collection/collection_form.html:22
+msgid ""
+"\n"
+"            Please use this page to make a collection of assignments. Please "
+"provide what discipline this collection would be most pertinent for,\n"
+"            as well as a description which would help your colleagues "
+"understand how best to incorporate it into their pedagogy.\n"
+"            <br><br>\n"
+"            - The SALTISE/S4 Team"
+msgstr ""
+
 #: peerinst/templates/peerinst/cookie_help.html:5 templates/errors.html:8
 msgid "Error"
 msgstr "Erreur"
@@ -1689,19 +1735,19 @@ msgstr "Produire un rapport"
 msgid "Student list"
 msgstr "Lien pour l'étudiant(e)"
 
-#: peerinst/templates/peerinst/group/assignment.html:186
+#: peerinst/templates/peerinst/group/assignment.html:187
 #, fuzzy
 #| msgid "this assignment"
 msgid "Started assignment: "
 msgstr "cet exercice"
 
-#: peerinst/templates/peerinst/group/assignment.html:186
+#: peerinst/templates/peerinst/group/assignment.html:189
 #: tos/templates/tos/email_modify.html:100
 #: tos/templates/tos/email_modify.html:104
 msgid "Yes"
 msgstr ""
 
-#: peerinst/templates/peerinst/group/assignment.html:186
+#: peerinst/templates/peerinst/group/assignment.html:191
 #: tos/templates/tos/email_modify.html:101
 #: tos/templates/tos/email_modify.html:105
 #, fuzzy
@@ -1709,13 +1755,13 @@ msgstr ""
 msgid "No"
 msgstr "Non"
 
-#: peerinst/templates/peerinst/group/assignment.html:191
+#: peerinst/templates/peerinst/group/assignment.html:198
 #, fuzzy
 #| msgid "Student link"
 msgid "Resend link"
 msgstr "Lien pour l'étudiant(e)"
 
-#: peerinst/templates/peerinst/group/assignment.html:201
+#: peerinst/templates/peerinst/group/assignment.html:208
 #: peerinst/templates/peerinst/group/details.html:260
 msgid "No student has signed up yet"
 msgstr ""
@@ -2080,7 +2126,7 @@ msgid "No search results"
 msgstr "Aucun résultat"
 
 #: peerinst/templates/peerinst/question/search_results.html:17
-#: peerinst/templates/peerinst/question/search_results.html:156
+#: peerinst/templates/peerinst/question/search_results.html:157
 msgid "Page"
 msgstr ""
 
@@ -3166,7 +3212,7 @@ msgstr ""
 
 #: peerinst/templates/registration/account_activated_html.html:7
 msgid "Welcome to myDALITE"
-msgstr "Bienvenue dans myDALITE"
+msgstr "Bienvenue à myDALITE"
 
 #: peerinst/templates/registration/account_activated_html.html:9
 msgid "You're receiving this email because your account has been activated."
@@ -3193,7 +3239,7 @@ msgstr "Merci d'utiliser notre site!"
 #: peerinst/templates/registration/password_reset_email_html.html:21
 #: peerinst/templates/registration/sign_up_admin_email_html.html:25
 #, fuzzy, python-format
-#| msgid "The %(site_name)s team"
+#| msgid "The %(site_name) team"
 msgid "The %(site_name)s team"
 msgstr "L'équipe %(nom_site)"
 
@@ -3509,6 +3555,9 @@ msgid ""
 "Your username and password didn't match or your account has not yet been "
 "activated. Please try again."
 msgstr ""
+"Soit que le mot de passe ici ne concorde pas avec ce nom d'uilisateur, ou "
+"votre compte n'a pas encore été activé. S'il vous plaît, veuillez réessayer "
+"de nouveau."
 
 #: peerinst/templates/registration/login.html:44
 msgid ""
@@ -3577,12 +3626,7 @@ msgid ""
 msgstr ""
 
 #: peerinst/templates/registration/password_reset_email.html:5
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "You're receiving this email because you requested a password reset for "
-#| "your user account at %(site_name)s.\n"
-#| "\n"
+#, python-format
 msgid ""
 "\n"
 "\n"
@@ -3590,6 +3634,7 @@ msgid ""
 "user account at %(site_name)s.\n"
 "\n"
 msgstr ""
+"\n"
 "\n"
 "Vous recevez ce courriel parce que vous avez demandé de réinitialiser votre "
 "compte utilisateur au %(site_name)s.\n"
@@ -3645,25 +3690,31 @@ msgstr "Bienvenue!"
 
 #: peerinst/templates/registration/sign_up.html:18
 msgid ""
-"To create an teacher account, provide a unique username, an e-mail address, "
-"and a password."
+"To create an teacher account, provide a unique username, and your e-mail "
+"address."
 msgstr ""
+"Pour vous créer un compte avec priviléges réservées pour les professeurs "
+"veuillez entrer un non d'utilisateur unique, et votre addresse courriel. "
 
 #: peerinst/templates/registration/sign_up.html:20
 msgid ""
 "Only teachers can request an account using this form.  Student accounts are "
 "created by teachers."
 msgstr ""
+"Ce formulaire est seulement necessaire pour les professeurs. Les comptes "
+"étudiants seront créées par votre professeur. "
 
 #: peerinst/templates/registration/sign_up.html:22
 msgid ""
 "After the sign-up form is submitted, a site administrator will contact you "
 "to finalize the registration process."
 msgstr ""
+"Après que vous avez soumis, une administrateur vous contactera pour "
+"finaliser le processus d'inscription."
 
 #: peerinst/templates/registration/sign_up.html:46
 msgid "By clicking on 'Register' you agree to the "
-msgstr ""
+msgstr "En cliquant ici, vous acceptiez nos "
 
 #: peerinst/templates/registration/sign_up.html:46
 #: peerinst/templates/registration/terms.html:9
@@ -3688,10 +3739,6 @@ msgstr "Madame l'administratrice, Monsieur l'administrateur"
 msgid "A new user was created on "
 msgstr "Un nouveau compte utilisateur a été créé le "
 
-#: peerinst/templates/registration/sign_up_admin_email_html.html:14
-msgid "Username"
-msgstr "Nom d'utilisateur"
-
 #: peerinst/templates/registration/sign_up_admin_email_html.html:16
 msgid "Verification url"
 msgstr "URL de vérification"
@@ -3708,15 +3755,19 @@ msgstr "Hourra!"
 
 #: peerinst/templates/registration/sign_up_done.html:8
 msgid "Processing Request"
-msgstr ""
+msgstr "Votre demande à été reçu."
 
 #: peerinst/templates/registration/sign_up_done.html:13
 #: peerinst/templates/registration/sign_up_student_confirmation.html:13
 #: peerinst/templates/registration/sign_up_student_done.html:13
-#, fuzzy
-#| msgid "Welcome to myDALITE"
 msgid "About myDALITE"
 msgstr "Bienvenue dans myDALITE"
+
+#: peerinst/templates/registration/sign_up_done.html:16
+msgid ""
+"A member of our team will contact you once your account has been created."
+msgstr ""
+"Vous recevrez un courriel de notre équipe quand votre compte aura été activé."
 
 #: peerinst/templates/registration/sign_up_student.html:14
 msgid "To subscribe to this group, enter your e-mail address below."
@@ -3750,6 +3801,19 @@ msgstr ""
 msgid ""
 "To validate this request, click the link in the confirmation email sent to: "
 msgstr ""
+
+#: peerinst/templates/registration/verification_email.html:10
+msgid ""
+"\n"
+"  Your account has been recently activated. Please visit the following link "
+"to\n"
+"  set you password:\n"
+"  "
+msgstr ""
+"\n"
+" Votre compte vient d'être activé. S'il vous plaît veuillez cliquez sur le  "
+"lien ci-dessous pour configurer votre mot de passe: \n"
+"  "
 
 #: peerinst/views/assignment.py:28 peerinst/views/group.py:40
 #: peerinst/views/group.py:211 peerinst/views/student.py:72
@@ -3988,23 +4052,49 @@ msgstr ""
 msgid "The wanted group doesn't seem to exist."
 msgstr ""
 
-#: peerinst/views/views.py:215
-msgid "Your myDALITE account has been activated"
-msgstr "Votre compte myDALITE a été activé."
+#: peerinst/views/views.py:233
+msgid "Please verify your myDalite account"
+msgstr ""
 
-#: peerinst/views/views.py:367
+#: peerinst/views/views.py:234
+msgid "Dear "
+msgstr "Cher(e) "
+
+#: peerinst/views/views.py:236
+msgid ""
+"\n"
+"\n"
+"Your account has been recently activated. Please visit the following link to "
+"set you password:\n"
+"\n"
+msgstr ""
+"\n"
+"\n"
+"Votre compte vient d'être activé. S'il vous plaît veuillez cliquez sur le  "
+"lien ci-dessous pour configurer votre mot de passe: \n"
+"\n"
+
+#: peerinst/views/views.py:239
+msgid ""
+"\n"
+"\n"
+"Cheers,\n"
+"The myDalite Team"
+msgstr ""
+
+#: peerinst/views/views.py:387
 msgid "Copy of "
 msgstr ""
 
-#: peerinst/views/views.py:1078
+#: peerinst/views/views.py:1098
 msgid "There was a problem with your submission"
 msgstr "Un problème est survenu avec votre demande."
 
-#: peerinst/views/views.py:1079
+#: peerinst/views/views.py:1099
 msgid "Check the form below."
 msgstr "Veuillez vérifier le formulaire ci-dessous."
 
-#: peerinst/views/views.py:1347
+#: peerinst/views/views.py:1367
 #, fuzzy
 #| msgid ""
 #| "The rationale you chose does not exist anymore.  This should not happen.  "
@@ -4016,7 +4106,7 @@ msgstr ""
 "L'explication que vous avez choisie n'existe plus. Ceci ne devrait pas se "
 "produire. Veuillez recommencer la question."
 
-#: peerinst/views/views.py:1358
+#: peerinst/views/views.py:1378
 msgid ""
 "The rationale you chose does not match your second answer choice.  This "
 "should not happen.  Please start over with the question."
@@ -4025,13 +4115,13 @@ msgstr ""
 "choix de réponse. Ceci ne devrait pas se produire. Veuillez recommencer la "
 "question."
 
-#: peerinst/views/views.py:2674
+#: peerinst/views/views.py:2693
 msgid ""
 "You must be logged in as a teacher to search the database. Log in again with "
 "a teacher account."
 msgstr ""
 
-#: peerinst/views/views.py:2776
+#: peerinst/views/views.py:2798
 msgid "An error occurred.  Retry search after logging in again."
 msgstr ""
 
@@ -4282,7 +4372,6 @@ msgid "Edit Post"
 msgstr "Modifier la question"
 
 #: templates/pinax/forums/forumthread_form.html:43
-#: templates/pinax/forums/post_create.html:43
 msgid "Upload a pdf (max 1MB)"
 msgstr ""
 
@@ -4303,6 +4392,10 @@ msgstr ""
 #| msgid "Create a new assignment"
 msgid "Create a New Post"
 msgstr "Créer un nouvel exercice"
+
+#: templates/pinax/forums/post_create.html:43
+msgid "Upload a pdf (max 2 MB)"
+msgstr ""
 
 #: templates/pinax/forums/thread.html:10
 #, fuzzy
@@ -4349,12 +4442,6 @@ msgstr "Instructions sur Dalite Peer"
 #: tos/templates/tos/email_modify.html:17
 msgid "Email Settings"
 msgstr ""
-
-#: tos/templates/tos/email_modify.html:27
-#, fuzzy
-#| msgid "Email: "
-msgid "Email address"
-msgstr "Courriel :"
 
 #: tos/templates/tos/email_modify.html:33
 msgid ""
@@ -4477,11 +4564,11 @@ msgid ""
 "        "
 msgstr ""
 
-#: tos/views/email.py:103 tos/views/tos.py:72 tos/views/tos.py:118
+#: tos/views/email.py:102 tos/views/tos.py:72 tos/views/tos.py:118
 msgid "The user \"{}\" doesn't exist."
 msgstr ""
 
-#: tos/views/email.py:120
+#: tos/views/email.py:119
 msgid "The role {} doesn't seem to exist."
 msgstr ""
 
@@ -4496,6 +4583,9 @@ msgstr ""
 #: tos/views/tos.py:133
 msgid "There is no terms of service yet."
 msgstr ""
+
+#~ msgid "Your myDALITE account has been activated"
+#~ msgstr "Votre compte myDALITE a été activé."
 
 #, fuzzy
 #~| msgid "Questions"

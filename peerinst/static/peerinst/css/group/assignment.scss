@@ -91,4 +91,10 @@
     margin: 0 auto 0 auto;
     width: 35px;
   }
+
+  & .student-progress__time_taken {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }

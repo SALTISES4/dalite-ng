@@ -1,0 +1,370 @@
+{% extends 'peerinst/base.html' %}
+
+{% load compress bleach_html staticfiles add_class i18n %}
+
+{% block stylesheets %}
+{{ block.super }}
+{% compress css %}
+<link href="{% static 'peerinst/css/collection.min.css' %}" rel="stylesheet">
+{% endcompress %}
+{% endblock %}
+
+{% block body %}
+<main>
+  <section>
+    <h1 class="mdc-typography--display3">{% trans 'Collections' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
+    <div>
+      <div class="admin-link">
+        {% if user.is_staff %}
+        <a href="{% url 'admin_index_wrapper' %}">Click here to access admin</a>
+        <span class="links-divider">|</span>{% endif %}<a href="{% url 'teacher' request.user.teacher.pk %}">{% trans 'Back to My Account' %}</a>
+        <span class="links-divider">|</span><a href="{% url 'collection-detail' object.pk %}">{% trans 'Back to Collection' %}</a>
+      </div>
+    </div>
+    <div>
+    <h2 class="mdc-typography--display1 mdc-theme--secondary">
+      {% trans 'Edit Your Collection' %}
+    </h2>
+    <div class='field-container'>
+      <div class='number-box'><span class='number'>?</span></div>
+      <div class='field'>
+        <p><small>
+          {% blocktrans %}
+          Please use this page to edit your collection of assignments. Please
+          provide what discipline this collection would be most pertinent for,
+          as well as a description which would help your colleagues understand
+          how best to incorporate it into their pedagogy.
+          {% endblocktrans %}
+        </small></p>
+      </div>
+    </div>
+    <form id="collection-update-form" enctype="multipart/form-data" method="post">
+      {% csrf_token %}
+      <div class='field-container'>
+        <div class='number-box flush-to-textbox'><span class='number'></span></div>
+        <div class='field'>
+          <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense"
+               data-mdc-auto-init="MDCTextField">
+            {{ form.title|add_class:"mdc-text-field__input" }}
+            {{ form.title.label_tag|add_class:"mdc-floating-label"|cut:":" }}
+            <div class="mdc-notched-outline">
+              <svg>
+                <path class="mdc-notched-outline__path"/>
+              </svg>
+            </div>
+            <div class="mdc-notched-outline__idle"></div>
+          </div>
+          <p class="form-helper-text" aria-hidden="true">
+            {% blocktrans %}
+            Provide a helpful description referencing the content and the
+            indended use of this collection.
+            {% endblocktrans %}
+          </p>
+          {{ form.title.errors }}
+        </div>
+      </div>
+      <div class='field-container'>
+        <div class='number-box flush-to-textbox'><span class='number'></span></div>
+        <div class="field">
+          <div class="mdc-text-field mdc-text-field--textarea mdc-text-field--dense"
+               data-mdc-auto-init="MDCTextField">
+            {{ form.description|add_class:"mdc-text-field__input" }}
+            {{ form.description.label_tag|add_class:"mdc-floating-label"|cut:":" }}
+          </div>
+          <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent"
+             aria-hidden="true">
+            {% trans 'Enter the description text.'  %}
+          </p>
+        </div>
+      </div>
+      <div class='field-container'>
+        <div class='number-box'><span class='number'></span></div>
+        <div class='field'>
+          <div id='discipline_form'>
+            <div class='mdc-form-field'>
+              <label for='id_discipline'>{{ form.discipline.label }}:</label>
+              <div class='mdc-select'>
+                {{ form.discipline|add_class:"mdc-select__native-control" }}
+                <div class="mdc-select__bottom-line"></div>
+              </div>
+            </div>
+          </div>
+          <p class="form-helper-text" aria-hidden="true">
+            {{ form.discipline.help_text|safe }}
+          </p>
+            {{ form.discipline.errors }}
+        </div>
+      </div>
+      <div class='field-container'>
+        <div class='number-box'><span class='number'></span></div>
+        <div class='field'>
+          <div class='mdc-form-field'>
+            <label for='id_image'>{{ form.image.label }}</label>
+          </div>
+          <div class='image-field'>
+            {{form.image}}
+          </div>
+          <p class="form-helper-text" aria-hidden="true">
+            {{ form.image.help_text|safe }}
+          </p>
+          {{ form.image.errors }}
+        </div>
+      </div>
+      <div class='field-container'>
+        <div class='number-box'><span class='number'></span></div>
+        <div class='field'>
+          <div class='mdc-form-field'>
+            <label for="private">{{ form.private.label }}</label>
+            <div class="mdc-checkbox">
+              {{ form.private|add_class:'mdc-checkbox__native-control'}}
+              <div class="mdc-checkbox__background">
+                <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                  <path class="mdc-checkbox__checkmark-path"
+                    fill="none"
+                    stroke="white"
+                    d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                </svg>
+                <div class="mdc-checkbox__mixedmark"></div>
+              </div>
+            </div>
+          </div>
+          <p class="form-helper-text" aria-hidden="true">
+            {% trans 'A private collection will be hidden from other teachers.' %}
+          </p>
+            {{ form.private.errors }}
+        </div>
+      </div>
+      <input class="mdc-button mdc-button--raised padded-top"
+             type="submit"
+             value="Update"
+             id="id_update"/>
+      <div>
+        <h2 class="mdc-typography--display1 mdc-theme--secondary">
+          {% trans 'Assignments in' %} {{ object.title|bleach_html|safe }}
+          <p class="form-helper-text" aria-hidden="true">
+            {% blocktrans %}
+            Select assignments that you wish to add or remove from this collection.
+            {% endblocktrans %}
+          </p>
+        </h2>
+        <p>
+          {% blocktrans %}
+          These are the assignments in this collection.
+          {% endblocktrans %}
+        </p>
+        {% if not teacher.assignments.all %}
+        <p>
+          {% blocktrans %}
+          This collection does not have any assignments.
+          {% endblocktrans %}
+        </p>
+        {% endif %}
+        <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
+          {% for b in collection_assignments %}
+          <li role="separator" class="mdc-list-divider"></li>
+          <li class="mdc-list-item">
+            <span class="mdc-list-item__graphic mdc-theme--primary">
+                <a class="translate-4" href="{% url 'question-list' b.pk %}">
+                  <i class="mdc-theme--primary material-icons md-48">assignment</i>
+                </a>
+            </span>
+            <span class="mdc-list-item__text mdc-theme--secondary bold">
+              {{ b.identifier|bleach_html|safe }}
+              <span class="mdc-list-item__secondary-text">
+                {{ b.questions.count }} {% trans "questions" %}
+              </span>
+            </span>
+            <span class="mdc-list-item__meta">
+              <i class="mdc-icon-toggle material-icons mdc-theme--primary follower-btn"
+                  role="button"
+                  aria-pressed="false"
+                  aria-label="Add to favorites" tabindex="0"
+                  {% if b in object.assignments.all %}
+                  data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
+                  data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+                  {% else %}
+                  data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
+                  data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
+                  {% endif %}
+                  pk="{{ b.pk|safe }}"
+                  ppk="{{ object.pk|safe }}">
+                  favorite_border
+              </i>
+            </span>
+          </li>
+          {% endfor %}
+          <li role="separator" class="mdc-list-divider"></li>
+        </ul>
+        <div class="foldable">
+      <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
+        {% trans 'Your Assignments' %}
+      </h2>
+      <div class="foldable--body">
+      <p>
+        {% blocktrans %}
+        These are the assignments for which you are an author, and have editing rights.
+        {% endblocktrans %}
+      </p>
+      {% if not owned_assignments %}
+      <p>
+        {% blocktrans %}
+        You currently do not have editing rights on any assignments.
+        {% endblocktrans %}
+      </p>
+      {% endif %}
+      <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
+        {% for a in owned_assignments %}
+        <li role="separator" class="mdc-list-divider"></li>
+          <li class="mdc-list-item">
+            <span class="mdc-list-item__graphic mdc-theme--primary">
+              <a class="translate-4" href="{% url 'question-list' a.pk %}">
+                <i class="mdc-theme--primary material-icons md-48">assignment</i>
+              </a>
+            </span>
+            <span class="mdc-list-item__text mdc-theme--secondary bold">
+              {{ a.identifier|bleach_html|safe }}
+              <span class="mdc-list-item__secondary-text">
+                {{ a.questions.count }} {% trans "questions" %}
+              </span>
+            </span>
+            <span class="mdc-list-item__meta">
+              <i class="mdc-icon-toggle material-icons mdc-theme--primary follower-btn"
+                  role="button"
+                  aria-pressed="false"
+                  aria-label="Add to favorites" tabindex="0"
+                  {% if a in object.assignments.all %}
+                  data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
+                  data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+                  {% else %}
+                  data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
+                  data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
+                  {% endif %}
+                  pk="{{ a.pk|safe }}"
+                  ppk="{{ object.pk|safe }}">
+                  favorite_border
+              </i>
+            </span>
+          </li>
+          {% endfor %}
+          <li role="separator" class="mdc-list-divider"></li>
+        </ul>
+        </div>
+        </div>
+        <div class="foldable">
+      <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
+        {% trans 'Followed Assignments' %}
+      </h2>
+      <div class="foldable--body">
+      <p>
+        {% blocktrans %}
+        These are the assignments you are following.
+        {% endblocktrans %}
+      </p>
+      {% if not teacher.assignments.all %}
+      <p>
+        {% blocktrans %}
+        You do not have any followed assignments.
+        {% endblocktrans %}
+      </p>
+      {% endif %}
+      <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
+        {% for g in followed_assignments %}
+        <li role="separator" class="mdc-list-divider"></li>
+        <li class="mdc-list-item">
+          <span class="mdc-list-item__graphic mdc-theme--primary">
+              <a class="translate-4" href="{% url 'question-list' g.pk %}">
+                <i class="mdc-theme--primary material-icons md-48">assignment</i>
+              </a>
+          </span>
+          <span class="mdc-list-item__text mdc-theme--secondary bold">
+            {{ g.identifier|bleach_html|safe }}
+            <span class="mdc-list-item__secondary-text">
+              {{ g.questions.count }} {% trans "questions" %}
+            </span>
+          </span>
+          <span class="mdc-list-item__meta">
+            <i class="mdc-icon-toggle material-icons mdc-theme--primary follower-btn"
+                role="button"
+                aria-pressed="false"
+                aria-label="Add to favorites" tabindex="0"
+                {% if g in object.assignments.all %}
+                data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
+                data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+                {% else %}
+                data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
+                data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
+                {% endif %}
+                pk="{{ g.pk|safe }}"
+                ppk="{{ object.pk|safe }}">
+                favorite_border
+            </i>
+          </span>
+        </li>
+        {% endfor %}
+        <li role="separator" class="mdc-list-divider"></li>
+      </ul>
+    </div>
+    </div>
+    </div>
+    <input type="hidden" name="owner" value="">
+  </form>
+  </div>
+</section>
+</main>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script nonce="{{ request.csp_nonce }}">
+
+    [].forEach.call(document.querySelectorAll(".mdc-icon-toggle"), el => {
+      bundle.iconToggle.MDCIconToggle.attachTo(el);
+    });
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+            }
+        }
+    });
+
+
+    function toggleAssignment(pk, ppk) {
+      var posting = $.post("{% url 'collection-toggle-assignment' %}", {pk: pk, ppk: ppk});
+      posting.done(function(data) {
+        console.info(data);
+      })
+    }
+
+
+    [].forEach.call(document.querySelectorAll(".follower-btn"), el => {
+      el.addEventListener("click", () => {
+        toggleAssignment(el.getAttribute('pk'), el.getAttribute('ppk'));
+      });
+    });
+
+  function enumerate(){
+    var counter = 1;
+    $('.number-box:visible').each(function() {
+      var el = $(this).children('.number')[0];
+      if (el.innerHTML == "") {
+        el.innerHTML = counter;
+        counter++;
+      }
+      return;
+    });
+  }
+  enumerate();
+  function takeTempOut(){
+    if(document.getElementById("id_title").value == "temporary text" && document.getElementById("id_description").value == "temporary text"){
+      document.getElementById("id_title").value = "";
+      document.getElementById("id_description").value = "";
+    }
+  }
+  takeTempOut();
+</script>
+{% endblock %}

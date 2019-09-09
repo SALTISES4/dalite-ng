@@ -3,10 +3,11 @@
 {% load compress staticfiles add_class i18n %}
 
 {% block stylesheets %}
+{{ block.super }}
 <!-- Self-hosted tinyMCE -->
 <script src="{% static 'peerinst/js/tinymce/js/tinymce/tinymce.min.js' %}"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<style>
+<style nonce="{{ request.csp_nonce }}">
 .spinning {
   opacity: 0;
   vertical-align: sub;
@@ -80,15 +81,15 @@
           </div>
 
           <div class='field-container'>
-            <div class='number-box flush-to-textbox'><span class='number'></span></div>
+            <div class='number-box'><span class='number'></span></div>
             <div class='field'>
-              <div class='mdc-form-field' style="display:block; padding-top:15px; margin-bottom:10px;">
-                <label for="id_text"> {{ form.text.label }}</label>
+              <div class='mdc-form-field id-text-field'>
+                <label for="id_text" class='p-bottom-10'> {{ form.text.label }}</label>
               </div>
               <div class="mdc-text-field mdc-text-field--textarea">
                 {{ form.text }}
               </div>
-              <p style='margin-left:16px;margin-right:16px;' class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
+              <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent id-text-field-helper" aria-hidden="true">
                 {{ form.text.help_text|safe }}
               </p>
               {{ form.text.errors }}
@@ -115,12 +116,12 @@
           <div class='field-container'>
             <div class='number-box'><span class='number'></span></div>
             <div class='field'>
-              <div class='mdc-form-field' style="display:block;">
+              <div class='mdc-form-field block'>
                 <label for='id_image'>{{ form.image.label }}</label>
               </div>
               <div class='image-field'>
                 {{form.image}}
-                <span class='mdc-typography--body1 bold' id='warning' style='display:none;color:red;'>{% trans 'Max file size 1MB' %}</span>
+                <span class='mdc-typography--body1 bold error-span' id='warning'>{% trans 'Max file size 1MB' %}</span>
               </div>
               <p class="form-helper-text" aria-hidden="true">
                 {{ form.image.help_text|safe }}
@@ -193,10 +194,6 @@
               <div id='discipline_form'>
                 {% include 'peerinst/discipline_select_form.html' %}
               </div>
-              <p class="form-helper-text" aria-hidden="true">
-                {{ form.discipline.help_text|safe }}
-              </p>
-              {{ form.discipline.errors }}
             </div>
           </div>
 
@@ -206,14 +203,10 @@
               <div id='category_form'>
                 {% include 'peerinst/category_select_form.html' %}
               </div>
-              <p class="form-helper-text" aria-hidden="true">
-                {{ form.category.help_text|safe }}
-              </p>
-              {{ form.category.errors }}
 
               <div id='current_categories' class='mdc-chip-set mdc-chip-set--input' data-mdc-auto-init='MDCChipSet'>
                 {% for c in object.category.all %}
-                  <div d="{{c.username}}" v="{{c.pk}}" class='mdc-chip mdc-typography--caption category' onclick="updateSelect(this,'#id_category');" tabindex='0' data-mdc-auto-init='MDCChip'>
+                  <div d="{{c.username}}" v="{{c.pk}}" class='mdc-chip mdc-typography--caption category' tabindex='0' data-mdc-auto-init='MDCChip'>
                     <div class='mdc-chip__text'>{{c.title|title}}</div>
                     <i class='material-icons mdc-chip__icon mdc-chip__icon--trailing' tabindex='0' role='button'>cancel</i>
                     </div>
@@ -322,7 +315,7 @@
           {% if not object or object.user == request.user %}
           <div>
           {% else %}
-          <div style="display:none;">
+          <div class="hidden">
           {% endif %}
             <h3>{% trans 'Authorship' %}</h3>
 
@@ -349,7 +342,7 @@
 
                 <div id='current_collaborators' class='mdc-chip-set mdc-chip-set--input' data-mdc-auto-init='MDCChipSet'>
                   {% for c in object.collaborators.all %}
-                    <div d="{{c.username}}" v="{{c.pk}}" class='mdc-chip mdc-typography--caption collaborator' onclick="updateSelect(this,'#id_collaborators');" tabindex='0' data-mdc-auto-init='MDCChip'>
+                    <div d="{{c.username}}" v="{{c.pk}}" class='mdc-chip mdc-typography--caption collaborator' tabindex='0' data-mdc-auto-init='MDCChip'>
                       <div class='mdc-chip__text'>{{c.username}}</div>
                       <i class='material-icons mdc-chip__icon mdc-chip__icon--trailing' tabindex='0' role='button'>cancel</i>
                       </div>
@@ -404,18 +397,18 @@
         </div>
       {% endif %}
 
-      <div style="margin-top:20px;">
+      <div class="m-top-20">
         {% if form %}
           {% if object %}
             {% if question.type == "PI" %}
               <span class="padded">
-                <form style="display:inline" id="next" action="{% url 'answer-choice-form' question_id=object.pk %}" method="get">
+                <form class="inline" id="next" action="{% url 'answer-choice-form' question_id=object.pk %}" method="get">
                   <button form="next" type="submit" class="mdc-button mdc-button--raised">{% trans 'Next' %}</button>
                 </form>
               </span>
             {% else %}
               <span class="padded">
-                <form style="display:inline" id="next" action="{% url 'sample-answer-form' question_id=question.id %}" method="get">
+                <form class="inline" id="next" action="{% url 'sample-answer-form' question_id=question.id %}" method="get">
                   <button form="next" type="submit" class="mdc-button mdc-button--raised">{% trans 'Next' %}</button>
                 </form>
               </span>
@@ -430,12 +423,12 @@
           {% endif %}
         {% else %}
           <span class="padded">
-            <form style="display:inline;" id="next" action="{% url 'sample-answer-form' question_id=object.pk %}" method="get">
+            <form class="inline" id="next" action="{% url 'sample-answer-form' question_id=object.pk %}" method="get">
               <button form="next" type="submit" class="mdc-button mdc-button--raised">{% trans 'Next' %}</button>
             </form>
           </span>
           <span class="padded">
-            <button type="button" class="mdc-button mdc-button--raised" onclick="window.location.href='{% url 'question-clone' pk=object.pk %}'">{% trans 'Clone' %}</button>
+            <button id="clone-btn" href="{% url 'question-clone' pk=object.pk %}" type="button" class="mdc-button mdc-button--raised">{% trans 'Clone' %}</button>
           </span>
         {% endif %}
       </div>
@@ -447,14 +440,32 @@
 {% endblock %}
 
 {% block scripts %}
+{{ block.super }}
 {% if form %}
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-<script>
+<script nonce="{{ request.csp_nonce }}">
   'use strict';
-  bundle.bindCheckbox();
-  bundle.bindAjaxTextInputForm('show_discipline_form', 'discipline_form', "{% url 'discipline-create' %}");
-  bundle.bindAjaxTextInputForm('show_category_form', 'category_form', "{% url 'category-create' %}");
 
+  // No form submission on ENTER key
+  $("#question-create-form").keypress(function( event ) {
+    if ( event.which == 13 ) {
+      event.preventDefault();
+    }
+  });
+  bundle.bindCheckbox();
+  bundle.bindAjaxTextInputForm('show_discipline_form', 'discipline_form', "{% url 'discipline-create' %}", "{% url 'discipline-form' %}", bundle.disciplineForm, null, null);
+  bundle.bindAjaxTextInputForm('show_category_form', 'category_form', "{% url 'category-create' %}", "{% url 'category-form' %}", bundle.categoryForm, "{% url 'search-categories' %}", null);
+
+
+  // Enumerate form
+  function enumerate(){
+    $('.number-box:visible').each(function(i) {
+      $(this).children('.number')[0].innerHTML = i+1;
+    });
+  }
+
+
+  // Update form is question type changes
   function updateForm(){
     if ($('#id_type').val() == "RO") {
       $('.peerinst').toggle(false);
@@ -477,6 +488,8 @@
 
   updateForm();
 
+
+  // Set file size limit
   function limitFileSize() {
     var imageForm = document.getElementById('id_image');
     var warning = document.getElementById('warning');
@@ -502,11 +515,6 @@
 
   limitFileSize();
 
-  function enumerate(){
-    $('.number-box:visible').each(function(i) {
-      $(this).children('.number')[0].innerHTML = i+1;
-    });
-  }
 
   // Generators for autocomplete
   const response = function(searchClass, spinnerId) {
@@ -555,10 +563,26 @@
       event.preventDefault();
       $(this).val("");
 
-      $(currentIds).append("<div d="+ui.item.label+" v="+ui.item.value+" class='mdc-chip mdc-typography--caption "+className+"' onclick=\"updateSelect(this,\'"+formId+"\');\" tabindex='0' data-mdc-auto-init='MDCChip'>\
-        <div class='mdc-chip__text'>"+ui.item.label+"</div>\
-        <i class='material-icons mdc-chip__icon mdc-chip__icon--trailing' tabindex='0' role='button'>cancel</i>\
-        </div>");
+      const newDiv = document.createElement("div");
+      newDiv.setAttribute("d", ui.item.label);
+      newDiv.setAttribute("v", ui.item.value);
+      newDiv.setAttribute("tabindex", "0");
+      newDiv.setAttribute("data-mdc-auto-init", "MDCChip");
+      newDiv.classList.add("mdc-chip", "mdc-typography--caption", className);
+      newDiv.addEventListener("click", function() {
+        updateSelect(this, formId)
+      })
+      const text = document.createElement("div");
+      text.classList.add("mdc-chip__text");
+      text.textContent = ui.item.label;
+      newDiv.appendChild(text);
+      const icon = document.createElement("i");
+      icon.classList.add("material-icons","mdc-chip__icon","mdc-chip__icon--trailing");
+      icon.setAttribute("tabindex", "0");
+      icon.setAttribute("role", "button");
+      icon.textContent = "cancel";
+      newDiv.appendChild(icon);
+      document.getElementById(currentIds).appendChild(newDiv);
 
       $(formId).append("<option selected='selected' value="+ui.item.value+">"+ui.item.label+"</option>");
     }
@@ -579,27 +603,11 @@
     response: response('.collaborator', '#search_collaborators'),
     search: search('#search_collaborators'),
     focus: focus,
-    select: select('#current_collaborators', 'collaborator', '#id_collaborators'),
+    select: select('current_collaborators', 'collaborator', '#id_collaborators'),
     autoFocus: true,
   });
 
-  function bindCategoryAutofill() {
-    $('#autofill_categories').autocomplete({
-      delay: 300,
-      minLength: 2,
-      classes: {
-        "ui-autocomplete" : "mdc-typography--body1"
-      },
-      source: "{% url 'search-categories' %}",
-      response: response('.category', '#search_categories'),
-      search: search('#search_categories'),
-      focus: focus,
-      select: select('#current_categories', 'category', '#id_category'),
-      autoFocus: true,
-    });
-  }
-  bindCategoryAutofill();
-
+  bundle.bindCategoryAutofill("{% url 'search-categories' %}");
 
   // TinyMCE bind to textarea
   $('#id_text').removeAttr('required');
@@ -607,12 +615,35 @@
     selector: 'textArea',
     elementpath: false,
     branding: false,
-    plugins: ['autolink', 'autosave', 'charmap', 'code', 'link', 'paste', 'textcolor'],
+    plugins: ['autolink', 'autosave', 'charmap', 'code', 'link', 'paste'],
     menubar: false,
-    toolbar: 'undo redo | bold italic  underline superscript subscript forecolor | link | charmap | code',
+    toolbar: 'undo redo | bold italic underline superscript subscript | link | charmap | code',
     content_css: "{% static 'peerinst/css/tiny.min.css' %}",
     link_assume_external_targets: true,
     default_link_target: '_blank',
+  });
+
+  // Listeners
+  window.addEventListener("load", function() {
+
+    document.querySelectorAll(".collaborator").forEach(btn => {
+      btn.addEventListener("click", function() {
+        updateSelect(this,'#id_collaborators');
+      });
+    });
+
+    document.querySelectorAll(".category").forEach(btn => {
+      btn.addEventListener("click", function() {
+        updateSelect(this,'#id_category');
+      });
+    });
+
+    const cloneBtn = document.getElementById("clone-btn");
+    if (cloneBtn != null) {
+      cloneBtn.addEventListener("click", function() {
+        window.location.href=this.getAttribute('href');
+      });
+    }
   });
 </script>
 {% endif %}

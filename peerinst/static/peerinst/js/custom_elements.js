@@ -1,4 +1,4 @@
-"use strict";
+import { LoadingSpinner } from "./_custom_elements/loading_spinner.js";
 
 function toggleFoldable(event) {
   const foldable = event.currentTarget.parentNode;
@@ -73,7 +73,7 @@ function handleDrop(event) {
   return false;
 }
 
-function addEventListeners() {
+export function addEventListeners() {
   Array.from(document.getElementsByClassName("foldable--title")).map(x =>
     x.addEventListener("click", e => toggleFoldable(e)),
   );
@@ -97,4 +97,6 @@ function addEventListeners() {
   );
 }
 
-export { addEventListeners };
+if (!customElements.get("loading-spinner")) {
+  customElements.define("loading-spinner", LoadingSpinner);
+}

@@ -4,59 +4,87 @@ i {
   vertical-align: middle;
 }
 
+#student-page ul {
+  padding-top: 0;
+}
+
 #student-add-group {
   & .admin-link {
-    margin-left: 50px;
+    color: #a9a9a9;
     cursor: pointer;
-    color: rgba($mdc-theme-secondary, 0.75);
   }
 
   & #student-add-group--box {
-    justify-content: center;
     align-items: center;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
     background: rgba(0, 0, 0, 0.5);
     cursor: auto;
-    z-index: 1;
+    display: none;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 2;
 
     & div {
-      width: 500px;
       background: #ffffff;
-      color: #000000;
-      padding: 25px 50px;
-      text-align: center;
+      border: 1px solid $mdc-theme-secondary;
       border-radius: 5px;
-      border: 1px solid $mdc-theme-primary;
-      box-shadow: 0 1px 1px 1px darken($mdc-theme-primary, 30%);
-
-      & h3 {
-      }
+      color: $mdc-theme-secondary;
+      max-width: 85%;
+      padding: 15px;
+      text-align: center;
+      width: 500px;
 
       & p {
         text-align: start;
       }
 
+      & #student-add-group__error {
+        color: $error;
+        display: block;
+        font-style: italic;
+        // height: 25px;
+        margin: 0;
+        margin-top: 10px;
+        text-align: center;
+
+        &[hidden] {
+          opacity: 0;
+        }
+      }
+
       & input {
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        display: block;
+        margin: 25px auto 0 auto;
+        max-width: 100%;
+        padding: 5px 10px;
         width: 180px;
-        margin: 25px 100px 0 100px;
-        padding: 5px 2px;
+
+        &:focus-within,
+        &:focus {
+          border: 2px solid rgba(darken($mdc-theme-primary, 25%), 0.5);
+        }
+
+        &.input--error {
+          border: 2px solid rgba($error, 0.5);
+        }
       }
 
       & select {
-        width: 200px;
-        margin: 25px 100px 0 100px;
         background: darken($mdc-theme-primary, 10%);
-        color: #ffffff;
-        padding: 5px 10px;
         border: none;
         border-radius: 3px;
+        color: #ffffff;
         font-family: inherit;
         font-size: 16px;
         font-weight: bold;
+        margin: 25px 100px 0 100px;
+        padding: 5px 10px;
+        width: 200px;
 
         &:disabled {
           opacity: 0.6;
@@ -69,14 +97,14 @@ i {
       }
 
       & button:first-of-type {
-        margin-right: 50px;
         --mdc-theme-primary: #339966;
+        margin-right: 50px;
       }
 
       & button:nth-of-type(2) {
         --mdc-theme-primary: #339966;
-        color: var(--mdc-theme-primary) !important;
         border: 1px solid var(--mdc-theme-primary);
+        color: var(--mdc-theme-primary) !important;
       }
     }
   }
@@ -104,22 +132,26 @@ i {
       color: #ffffff;
       display: grid;
       grid-template-columns: 200px minmax(min-content, 1fr) 200px;
+      height: min-content;
+      overflow: hidden;
       padding: 10px 5px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
       & .student-group--id {
-        grid-column: 1;
-        display: grid;
-        grid-template-columns: 34px min-content 33px 33px;
-        grid-gap: 5px;
         align-items: center;
+        display: grid;
+        grid-column: 1;
+        grid-gap: 5px;
+        grid-template-columns: 34px min-content 33px 33px;
         position: relative;
 
         & i {
-          color: white;
-          padding: 4px;
           border-radius: 15px;
-          transition: background 300ms;
+          color: white;
           cursor: pointer;
+          padding: 4px;
+          transition: background 300ms;
 
           &:hover {
             background: rgba(255, 255, 255, 0.25);
@@ -136,18 +168,18 @@ i {
         }
 
         & .student-group--id__id {
-          grid-column: 2;
-          font-weight: bold;
           border: 1px solid rgba(255, 255, 255, 0.75);
-          padding: 2px 5px;
           border-radius: 3px;
           cursor: pointer;
+          font-weight: bold;
+          grid-column: 2;
+          padding: 2px 5px;
         }
 
         & .student-group--id__input {
-          grid-column: 1 / span 2;
           border: 1px solid darken($mdc-theme-primary, 10%);
           border-radius: 20px;
+          grid-column: 1 / span 2;
           padding: 2px 10px;
           width: 100px;
         }
@@ -162,6 +194,20 @@ i {
 
         & .student-group--id__cancel {
           grid-column: 4;
+        }
+
+        & .student-group--id__alert {
+          background: #ffffff;
+          border: 1px solid $mdc-theme-primary;
+          border-radius: 5px;
+          color: $mdc-theme-secondary;
+          font-size: 0.9rem;
+          height: 50px;
+          padding: 10px;
+          position: absolute;
+          right: -110px;
+          top: -25px;
+          width: 200px;
         }
       }
 
@@ -184,11 +230,11 @@ i {
 
         & .student-group--notifications {
           & i {
-            color: white;
-            padding: 4px;
             border-radius: 15px;
-            transition: background 300ms;
+            color: white;
             cursor: pointer;
+            padding: 4px;
+            transition: background 300ms;
 
             &:hover {
               background: rgba(255, 255, 255, 0.25);
@@ -207,11 +253,11 @@ i {
           border-radius: 15px;
 
           & i {
-            color: white;
-            padding: 4px;
             border-radius: 15px;
-            transition: background 300ms;
+            color: white;
             cursor: pointer;
+            padding: 4px;
+            transition: background 300ms;
 
             &:hover {
               background: rgba(255, 255, 255, 0.25);
@@ -222,29 +268,26 @@ i {
             }
 
             & ~ .student-group--remove-confirmation-box {
-              justify-content: center;
               align-items: center;
-              position: fixed;
-              left: 0;
-              top: 0;
-              width: 100%;
-              height: 100%;
               background: rgba(0, 0, 0, 0.5);
               cursor: auto;
-              z-index: 1;
+              height: 100%;
+              justify-content: center;
+              left: 0;
+              position: fixed;
+              top: 0;
+              width: 100%;
+              z-index: 2;
 
               & div {
-                width: 500px;
                 background: #ffffff;
+                border: 1px solid $mdc-theme-primary;
+                border-radius: 5px;
+                box-shadow: 0 1px 1px 1px darken($mdc-theme-primary, 30%);
                 color: #000000;
                 padding: 25px 50px;
                 text-align: center;
-                border-radius: 5px;
-                border: 1px solid $mdc-theme-primary;
-                box-shadow: 0 1px 1px 1px darken($mdc-theme-primary, 30%);
-
-                & h3 {
-                }
+                width: 500px;
 
                 & p:first-of-type {
                   text-align: start;
@@ -256,14 +299,14 @@ i {
                 }
 
                 & button:first-of-type {
-                  margin-right: 50px;
                   --mdc-theme-primary: #cc0000;
+                  margin-right: 50px;
                 }
 
                 & button:nth-of-type(2) {
                   --mdc-theme-primary: #cc0000;
-                  color: var(--mdc-theme-primary) !important;
                   border: 1px solid var(--mdc-theme-primary);
+                  color: var(--mdc-theme-primary) !important;
                 }
               }
             }
@@ -273,22 +316,23 @@ i {
     }
 
     & .student-group--assignments {
-      padding: 10px 5px;
-      min-height: 200px;
       background: lighten($mdc-theme-primary, 25%);
       border-radius: 0 0 5px 5px;
+      min-height: 200px;
+      padding: 10px 5px;
 
       & ul {
         padding: 0;
       }
 
       & .student-group--assignment {
-        height: 32px;
+        align-items: center;
+        color: inherit;
+        cursor: pointer;
         display: grid;
         grid-template-columns: 50px 50px 1fr max-content;
-        align-items: center;
+        height: 32px;
         justify-items: center;
-        color: inherit;
 
         & .student-group--assignment-icon {
           text-align: center;
@@ -299,11 +343,11 @@ i {
         }
 
         & .student-group--assignment-questions {
+          align-items: center;
           display: flex;
+          font-size: 13px;
           justify-content: center;
           justify-items: center;
-          align-items: center;
-          font-size: 13px;
 
           & span {
             padding: 0 2px;
@@ -311,16 +355,20 @@ i {
         }
 
         & .student-group--assignment-title {
-          padding-left: 20px;
           font-size: 18px;
           justify-self: start;
+          overflow: hidden;
+          padding-left: 20px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: calc(100% - 50px);
         }
 
         & .student-group--assignment-date {
-          padding-right: 20px;
-          text-align: end;
           font-size: 13px;
           opacity: 0.9;
+          padding-right: 20px;
+          text-align: end;
 
           & i {
             margin-right: 10px;
@@ -335,11 +383,15 @@ i {
       & .student-group--no-assignments {
         display: block;
         font-size: 18px;
-        text-align: center;
         margin-top: 16px;
+        text-align: center;
       }
     }
   }
+}
+
+#student-old-groups {
+  display: none;
 }
 
 .blinking {
@@ -347,17 +399,17 @@ i {
 }
 
 .bubble {
-  background: rgba(50, 50, 50, 0.5);
-  color: #ffffff;
-  position: absolute;
-  font-size: 14px;
-  top: 10px;
-  left: 10px;
-  width: 100px;
-  padding: 3px;
   animation: 600ms ease-in-out bubble-show;
-  text-align: center;
+  background: rgba(50, 50, 50, 0.5);
   border-radius: 10px;
+  color: #ffffff;
+  font-size: 14px;
+  left: 10px;
+  padding: 3px;
+  position: absolute;
+  text-align: center;
+  top: 10px;
+  width: 100px;
 }
 
 @keyframes blink {

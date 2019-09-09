@@ -1,5 +1,8 @@
 import random
+
 from peerinst.models import Student, StudentAssignment
+
+from .utils import add_to_group
 
 
 def new_students(n):
@@ -25,6 +28,7 @@ def new_student_assignments(n, group_assignments, students):
         while True:
             choice = random.choice(list(combinations))
             combinations = combinations - set([choice])
+            add_to_group(choice[0], choice[1].group)
             yield {"student": choice[0], "group_assignment": choice[1]}
 
     combinations = [

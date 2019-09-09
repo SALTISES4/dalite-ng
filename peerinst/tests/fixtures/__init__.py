@@ -1,22 +1,41 @@
 __all__ = [
-    "answer_choices",
-    "answers_rationale_only",
+    "add_answers",
+    "add_to_group",
+    "admin",
     "answer_choice",
+    "answer_choices",
     "answers",
-    "first_answers_no_shown",
+    "answers_rationale_only",
     "assignment",
-    "student_group_assignment",
-    "user",
+    "assignment",
+    "assignments",
+    "category",
+    "collection",
+    "collections",
+    "discipline",
+    "disciplines",
+    "first_answers_no_shown",
+    "forum",
     "group",
+    "inactive_user",
+    "new_teacher",
+    "new_user",
     "question",
     "questions",
-    "add_to_group",
     "student",
+    "student_assignment",
+    "student_assignments",
+    "student_group_assignment",
+    "student_group_assignments",
     "student_new",
     "students",
     "teacher",
+    "teachers",
+    "thread",
+    "threads",
     "tos_student",
     "tos_teacher",
+    "user",
 ]
 
 
@@ -27,10 +46,31 @@ from .answer import (
     answers_rationale_only,
     first_answers_no_shown,
 )
-from .assignment import assignment, student_group_assignment
-from .auth import user
+from .assignment import (
+    assignment,
+    assignments,
+    student_group_assignment,
+    student_group_assignments,
+)
+from .collection import collection, collections
+from .forums import forum, thread, threads
 from .group import group
-from .question import question, questions
-from .student import add_to_group, student, student_new, students
-from .teacher import teacher
+from .question import (
+    add_answers,
+    category,
+    discipline,
+    disciplines,
+    question,
+    questions,
+)
+from .student import (
+    add_to_group,
+    student,
+    student_assignment,
+    student_assignments,
+    student_new,
+    students,
+)
+from .teacher import teacher, teachers
 from .tos import tos_student, tos_teacher
+from .user import admin, inactive_user, new_teacher, new_user, user

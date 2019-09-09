@@ -7,16 +7,16 @@
 <section>
   <div class="meta-container">
     <div class="container">
-      <h1 class="mdc-typography--display3">{% trans 'Assignment' %}
+      <h1 class="mdc-typography--display3">{% trans 'Update Assignment' %}
         <svg class="underline" width=150 height=4></svg>
       </h1>
 
       <div class="admin-link">
         <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
-        <span style="padding-left:0.3em;padding-right:0.5em;">|</span><a href="{% url 'teacher-assignments' teacher.id %}">{% trans 'Back to My Assignments' %}</a>
+        <span class="admin-link--padded">|</span><a href="{% url 'teacher-assignments' teacher.id %}">{% trans 'Back to My Assignments' %}</a>
       </div>
 
-      <h2 class="mdc-typography--display1 mdc-theme--primary">{% trans 'Edit assignment' %}</h2>
+      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Edit assignment' %}</h2>
 
       <h3>{% trans 'Identifier' %}: {{object.pk}}</h3>
 
@@ -50,7 +50,7 @@
           </p>
           {{ field.errors }}
         {% endfor %}
-        <input class="mdc-button mdc-button--raised" type="submit" value="Update" />
+        <input class="mdc-button mdc-button--raised padded-top" type="submit" value="Update" />
       </form>
 
 </main>

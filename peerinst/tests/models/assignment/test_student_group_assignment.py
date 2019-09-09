@@ -2,6 +2,7 @@ import random
 from datetime import datetime, timedelta
 from operator import itemgetter
 
+import pytest
 import pytz
 from django.core import mail
 
@@ -149,7 +150,8 @@ def test_get_question__assert_raised(student_group_assignment):
     pass
 
 
-def test_update_students(student_group_assignment, students):
+@pytest.mark.django_db(transaction=True)
+def test_update_students(student_group_assignment, students, celery_worker):
     add_to_group(students, student_group_assignment.group)
 
     for student in students:

@@ -92,10 +92,7 @@
 }
 
 .loading-icon {
-  animation-duration: 3s;
-  animation-iteration-count: infinite;
-  animation-name: rotate;
-  animation-timing-function: linear;
+  animation: 3s spin linear infinite;
   fill: none;
   height: 24px;
   stroke: $mdc-theme-primary;
@@ -105,11 +102,23 @@
   width: 24px;
 }
 
-@keyframes rotate {
-  from {
+.spinner {
+  animation: 1.75s spin linear infinite;
+  position: relative;
+
+  & .spinner__ring {
+    stroke: $mdc-theme-primary;
+  }
+  & .spinner__segment {
+    stroke: lighten($mdc-theme-primary, 30%);
+  }
+}
+
+@keyframes spin {
+  0% {
     transform: rotate(0deg);
   }
-  to {
+  100% {
     transform: rotate(360deg);
   }
 }

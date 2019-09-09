@@ -1,4 +1,4 @@
-{% extends './errors.html' %}
+{% extends 'errors.html' %}
 
 {% load i18n %}
 
@@ -9,6 +9,6 @@
   {% trans 'The page you are looking for does not exist at ' %}{{ request.path }}
 </p>
 
-<i class="corner-icon material-icons" style="vertical-align:middle;">search</i>
+<i class="corner-icon material-icons">search</i>
 
 {% endblock %}

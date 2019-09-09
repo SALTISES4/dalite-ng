@@ -1,4 +1,4 @@
-{% extends 'peerinst/base.html' %}
+{% extends 'peerinst/teacher/base.html' %}
 
 {% load i18n add_class compress staticfiles %}
 
@@ -61,7 +61,7 @@
       <li role="separator" class="mdc-list-divider"></li>
       <li class="mdc-list-item">
         <span class="mdc-list-item__graphic mdc-theme--primary">
-            <a href="{% url 'question-list' a.pk %}" style="transform:translateY(4pt);">
+            <a class="translate-4" href="{% url 'question-list' a.pk %}">
               <i class="mdc-theme--primary material-icons md-48">assignment</i>
             </a>
         </span>
@@ -72,13 +72,6 @@
           </span>
         </span>
         <span class="mdc-list-item__meta">
-  <!--         <form method="post" style="display:inline;">
-              {% csrf_token %}
-              <input type="hidden" id="id_assignment" name="assignment" value="{{g.pk}}"/>
-              <div class="mdc-ripple-surface input-ripple-wrapper">
-                <input class="material-icons md-24 mdc-button small-button" style="padding:0pt;margin:0pt;" type="submit" value="remove_circle"/>
-              </div>
-          </form> -->
           {% if user in a.owner.all and a.editable %}
             <a  id="edit-assignment-{{ a.pk|slugify }}" href="{% url 'assignment-update' a.pk %}">
               <i class="material-icons md-24 mdc-ripple-surface icon-list">mode_edit</i>
@@ -110,7 +103,7 @@
       <li role="separator" class="mdc-list-divider"></li>
       <li class="mdc-list-item">
         <span class="mdc-list-item__graphic mdc-theme--primary">
-            <a href="{% url 'question-list' g.pk %}" style="transform:translateY(4pt);">
+            <a class="translate-4" href="{% url 'question-list' g.pk %}">
               <i class="mdc-theme--primary material-icons md-48">assignment</i>
             </a>
         </span>
@@ -121,11 +114,11 @@
           </span>
         </span>
         <span class="mdc-list-item__meta">
-          <form method="post" style="display:inline;">
+          <form class="inline" method="post">
               {% csrf_token %}
               <input type="hidden" id="id_assignment" name="assignment" value="{{g.pk}}"/>
               <div class="mdc-ripple-surface input-ripple-wrapper">
-                <input class="material-icons md-24 mdc-button small-button" style="padding:0pt;margin:0pt;" type="submit" value="remove_circle"/>
+                <input class="material-icons md-24 mdc-button small-button no-whitespace" type="submit" value="remove_circle"/>
               </div>
           </form>
           {% if g.owner == teacher.user %}

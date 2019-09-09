@@ -13,3 +13,14 @@ def resp_405_middleware(get_response):
             return resp
 
     return middleware
+
+
+def resp_503_middleware(get_response):
+    def middleware(req):
+        resp = get_response(req)
+        if resp.status_code == 503:
+            return TemplateResponse(req, "503.html", status=503).render()
+        else:
+            return resp
+
+    return middleware

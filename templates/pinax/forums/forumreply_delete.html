@@ -1,4 +1,4 @@
-{% extends './base.html' %}
+{% extends 'pinax/forums/base.html' %}
 
 {% load i18n %}
 
@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-<span class="links-divider">|</span><a href="{% url 'pinax_forums:thread' object.thread.id %}">{% trans 'Back to post' %}</a>
+<span class="links-divider">|</span><a href="{% url 'pinax_forums:thread' object.thread.id %}">{% trans 'Back to Post' %}</a>
 {% endblock %}
 
 {% block content %}
@@ -26,9 +26,35 @@
   </div>
 </div>
 
+{% if object.reply_replies.all %}
+<h4>{% trans 'The following replies will also be deleted: ' %}<h4>
+
+{% for r in object.reply_replies.all %}
+<div class="mdc-card reply-to-reply">
+
+  <div class="mdc-typography--body1">
+    {{r.content|safe}}
+  </div>
+
+  <div class="mdc-card__actions">
+    <div class="mdc-card__action-buttons">
+        <div class="mdc-typography--caption white">
+        {% if r.created|date:"d M" != right_now %}
+          {{ r.author }} &middot; {{ r.created|date:"SHORT_DATE_FORMAT" }}
+        {% else %}
+          {{ r.author }} &middot; {{ r.created|timesince }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endfor %}
+{% endif %}
+
 <form method="post">
   {% csrf_token %}
-  <a class="padded-top mdc-button mdc-button--raised" href="{% url 'pinax_forums:thread' object.thread.id %}">{% trans 'Cancel' %}</a>
+  <a class="padded-top mdc-button mdc-button--raised padded-top" href="{% url 'pinax_forums:thread' object.thread.id %}">{% trans 'Cancel' %}</a>
   <input type="submit" class="padded-top mdc-button mdc-button--raised delete" value="{% trans 'Delete' %}"/>
 </form>
 {% endblock %}

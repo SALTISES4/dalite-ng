@@ -1,13 +1,13 @@
-{% extends './base.html' %}
+{% extends 'pinax/forums/base.html' %}
 
-{% load add_class compress i18n staticfiles %}
+{% load add_class compress i18n static %}
 
 {% block heading %}
 {% trans 'Edit Post' %}
 {% endblock %}
 
 {% block breadcrumbs %}
-<span class="links-divider">|</span><a href="{% url 'pinax_forums:thread' object.thread.id %}">{% trans 'Back to post' %}</a>
+<span class="links-divider">|</span><a href="{% url 'pinax_forums:thread' object.thread.id %}">{% trans 'Back to Post' %}</a>
 {% endblock %}
 
 {% block content %}
@@ -41,7 +41,7 @@
   <div class='file-upload'>
     {{ form.pdf.errors }}
     <p class="file-upload-label">{% trans 'Upload a pdf (max 1MB)' %}</p>
-    {{ form.pdf }}<span class='mdc-typography--body1 bold' id='warning' style='display:none;color:red;'>{% trans 'Max file size exceeded.' %}</span>
+    {{ form.pdf }}<span class='mdc-typography--body1 bold error-span' id='warning'>{% trans 'Max file size exceeded.' %}</span>
     <p class="mdc-typography--caption">{% trans 'You are responsible for content you post to the site.  <strong>Do not upload copyrighted materials.</strong>' %}</p>
   </div>
 
@@ -49,8 +49,9 @@
 </form>
 {% endblock %}
 
-{% block extrascripts %}
-{% compress js %}
+{% block scripts %}
+{{ block.super }}
+{% compress js file forums__upload_limit %}
 <script src="{% static 'pinax/forums/js/limit.min.js' %}"></script>
 {% endcompress %}
 {% endblock %}

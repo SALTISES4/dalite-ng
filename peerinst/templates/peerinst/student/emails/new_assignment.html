@@ -11,7 +11,7 @@
 
 <p>{% trans "Use the buttons below to go to the assignment or to your student page." %}</p>
 
-<p style="text-align: center; margin: 50px 0;">
+<p class="p-email-btn">
   <a class="email-btn" 
      href="{{ assignment_link }}"
      target="_blank">
@@ -25,22 +25,24 @@
   </a>
 </p>
 
-<p>
-  {% trans "If the buttons above don't work, paste one of these links into your web browser:" %}
-</p>
-<p>
-  Go to assignment:
-  <br/>
-  <a href="{{ assignment_link }}" target="_blank">
-    {{ assignment_link }}
-  </a>
-</p>
-<p>
-  Go to student page:
-  <br/>
-  <a href="{{ signin_link }}" target="_blank">
-    {{ signin_link }}
-  </a>
-</p>
+<div class="backup-link">
+  <p>
+    {% trans "If the buttons above don't work, paste one of these links into your web browser:" %}
+  </p>
+  <p>
+    Go to assignment:
+    <br/>
+    <a href="{{ assignment_link }}" target="_blank">
+      {{ assignment_link }}
+    </a>
+  </p>
+  <p>
+    Go to student page:
+    <br/>
+    <a href="{{ signin_link }}" target="_blank">
+      {{ signin_link }}
+    </a>
+  </p>
+</div>
 
 {% endblock %}

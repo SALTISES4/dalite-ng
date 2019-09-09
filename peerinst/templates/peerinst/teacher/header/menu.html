@@ -1,10 +1,10 @@
-{% load staticfiles i18n %}
+{% load i18n %}
 
 <i id="menu-icon" class="material-icons md-32 header-icon">menu</i>
 <aside class="mdc-drawer mdc-drawer--temporary mdc-typography">
   <nav class="mdc-drawer__drawer">
     <nav id="icon-with-text-demo" class="mdc-drawer__content mdc-list">
-      <a class="mdc-list-item" href="{% url 'landing_page' %}">
+      <a class="mdc-list-item" href="{% url 'teacher-dashboard' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
            aria-hidden="true">
           home
@@ -57,7 +57,7 @@
           aria-hidden="true">
           help
         </i>
-        {% trans 'Forums' %}<span class="mdc-theme--primary" style="padding-left:4px;">{% trans 'New!' %}</span>
+        {% trans 'Forums' %}<span class="mdc-theme--primary new-feature">{% trans 'New!' %}</span>
       </a>
       {% else %}
       <a class="mdc-list-item" href="{% url 'pinax_forums:forums' %}">

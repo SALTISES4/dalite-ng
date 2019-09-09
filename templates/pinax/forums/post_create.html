@@ -1,6 +1,6 @@
-{% extends './base.html' %}
+{% extends 'pinax/forums/base.html' %}
 
-{% load add_class compress i18n staticfiles %}
+{% load add_class compress i18n static %}
 
 {% block heading %}
 {% trans 'Create a New Post' %}
@@ -13,6 +13,7 @@
 {% block content %}
 <form enctype="multipart/form-data" method="post">
   {% csrf_token %}
+
   <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
     {{ form.title|add_class:"mdc-text-field__input" }}
     {{ form.title.label_tag|add_class:"mdc-floating-label"|cut:":" }}
@@ -23,10 +24,14 @@
     </div>
     <div class="mdc-notched-outline__idle"></div>
   </div>
+  {{ form.title.errors }}
+
   <div class="mdc-text-field mdc-text-field--textarea mdc-theme--background" data-mdc-auto-init="MDCTextField">
     {{ form.content|add_class:"mdc-text-field__input" }}
     <label for="id_content" class="mdc-floating-label">{% trans 'Content' %}</label>
   </div>
+  {{ form.content.errors }}
+
   <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
     {{ form.url|add_class:"mdc-text-field__input" }}
     {{ form.url.label_tag|add_class:"mdc-floating-label"|cut:":" }}
@@ -37,11 +42,12 @@
     </div>
     <div class="mdc-notched-outline__idle"></div>
   </div>
+  {{ form.url.errors }}
 
   <div class='file-upload'>
     {{ form.pdf.errors }}
     <p class="file-upload-label">{% trans 'Upload a pdf (max 2 MB)' %}</p>
-    {{ form.pdf }}<span class='mdc-typography--body1 bold' id='warning' style='display:none;color:red;'>{% trans 'Max file size exceeded.' %}</span>
+    {{ form.pdf }}<span class='mdc-typography--body1 bold error-span' id='warning'>{% trans 'Max file size exceeded.' %}</span>
     <p class="mdc-typography--caption">{% trans 'You are responsible for content you post to the site.  <strong>Do not upload copyrighted materials.</strong>' %}</p>
   </div>
 
@@ -49,8 +55,9 @@
 </form>
 {% endblock %}
 
-{% block extrascripts %}
-{% compress js %}
+{% block scripts %}
+{{ block.super }}
+{% compress js file forums__upload_limit %}
 <script src="{% static 'pinax/forums/js/limit.min.js' %}"></script>
 {% endcompress %}
 {% endblock %}

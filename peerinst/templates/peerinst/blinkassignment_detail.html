@@ -3,11 +3,9 @@
 {% load staticfiles compress i18n %}
 
 {% block stylesheets %}
+{{ block.super }}
 {% compress css %}
 <link href="{% static 'peerinst/css/search.min.css' %}" rel="stylesheet">
-{% endcompress %}
-{% compress js %}
-<script src="{% static 'peerinst/js/search.min.js' %}"></script>
 {% endcompress %}
 {% endblock %}
 
@@ -50,15 +48,15 @@
         {{g.blinkquestion.question.title|safe}}
       </div>
 
-      <div class="mdc-typography--body1" style="margin-top:5px;">
+      <div class="mdc-typography--body1 m-top-5">
         {{g.blinkquestion.question.text|safe}}
       </div>
 
       {% if g.blinkquestion.question.image %}
-      <img class="question-image" style="display:none;" src="{{ g.blinkquestion.question.image.url }}" alt="g.blinkquestion.question.image_alt_text">
+      <img class="question-image hidden" src="{{ g.blinkquestion.question.image.url }}" alt="g.blinkquestion.question.image_alt_text">
       {% endif %}
 
-      <div class="question-answers" style="display:none;">
+      <div class="question-answers hidden">
         <ul>
           {% for label, choice in g.blinkquestion.question.get_choices %}
           <li class="mdc-typography--body1">{{ label }}. {{ choice|safe }}</li>
@@ -67,7 +65,7 @@
       </div>
 
       <div class="mdc-card__actions">
-        <div class="mdc-card__action-buttons" style="color:grey;">
+        <div class="mdc-card__action-buttons grey">
           <div class="mdc-typography--caption">
             <div>
               {% trans 'Discipline' %}: {{g.blinkquestion.question.discipline}}
@@ -87,14 +85,14 @@
         </div>
 
         <div class="mdc-card__action-icons">
-          <form style="display:inline;" method="post" action="#">
+          <form class="inline" method="post" action="#">
             {% csrf_token %}
             <input type="hidden" name="q" value="{{g.blinkquestion.key}}" />
             <input type="hidden" name="rank" value="clear" />
             <input class="material-icons small-button mdc-button mdc-button--raised" type="submit" value="clear"/>
           </form>
           {% if forloop.counter > 1 %}
-          <form style="display:inline;" method="post" action="#{{g.blinkquestion.question.id|slugify}}">
+          <form class="inline" method="post" action="#{{g.blinkquestion.question.id|slugify}}">
             {% csrf_token %}
             <input type="hidden" name="q" value="{{g.blinkquestion.key}}" />
             <input type="hidden" name="rank" value="up" />
@@ -102,7 +100,7 @@
           </form>
           {% endif %}
           {% if not forloop.last %}
-          <form style="display:inline;" method="post" action="#{{g.blinkquestion.question.id|slugify}}">
+          <form class="inline" method="post" action="#{{g.blinkquestion.question.id|slugify}}">
             {% csrf_token %}
             <input type="hidden" name="q" value="{{g.blinkquestion.key}}" />
             <input type="hidden" name="rank" value="down" />
@@ -148,15 +146,15 @@
             {{g.question.title|safe}}
           </div>
 
-          <div class="mdc-typography--body1" style="margin-top:5px;">
+          <div class="mdc-typography--body1 m-top-5">
             {{g.question.text|safe}}
           </div>
 
           {% if g.question.image %}
-          <img class="question-image" style="display:none;" src="{{ g.question.image.url }}" alt="g.question.image_alt_text">
+          <img class="question-image hidden" src="{{ g.question.image.url }}" alt="g.question.image_alt_text">
           {% endif %}
 
-          <div class="question-answers" style="display:none;">
+          <div class="question-answers hidden">
             <ul>
             {% for label, choice in g.question.get_choices %}
             <li class="mdc-typography--body1">{{ label }}. {{ choice|safe }}</li>
@@ -166,7 +164,7 @@
 
           <div class="mdc-card__actions">
 
-            <div class="mdc-card__action-buttons" style="color:grey;">
+            <div class="mdc-card__action-buttons grey">
               <div class="mdc-typography--caption">
                 <div>
                   {% trans 'Discipline' %}: {{g.question.discipline}}
@@ -186,7 +184,7 @@
             </div>
 
             <div class="mdc-card__action-icons">
-              <form style="display:inline" method="post" action="#{{g.question.id|slugify}}">
+              <form class="inline" method="post" action="#{{g.question.id|slugify}}">
                 {% csrf_token %}
                 <input type="hidden" name="blink" value="{{g.pk}}" />
                 <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit" value="add" />
@@ -256,15 +254,15 @@
       </div>
     </div>
 
-    <div id="filters" style="display:none;">
+    <div id="filters" class="display-none">
       <h2 class='mdc-typography--display1  mdc-theme--secondary'>{% trans 'Filters' %}</h2>
 
       <div id="select-filters">
-        <div id="discipline-filters" style="display:none;"><div style="margin-bottom:5px;">{% trans 'Disciplines: ' %}</div><span id="filter-on-discipline"></span></div>
+        <div id="discipline-filters hidden"><div class="m-bot-5">{% trans 'Disciplines: ' %}</div><span id="filter-on-discipline"></span></div>
 
-        <div id="category-filters" style="margin-top:10px;display:none;"><div style="margin-bottom:5px;">{% trans 'Keywords: ' %}</div><span id="filter-on-category"></span></div>
+        <div id="category-filters m-top-10 hidden"><div class="m-bot-5">{% trans 'Keywords: ' %}</div><span id="filter-on-category"></span></div>
 
-        <button id="reset-filters" type="button" class='mdc-button mdc-button--raised padded-top' disabled=true onclick='search.reset()'>{% trans 'Clear' %}</button>
+        <button id="reset-filters" type="button" class='mdc-button mdc-button--raised padded-top' disabled=true>{% trans 'Clear' %}</button>
       </div>
     </div>
 
@@ -275,41 +273,50 @@
 {% endblock %}
 
 {% block scripts %}
-{% compress js inline %}
-<script>
-bundle.toggleImages();
-bundle.toggleAnswers();
+{{ block.super }}
+{% compress js %}
+<script src="{% static 'peerinst/js/search.min.js' %}"></script>
+{% endcompress %}
 
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", bundle.getCookie('csrftoken'));
-        }
+<script nonce="{{ request.csp_nonce }}">
+  bundle.toggleImages();
+  bundle.toggleAnswers();
+
+  const limitSearch = document.querySelector('#limit-search');
+  bundle.iconToggle.MDCIconToggle.attachTo(limitSearch);
+
+  const filterBar = document.getElementById('filter-bar');
+  filterBar.oninput = function() {
+    bundle.search('.searchable', filterBar);
+  }
+
+  const input = document.getElementById('search-bar');
+  input.onchange = function() {
+    if (input.value != "") {
+      search.setupSearch();
+      console.info("Searching: "+input.value);
+      $('#search_results').load("{% url 'question-search' %}", "search_string="+input.value+"&type=blink&id={{ object.id|urlencode }}&limit_search="+limitSearch.checked, search.processResponse);
     }
-});
+  }
 
-var limitSearch = document.querySelector('#limit-search');
-bundle.iconToggle.MDCIconToggle.attachTo(limitSearch);
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+          }
+      }
+  });
 
-var filterBar = document.getElementById('filter-bar');
-filterBar.oninput = function() {
-  bundle.search('.searchable', filterBar);
-}
-
-var input = document.getElementById('search-bar');
-input.onchange = function() {
-  if (input.value != "") {
+  function pageNav(page) {
     search.setupSearch();
     console.info("Searching: "+input.value);
-    $('#search_results').load("{% url 'question-search' %}", "search_string="+input.value+"&type=blink&id={{ object.id|urlencode }}&limit_search="+limitSearch.checked, search.processResponse);
+    $('#search_results').load("{% url 'question-search' %}?page="+page, "search_string="+input.value+"&type=blink&id={{ object.id|urlencode }}&limit_search="+limitSearch.checked, search.processResponse);
   }
-}
 
-function pageNav(page) {
-  search.setupSearch();
-  console.info("Searching: "+input.value);
-  $('#search_results').load("{% url 'question-search' %}?page="+page, "search_string="+input.value+"&type=blink&id={{ object.id|urlencode }}&limit_search="+limitSearch.checked, search.processResponse);
-}
+  window.addEventListener("load", function() {
+    document.getElementById("reset-filters").addEventListener("click", () => {
+      search.reset()
+    })
+  })
 </script>
-{% endcompress %}
 {% endblock %}

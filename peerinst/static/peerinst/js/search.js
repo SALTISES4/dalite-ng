@@ -1,3 +1,5 @@
+import { updateAssignmentQuestionList } from "./ajax.js";
+
 /** Recount search results
  *  @function
  */
@@ -78,13 +80,34 @@ export function reset() {
  *  @function
  */
 export function processResponse() {
-  console.info("Processing response...");
-
   bundle.toggleImages();
   bundle.toggleAnswers();
 
   $("#search-bar").attr("disabled", false);
   $("#progressbar").addClass("mdc-linear-progress--closed");
+
+  // Update template response
+  $(".search-nav").each(function(i, el) {
+    el.addEventListener("click", function() {
+      pageNav(el.getAttribute("data-page"));
+    });
+  });
+
+  $(".favourite-btn").each(function(i, el) {
+    el.addEventListener("click", function() {
+      toggleFavourite(el.getAttribute("data-id"));
+    });
+  });
+
+  $(".update-questions-btn").each(function(i, el) {
+    el.addEventListener("click", function() {
+      updateAssignmentQuestionList(
+        el.getAttribute("data-url"),
+        el.getAttribute("data-id"),
+        el.getAttribute("data-assignment-id"),
+      );
+    });
+  });
 
   // Add filters based on search results
   $("#filter-on-discipline").empty();
@@ -102,7 +125,7 @@ export function processResponse() {
       $("#filter-on-discipline .mdc-chip-set").append(
         "<div d=" +
           d +
-          " class='mdc-chip' onclick='search.filter(this)' " +
+          " class='mdc-chip' " +
           "tabindex='0' data-mdc-auto-init='MDCChip'>" +
           "<div class='mdc-chip__checkmark' >" +
           "<svg class='mdc-chip__checkmark-svg' viewBox='-2 -3 30 30'>" +
@@ -117,7 +140,11 @@ export function processResponse() {
       );
     }
   });
-  console.info(disciplineList);
+  $("#filter-on-discipline .mdc-chip").each(function(i, el) {
+    el.addEventListener("click", function() {
+      filter(el);
+    });
+  });
 
   const categoryList = [];
   $("#filter-on-category").append(
@@ -133,7 +160,7 @@ export function processResponse() {
         $("#filter-on-category .mdc-chip-set").append(
           "<div c=" +
             list[i] +
-            " class='mdc-chip' onclick='search.filter(this)' tabindex='0' " +
+            " class='mdc-chip' tabindex='0' " +
             "data-mdc-auto-init='MDCChip'>" +
             "<div class='mdc-chip__checkmark' >" +
             "<svg class='mdc-chip__checkmark-svg' viewBox='-2 -3 30 30'>" +
@@ -150,7 +177,11 @@ export function processResponse() {
       }
     });
   });
-  console.info(categoryList);
+  $("#filter-on-category .mdc-chip").each(function(i, el) {
+    el.addEventListener("click", function() {
+      filter(el);
+    });
+  });
 
   if (
     (disciplineList.length > 1 || categoryList.length > 1) &&

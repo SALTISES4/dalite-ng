@@ -1,0 +1,138 @@
+{% load csp staticfiles i18n compress cookielaw_tags admin_urls tz piwik %}
+
+{% get_current_language as LANGUAGE_CODE %}
+
+{% timezone "Canada/Eastern" %}
+
+<!DOCTYPE html>
+<html lang="{{LANGUAGE_CODE}}">
+
+<head>
+  <!-- Meta -->
+  <title>{% block title %}myDALITE{% endblock %}</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="myDALITE">
+  <meta name="theme-color" content="#004266">
+
+  <!-- Polyfills for non-awesome browsers-->
+  <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default,fetch,Array.prototype.includes">
+  </script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+  <script src="https://unpkg.com/@webcomponents/webcomponentsjs@^2/webcomponents-loader.js">
+  </script>
+
+  <!-- Local resources -->
+  <link href="{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" rel="icon">
+  <link href="{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" rel="apple-touch-icon">
+  {% compress css file main %}
+  <link href="{% static 'peerinst/css/main.min.css' %}" rel="stylesheet">
+  {% endcompress %}
+
+  <!-- Cookie law -->
+  {% if not request.session.LTI %}
+  {% compress js file cookie_law %}
+  <script src="{% static 'cookielaw/js/cookielaw.js' %}" defer="true"></script>
+  {% endcompress %}
+  {% compress css file cookie_law %}
+  <link href="{% static 'cookie_law/css/cookie_law.min.css' %}" rel="stylesheet">
+  {% endcompress %}
+  {% endif %}
+
+  <!-- External resources -->
+  <link href="https://unpkg.com/ionicons@4.2.4/dist/css/ionicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- Custom settings for local instance -->
+  {% include 'peerinst/custom-instance-head.html' %}
+
+  {% block stylesheets %}{% endblock %}
+</head>
+
+<body {% block logged_in_layout_class %}{% endblock %} >
+  <header id="header">
+    <div id="header-left">
+      {% block header-left %}{% endblock %}
+      <div class="header branding">
+        {% if not request.session.LTI %}
+        <a href="{% url 'landing_page' %}">
+          <img src="{% static 'peerinst/img/SALTISE-favicon.gif' %}"
+               alt="site-logo"
+               id="logo">
+        </a>
+        {% else %}
+          <img src="{% static 'peerinst/img/SALTISE-favicon.gif' %}"
+               alt="site-logo"
+               id="logo">
+        {% endif %}
+        {% if not user.student and not request.session.LTI  %}
+        <a href="{% url 'browse-database' %}">
+          {% include 'peerinst/custom-instance-header.html' %}
+        </a>
+        {% else %}
+          {% include 'peerinst/custom-instance-header.html' %}
+        {% endif %}
+      </div>
+    </div>
+    <div id="header-right">
+      {% block header-right %}{% endblock %}
+    </div>
+    <div id="header-background"></div>
+  </header>
+
+  <div class="site-content">
+    <form id="switchLanguage" action="{% url 'set_language' %}" method="post">
+      {% csrf_token %}
+      <input name="next"
+             type="hidden"
+             value={{ request.path|slice:"3:"|urlencode }}>
+      <input name="language"
+             type="hidden"
+             value={% if LANGUAGE_CODE == 'en' %}fr{% else %}en{% endif %}>
+    </form>
+    <svg id="corner" class="corner" width=35 height=35></svg>
+    {% block body %}{% endblock %}
+
+  {% block footer %}{% endblock %}
+  </div>
+
+  <!-- JS bundle -->
+  {% compress js file index %}
+  <script src="{% static 'peerinst/js/index.min.js' %}"></script>
+  {% endcompress %}
+
+  {% script type="text/javascript" %}
+  <script>
+  if (document.querySelector('.mdc-drawer--temporary')){
+    var drawer = new bundle.drawer.MDCTemporaryDrawer(document.querySelector('.mdc-drawer--temporary'));
+    document.querySelector('#menu-icon').addEventListener('click', function() {
+      drawer.open = true;
+    });
+  }
+  bundle.cornerGraphic('#corner', 'switchLanguage', {% if LANGUAGE_CODE == 'en' %}'FR'{% else %}'EN'{% endif %}, 'fill-primary');
+
+  // IE11 HTML5 form attribute patch
+  $('.submit_button').click(function() {
+    event.preventDefault();
+    $('#'+$(this).attr('form')).submit();
+  })
+  </script>
+  {% endscript %}
+
+  {% block scripts %}{% endblock %}
+
+  {% script type="text/javascript" %}
+  {% piwik %}
+  {% endscript %}
+
+  {% if not request.session.LTI %}
+  {% cookielaw_banner %}
+  {% endif %}
+
+  {% include 'icons.svg' %}
+</body>
+
+</html>
+
+{% endtimezone %}

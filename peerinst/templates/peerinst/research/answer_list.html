@@ -3,7 +3,8 @@
 {% load staticfiles compress i18n %}
 
 {% block stylesheets %}
-<style>
+{{ block.super }}
+<style nonce="{{ request.csp_nonce }}">
   .sticky-header {
     position: -webkit-sticky;
     position: sticky;
@@ -79,8 +80,7 @@
           aria-label="{% trans 'Show/Hide' %}" tabindex="0"
           aria-pressed="false"
           data-toggle-on='{"label": "{% trans 'Show' %}", "content": "unfold_more"}'
-          data-toggle-off='{"label": "{% trans 'Hide' %}", "content": "unfold_less"}'
-          onclick="$('.hidable').toggle();localStorage.setItem('collapse', $('.hidable').css('display')=='none' ? false : true);">
+          data-toggle-off='{"label": "{% trans 'Hide' %}", "content": "unfold_less"}'>
           unfold_less
       </i>
 
@@ -89,8 +89,7 @@
       {% if message %}
       <div class="message-box">
         <div class="message">{{ message }}</div>
-        <i class="clear mdc-theme--secondary material-icons md-24 mdc-ripple-surface icon-list"
-          onclick="$(this).parent().remove();">
+        <i id="clear" class="clear mdc-theme--secondary material-icons md-24 mdc-ripple-surface icon-list">
             clear
         </i>
       </div>
@@ -118,7 +117,7 @@
               {% for c in question.answerchoice_set.all %}
                 {% if forloop.counter == forloop.parentloop.counter %}
                   {% if c.correct %}
-                    <i id="check" class="material-icons" style="-webkit-transform: translateY(3px);font-size:12pt;">check</i>
+                    <i id="check" class="material-icons check-12">check</i>
                   {% endif %}
                 {% endif %}
               {% endfor %}
@@ -169,7 +168,8 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
+{{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
   var show = localStorage.getItem('collapse') === 'true';
   $('.hidable').toggle(show);
   $(".mdc-icon-toggle").each(function() {
@@ -177,5 +177,12 @@
     el.on = !show;
   });
   bundle.addDialog();
+  document.getElementById("hide").addEventListener("click", function() {
+    $('.hidable').toggle();
+    localStorage.setItem('collapse', $('.hidable').css('display')=='none' ? false : true);
+  })
+  document.getElementById("clear").addEventListener("click", function() {
+    $(this).parent().remove();
+  })
 </script>
 {% endblock %}

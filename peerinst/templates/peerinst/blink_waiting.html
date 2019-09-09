@@ -13,7 +13,7 @@
     {% if user.teacher and assignment %}
     <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Waiting for students' %}</h2>
 
-    <p style="margin-bottom:10pt;">{% trans 'Student link' %}: <span class="bold">{{ request.get_host}}{% url 'blink-get-current' teacher.user.username %}</span></p>
+    <p class="m-bot-10">{% trans 'Student link' %}: <span class="bold">{{ request.get_host}}{% url 'blink-get-current' teacher.user.username %}</span></p>
 
     <form method="post" action="{% url 'blinkAssignment-set-time' assignment %}">
       {% csrf_token %}
@@ -29,7 +29,7 @@
           <div class="mdc-notched-outline__idle"></div>
         </div>
         <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
-          {{ field.help_text|safe }}
+          {{ field.help_text }}
         </p>
         {{ field.errors }}
       {% endfor %}
@@ -47,29 +47,25 @@
 {% endblock %}
 
 {% block scripts %}
+{{ block.super }}
 {% if not request.user.is_authenticated %}
-<script>
-function processResponse(text, status, obj) {
-  console.info(text);
-  console.info(status);
-  console.info(obj);
+<script nonce="{{ request.csp_nonce }}">
+function processResponse(response, status, obj) {
+  const action = response["action"];
 
-  var response = text;
-  console.info(response);
-
-  if (response != 'stop') {
-    if (status == 'success' & window.location.pathname != response) {
+  if (action !== "stop") {
+    if (status === "success" & window.location.pathname != action) {
       clearInterval(status);
-      location = response;
+      window.location = action;
     }
   }
 }
 
 function checkURL() {
-  $.get("{% url 'blink-get-current-url' username=teacher.user.username %}",processResponse);
+  $.get("{% url 'blink-get-current-url' username=teacher.user.username %}", processResponse);
 }
 
-var status = window.setInterval(checkURL,1000);
+const status = window.setInterval(checkURL, 1000);
 </script>
 {% endif %}
 {% endblock %}

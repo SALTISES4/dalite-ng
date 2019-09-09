@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+
 from peerinst.models import Teacher
 
 
@@ -19,7 +20,10 @@ def new_teachers(n):
 
 def add_teachers(teachers):
     teachers = teachers if hasattr(teachers, "__iter__") else [teachers]
-    return [
-        Teacher.objects.create(user=User.objects.create_user(**t))
-        for t in teachers
-    ]
+    users = []
+    for teacher in teachers:
+        try:
+            users.append(User.objects.get(username=teacher["username"]))
+        except User.DoesNotExist:
+            users.append(User.objects.create_user(**teacher))
+    return [Teacher.objects.get_or_create(user=user)[0] for user in users]

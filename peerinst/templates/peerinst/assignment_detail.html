@@ -1,8 +1,9 @@
 {% extends 'peerinst/base.html' %}
 
-{% load staticfiles compress i18n %}
+{% load bleach_html staticfiles compress i18n %}
 
 {% block stylesheets %}
+{{ block.super }}
 {% compress css %}
 <link href="{% static 'peerinst/css/search.min.css' %}" rel="stylesheet">
 {% endcompress %}
@@ -25,7 +26,7 @@
       <span class="links-divider">|</span><a href="{% url 'question-create' %}">{% trans 'Create new question' %}</a>
     </div>
 
-    <h2 id="assignment" class="mdc-typography--display1  mdc-theme--secondary">{{object.title}}</h2>
+    <h2 id="assignment" class="mdc-typography--display1 mdc-theme--secondary">{{object.title}}</h2>
     <div class="admin-link">
       <a href="{% url 'assignment-edit' object.pk %}">{% trans 'Edit title' %}</a>
       <span class="links-divider">|</span><a href="{% url 'question-list' object.pk %}">{% trans 'Preview' %}</a>
@@ -53,7 +54,7 @@
 
     <div id="question-list">
     {% for g in object.questions.all %}
-    <div class="mdc-card" id={{g.id|slugify}}>
+    <div class="mdc-card" id={{g.id|slugify}} matrix="{{ g.get_matrix|safe }}">
       <div class="mdc-typography--title bold">
         {{g.title|safe}}
       </div>
@@ -62,24 +63,32 @@
         #{{g.id}} {% if g.user %}{% trans 'by' %} {{ g.user.username }}{% endif %}
       </div>
 
-      <div class="mdc-typography--body1" style="margin-top:5px;">
-        {{g.text|safe}}
+      <div class="mdc-typography--body1 m-top-5">
+        {{g.text|bleach_html|safe}}
       </div>
 
       {% if g.image %}
-      <img class="question-image" style="display:none;" src="{{ g.image.url }}" alt="g.image_alt_text">
+      <img class="question-image hidden" src="{{ g.image.url }}" alt="g.image_alt_text">
       {% endif %}
 
-      <div class="question-answers" style="display:none;">
+      <div class="question-answers hidden">
         <ul>
           {% for label, choice in g.get_choices %}
-          <li class="mdc-typography--body1">{{ label }}. {{ choice|safe }}</li>
+            <li class="dense-list">{{ label }}. {{ choice|bleach_html|safe }}
+            {% for c in g.answerchoice_set.all %}
+              {% if forloop.counter == forloop.parentloop.counter %}
+                {% if c.correct %}
+                  <i class="check material-icons">check</i>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+            </li>
           {% endfor %}
         </ul>
       </div>
 
       <div class="mdc-card__actions">
-        <div class="mdc-card__action-buttons" style="color:grey;">
+        <div class="mdc-card__action-buttons grey">
           <div class="mdc-typography--caption">
             <div>
               {% trans 'Discipline' %}: {{g.discipline}}
@@ -99,37 +108,45 @@
         </div>
 
         <div class="mdc-card__action-icons">
+
+          <div id="stats-{{ g.id|safe }}" class="stats">
+            <i id="activate-dialog-analytics-{{ g.id|safe }}"
+            ref_id="{{ g.id|safe }}" class="material-icons md-24 analytics-tags">assessment</i>
+            <span id="rating-{{ g.id|safe }}"></span>
+          </div>
+
           {% if request.user == g.user or request.user in g.collaborators.all %}
             <a title="{% trans 'Edit' %}" id="edit-question-{{ g.pk }}" href="{% url 'question-update' g.pk %}">
-              <i class="material-icons md-24 mdc-ripple-surface icon-list edit-question mdc-theme--primary">mode_edit</i>
+              <i class="material-icons md-24 mdc-ripple-surface card-icon-list mdc-theme--primary">mode_edit</i>
             </a>
           {% else %}
             <a title="{% trans 'Copy and edit' %}" id="clone-question-{{ g.pk }}" href="{% url 'question-clone' g.pk %}">
-              <i class="material-icons md-24 mdc-ripple-surface icon-list edit-question mdc-theme--primary">file_copy</i>
+              <i class="material-icons md-24 mdc-ripple-surface card-icon-list mdc-theme--primary">file_copy</i>
             </a>
           {% endif %}
-          <form style="display:inline;" method="post" action="#">
+          <form id="question-remove-{{g.pk}}" method="post">
             {% csrf_token %}
             <input type="hidden" name="q" value="{{g.pk}}" />
-            <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit" value="clear"/>
+            <i form="question-remove-{{g.pk}}" class="material-icons mdc-theme--primary md-24 mdc-ripple-surface icon-list submit-question-remove">delete</i>
           </form>
         </div>
       </div>
     </div>
     {% empty %}
     <ul id="empty-assignment-list">
-      <li><strong>Note:</strong> There are currently no questions in this assignment.  You can add them from the list below.</li>
+      <li><strong>{% trans 'Note:' %}</strong>{% trans 'There are currently no questions in this assignment.  You can add them from the list below.' %}</li>
     </ul>
     {% endfor %}
     </div>
 
-    <div id="favourite-questions" class="foldable foldable__unfolded">
-      <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">{% trans 'My favourite questions' %}</h2>
-      <div class="foldable--body" style="margin-top:20px;">
+    <div id="favourite-questions" class="foldable">
+      <h2 id="favourite-question-section" class="foldable--title mdc-typography--display1 mdc-theme--secondary">{% trans 'My favourite questions' %}</h2>
+      <br>
+      <div class="foldable--body" class="m-top-20">
       {% for g in teacher.favourite_questions.all %}
       {% if g not in object.questions.all %}
       {% if g not in teacher.deleted_questions.all %}
-      <div class="all-my-questions mdc-card" id={{g.id|slugify}}>
+      <div class="all-my-questions mdc-card" id="{{g.id|slugify}}"  matrix="{{ g.get_matrix|safe }}">
         <div class="mdc-typography--title bold">
           {{g.title|safe}}
         </div>
@@ -138,24 +155,32 @@
           #{{g.id}} {% if g.user %}{% trans 'by' %} {{ g.user.username }}{% endif %}
         </div>
 
-        <div class="mdc-typography--body1" style="margin-top:5px;">
+        <div class="mdc-typography--body1 m-top-5">
           {{g.text|safe}}
         </div>
 
         {% if g.image %}
-        <img class="question-image" style="display:none;" src="{{ g.image.url }}" alt="g.image_alt_text">
+        <img class="question-image hidden" src="{{ g.image.url }}" alt="g.image_alt_text">
         {% endif %}
 
-        <div class="question-answers" style="display:none;">
+        <div class="question-answers hidden">
           <ul>
             {% for label, choice in g.get_choices %}
-            <li class="mdc-typography--body1">{{ label }}. {{ choice|safe }}</li>
+              <li class="dense-list">{{ label }}. {{ choice|bleach_html|safe }}
+              {% for c in g.answerchoice_set.all %}
+                {% if forloop.counter == forloop.parentloop.counter %}
+                  {% if c.correct %}
+                    <i class="check material-icons">check</i>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              </li>
             {% endfor %}
           </ul>
         </div>
 
         <div class="mdc-card__actions">
-          <div class="mdc-card__action-buttons" style="color:grey;">
+          <div class="mdc-card__action-buttons grey">
             <div class="mdc-typography--caption">
               <div>
                 {% trans 'Discipline' %}: {{g.discipline}}
@@ -175,21 +200,28 @@
           </div>
 
           <div class="mdc-card__action-icons">
+
+            <div id="stats-{{ g.id|safe }}" class="stats">
+              <i id="activate-dialog-analytics-{{ g.id|safe }}"
+              ref_id="{{ g.id|safe }}" class="material-icons md-24 analytics-tags">assessment</i>
+              <span id="rating-{{ g.id|safe }}"></span>
+            </div>
+
             {% if request.user.teacher %}
-            <i class="mdc-icon-toggle material-icons mdc-theme--primary"
+            <i class="mdc-icon-toggle material-icons mdc-theme--primary favourite-btn"
                 role="button"
+                data-id="{{ g.pk|safe }}"
                 aria-pressed="false"
                 aria-label="Add to favorites" tabindex="0"
                 data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
-                data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
-                onclick="toggleFavourite({{g.pk}})">
+                data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'>
                 favorite_border
             </i>
             {% endif %}
-            <form style="display:inline" method="post" action="#{{g.id|slugify}}">
+            <form id="question-add-{{g.pk}}" class="inline" method="post" action="#{{g.id|slugify}}">
               {% csrf_token %}
               <input type="hidden" name="q" value="{{g.pk}}" />
-              <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit" value="add" />
+              <i form="question-add-{{g.pk}}" class="material-icons mdc-theme--primary md-24 mdc-ripple-surface icon-list submit-question-add">add</i>
             </form>
           </div>
         </div>
@@ -253,15 +285,15 @@
       </div>
     </div>
 
-    <div id="filters" style="display:none;">
+    <div id="filters" class="hidden">
       <h2 class='mdc-typography--display1  mdc-theme--secondary'>{% trans 'Filters' %}</h2>
 
       <div id="select-filters">
-        <div id="discipline-filters" style="display:none;"><div style="margin-bottom:5px;">{% trans 'Disciplines: ' %}</div><span id="filter-on-discipline"></span></div>
+        <div id="discipline-filters" class="hidden"><div class="m-bot-5">{% trans 'Disciplines: ' %}</div><span id="filter-on-discipline"></span></div>
 
-        <div id="category-filters" style="margin-top:10px;display:none;"><div style="margin-bottom:5px;">{% trans 'Keywords: ' %}</div><span id="filter-on-category"></span></div>
+        <div id="category-filters m-top-10 hidden"><div class="m-bot-5p">{% trans 'Keywords: ' %}</div><span id="filter-on-category"></span></div>
 
-        <button id="reset-filters" type="button" class='mdc-button mdc-button--raised padded-top' disabled=true onclick='search.reset()'>{% trans 'Clear' %}</button>
+        <button id="reset-filters" type="button" class='mdc-button mdc-button--raised padded-top' disabled=true>{% trans 'Clear' %}</button>
       </div>
     </div>
 
@@ -272,45 +304,88 @@
 {% endblock %}
 
 {% block scripts %}
-{% compress js inline %}
-<script>
-bundle.toggleImages();
-bundle.toggleAnswers();
-search.initFavourites();
+{{ block.super }}
 
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", bundle.getCookie('csrftoken'));
-        }
+<script nonce="{{ request.csp_nonce }}">
+  // Remember state of unfolded elements
+  // All h2 require ids
+  $(".foldable").each(function() {
+    const container = $(this);
+    if (localStorage.getItem('collapse-'+container.find("h2").attr('id')) === 'false') {
+      $(this).addClass('foldable__unfolded');
     }
-});
+    container.find("h2").click(function() {
+      const state = localStorage.getItem('collapse-'+$(this).attr('id'));
+      localStorage.setItem('collapse-'+$(this).attr('id'), state === 'false' ? 'true' : 'false');
+    })
+  });
 
-var limitSearch = document.querySelector('#limit-search');
-bundle.iconToggle.MDCIconToggle.attachTo(limitSearch);
+  bundle.toggleImages();
+  bundle.toggleAnswers();
+  search.initFavourites();
 
-var input = document.getElementById('search-bar');
-input.onchange = function() {
-  if (input.value != "") {
+  const limitSearch = document.querySelector('#limit-search');
+  bundle.iconToggle.MDCIconToggle.attachTo(limitSearch);
+
+  const input = document.getElementById('search-bar');
+  input.onchange = function() {
+    if (input.value != "") {
+      search.setupSearch();
+      console.info("Searching: "+input.value);
+      $('#search_results').load("{% url 'question-search' %}", "search_string="+input.value+"&type=assignment&id={{object.pk|urlencode}}&limit_search="+limitSearch.checked+"&assignment_identifier={{object.identifier|urlencode}}", search.processResponse);
+    }
+  }
+
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+          }
+      }
+  });
+
+  function pageNav(page) {
     search.setupSearch();
     console.info("Searching: "+input.value);
-    $('#search_results').load("{% url 'question-search' %}", "search_string="+input.value+"&type=assignment&id={{object.pk|urlencode}}&limit_search="+limitSearch.checked+"&assignment_identifier={{object.identifier|urlencode}}", search.processResponse);
+    $('#search_results').load("{% url 'question-search' %}?page="+page, "search_string="+input.value+"&type=assignment&id={{object.pk|urlencode}}&limit_search="+limitSearch.checked+"&assignment_identifier={{object.identifier|urlencode}}", search.processResponse);
   }
-}
 
-function pageNav(page) {
-  search.setupSearch();
-  console.info("Searching: "+input.value);
-  $('#search_results').load("{% url 'question-search' %}?page="+page, "search_string="+input.value+"&type=assignment&id={{object.pk|urlencode}}&limit_search="+limitSearch.checked+"&assignment_identifier={{object.identifier|urlencode}}", search.processResponse);
-}
+  function toggleFavourite(pk) {
+    var posting = $.post("{% url 'teacher-toggle-favourite' %}", {pk: pk});
+    posting.done(function(data) {
+      console.info(data);
+    });
+    $('#favourite-questions').find($('#'+pk).remove());
+  }
 
-function toggleFavourite(pk) {
-  var posting = $.post("{% url 'teacher-toggle-favourite' %}", {pk: pk});
-  posting.done(function(data) {
-    console.info(data);
-  });
-  $('#favourite-questions').find($('#'+pk).remove());
-}
+  window.addEventListener("load", function() {
+    $(".mdc-card").each(function(i, el) {
+      bundle.difficulty(el.getAttribute("matrix").replace(/'/g, '"'), el.id);
+    });
+    $(".analytics-tags").css("cursor", "default");
+
+    $(".submit-question-remove").each(function(i, el) {
+      el.addEventListener("click", function() {
+        $('#'+el.getAttribute("form")).submit();
+      });
+    });
+
+    $(".submit-question-add").each(function(i, el) {
+      el.addEventListener("click", function() {
+        $('#'+el.getAttribute("form")).submit();
+      });
+    });
+
+    $(".favourite-btn").each(function(i, el) {
+      el.addEventListener("click", function() {
+        toggleFavourite(el.getAttribute("data-id"));
+      });
+    });
+
+    document.getElementById("reset-filters").addEventListener("click", () => {
+      search.reset()
+    })
+  })
 </script>
-{% endcompress %}
+
 {% endblock %}

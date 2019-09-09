@@ -1,4 +1,4 @@
-{% load staticfiles compress i18n %}
+{% load compress i18n static %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css?family=Montserrat:300,700" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-  {% compress css %}
+  {% compress css file errors %}
   <link href="{% static 'peerinst/css/error.min.css' %}" rel="stylesheet">
   {% endcompress %}
 </head>

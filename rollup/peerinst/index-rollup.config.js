@@ -1,16 +1,16 @@
-import babel from 'rollup-plugin-babel';
-import eslint from 'rollup-plugin-eslint';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import uglify from 'rollup-plugin-uglify';
+import babel from "rollup-plugin-babel";
+import eslint from "rollup-plugin-eslint";
+import resolve from "rollup-plugin-node-resolve";
+import commonjs from "rollup-plugin-commonjs";
+import uglify from "rollup-plugin-uglify";
 
 export default {
-  input: 'peerinst/static/peerinst/js/index.js',
+  input: "peerinst/static/peerinst/js/index.js",
   output: {
-    file: 'peerinst/static/peerinst/js/index.min.js',
-    name: 'bundle',
-    format: 'iife',
-    sourceMap: 'inline',
+    file: "peerinst/static/peerinst/js/index.min.js",
+    name: "bundle",
+    format: "iife",
+    sourceMap: "inline",
   },
   plugins: [
     resolve({
@@ -20,14 +20,10 @@ export default {
     }),
     commonjs(),
     eslint({
-      exclude: [
-        '**.css',
-      ],
+      exclude: ["**.css"],
     }),
     babel({
-      exclude: [
-        'node_modules/d3/**',
-      ],
+      exclude: ["node_modules/d3/**"],
     }),
     uglify(),
   ],

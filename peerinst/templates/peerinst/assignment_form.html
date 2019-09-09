@@ -13,7 +13,7 @@
 
       <div class="admin-link">
         <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
-        <span style="padding-left:0.3em;padding-right:0.5em;">|</span><a href="{% url 'teacher-assignments' teacher.id %}">{% trans 'Back to My Assignments' %}</a>
+        <span class="admin-link--padded">|</span><a href="{% url 'teacher-assignments' teacher.id %}">{% trans 'Back to My Assignments' %}</a>
       </div>
 
       <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Copy an assignment' %}</h2>

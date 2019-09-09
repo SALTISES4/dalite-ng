@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 
 class EmailChangeForm(forms.Form):
     """Form for user email address"""
 
-    email = forms.EmailField()
+    email = forms.EmailField(help_text=_("Enter a new email address"))

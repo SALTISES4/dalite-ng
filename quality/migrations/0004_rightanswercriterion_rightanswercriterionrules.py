@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
-import quality.models.custom_fields
+import dalite.models.custom_fields
 
 
 class Migration(migrations.Migration):
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "uses_rules",
-                    quality.models.custom_fields.CommaSepField(
+                    dalite.models.custom_fields.CommaSepField(
                         blank=True,
                         help_text="Comma separated list of used rules for the criterion found as the fields of the associated rules object. Make sure to use the verbose_name",  # noqa
                     ),
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "threshold",
-                    quality.models.custom_fields.ProbabilityField(
+                    dalite.models.custom_fields.ProbabilityField(
                         help_text="Minimum value for the answer to be accepted",  # noqa
                         verbose_name="Threshold",
                     ),

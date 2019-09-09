@@ -3,12 +3,13 @@ from __future__ import unicode_literals
 
 import json
 
-from dalite.views.errors import response_400
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
+
+from dalite.views.errors import response_400
 from peerinst.models import Assignment, Question
 
 from .decorators import teacher_required
@@ -17,7 +18,7 @@ from .decorators import teacher_required
 @login_required
 @require_http_methods(["POST"])
 @teacher_required
-def update_assignment_question_list(req):
+def update_assignment_question_list(req, teacher):
 
     post_data = json.loads(req.body)
 
@@ -50,5 +51,4 @@ def update_assignment_question_list(req):
     else:
         assignment.questions.add(question)
     assignment.save()
-
     return HttpResponse("Success")

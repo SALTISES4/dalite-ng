@@ -1,4 +1,4 @@
-{% extends './base.html' %}
+{% extends 'pinax/forums/base.html' %}
 
 {% load i18n %}
 
@@ -8,10 +8,10 @@
 
 {% block content %}
 <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Forum list' %}</h2>
-<ul class="mdc-list mdc-list--two-line">
+<ul id="forum-list" class="mdc-list mdc-list--two-line">
   {% for f in object_list|dictsortreversed:"view_count" %}
   <li role="separator" class="mdc-list-divider"></li>
-  <li class="mdc-list-item {{ f.category }}" onclick="window.location.href='{% url 'pinax_forums:forum' f.pk %}'" style="cursor:pointer;">
+  <li id="link-{{ f.pk }}" class="mdc-list-item {{ f.category }} pointer">
     <span class="mdc-list-item__graphic mdc-theme--primary">
       <i class="mdc-theme--primary material-icons md-48">forum</i>
     </span>
@@ -41,10 +41,25 @@
 -->
 
 <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Most active contributors' %}</h2>
-<ul>
-{% for u in most_active_members %}
-  <li>{{ u.user }}: {{ u.count  }} {% trans 'posts' %}</li>
-{% endfor %}
+<ul class="mdc-list mdc-list--two-line">
+  {% for u in most_active_members %}
+  <li role="separator" class="mdc-list-divider"></li>
+  <li class="mdc-list-item">
+      <span class="mdc-list-item__graphic mdc-theme--primary">
+        <i class="mdc-theme--primary material-icons md-48">person_outline</i>
+      </span>
+      <span class="mdc-list-item__text mdc-theme--secondary bold">
+          {{ u.user }}: {{ u.count  }} {% if u.count == 1 %}{% trans 'post' %}{% else %}{% trans 'posts' %}{% endif %}
+        <span class="mdc-list-item__secondary-text">
+            {% trans 'Has taught' %} {{ u.user.teacher.disciplines.first }} {% trans 'at' %} {{ u.user.teacher.institutions.first }}
+        </span>
+        <span class="mdc-list-item__secondary-text">
+            {% trans 'Currently teaches' %} {{ u.user.teacher.current_groups.count }} {% if u.user.teacher.current_groups.count == 1 %}{% trans 'group on MyDalite' %}{% else %}{% trans 'groups on MyDalite' %}{% endif %}
+        </span>
+      </span>
+  </li>
+  {% endfor %}
+  <li role="separator" class="mdc-list-divider"></li>
 </ul>
 
 <!--
@@ -63,7 +78,7 @@
 <ul class="mdc-list mdc-list--two-line">
   {% for t in latest_threads|slice:":3" %}
   <li role="separator" class="mdc-list-divider"></li>
-  <li class="mdc-list-item" onclick="window.location.href='{% url 'pinax_forums:thread' t.pk %}'" style="cursor:pointer;">
+  <li class="mdc-list-item pointer latest-thread-link">
     <span class="mdc-list-item__graphic mdc-theme--primary">
       <i class="mdc-theme--primary material-icons md-48">message</i>
     </span>
@@ -87,7 +102,7 @@
 <ul class="mdc-list mdc-list--two-line">
   {% for t in most_active_threads|slice:":5" %}
   <li role="separator" class="mdc-list-divider"></li>
-  <li class="mdc-list-item" onclick="window.location.href='{% url 'pinax_forums:thread' t.pk %}'" style="cursor:pointer;">
+  <li class="mdc-list-item pointer active-thread-link">
     <span class="mdc-list-item__graphic mdc-theme--primary">
       <i class="mdc-theme--primary material-icons md-48">message</i>
     </span>
@@ -110,7 +125,7 @@
 <ul class="mdc-list mdc-list--two-line">
   {% for t in most_viewed_threads|slice:":5" %}
   <li role="separator" class="mdc-list-divider"></li>
-  <li class="mdc-list-item" onclick="window.location.href='{% url 'pinax_forums:thread' t.pk %}'" style="cursor:pointer;">
+  <li class="mdc-list-item pointer popular-thread-link">
     <span class="mdc-list-item__graphic mdc-theme--primary">
       <i class="mdc-theme--primary material-icons md-48">message</i>
     </span>
@@ -129,4 +144,36 @@
 </ul>
 
 
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
+  window.addEventListener("load", function() {
+    {% for f in object_list %}
+    document.getElementById("link-{{f.pk}}")
+      .addEventListener("click", function() {
+        window.location.href="{% url 'pinax_forums:forum' f.pk %}";
+      });
+    {% endfor %}
+    let links = document.getElementsByClassName("latest-thread-link");
+    {% for t in latest_threads|slice:":3" %}
+      links[{{ forloop.counter0 }}].addEventListener("click", function() {
+        window.location.href="{% url 'pinax_forums:thread' t.pk %}";
+      });
+    {% endfor %}
+    links = document.getElementsByClassName("active-thread-link");
+    {% for t in most_active_threads|slice:":5" %}
+      links[{{ forloop.counter0 }}].addEventListener("click", function() {
+        window.location.href="{% url 'pinax_forums:thread' t.pk %}";
+      });
+    {% endfor %}
+    links = document.getElementsByClassName("popular-thread-link");
+    {% for t in most_viewed_threads|slice:":5" %}
+      links[{{ forloop.counter0 }}].addEventListener("click", function() {
+        window.location.href="{% url 'pinax_forums:thread' t.pk %}";
+      });
+    {% endfor %}
+  });
+</script>
 {% endblock %}

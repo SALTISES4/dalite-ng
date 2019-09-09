@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import hashlib
 import itertools
 import string
 from datetime import datetime
 
 import pytz
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core import exceptions
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -15,7 +17,10 @@ from django.utils.encoding import smart_bytes
 from django.utils.html import escape, strip_tags
 from django.utils.translation import ugettext_lazy as _
 
+from reputation.models import Reputation
+
 from .. import rationale_choice
+from .search import MetaSearch
 
 
 def no_hyphens(value):
@@ -23,12 +28,22 @@ def no_hyphens(value):
         raise ValidationError(_("Hyphens may not be used in this field."))
 
 
+def images(instance, filename):
+    hash = hashlib.sha256(
+        "{}-{}".format(datetime.now(), smart_bytes(filename))
+    ).hexdigest()[:8]
+    path = "images/{0}/{1}/{2}_{3}".format(
+        instance.user.username, datetime.now().month, hash, filename
+    )
+    return path
+
+
 class Category(models.Model):
     title = models.CharField(
         _("Category Name"),
         unique=True,
         max_length=100,
-        help_text=_("Name of a category questions can be sorted into."),
+        help_text=_("Enter the name of a new question category."),
         validators=[no_hyphens],
     )
 
@@ -45,7 +60,7 @@ class Discipline(models.Model):
         _("Discipline name"),
         unique=True,
         max_length=100,
-        help_text=_("Name of a discipline."),
+        help_text=_("Enter the name of a new discipline."),
         validators=[no_hyphens],
     )
 
@@ -70,8 +85,54 @@ class QuestionManager(models.Manager):
         return self.get(title=title)
 
 
+class QuestionFlag(models.Model):
+    question = models.ForeignKey("Question")
+    flag_reason = models.ManyToManyField("QuestionFlagReason")
+    user = models.ForeignKey(User)
+    flag = models.BooleanField(default=True)
+    comment = models.CharField(max_length=200, null=True, blank=True)
+    datetime_created = models.DateTimeField(auto_now_add=True)
+    datetime_last_modified = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return "{} - {}- {}- {}".format(
+            self.question.pk, self.question, self.user.email, self.comment
+        )
+
+    class Meta:
+        verbose_name = _("flagged question")
+
+
+class FlaggedQuestionManager(models.Manager):
+    def get_queryset(self):
+        flagged_questions = QuestionFlag.objects.filter(flag=True).values_list(
+            "question", flat=True
+        )
+
+        return (
+            super(FlaggedQuestionManager, self)
+            .get_queryset()
+            .filter(pk__in=flagged_questions)
+        )
+
+
+class UnflaggedQuestionManager(models.Manager):
+    def get_queryset(self):
+        flagged_questions = QuestionFlag.objects.filter(flag=True).values_list(
+            "question", flat=True
+        )
+
+        return (
+            super(UnflaggedQuestionManager, self)
+            .get_queryset()
+            .exclude(pk__in=flagged_questions)
+        )
+
+
 class Question(models.Model):
     objects = QuestionManager()
+    flagged_objects = FlaggedQuestionManager()
+    unflagged_objects = UnflaggedQuestionManager()
 
     id = models.AutoField(
         primary_key=True,
@@ -121,11 +182,12 @@ class Question(models.Model):
     )
     created_on = models.DateTimeField(auto_now_add=True, null=True)
     last_modified = models.DateTimeField(auto_now=True, null=True)
+
     image = models.ImageField(
         _("Question image"),
         blank=True,
         null=True,
-        upload_to="images",
+        upload_to=images,
         help_text=_(
             "Optional. An image to include after the question text. Accepted "
             "formats: .jpg, .jpeg, .png, .gif"
@@ -166,8 +228,8 @@ class Question(models.Model):
         Category,
         _("Categories"),
         help_text=_(
-            "Select at least one category for this question. You can select "
-            "multiple categories."
+            "Type to search and select at least one category for this "
+            "question. You can select multiple categories."
         ),
     )
     discipline = models.ForeignKey(
@@ -175,7 +237,7 @@ class Question(models.Model):
         blank=True,
         null=True,
         help_text=_(
-            "Optional. Select the discipline to which this question should "
+            "Optional. Select the discipline to which this item should "
             "be associated."
         ),
     )
@@ -184,8 +246,7 @@ class Question(models.Model):
         default=False,
         help_text=_(
             "Add random fake attributions consisting of username and country "
-            "to rationales. You can configure the lists of fake values and "
-            "countries from the start page of the admin interface."
+            "to rationales. "
         ),
     )
     sequential_review = models.BooleanField(
@@ -224,6 +285,10 @@ class Question(models.Model):
             "correct answer."
         ),
     )
+    reputation = models.OneToOneField(
+        Reputation, blank=True, null=True, on_delete=models.SET_NULL
+    )
+    meta_search = GenericRelation(MetaSearch, related_query_name="questions")
 
     def __unicode__(self):
         if self.discipline:
@@ -239,14 +304,12 @@ class Question(models.Model):
         first_answer_choice = int(form.cleaned_data["first_answer_choice"])
         correct = view.question.is_correct(first_answer_choice)
         rationale = form.cleaned_data["rationale"]
-        datetime_start = form.cleaned_data["datetime_start"]
         datetime_first = datetime.now(pytz.utc).strftime(
             "%Y-%m-%d %H:%M:%S.%f"
         )
         view.stage_data.update(
             first_answer_choice=first_answer_choice,
             rationale=rationale,
-            datetime_start=datetime_start,
             datetime_first=datetime_first,
             completed_stage="start",
         )
@@ -455,21 +518,3 @@ class QuestionFlagReason(models.Model):
 
     class Meta:
         verbose_name = _("Question flag reason")
-
-
-class QuestionFlag(models.Model):
-    question = models.ForeignKey(Question)
-    flag_reason = models.ManyToManyField(QuestionFlagReason)
-    user = models.ForeignKey(User)
-    flag = models.BooleanField(default=True)
-    comment = models.CharField(max_length=200, null=True, blank=True)
-    datetime_created = models.DateTimeField(auto_now_add=True)
-    datetime_last_modified = models.DateTimeField(auto_now=True)
-
-    def __unicode__(self):
-        return "{} - {}- {}- {}".format(
-            self.question.pk, self.question, self.user.email, self.comment
-        )
-
-    class Meta:
-        verbose_name = _("flagged question")

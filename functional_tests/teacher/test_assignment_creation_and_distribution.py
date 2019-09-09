@@ -1,4 +1,3 @@
-from django.core.urlresolvers import reverse
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -8,106 +7,12 @@ from selenium.webdriver.support.expected_conditions import (
 from selenium.webdriver.support.ui import WebDriverWait
 
 from functional_tests.fixtures import *  # noqa
+from .utils import go_to_account, login
 
 timeout = 3
 
 
-def login(browser, teacher):
-    username = teacher.user.username
-    password = "test"
-
-    browser.get("{}{}".format(browser.server_url, reverse("login")))
-
-    username_input = browser.find_element_by_xpath(
-        "//input[@id=(//label[text()='Username']/@for)]"
-    )
-    username_input.clear()
-    username_input.send_keys(username)
-
-    password_input = browser.find_element_by_xpath(
-        "//input[@id=(//label[text()='Password']/@for)]"
-    )
-    password_input.clear()
-    password_input.send_keys(password)
-
-    submit_button = browser.find_element_by_xpath("//input[@value='Submit']")
-    submit_button.click()
-
-
-def go_to_account(browser):
-    link = browser.find_element_by_link_text("Go to My Account").get_attribute(
-        "href"
-    )
-    browser.get(link)
-
-
-def create_question(browser, teacher):
-    try:
-        WebDriverWait(browser, timeout).until(
-            presence_of_element_located((By.ID, "question-section"))
-        ).click()
-    except TimeoutException:
-        assert False
-    browser.find_element_by_link_text("Create new").click()
-
-    try:
-        title = WebDriverWait(browser, timeout).until(
-            presence_of_element_located(((By.ID, "id_title")))
-        )
-    except TimeoutException:
-        assert False
-
-    title.send_keys("test")
-
-    tinymce = browser.find_element_by_tag_name("iframe")
-    browser.switch_to.frame(tinymce)
-    text = browser.find_element_by_id("tinymce")
-    text.send_keys("test")
-    browser.switch_to.default_content()
-
-    submit = browser.find_element_by_xpath(
-        "//input[@type='submit' and @value='Add']"
-    )
-    submit.click()
-
-    try:
-        answer_1 = WebDriverWait(browser, timeout).until(
-            presence_of_element_located(
-                (By.ID, "id_answerchoice_set-0-text_ifr")
-            )
-        )
-    except TimeoutException:
-        assert False
-
-    browser.switch_to.frame(answer_1)
-    text = browser.find_element_by_id("tinymce")
-    text.send_keys("test 1")
-    browser.switch_to.default_content()
-
-    answer_2 = browser.find_element_by_id("id_answerchoice_set-1-text_ifr")
-    browser.switch_to.frame(answer_2)
-    text = browser.find_element_by_id("tinymce")
-    text.send_keys("test 2")
-    browser.switch_to.default_content()
-
-    browser.find_element_by_id("id_answerchoice_set-0-correct").click()
-
-    submit = browser.find_element_by_xpath(
-        "//input[@type='submit' and @value='Save and next']"
-    )
-    submit.click()
-
-    try:
-        WebDriverWait(browser, timeout).until(
-            presence_of_element_located(
-                (By.XPATH, "//input[@type='submit' and @value='Done']")
-            )
-        ).click()
-    except TimeoutException:
-        assert False
-
-
-def create_assignment(browser, teacher):
+def create_assignment(browser, teacher, complete_questions):
     try:
         WebDriverWait(browser, timeout).until(
             presence_of_element_located((By.ID, "assignment-section"))
@@ -231,10 +136,9 @@ def distribute_assignment(browser):
         assert False
 
 
-def test_assignment_creation_and_distribution(browser, teacher):
+def test_assignment_creation_and_distribution(browser, questions, teacher):
     login(browser, teacher)
     go_to_account(browser)
-    create_question(browser, teacher)
-    create_assignment(browser, teacher)
-    create_group(browser)
-    distribute_assignment(browser)
+    create_assignment(browser, teacher, questions)
+    # create_group(browser)
+    # distribute_assignment(browser)

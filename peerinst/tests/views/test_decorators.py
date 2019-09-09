@@ -1,35 +1,61 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.contrib.auth.models import AnonymousUser
-from django.test import RequestFactory, TestCase
+
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.views.decorators import student_required, teacher_required
 
-from ..generators import add_teachers, add_users, new_teachers, new_users
+
+def test_teacher_required__with_teacher(rf, teacher):
+    req = rf.get("/test")
+    req.user = teacher.user
+
+    fct = teacher_required(lambda req, teacher: teacher)
+    resp = fct(req)
+    assert resp == teacher
 
 
-class TeacherRequired(TestCase):
-    def setUp(self):
-        self.req_factory = RequestFactory()
-        self.teacher_required = teacher_required(lambda req: None)
+def test_teacher_required__with_student(rf, student):
+    req = rf.get("/test")
+    req.user = student.student
 
-    def test_teacher_required_teacher_exists(self):
-        user = add_teachers(new_teachers(1))[0].user
-        req = self.req_factory.get("/test")
-        req.user = user
-
-        resp = self.teacher_required(req)
-        self.assertIs(resp, None)
-
-    def test_teacher_required_not_teacher(self):
-        user = add_users(new_users(1))[0]
-        req = self.req_factory.get("/test")
-        req.user = user
-
-        resp = self.teacher_required(req)
-        self.assertEqual(resp.status_code, 403)
-        self.assertEqual(resp.template_name, "403.html")
+    fct = teacher_required(lambda req, teacher: teacher)
+    resp = fct(req)
+    assert resp.status_code == 403
+    assert resp.template_name == "403.html"
 
 
-def test_student_required__with_student(client, rf, student):
+def test_teacher_required__with_teacher(rf, teacher):
+    req = rf.get("/test")
+    req.user = teacher.user
+
+    fct = teacher_required(lambda req, teacher: teacher)
+    resp = fct(req)
+    assert resp == teacher
+
+
+def test_teacher_required__with_regular_user(rf, user):
+    req = rf.get("/test")
+    req.user = user
+
+    fct = teacher_required(lambda req, teacher: teacher)
+    resp = fct(req)
+    assert resp.status_code == 403
+    assert resp.template_name == "403.html"
+
+
+def test_teacher_required__with_anonymous_user(rf):
+    req = rf.get("/test")
+    req.user = AnonymousUser()
+
+    fct = teacher_required(lambda req, teacher: teacher)
+    resp = fct(req)
+    assert resp.status_code == 403
+    assert resp.template_name == "403.html"
+
+
+def test_student_required__with_student(rf, student):
     req = rf.get("/test")
     req.user = student.student
 
@@ -38,7 +64,7 @@ def test_student_required__with_student(client, rf, student):
     assert resp == student
 
 
-def test_student_required__with_teacher(client, rf, teacher):
+def test_student_required__with_teacher(rf, teacher):
     req = rf.get("/test")
     req.user = teacher.user
 
@@ -48,7 +74,7 @@ def test_student_required__with_teacher(client, rf, teacher):
     assert resp.template_name == "403.html"
 
 
-def test_student_required__with_regular_user(client, rf, user):
+def test_student_required__with_regular_user(rf, user):
     req = rf.get("/test")
     req.user = user
 
@@ -58,7 +84,7 @@ def test_student_required__with_regular_user(client, rf, user):
     assert resp.template_name == "403.html"
 
 
-def test_student_required__with_anonymous_user(client, rf, user):
+def test_student_required__with_anonymous_user(rf):
     req = rf.get("/test")
     req.user = AnonymousUser()
 

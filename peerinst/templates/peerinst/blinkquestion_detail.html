@@ -3,10 +3,6 @@
 {% load i18n %}
 
 {% block body %}
-
-<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js">
-</script>
-
 <main>
   <section>
     <h1 class="mdc-typography--display3"> {% trans 'Blink Question' %}
@@ -24,7 +20,7 @@
     {% endif %}
 
     <div>
-      <div style="display:inline;float:left;max-width:400px;">
+      <div class="inline f-left max-width-400">
         <ul>
         {% for label, choice in object.question.get_choices %}
           <li class="dense-list">
@@ -37,24 +33,24 @@
         {% endfor %}
         </ul>
       </div>
-    <svg id="timer" width=300 height=200 style="display:block;margin: auto;"></svg>
-    <svg id="results" width=300 height=200 style="display:none;margin: auto;"></svg>
+      <svg id="timer" class="block-auto" width=300 height=200></svg>
+      <svg id="results" class="block-auto" width=300 height=200></svg>
     </div>
-    <div style="clear:both;"></div>
+    <div class="clear-both"></div>
 
     <div class="note">
-      Round: {{round}}<br>
+      {% trans 'Round:' %} <span id="round">{{round}}</span><br>
       {% if request.user.is_authenticated %}
-        Number of respondents: <span id="counter"></span>
+        {% trans 'Number of respondents:' %} <span id="counter"></span>
       {% endif %}
     </div>
 
     {% if request.user.is_authenticated %}
-    <input class="mdc-button mdc-button--raised" id="reset_button" type="button" style="display:none;" value="Reset" onclick="reset()">
+    <input class="mdc-button mdc-button--raised hidden" id="reset_button" type="button" value="Reset">
     {% endif %}
 
     {% if request.user.is_authenticated %}
-    <input class="mdc-button mdc-button--raised" id="next_button" type="button" style="margin-left:20px;display:none;" value="Next" onclick="next()">
+    <input class="mdc-button mdc-button--raised hidden m-left-20" id="next_button" type="button" value="Next">
     {% endif %}
 
   </section>
@@ -62,23 +58,24 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
+{{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
 function reset(){
-  location="{% url 'blink-reset' pk=object.pk %}"
+  window.location = "{% url 'blink-reset' pk=object.pk %}"
 }
 function next(){
-  location="{% url 'blink-get-next' pk=object.pk %}"
+  window.location = "{% url 'blink-get-next' pk=object.pk %}"
 }
 
-var csrftoken = Cookies.get('csrftoken');
+const csrftoken = bundle.getCsrfToken();
 
 // AJAX
 function get(url,callback) {
-  var request = new XMLHttpRequest();
+  const request = new XMLHttpRequest();
   request.open("GET",url);
   request.onreadystatechange = function() {
     if (request.readyState === 4 && request.status === 200) {
-      var type = request.getResponseHeader("Content-Type");
+      const type = request.getResponseHeader("Content-Type");
       console.info('URL: '+url);
       console.info('Type: '+type);
       console.info('Response: '+request.responseText);
@@ -101,12 +98,12 @@ function set_counter(json) {
 
 // Schedule AJAX event
 {% if request.user.is_authenticated %}
-var counterID = window.setInterval(get,1000,"{% url 'blink-count' pk=object.pk %}",set_counter);
+const counterID = window.setInterval(get,1000,"{% url 'blink-count' pk=object.pk %}", set_counter);
 {% endif %}
 
 // Countdown
-var startTime = parseInt({{ time_left }});
-console.info({{ time_left }});
+let startTime = parseFloat({{ time_left }});
+console.info(startTime);
 
 var svg = bundle.select("#timer"),
 width = +svg.attr("width"),
@@ -130,9 +127,14 @@ var time = g.append("text")
 .attr("text-anchor","middle")
 .attr("font-size",r)
 .style("fill","white")
-.text(startTime);
+.text(parseInt(startTime));
 
-var timerID = window.setInterval(update_time,1000);
+let timerId;
+
+window.setTimeout(() => {
+  startTime = parseInt(startTime);
+  timerID = window.setInterval(update_time,1000);
+}, 1000*(startTime%1));
 
 function changeQuestionState(url,state,callback) {
   var request = new XMLHttpRequest();
@@ -166,8 +168,8 @@ function getResults(response) {
 
 function update_time(){
   time.text(function(){
-    startTime=startTime-1;
-    if (startTime>0) {
+    startTime = startTime - 1;
+    if (startTime > 0) {
       return startTime;
     }
     else {
@@ -184,6 +186,7 @@ function update_time(){
       }
       else {
         function processStatus(response) {
+          console.info("Checking status");
           if (response['status'] == false) {
             clearInterval(checkID);
             getResults();
@@ -191,15 +194,16 @@ function update_time(){
             function checkRedirect(response) {
               function compare(response){
                 console.info(response);
-                if (response != "stop"){
-                  if (window.location.pathname != response) {
-                    location = response;
+                const action = response["action"]
+                if (action != "stop"){
+                  if (window.location.pathname != action) {
+                    window.location = action;
                   }
                 }
-                if (response == "stop") {
+                if (action == "stop") {
                   clearInterval(checkURLID);
                   // Back to waiting room
-                  location = "{% url 'blink-waiting' username=teacher %}"
+                  window.location = "{% url 'blink-waiting' username=teacher %}"
                 }
                 return;
               }
@@ -290,5 +294,21 @@ function showResults(data){
 
   // show average response time per choice1
 }
+</script>
+<script nonce="{{ request.csp_nonce }}">
+  window.addEventListener("load", function() {
+    const reset_btn = document.getElementById("reset_button");
+    if (reset_btn) {
+      reset_btn.addEventListener("click", () => {
+        reset();
+      });
+    }
+    const next_btn = document.getElementById("next_button");
+    if (next_btn) {
+      next_btn.addEventListener("click", () => {
+        next();
+      });
+    }
+  });
 </script>
 {% endblock %}

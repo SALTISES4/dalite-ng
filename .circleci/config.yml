@@ -30,7 +30,7 @@ jobs:
             yarn run gulp build
       - run:
           name: Safety
-          command:  |
+          command: |
             . .venv/bin/activate
             pip install safety
             safety check
@@ -56,7 +56,13 @@ jobs:
             . .venv/bin/activate
             ./manage.py migrate
       - run:
+          name: Collect static content and compress
+          command: |
+            . .venv/bin/activate
+            ./manage.py collectstatic -c
+            ./manage.py compress
+      - run:
           name: Tests
           command: |
             . .venv/bin/activate
-            pytest --cov --create-db --cov-report term-missing
+            pytest --migrations --cov --create-db

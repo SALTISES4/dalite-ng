@@ -10,7 +10,9 @@ def add_to_group(students, groups):
     for student in students:
         student.groups.add(*groups)
         for group in groups:
-            StudentGroupMembership.objects.create(student=student, group=group)
+            StudentGroupMembership.objects.get_or_create(
+                student=student, group=group
+            )
 
 
 def login_student(client, student):

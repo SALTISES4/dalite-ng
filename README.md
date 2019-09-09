@@ -37,7 +37,7 @@ Setting up the development server
 
 5. Run the Django development server.
 
-        $ ./manage.py runserver
+        $ ./manage.py runsslserver
 
 
 6. Add Sample Consent Form
@@ -326,9 +326,39 @@ Bruce][entypo].
 [entypo]: http://www.entypo.com/
 
 
+Coverage
+--------
+
+`$ pytest --cov --cov-report html`
 
 
-Local coverage command
-----------------------
+Celery, beat, and Redis
+-----------------------
 
-`$ py.test --cov-config .coveragerc --cov-report html --cov=peerinst --cov=dalite --cov=tos ./`
+Requires Redis 5.0.0
+ - Installation
+ (env) $ wget http://download.redis.io/releases/redis-5.0.0.tar.gz
+ (env) $ tar xzf redis-5.0.0.tar.gz
+ (env) $ cd redis-5.0.0
+ (env) $ make
+
+ - Start redis
+ (env) $ redis-5.0.0/src/redis-server
+
+ - Start celery worker (for development)
+ (env) $ celery -A dalite worker -l debug
+
+ - Start beat scheduler (for development)
+ (env) $ celery -A dalite beat -l debug --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
+ - Schedule tasks at: /admin/django_celery_beat/
+
+Tools
+-----
+`makefile`:
+  Command shortcuts
+
+  `make test`:
+    Runs pytest with migration and coverage options
+  `make test-cdb`:
+    Runs pytest with migration and coverage options, re-creating the db

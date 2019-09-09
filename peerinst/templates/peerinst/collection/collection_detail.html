@@ -1,0 +1,349 @@
+{% extends 'peerinst/base.html' %}
+
+{% load get_value bleach_html staticfiles compress i18n %}
+
+{% block stylesheets %}
+{{ block.super }}
+{% compress css %}
+<link href="{% static 'peerinst/css/collection.min.css' %}" rel="stylesheet">
+{% endcompress %}
+{% endblock %}
+{% block body %}
+<main>
+  <section>
+    <h1 class="mdc-typography--display3">{% trans 'Collections' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
+    <div class="admin-link">
+      <a href="{% url 'teacher' request.user.teacher.pk %}">{% trans 'Back to My Account' %}</a>
+      <span class="links-divider">|</span><a href="{% url 'collection-list' %}">{% trans 'View Collections' %}</a>
+      <span class="links-divider">|</span>{% if request.user.teacher == object.owner %}<a href="{% url 'collection-update' object.pk %}">{% trans 'Edit' %}</a>
+      <span class="links-divider">|</span><a href="{% url 'collection-delete' object.pk %}">{% trans 'Delete' %}</a>
+      <span class="links-divider">|</span>{% endif %}<a href="{% url 'collection-create' %}">{% trans 'Create' %}</a>
+    </div>
+    <div>
+      <h2 class="mdc-typography--display1
+                 mdc-theme--secondary">{{ object.title|bleach_html|safe }}</h2>
+    </div>
+    <div class='field-container'>
+      <div class='number-box'><span class='number'>?</span></div>
+      <div class='field'>
+        <p><small>
+          {% blocktrans %}
+          A collection is a compilation of assignments that work well in conjunction
+          with one another.
+          Collections have various functions, from housing an entire semester's
+          worth of course material to simply covering one topic.
+          {% endblocktrans %}
+          </small></p>
+          <p><small>
+          {% blocktrans %}
+          Your may assign the this collection to one of your student groups by
+          clicking on the assign button below.
+          {% endblocktrans %}
+        </small></p>
+      </div>
+    </div>
+    <div class="mdc-card" id="desciption">
+      <div class="mdc-typography--caption">
+        {% trans 'Created by' %} {{ object.owner.user.username }}
+      </div>
+      <div class="mdc-typography--body1" id="obj.desc">
+        {{ object.description|bleach_html|safe }}
+      </div>
+      <div class="mdc-card__actions">
+        <div class="mdc-card__action-buttons">
+          <div class="mdc-typography--caption caption">
+            <div>
+              {% trans 'Discipline' %}: {{ object.discipline|bleach_html|safe }}
+            </div>
+            <div class="followers-number"
+                 id="follower-count-{{ object.pk }}"
+                 data-count="{{ object.followers.count }}">{% trans 'Followers' %}: {{ object.followers.count }}</div>
+            <div>
+              {% trans 'Published on' %} {{ object.created_on }}
+            </div>
+          </div>
+        </div>
+        <div class="mdc-card__action-icons">
+          <i class="mdc-icon-toggle material-icons mdc-theme--primary md-24 follower-btn"
+              role="button"
+              aria-pressed="false"
+              aria-label="Add to favorites" tabindex="0"
+              {% if request.user.teacher in object.followers.all %}
+              data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
+              data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+              {% else %}
+              data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
+              data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
+              {% endif %}
+              pk="{{ object.pk }}"
+              data-count="{{ object.followers.count }}">
+              favorite_border
+          </i>
+          <i pk="{{ object.pk|safe }}"
+                  class="mdc-icon-toggle material-icons mdc-theme--primary collection-distribute md-24"
+                  >share
+          </i>
+        </div>
+      </div>
+    </div>
+    <div class="mdc-card" id="desciption">
+      <div class="mdc-typography--body1" id="obj.desc">
+        <b>{% trans 'Collection Statistics' %}</b>
+      </div>
+      <div class="mdc-card__actions">
+        <div class="mdc-card__action-buttons">
+          <div class="mdc-typography--caption caption">
+            <div>
+              {% trans 'Total Answers' %}: {{ collection_data.total_answers }}
+            </div>
+            <div>
+              {% trans 'Answers Switched' %}: {{ collection_data.switches }}
+            </div>
+          </div>
+        </div>
+        <div class="mdc-card__action-icons">
+          <div class="mdc-card__action-buttons">
+            <div class="mdc-typography--caption caption">
+              <div>
+                {% trans 'Correct Answers on First Attempt' %}:
+                {{ collection_data.correct_first_answers }}
+              </div>
+              <div>
+                {% trans 'Correct Answers on Second Attempt' %}:
+                {{ collection_data.correct_second_answers }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul>
+    {% for obj in object.assignments.all %}
+    <li class="dense-list searchable">
+        <div class="mdc-card" id="card-assign">
+          <div class="mdc-typography--title bold">
+            {{ obj.title|bleach_html|safe }}
+          </div>
+        <div class="mdc-typography--caption">
+          {% trans 'Created by' %} {% for c in obj.owner.all %}
+          {{ c }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </div>
+        <div class="mdc-typography--body1">
+          <div class="mdc-card" id="desciption">
+            <div class="mdc-typography--body1">
+                <b>{% trans 'Assignment Statistics' %}</b>
+            </div>
+            <div class="mdc-card__actions">
+              <div class="mdc-card__action-buttons">
+                <div class="mdc-typography--caption caption">
+                  <div>
+                    {% trans 'Total Answers' %}:
+                    {{ assignment_data|get_value:obj.pk|get_value:"total_answers" }}
+                  </div>
+                  <div>
+                    {% trans 'Answers Switched' %}:
+                    {{ assignment_data|get_value:obj.pk|get_value:"switches" }}
+                  </div>
+                </div>
+              </div>
+              <div class="mdc-card__action-icons">
+                <div class="mdc-card__action-buttons">
+                  <div class="mdc-typography--caption caption">
+                    <div>
+                      {% trans 'Correct Answers on First Attempt' %}:
+                      {{ assignment_data|get_value:obj.pk|get_value:"correct_first_answers" }}
+                    </div>
+                    <div>
+                      {% trans 'Correct Answers on Second Attempt' %}:
+                      {{ assignment_data|get_value:obj.pk|get_value:"correct_second_answers" }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="foldable">
+            <h1 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
+              {{ obj.questions.count }} {% if obj.questions.count == 1 %}{% trans 'Question' %}{% else %}{% trans 'Questions' %}{% endif %}
+            </h1>
+            <div class="foldable--body">
+              <ul>
+                {% for question in obj.questions.all %}
+                <li class="dense-list searchable">
+                  <div class="mdc-card"
+                       id="{{ obj.id|safe }}"
+                       discipline="'{{ obj.discipline|safe }}'"
+                       category="{% for c in obj.category.all %}{{ c.title|safe }} {% endfor %}"
+                       matrix="{{ obj.get_matrix|safe }}">
+                    <div class="mdc-typography--title bold">
+                      {{ question.title|bleach_html|safe }}
+                    </div>
+                    <div class="mdc-typography--caption">
+                      #{{ question.id }} {% if question.user %}{% trans 'by' %}
+                      {{ question.user.username }}{% endif %}
+                    </div>
+                    <div class="mdc-typography--body1">
+                      {{ question.text|bleach_html|safe  }}
+                    </div>
+
+                    {% if question.image %}
+                      <img class="question-image"
+                           src="{{ question.image.url|safe }}"
+                           alt="question.image_alt_text">
+                    {% endif %}
+
+                    {% if question.video_url %}
+                    <div id="question-video">
+                      <object class="question-image"
+                              width="640"
+                              height="390"
+                              data="{{ question.video_url|safe }}">
+                      </object>
+                    </div>
+                    {% endif %}
+
+                    <div class="question-answers">
+                      <ul>
+                        {% for label, choice in question.get_choices %}
+                          <li class="dense-list">{{ label }}. {{ choice|bleach_html|safe }}
+                          {% for c in question.answerchoice_set.all %}
+                            {% if forloop.counter == forloop.parentloop.counter %}
+                              {% if c.correct %}
+                                <i class="check material-icons">check</i>
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+
+                    <div class="mdc-card__actions">
+                      <div class="mdc-card__action-buttons">
+                        <div class="mdc-typography--caption">
+                          <div>
+                            {% trans 'Discipline' %}: {{ question.discipline|bleach_html|safe }}
+                          </div>
+                          <div>
+                            {% trans 'Categories' %}:
+                            {% for c in question.category.all %}
+                            {{ c.title|bleach_html|safe }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                            {% trans 'Uncategorized' %}
+                            {% endfor %}
+                          </div>
+                          <div>
+                            {% trans 'Student answers' %}: {{ obj.answer_set.all.count }}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mdc-card__action-icons">
+                        <div id="stats-{{ question.id|safe }}" class="stats">
+                          <i id="activate-dialog-analytics-{{ question.id|safe }}"
+                             ref_id="{{ question.id|safe }}"
+                             class="material-icons md-24 analytics-tags">assessment</i>
+                          <span id="rating-{{ question.id|safe }}"></span>
+                        </div>
+                        <i class="mdc-icon-toggle material-icons mdc-theme--primary favourite-btn"
+                            role="button"
+                            aria-pressed="false"
+                            aria-label="Add to favorites" tabindex="0"
+                            {% if question in request.user.teacher.favourite_questions.all %}
+                            data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
+                            data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+                            {% else %}
+                            data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
+                            data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
+                            {% endif %}
+                            pk="{{ question.pk|safe }}">
+                            favorite_border
+                        </i>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="mdc-card__actions">
+          <div class="mdc-card__action-buttons">
+            <div class="mdc-typography--caption">
+              <div class="admin-link">
+                <a id="assignment-view" href="{% url 'question-list' obj.pk %}">
+                  <b>{% trans 'See More' %}</b>
+                </a>
+              </div>
+            </div>
+          </div>
+      </div>
+        </div>
+    {% empty %}
+    {% trans 'No assignments available.' %}
+    {% endfor %}
+  </li>
+  </ul>
+  </section>
+</main>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
+
+  [].forEach.call(document.querySelectorAll(".mdc-icon-toggle"), el => {
+    bundle.iconToggle.MDCIconToggle.attachTo(el);
+  });
+
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+          }
+      }
+  });
+
+  function toggleFollower(pk) {
+    var posting = $.post("{% url 'teacher-toggle-follower' %}", {pk: pk});
+    posting.done(function(data) {
+      console.info(data);
+      let followerValue = document.getElementById("follower-count-"+pk).innerHTML;
+      followerValue = followerValue.substring(11);
+      followerValue = parseInt(followerValue);
+      if (data.action == "added") {
+        document.getElementById("follower-count-"+pk).innerHTML = ("{% trans 'Followers' %}: " + (followerValue+1));
+      } else if (data.action == "removed") {
+        document.getElementById("follower-count-"+pk).innerHTML = ("{% trans 'Followers' %}: " + (followerValue-1));
+      }
+    })
+  }
+
+  [].forEach.call(document.querySelectorAll(".follower-btn"), el => {
+    el.addEventListener("click", () => {
+      toggleFollower(el.getAttribute('pk'));
+    });
+  });
+
+  function toggleFavourite(pk) {
+    var posting = $.post("{% url 'teacher-toggle-favourite' %}", {pk: pk});
+    posting.done(function(data) {
+      console.info(data);
+    })
+  }
+
+  [].forEach.call(document.querySelectorAll(".favourite-btn"), el => {
+    el.addEventListener("click", () => {
+      toggleFavourite(el.getAttribute('pk'));
+    });
+  });
+
+  [].forEach.call(document.querySelectorAll(".collection-distribute"), el => {
+    el.addEventListener("click", () => {
+      window.location.assign("{% url 'collection-distribute' object.pk %}");
+    });
+  });
+</script>
+{% endblock %}

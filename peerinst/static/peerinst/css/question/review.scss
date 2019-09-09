@@ -1,0 +1,38 @@
+#review-alert {
+  align-items: center;
+  background: rgba(#cccccc, 0.25);
+  display: none;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  top: 0;
+  transition: transform 200ms;
+  width: 100%;
+  z-index: 1000;
+
+  & div {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #c8c8c8;
+    border-radius: 25px;
+    box-shadow: 0 1px 1px 1px #c8c8c8;
+    display: flex;
+    flex-direction: column;
+    float: left;
+    justify-content: space-between;
+    left: 25%;
+    min-width: 50%;
+    padding: 25px;
+    position: fixed;
+    top: 38%;
+
+    & button {
+      margin-top: 25px;
+    }
+  }
+  &.review-alert--showing {
+    display: flex;
+    transform: scale(1, 1);
+  }
+}

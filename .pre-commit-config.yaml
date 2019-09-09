@@ -5,10 +5,12 @@ repos:
     rev: stable
     hooks:
       - id: black
+        exclude: "^.*/migrations/.*.py$"
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.0.0
     hooks:
       - id: flake8
+        exclude: "^.*/migrations/.*.py$"
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v5.9.0
     hooks:
@@ -32,7 +34,17 @@ repos:
         args: [--fix]
         exclude: "^.*\\.min\\..*$"
         additional_dependencies: ['stylelint@9.9.0', 'stylelint-config-recommended-scss@3.2.0', 'stylelint-config-recommended@2.1.0']
-  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-    sha: v1.1.0
+  - repo: local
     hooks:
-    -   id: python-safety-dependencies-check
+      - id: safety
+        name: safety
+        entry: safety check
+        language: system
+        always_run: true
+        exclude: ".*"
+      - id: npm-audit
+        name: npm-audit
+        language: system
+        entry: npm audit
+        always_run: true
+        exclude: ".*"

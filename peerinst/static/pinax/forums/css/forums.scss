@@ -21,7 +21,7 @@ main {
 }
 .mdc-typography--caption {
   color: gray;
-  }
+}
 .centered {
   margin: auto;
   width: fit-content;
@@ -30,34 +30,34 @@ main {
   border-style: solid;
   border-width: 0.5px;
   color: lightgray;
-  margin-bottom:10px;
-  margin-top:10px;
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
 .reply {
-  margin-right:5%;
+  margin-right: 5%;
   padding: 10px 20px 6px;
-  width:95%;
+  width: 95%;
 }
-.reply-to-reply{
+.reply-to-reply {
   background-color: lightgray;
-  margin-left:5%;
+  margin-left: 5%;
   padding: 10px 20px 6px;
-  width:95%;
+  width: 95%;
 }
 .post-form {
-  margin-right:5%;
-  width:95%;
+  margin-right: 5%;
+  width: 95%;
 }
 .reply-form {
   display: none;
-  margin-left:5%;
-  width:95%;
+  margin-left: 5%;
+  width: 95%;
 }
 .external-content {
   background-color: white;
   margin: auto;
-  margin-top:20px;
-  width:fit-content;
+  margin-top: 20px;
+  width: fit-content;
 }
 .file-upload {
   border-left-color: lightgray;
@@ -81,4 +81,24 @@ main {
 .follow {
   position: absolute;
   right: -48px;
+}
+.pointer  {
+  cursor: pointer;
+}
+
+.error-span {
+  color: red;
+  display: none;
+}
+
+.white {
+  color: white;
+}
+
+.inline {
+  display: inline;
+}
+
+.colored-submit {
+  color: #54c0db !important;
 }

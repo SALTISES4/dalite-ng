@@ -22,12 +22,12 @@ function toggleButtonAll(event) {
   const checkbox = container.getElementsByTagName("input")[0];
   if (checkbox.checked) {
     const toggleButtons = document.getElementsByClassName("btn-toggle");
-    for (const i = 0; i < toggleButtons.length; i++) {
+    for (let i = 0; i < toggleButtons.length; i++) {
       toggleButtons[i].classList.remove("btn-toggle--disabled");
     }
   } else {
     const toggleButtons = document.getElementsByClassName("btn-toggle");
-    for (const i = 0; i < toggleButtons.length; i++) {
+    for (let i = 0; i < toggleButtons.length; i++) {
       if (toggleButtons[i] != container) {
         toggleButtons[i].classList.add("btn-toggle--disabled");
       }

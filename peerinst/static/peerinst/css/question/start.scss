@@ -1,16 +1,22 @@
-.errorlist {
-  // border: 2px solid #b30000;
-  // border-radius: 5px;
-  // display: inline-block;
-  // padding: 5px 10px;
+.errorlist ul {
+  list-style: square;
+  margin: 5px 0;
 
-  & ul {
-    list-style: square;
-    margin: 5px 0;
-
-    & li {
-      cursor: default;
-      text-decoration: underline;
-    }
+  & li {
+    cursor: default;
+    text-decoration: underline;
   }
+}
+
+.nav-question {
+  border-color: LightGray;
+  border-top: solid;
+  border-width: 1px;
+}
+
+.nav-disks {
+  bottom: 50%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, 50%);
 }

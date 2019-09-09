@@ -12,6 +12,23 @@ from .assignment import Assignment
 from .question import GradingScheme, Question
 
 
+class AnswerMayShowManager(models.Manager):
+    def get_queryset(self):
+        never_show = [
+            a
+            for a in set(
+                AnswerAnnotation.objects.filter(score=0).values_list(
+                    "answer", flat=True
+                )
+            )
+        ]
+        return (
+            super(AnswerMayShowManager, self)
+            .get_queryset()
+            .exclude(pk__in=never_show)
+        )
+
+
 class AnswerChoice(models.Model):
     question = models.ForeignKey(Question)
     text = models.CharField(_("Text"), max_length=500)
@@ -27,6 +44,9 @@ class AnswerChoice(models.Model):
 
 
 class Answer(models.Model):
+    objects = models.Manager()
+    may_show = AnswerMayShowManager()
+
     question = models.ForeignKey(Question)
     assignment = models.ForeignKey(Assignment, blank=True, null=True)
     first_answer_choice = models.PositiveSmallIntegerField(
@@ -72,7 +92,7 @@ class Answer(models.Model):
         Quality,
         blank=True,
         null=True,
-        help_text="Chich quality was used to filter shown rationales.",
+        help_text="Which quality was used to filter shown rationales.",
         related_name="filtering_quality",
     )
 
@@ -298,3 +318,6 @@ class AnswerAnnotation(models.Model):
         null=True, default=None, blank=True, choices=SCORE_CHOICES
     )
     note = models.CharField(max_length=500, null=True, blank=True)
+
+    def __unicode__(self):
+        return "{}: {} by {}".format(self.answer, self.score, self.annotator)

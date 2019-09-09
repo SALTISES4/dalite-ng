@@ -1,6 +1,6 @@
 {% extends user.student|yesno:'peerinst/student/base.html,peerinst/base.html' %}
-{% load i18n %}
-{% load static %}
+{% load compress i18n static %}
+
 {% block title %}{{ question.title }}{% endblock %}
 {% block body %}
 <!-- Show the summary table-->
@@ -18,5 +18,7 @@
 {% endblock %}
 
 {% block scripts %}
+{% compress js %}
 <script src="{% static 'peerinst/js/question_answers_summary.js' %}"></script>
+{% endcompress %}
 {% endblock %}

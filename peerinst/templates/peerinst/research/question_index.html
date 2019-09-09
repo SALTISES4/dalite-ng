@@ -3,7 +3,8 @@
 {% load staticfiles compress i18n %}
 
 {% block stylesheets %}
-<style>
+{{ block.super }}
+<style nonce="{{ request.csp_nonce }}">
   .question-list {
     position: relative;
   }
@@ -72,17 +73,17 @@
           {% if discipline_title %}
             <a href="{% url 'research-all-annotations-for-question-by-discipline' discipline_title=discipline_title question_pk=item.question.pk %}"><i class="mdc-theme--primary material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'See all scores' %}">group</i></a>
 
-            <a href="{% url 'research-flag-question-by-discipline' discipline_title=discipline_title question_pk=item.question.pk %}"><i {% if item.flag_color_code %} style="color:{{ item.flag_color_code }};" {% endif %} class="{% if not item.flag_color_code %}mdc-theme--primary {% endif %}material-icons md-24 mdc-ripple-surface icon-list" title="{% if item.flagged_reasons %}{{ item.flagged_reasons }}{% else %}{% trans 'Flag question as problematic' %}{% endif %}">report</i></a>
+            <a href="{% url 'research-flag-question-by-discipline' discipline_title=discipline_title question_pk=item.question.pk %}"><i class="{% if item.flag_color_code %} {{ item.flag_color_code }} {% else %} gray {% endif %} material-icons md-24 mdc-ripple-surface icon-list" title="{% if item.flagged_reasons %}{{ item.flagged_reasons }}{% else %}{% trans 'Flag question as problematic' %}{% endif %}">report</i></a>
           {% elif assignment_id %}
             <a href="{% url 'research-all-annotations-for-question-by-assignment' assignment_id=assignment_id question_pk=item.question.pk %}"><i class="mdc-theme--primary material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'See all scores' %}">group</i></a>
 
-            <a href="{% url 'research-flag-question-by-assignment' assignment_id=assignment_id question_pk=item.question.pk %}"><i {% if item.flag_color_code %} style="color:{{ item.flag_color_code }};"{% endif %} class="{% if not item.flag_color_code %}mdc-theme--primary {% endif %}material-icons md-24 mdc-ripple-surface icon-list" title="{% if item.flagged_reasons %}{{ item.flagged_reasons }}{% else %}{% trans 'Flag question as problematic' %}{% endif %}">report</i></a>
+            <a href="{% url 'research-flag-question-by-assignment' assignment_id=assignment_id question_pk=item.question.pk %}"><i class="{% if item.flag_color_code %} {{ item.flag_color_code }} {% else %} gray {% endif %} material-icons md-24 mdc-ripple-surface icon-list" title="{% if item.flagged_reasons %}{{ item.flagged_reasons }}{% else %}{% trans 'Flag question as problematic' %}{% endif %}">report</i></a>
           {% endif %}
 
         <a href="{% url 'research-fix-expert-rationale' question_id=item.question.pk %}"><i class="mdc-theme--primary material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'Add/edit expert rationales' %}">add_comment</i></a>
 
         {% if item.question_expert_answers|length > 0 %}
-          <i style="color:green;" id="activate-dialog-expert-{{ item.question.pk }}" class="material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'Show expert rationales ' %}({{ item.question_expert_answers|length }})">check_circle</i>
+          <i id="activate-dialog-expert-{{ item.question.pk }}" class="material-icons md-24 mdc-ripple-surface icon-list green" title="{% trans 'Show expert rationales ' %}({{ item.question_expert_answers|length }})">check_circle</i>
           <aside id="dialog-expert-{{ item.question.pk }}"
           class="mdc-dialog"
           role="alertdialog"
@@ -109,12 +110,12 @@
 
           </aside>
         {% else %}
-          <a href="{% url 'research-fix-expert-rationale' question_id=item.question.pk %}"><i style="color:red;" class="material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'No expert rationales' %}">warning</i></a>
+          <a href="{% url 'research-fix-expert-rationale' question_id=item.question.pk %}"><i class="material-icons md-24 mdc-ripple-surface icon-list red" title="{% trans 'No expert rationales' %}">warning</i></a>
         {% endif %}
 
       </div>
 
-      <ul style="margin-top:4px;">
+      <ul class="m-top-4">
         {% for answerchoice in item.answerchoices|dictsort:"answer_label" %}
           {% if discipline_title %}
             <li><a href="{% url 'research-question-answer-list-by-discipline' discipline_title=discipline_title question_pk=item.question.pk answerchoice_value=answerchoice.answer_label|make_list|first %}">({{ answerchoice.annotation_count_by_user }}/{{ answerchoice.annotation_count }}/{{ answerchoice.frequency }}) - {{ answerchoice.answer_label|safe }}</a></li>
@@ -131,7 +132,8 @@
 </main>
 {% endblock %}
 {% block scripts %}
-<script>
+{{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
   bundle.addDialog();
 </script>
 {% endblock %}

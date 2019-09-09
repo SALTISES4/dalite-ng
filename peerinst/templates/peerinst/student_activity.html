@@ -18,7 +18,7 @@
         {% if answers.answers|length > 0 %}
         <h3 class="mdc-typography--headline mdc-theme--secondary">
           {{ group.title }}
-          <i class="material-icons" style="vertical-align:middle;">keyboard_arrow_right</i>
+          <i class="material-icons">keyboard_arrow_right</i>
           {% if assignment.assignment %}
           <a href="{% url 'group-assignment' assignment.hash %}">{{ assignment.assignment }}</a>
           {% else %}
@@ -26,7 +26,7 @@
           {% endif %}
         </h3>
 
-        <ul style='font-size:9pt;'>
+        <ul class='pt9'>
           <li>Answers submitted: {{ answers.answers|length }}</li>
           <li>New answers since last login: {{ answers.new|length }} </li>
           <li>Percent complete: {{ answers.percent_complete }}%</li>
@@ -43,7 +43,8 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
+{{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
 let data = {{ json|safe }};
 
 function draw() {

@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
-import quality.models.custom_fields
+import dalite.models.custom_fields
 
 
 class Migration(migrations.Migration):
@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="mincharscriterion",
             name="uses_rules",
-            field=quality.models.custom_fields.CommaSepField(
+            field=dalite.models.custom_fields.CommaSepField(
                 blank=True,
                 help_text="Comma separated list of used rules for the criterion found as the fields of the associated rules object. Make sure to use the verbose_name",
             ),
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="minwordscriterion",
             name="uses_rules",
-            field=quality.models.custom_fields.CommaSepField(
+            field=dalite.models.custom_fields.CommaSepField(
                 blank=True,
                 help_text="Comma separated list of used rules for the criterion found as the fields of the associated rules object. Make sure to use the verbose_name",
             ),
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="negwordscriterion",
             name="uses_rules",
-            field=quality.models.custom_fields.CommaSepField(
+            field=dalite.models.custom_fields.CommaSepField(
                 blank=True,
                 help_text="Comma separated list of used rules for the criterion found as the fields of the associated rules object. Make sure to use the verbose_name",
             ),

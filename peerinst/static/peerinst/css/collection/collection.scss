@@ -1,0 +1,85 @@
+/* Load common sass variables */
+@import "../variables";
+@import "../functions";
+
+/* Stylesheet */
+.card-icon {
+  padding-right: 8px;
+}
+
+.follower-button--following {
+  color: $mdc-theme-secondary;
+}
+
+#card-featured {
+  background-color: $mdc-theme-primary-faded;
+}
+
+#collection-view {
+  color: $mdc-theme-secondary;
+}
+
+.mdc-card__action-buttons {
+  color: $hint;
+}
+
+#desciption {
+  margin-top: 10px;
+}
+
+#obj.desc {
+  margin-top: 5px;
+}
+
+#card-assign {
+  background-color: $mdc-theme-primary-faded;
+}
+
+#assignment-view {
+  color: $mdc-theme-secondary;
+}
+
+.mdc-text-field__input {
+  width: 100%;
+}
+:not(.mdc-list--non-interactive) > .mdc-list-item::before,
+:not(.mdc-list--non-interactive) > .mdc-list-item::after {
+  background-color: $mdc-theme-background;
+}
+
+.image-field {
+  color: text-color(dark, primary);
+  font-family: "Montserrat", sans-serif;
+  font-size: 14px;
+  padding-bottom: 6px;
+  padding-left: 16px;
+  padding-top: 6px;
+}
+
+#thumbnail {
+  border-radius: 50%;
+  height: 50px;
+  margin-bottom: -9px;
+  width: 50px;
+}
+
+.foldable__unfolded > .foldable--body {
+  margin-top: 10px;
+  max-height: none;
+}
+
+.mdc-snackbar__text {
+  color: text-color(light, primary);
+}
+
+.mdc-snackbar {
+  background-color: $mdc-theme-secondary;
+}
+
+.caption {
+  color: $mdc-theme-secondary;
+}
+
+#distribute-help {
+    margin: 25px 0px;
+}

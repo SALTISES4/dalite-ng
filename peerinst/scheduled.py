@@ -1,7 +1,10 @@
-import threading
-from datetime import datetime, timedelta
+# import threading
+import logging
 
-from .models import StudentGroupAssignment
+# from datetime import datetime, timedelta
+
+# from .models import StudentGroupAssignment
+logger = logging.getLogger("peerinst-models")
 
 
 def start_scheduled_events():

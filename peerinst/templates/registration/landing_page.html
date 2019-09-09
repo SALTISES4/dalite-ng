@@ -1,4 +1,4 @@
-{% extends "peerinst/base.html" %}
+{% extends "peerinst/_base.html" %}
 
 {% load staticfiles compress i18n %}
 
@@ -9,11 +9,11 @@
 {% endblock %}
 
 {% block body %}
-<script>
+<script nonce="{{ request.csp_nonce }}">
 var desktop = window.matchMedia("(min-width:450px)").matches&&window.matchMedia("(min-height:450px)").matches;
-console.info(desktop);
 // Override default size of header to fill page based on window size
 var styles = document.createElement('style');
+styles.setAttribute("nonce", "{{ request.csp_nonce }}");
 document.head.appendChild(styles);
 var styleSheet = styles.sheet;
 if (desktop) {
@@ -40,11 +40,6 @@ if (desktop) {
         <a id='link-to-signup' href="{% url 'sign_up' %}">{% trans 'Signup' %}</a>
       {% endif %}
     </span>
-    <!-- Language selector
-    <span class="navright">
-      <a href="">EN</a>
-    </span>
-    -->
   </div>
 </header>
 
@@ -60,7 +55,7 @@ if (desktop) {
       </div>
       <p class="mdc-typography--headline">
         {% blocktrans %}
-        <span style="font-family: 'Cardo', serif;font-style:italic;">my</span>DALITE is a free open-source web-based platform that promotes <strong>conceptual learning</strong>. Its pedagogical foundations are guided by social learning and based on learning principles and practical know-how. It engages students in cognitive tasks that include written self-explanation, comparison and evaluation of explanations produced by peers, and reflection.
+        <span class="dalite-my">my</span>DALITE is a free open-source web-based platform that promotes <strong>conceptual learning</strong>. Its pedagogical foundations are guided by social learning and based on learning principles and practical know-how. It engages students in cognitive tasks that include written self-explanation, comparison and evaluation of explanations produced by peers, and reflection.
         {% endblocktrans %}
       </p>
     </div>
@@ -82,7 +77,7 @@ if (desktop) {
       </div>
       <p class="mdc-typography--headline">
         {% blocktrans %}
-        With <span style="font-family: 'Cardo', serif;font-style:italic;">my</span>DALITE, teachers can use the same questions <strong>in class</strong> in polling mode, or assign questions as <strong>out-of-class</strong> homework through any learning management system.  Teachers can peruse content based on analytics and get reports for how their students are doing over time.
+        With <span class="dalite-my">my</span>DALITE, teachers can use the same questions <strong>in class</strong> in polling mode, or assign questions as <strong>out-of-class</strong> homework through any learning management system.  Teachers can peruse content based on analytics and get reports for how their students are doing over time.
         {% endblocktrans %}
       </p>
     </div>
@@ -93,7 +88,7 @@ if (desktop) {
       </div>
       <p class="mdc-typography--headline">
         {% blocktrans %}
-        <span style="font-family: 'Cardo', serif;font-style:italic;">my</span>DALITE has a <strong>growing database</strong> of questions in subjects ranging from chemistry to the humanities. It is funded by the SALTISE/S4 grant and aims to be the home of an open-source community offering high-impact high-quality learning resources <strong>built for teachers by teachers</strong>. If you don't find the type of content you are looking for, you can author new question items and contribute to the ever-growing community!   The current top disciplines are:
+        <span class="dalite-my">my</span>DALITE has a <strong>growing database</strong> of questions in subjects ranging from chemistry to the humanities. It is funded by the SALTISE/S4 grant and aims to be the home of an open-source community offering high-impact high-quality learning resources <strong>built for teachers by teachers</strong>. If you don't find the type of content you are looking for, you can author new question items and contribute to the ever-growing community!   The current top disciplines are:
         {% endblocktrans %}
       </p>
       <div class="mdc-layout-grid">
@@ -110,7 +105,7 @@ if (desktop) {
       </div>
       <div class="mdc-chip-set mdc-chip-set--choice" data-mdc-auto-init="MDCChipSet">
         {% for d in disciplines %}
-        <div id="{{ d.name }}" class="mdc-chip" onclick="update(this,event)" tabindex="0" data-mdc-auto-init="MDCChip">
+        <div id="{{ d.name }}" class="mdc-chip" tabindex="0" data-mdc-auto-init="MDCChip">
           <div class="mdc-chip__checkmark">
             <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
               <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
@@ -140,9 +135,6 @@ if (desktop) {
       <svg id="history" width=350 height=450></svg>
     </div>
 
-    <!--
-    <blockquote class="mdc-theme--primary">{% blocktrans %}This research has shown my<span style="font-family: 'Montserrat', sans-serif;font-style:normal;">DALITE</span> to be an effective tool for supporting deep learning.{% endblocktrans %}</blockquote>
-    -->
   </section>
 
   <section>
@@ -181,8 +173,8 @@ if (desktop) {
           <svg class="browser icon-resize" width=80 height=80></svg>
       </div>
       <p class="mdc-typography--headline">
-        <span style="font-family: 'Cardo', serif;font-style:italic;">my</span>DALITE {% blocktrans %}supports the following browsers:{% endblocktrans %}
-        <ul class="mdc-typography--headline" style='padding-left:25%'>
+        <span class="dalite-my">my</span>DALITE {% blocktrans %}supports the following browsers:{% endblocktrans %}
+        <ul class="mdc-typography--headline pad-l-25">
           <li>Google Chrome 65+</li>
           <li>Mozilla Firefox 58+</li>
           <li>Microsoft Edge 15+</li>
@@ -232,7 +224,7 @@ if (desktop) {
     <div class="footer_content">
       &copy 2018 SALTISE/S4
     </div>
-    <div class="footer_content" style="text-align:right;">
+    <div class="footer_content align-right">
       <a href="mailto:info@saltise.ca"><i class="icon ion-ios-mail"></i></a>
       <a href="https://www.saltise.ca"><i class="icon ion-md-globe"></i></a>
       <a href="https://www.facebook.com/SALTISE/"><i class="icon ion-logo-facebook"></i></a>
@@ -244,8 +236,7 @@ if (desktop) {
 {% endblock %}
 
 {% block scripts %}
-{% compress js inline %}
-<script>
+<script nonce="{{ request.csp_nonce }}">
 // MDC binds
 var arrow = document.getElementById('scrollprompt');
 if (desktop) {
@@ -265,7 +256,7 @@ if (desktop) {
 }
 </script>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 // Animations
 function logo(){
   'use strict';
@@ -557,7 +548,7 @@ logo();
 window.addEventListener("resize", logo);
 </script>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 // Counts
 data = {{ json|safe }};
 labels = bundle.keys(data['All']);
@@ -696,7 +687,7 @@ function update(t,e) {
 }
 </script>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 function icons() {
   'use strict';
 
@@ -953,7 +944,7 @@ icons();
 window.addEventListener('resize', icons);
 </script>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 // History
 function timeline() {
   'use strict';
@@ -1209,7 +1200,7 @@ window.addEventListener('resize', timeline);
 
 </script>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 function pillars() {
   var pillars = bundle.select("#pillars");
   pillars.attr("width",document.querySelector(".blurb").offsetWidth);
@@ -1463,20 +1454,21 @@ pillars();
 window.addEventListener('resize', pillars);
 </script>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 // Async load video as per API
 // https://developers.google.com/youtube/iframe_api_reference#Loading_a_Video_Player
 var tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
+tag.setAttribute("nonce", "{{ request.csp_nonce }}");
+tag.src = "https://www.youtube.com/iframe_api?enablejsapi=1&origin="+window.location.origin;
 var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 var player;
-var w = Math.min(700,document.querySelector("section").offsetWidth-30);
-var h = 315/560*w;
+var ytWidth = Math.min(700,document.querySelector("section").offsetWidth-30);
+var ytHeight = 315/560*ytWidth;
 function onYouTubeIframeAPIReady() {
   player = new YT.Player('player', {
-    height: h,
-    width: w,
+    height: ytHeight,
+    width: ytWidth,
     videoId: '0tJVVy2ay7c',
     playerVars: {
       playlist: '0tJVVy2ay7c',
@@ -1504,5 +1496,14 @@ if (hStyles['position'] == 'relative') {
   h.style.marginTop = '200px';
 }
 </script>
-{% endcompress %}
+
+<script nonce="{{ request.csp_nonce }}">
+  window.addEventListener("load", function() {
+    {% for d in disciplines %}
+    document.getElementById("{{ d.name }}").addEventListener("click", function(event) {
+      update(this, event)
+    })
+    {% endfor %}
+  })
+</script>
 {% endblock %}

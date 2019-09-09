@@ -6,13 +6,14 @@ import logging
 
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils.translation import ugettext
 from django.utils.translation import ugettext_lazy as _
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_POST, require_safe
 
 from dalite.views.errors import response_400, response_500
+from dalite.views.utils import get_json_params
 from peerinst.models import (
     Student,
     StudentAssignment,
@@ -21,7 +22,6 @@ from peerinst.models import (
     Teacher,
 )
 
-from ..gradebook import group_gradebook, groupassignment_gradebook
 from .decorators import group_access_required
 
 logger = logging.getLogger("peerinst-views")
@@ -43,19 +43,50 @@ def validate_update_data(req):
 
 
 @login_required
-@require_http_methods(["GET"])
+@require_safe
 @group_access_required
 def group_details_page(req, group_hash, teacher, group):
 
     assignments = StudentGroupAssignment.objects.filter(group=group)
 
-    context = {"group": group, "assignments": assignments, "teacher": teacher}
+    data = {
+        "assignments": [
+            {
+                "url": reverse(
+                    "group-assignment",
+                    kwargs={"assignment_hash": assignment.hash},
+                )
+            }
+            for assignment in assignments
+        ],
+        "students": [
+            student.pk
+            for student in group.students.order_by(
+                "student__student__student__email"
+            )
+        ],
+        "urls": {
+            "update_url": reverse(
+                "group-details-update", kwargs={"group_hash": group.hash}
+            ),
+            "get_student_information_url": reverse(
+                "group-details--student-information"
+            ),
+        },
+    }
+
+    context = {
+        "data": json.dumps(data),
+        "group": group,
+        "assignments": assignments,
+        "teacher": teacher,
+    }
 
     return render(req, "peerinst/group/details.html", context)
 
 
 @login_required
-@require_http_methods(["POST"])
+@require_POST
 @group_access_required
 def group_details_update(req, group_hash, teacher, group):
     """
@@ -121,7 +152,7 @@ def group_details_update(req, group_hash, teacher, group):
 
 
 @login_required
-@require_http_methods(["GET"])
+@require_safe
 @group_access_required
 def group_assignment_page(req, assignment_hash, teacher, group, assignment):
 
@@ -176,7 +207,7 @@ def group_assignment_page(req, assignment_hash, teacher, group, assignment):
 
 
 @login_required
-@require_http_methods(["POST"])
+@require_POST
 @group_access_required
 def group_assignment_remove(req, assignment_hash, teacher, group, assignment):
     assignment.delete()
@@ -184,7 +215,7 @@ def group_assignment_remove(req, assignment_hash, teacher, group, assignment):
 
 
 @login_required
-@require_http_methods(["POST"])
+@require_POST
 @group_access_required
 def group_assignment_update(req, assignment_hash, teacher, group, assignment):
 
@@ -201,7 +232,7 @@ def group_assignment_update(req, assignment_hash, teacher, group, assignment):
 
 
 @login_required
-@require_http_methods(["POST"])
+@require_POST
 @group_access_required
 def send_student_assignment(req, assignment_hash, teacher, group, assignment):
 
@@ -235,7 +266,7 @@ def send_student_assignment(req, assignment_hash, teacher, group, assignment):
 
 
 @login_required
-@require_http_methods(["GET"])
+@require_safe
 @group_access_required
 def get_assignment_student_progress(
     req, assignment_hash, teacher, group, assignment
@@ -246,7 +277,7 @@ def get_assignment_student_progress(
 
 
 @login_required
-@require_http_methods(["POST"])
+@require_POST
 @group_access_required
 def distribute_assignment(req, assignment_hash, teacher, group, assignment):
     """
@@ -263,67 +294,60 @@ def distribute_assignment(req, assignment_hash, teacher, group, assignment):
 
 
 @login_required
-@require_http_methods(["GET"])
-@group_access_required
-def csv_gradebook(req, group_hash, teacher, group):
+@require_POST
+def get_student_reputation(req):
     """
-    Returns the csv gradebook for the given `group` in a stream.
+    Returns the student information along with the convincing rationales
+    criterion.
 
     Parameters
     ----------
-    group_hash : str
-        Hash of the group
-    teacher : Teacher
-        Teacher corresponding to the requested (returned by
-        `group_access_required`) (not used)
-    group : StudentGroup
-        Group corresponding to the hash (returned by `group_access_required`)
+    req : HttpRequest
+        Request with:
+            parameters:
+                id: int
+                    Student pk
 
     Returns
     -------
-    HttpResponse
-        Either a streaming 200 response with the csv data if everything worked
-        or an error response
+    Either
+        JSONResponse
+            Response with json data:
+                {
+                    email : str
+                        Student email
+                    last_login : str
+                        Date of last login in isoformat
+                    popularity : float
+                        Value of the convincing rationales criterion
+
+                }
+        HttpResponse
+            Error response
     """
-    filename = "myDALITE_gradebook_{}.csv".format(group)
-    gradebook_gen = group_gradebook(group)
-    resp = StreamingHttpResponse(gradebook_gen, content_type="text/csv")
-    resp["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
-    return resp
+    args = get_json_params(req, args=["id"])
+    if isinstance(args, HttpResponse):
+        return args
+    (id_,), _ = args
 
+    try:
+        student = Student.objects.get(pk=id_)
+    except Student.DoesNotExist:
+        return response_400(
+            req,
+            msg=_("The student couldn't be found."),
+            logger_msg=(
+                "The student with pk {} couldn't be found.".format(id_)
+            ),
+            log=logger.warning,
+        )
 
-@login_required
-@require_http_methods(["GET"])
-@group_access_required
-def csv_assignment_gradebook(
-    req, group_hash, assignment_hash, teacher, group, assignment
-):
-    """
-    Returns the csv gradebook for the given `group_assignment` in a stream.
-
-    Parameters
-    ----------
-    group_hash : str
-        Hash of the group
-    assignment_hash : str
-        Hash of the group_assignment
-    teacher : Teacher
-        Teacher corresponding to the requested (returned by
-        `group_access_required`) (not used)
-    group : StudentGroup
-        Group corresponding to the hash (returned by `group_access_required`)
-    assignment : StudentGroupAssignment
-        group_assignment corresponding to the hash
-        (`returned by group_access_required`)
-
-    Returns
-    -------
-    HttpResponse
-        Either a streaming 200 response with the csv data if everything worked
-        or an error response
-    """
-    filename = "myDALITE_gradebook_{}_{}.csv".format(group, assignment)
-    gradebook_gen = groupassignment_gradebook(group, assignment)
-    resp = StreamingHttpResponse(gradebook_gen, content_type="text/csv")
-    resp["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
-    return resp
+    return JsonResponse(
+        {
+            "email": student.student.email,
+            "last_login": student.student.last_login.isoformat()
+            if student.student.last_login is not None
+            else None,
+            "popularity": student.evaluate_reputation("convincing_rationales"),
+        }
+    )

@@ -5,9 +5,9 @@
 {% block extra_title %}
 <h2 class="mdc-typography--display1 mdc-theme--secondary">
   {% if question.type == "PI" %}
-    {% trans 'Step 4: Example answers' %}
+    {% trans 'Step 4: Sample answers' %}
   {% else %}
-    {% trans 'Step 3: Preview' %}
+    {% trans 'Step 2: Preview' %}
   {% endif %}
 </h2>
 
@@ -33,7 +33,18 @@
 </div>
 {% endblock %}
 
-{% block submit_button %}{% trans 'Submit example answer' %}{% endblock %}
+{% block messages %}
+{% for message in messages %}
+<div class="message-box">
+  <div class="message">{{ message }}</div>
+  <i id="clear_message" class="clear mdc-theme--secondary material-icons md-24 mdc-ripple-surface icon-list">
+      clear
+  </i>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block submit_button %}{% trans 'Submit sample answer' %}{% endblock %}
 {% block extra_content %}
 {% if question.type == "PI" %}
   {{ form.errors }}
@@ -45,7 +56,7 @@
   <ul class="mdc-list">
     {% for sample in question.answer_set.all|dictsort:'first_answer_choice' %}
       {% if not sample.user_token %}
-        <li><span class='mdc-theme--primary bold'>{{ sample.first_answer_choice_label }}</span>: {{ sample.rationale|safe|striptags }}.</li>
+        <li><span class='mdc-theme--primary bold'>{{ sample.first_answer_choice_label }}</span>: {{ sample.rationale|safe|striptags }}</li>
       {% endif %}
     {% endfor %}
   </ul>
@@ -54,11 +65,13 @@
 <hr class="simple-hr">
 
 {% if user.teacher %}
+{% if save_allowed or question.type == "RO" %}
 <h3>{% trans 'Auto add to assignments' %}</h3>
 <form id="add_question_to_assignment" action="{% url 'sample-answer-form-done' question_id=question.id %}" method="post">
   {% csrf_token %}
   <div class='field-container'>
-    <div class='number-box'><span class='number'>+</span></div>
+    <div class='number-box'><span class='number'><i class="material-icons">add</i></span></div>
+    {% if assignment_count > 0 %}
     <div class='field'>
       <div class='mdc-form-field'>
         <label for='id_assignments'>{{ assignment_form.assignments.label }}:</label>
@@ -69,30 +82,37 @@
       </p>
       {{ assignment_form.assignments.errors }}
     </div>
+    {% else %}
+    <div class='field'>
+      {% trans 'You currently do not have any assignments.  You can create one from your account page.' %}
+    </div>
+    {% endif %}
   </div>
 </form>
+<hr class="simple-hr">
+{% endif %}
 {% endif %}
 
-<div style="margin-top:20px;">
+<div class="m-top-20">
   <span class="padded">
     {% if question.type == "PI" %}
-      <form style="display:inline" id="back" action="{% url 'answer-choice-form' question_id=question.id %}" method="get">
-        <button form="back" type="submit" class="mdc-button mdc-button--raised">Back</button>
+      <form class="inline" id="back" action="{% url 'research-fix-expert-rationale' question_id=question.id %}" method="get">
+        <button form="back" type="submit" class="mdc-button mdc-button--raised">{% trans 'Back' %}</button>
       </form>
     {% else %}
-      <form style="display:inline" id="back" action="{% url 'question-update' pk=question.id %}" method="get">
-        <button form="back" type="submit" class="mdc-button mdc-button--raised">Back</button>
+      <form class="inline" id="back" action="{% url 'question-update' pk=question.id %}" method="get">
+        <button form="back" type="submit" class="mdc-button mdc-button--raised">{% trans 'Back' %}</button>
       </form>
     {% endif %}
   </span>
   <span class="padded">
     {% if user.teacher %}
       {% if save_allowed or question.type == "RO" %}
-        <input form="add_question_to_assignment" type="submit" class="mdc-button mdc-button--raised submit_button" value="{% trans 'Done' %}">
+        <input id="done" form="add_question_to_assignment" type="submit" class="mdc-button mdc-button--raised submit_button" value="{% trans 'Done' %}">
       {% endif %}
     {% else %}
-      <form style="display:inline" id="done" action="{% url 'welcome' %}" method="get">
-        <button form="done" type="submit" class="mdc-button mdc-button--raised">Done</button>
+      <form class="inline" id="done" action="{% url 'welcome' %}" method="get">
+        <button form="done" type="submit" class="mdc-button mdc-button--raised">{% trans 'Done' %}</button>
       </form>
     {% endif %}
   </span>
@@ -101,9 +121,22 @@
 {% endblock %}
 
 {% block scripts %}
+{{ block.super }}
+
 {% if question.type == "RO" %}
-<script>
+<script nonce="{{ request.csp_nonce }}">
 $('#submit-answer-form').remove();
 </script>
 {% endif %}
+
+<script nonce="{{ request.csp_nonce }}">
+window.addEventListener("load", function() {
+  const clearButton = document.getElementById("clear_message");
+  if (clearButton) {
+    clearButton.addEventListener("click", function() {
+      $(this).parent().remove();
+    });
+  }
+});
+</script>
 {% endblock %}

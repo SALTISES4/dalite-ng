@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import hashlib
+import json
 import logging
 from itertools import chain
 
@@ -46,10 +48,15 @@ class Quality(models.Model):
             )
         )
 
-    def evaluate(self, answer, *args, **kwargs):
+    def evaluate(self, answer, cache=False):
         """
         Returns the quality as a tuple of the quality and the different
         criterion results.
+
+        Parameters
+        ----------
+        answer : Union[Answer, str]
+            Answer to evaluate
 
         Returns
         -------
@@ -80,26 +87,35 @@ class Quality(models.Model):
             }
             for c in self.criterions.all()
         ]
-        qualities = [
-            dict(
-                chain(
-                    dict(c["criterion"]).iteritems(),
-                    {
-                        "weight": c["weight"],
-                        "quality": c["criterion"].evaluate(
-                            answer, c["rules"], *args, **kwargs
-                        ),
-                    }.iteritems(),
+
+        if cache:
+            quality, qualities = QualityCache.get(self, answer)
+
+        if not cache or quality is None:
+            qualities = [
+                dict(
+                    chain(
+                        dict(c["criterion"]).iteritems(),
+                        {
+                            "weight": c["weight"],
+                            "quality": c["criterion"].evaluate(
+                                answer, c["rules"]
+                            ),
+                        }.iteritems(),
+                    )
                 )
-            )
-            for c in criterions_
-        ]
-        quality = float(
-            sum(q["quality"]["quality"] * q["weight"] for q in qualities)
-        ) / sum(q["weight"] for q in qualities)
+                for c in criterions_
+            ]
+            quality = float(
+                sum(q["quality"]["quality"] * q["weight"] for q in qualities)
+            ) / sum(q["weight"] for q in qualities)
+
+            if cache:
+                QualityCache.cache(self, answer, quality, qualities)
+
         return quality, qualities
 
-    def batch_evaluate(self, answers, *args, **kwargs):
+    def batch_evaluate(self, answers, cache=False):
         if not self.criterions.exists():
             return [(None, [])]
 
@@ -118,8 +134,14 @@ class Quality(models.Model):
             for c in self.criterions.all()
         ]
 
+        if cache:
+            cached = [QualityCache.get(self, answer) for answer in answers]
+            answers = [a for a, c in zip(answers, cached) if c[0] is None]
+        else:
+            cached = [(None, None) for _ in answers]
+
         qualities = [
-            c["criterion"].batch_evaluate(answers, c["rules"], *args, **kwargs)
+            c["criterion"].batch_evaluate(answers, c["rules"])
             for c in criterions_
         ]
         qualities = [
@@ -142,7 +164,17 @@ class Quality(models.Model):
             / sum(q["weight"] for q in _qualities)
             for _qualities in qualities
         ]
-        return [(q, qq) for q, qq in zip(quality, qualities)]
+
+        combined = [(q, qq) for q, qq in zip(quality, qualities)]
+
+        if cache:
+            for (q, qq), answer in zip(combined, answers):
+                QualityCache.cache(self, answer, q, qq)
+
+            gen = iter(combined)
+            combined = [q if q[0] is not None else next(gen) for q in cached]
+
+        return combined
 
     def add_criterion(self, name):
         """
@@ -294,3 +326,78 @@ class UsesCriterion(models.Model):
 
     def __str__(self):
         return "{} for quality {}".format(self.name, str(self.quality))
+
+
+class QualityCache(models.Model):
+    answer = models.PositiveIntegerField(null=True, blank=True)
+    hash = models.CharField(max_length=32, unique=True, db_index=True)
+    quality = models.FloatField()
+    qualities = models.TextField()
+
+    @classmethod
+    def get(cls, quality, answer):
+        if isinstance(answer, basestring):
+            answer_pk = None
+            rationale = answer
+        else:
+            answer_pk = answer.pk
+            rationale = answer.rationale
+
+        criterions = [
+            dict(
+                chain(
+                    iter(
+                        get_criterion(c.name)["criterion"].objects.get(
+                            version=c.version
+                        )
+                    ),
+                    {"rules": c.rules, "weight": c.weight}.items(),
+                )
+            )
+            for c in quality.criterions.all()
+        ]
+
+        hash_ = hashlib.md5(
+            json.dumps({"text": rationale, "criterions": criterions}).encode()
+        ).hexdigest()
+
+        if cls.objects.filter(hash=hash_).exists():
+            cache = cls.objects.get(hash=hash_)
+            return cache.quality, json.loads(cache.qualities)
+        else:
+            return None, None
+
+    @classmethod
+    def cache(cls, quality_instance, answer, quality, qualities):
+        if isinstance(answer, basestring):
+            answer_pk = None
+            rationale = answer
+        else:
+            answer_pk = answer.pk
+            rationale = answer.rationale
+
+        criterions = [
+            dict(
+                chain(
+                    iter(
+                        get_criterion(c.name)["criterion"].objects.get(
+                            version=c.version
+                        )
+                    ),
+                    {"rules": c.rules, "weight": c.weight}.items(),
+                )
+            )
+            for c in quality_instance.criterions.all()
+        ]
+
+        hash_ = hashlib.md5(
+            json.dumps({"text": rationale, "criterions": criterions}).encode()
+        ).hexdigest()
+
+        if not cls.objects.filter(hash=hash_):
+            cls.objects.create(
+                answer=answer_pk,
+                hash=hash_,
+                quality=quality,
+                qualities=json.dumps(qualities),
+            )

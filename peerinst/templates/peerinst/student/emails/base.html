@@ -1,5 +1,5 @@
 <head>
-  <style>
+  <style nonce="{{ request.csp_nonce }}">
   body {
     background-color: #f4f4f4;
     padding: 10 20pt;
@@ -40,6 +40,12 @@
   }
   p {
     color: inherit;
+  }
+  .p-email-btn {
+    display: flex
+    flex-direction: column;
+    margin: 50px auto;
+    width: 250px;
   }
   </style>
 </head>

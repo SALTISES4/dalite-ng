@@ -45,7 +45,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
+<script nonce="{{ request.csp_nonce }}">
 const searchBar = document.getElementById('search-bar');
 searchBar.oninput = function() {
   bundle.search('.searchable', searchBar);

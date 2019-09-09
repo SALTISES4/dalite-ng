@@ -214,16 +214,19 @@ def test_add_assignment(student, group_assignment):
     assert StudentNotification.objects.filter(
         student=student, notification__type="new_assignment"
     ).exists()
-    assert StudentNotification.objects.get(
-        student=student, notification__type="new_assignment"
-    ).link == reverse(
-        "live",
-        kwargs={
-            "assignment_hash": group_assignment.hash,
-            "token": create_student_token(
-                student.student.username, student.student.email
-            ),
-        },
+    assert (
+        StudentNotification.objects.get(
+            student=student, notification__type="new_assignment"
+        ).link.split("/")[-1]
+        == reverse(
+            "live",
+            kwargs={
+                "assignment_hash": group_assignment.hash,
+                "token": create_student_token(
+                    student.student.username, student.student.email
+                ),
+            },
+        ).split("/")[-1]
     )
 
     assert len(mail.outbox) == 1
@@ -255,14 +258,17 @@ def test_add_assignment__assignment_exists(student, group_assignment):
     assert StudentNotification.objects.filter(
         student=student, notification__type="new_assignment"
     ).exists()
-    assert StudentNotification.objects.get(
-        student=student, notification__type="new_assignment"
-    ).link == reverse(
-        "live",
-        kwargs={
-            "assignment_hash": group_assignment.hash,
-            "token": create_student_token(
-                student.student.username, student.student.email
-            ),
-        },
+    assert (
+        StudentNotification.objects.get(
+            student=student, notification__type="new_assignment"
+        ).link.split("/")[-1]
+        == reverse(
+            "live",
+            kwargs={
+                "assignment_hash": group_assignment.hash,
+                "token": create_student_token(
+                    student.student.username, student.student.email
+                ),
+            },
+        ).split("/")[-1]
     )

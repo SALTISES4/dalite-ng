@@ -1,0 +1,129 @@
+{% load bleach_html i18n %}
+
+{% for g in question_list %}
+
+<div class="mdc-card question"
+     id="{{ g.id|safe }}"
+     discipline="'{{ g.discipline|safe }}'"
+     category="{% for c in g.category.all %}{{ c.title|safe }} {% endfor %}"
+     matrix="{{ g.get_matrix|safe }}">
+  <div class="mdc-typography--title bold">
+    {{ g.title|title|bleach_html|safe }}
+  </div>
+
+  <div class="mdc-typography--caption">
+    #{{ g.id|safe }} {% if g.user %}{% trans 'by' %} {{ g.user.username|safe }}{% endif %}
+  </div>
+
+  <div class="mdc-typography--body1 question-text">
+    {{ g.text|bleach_html|safe }}
+  </div>
+
+  {% if g.image %}
+    <img class="question-image" src="{{ g.image.url|safe }}" alt="g.image_alt_text">
+  {% endif %}
+
+  {% if g.video_url %}
+  <div id="question-video">
+    <object class="question-image" width="640" height="390" data="{{ g.video_url|safe }}"></object>
+  </div>
+  {% endif %}
+
+  <div class="question-answers">
+    <ul>
+      {% for label, choice in g.get_choices %}
+        <li class="dense-list">{{ label }}. {{ choice|bleach_html|safe }}
+        {% for c in g.answerchoice_set.all %}
+          {% if forloop.counter == forloop.parentloop.counter %}
+            {% if c.correct %}
+              <i class="check material-icons">check</i>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="mdc-card__actions">
+
+    <div class="mdc-card__action-buttons">
+      <div class="mdc-typography--caption">
+        <div>
+          {% trans 'Discipline' %}: {{ g.discipline|safe }}
+        </div>
+        <div>
+          {% trans 'Categories' %}:
+          {% for c in g.category.all %}
+          {{ c.title|safe }}{% if not forloop.last %}, {% endif %}
+          {% empty %}
+          {% trans 'Uncategorized' %}
+          {% endfor %}
+        </div>
+        <div>
+          {% trans 'Student answers' %}: {{ g.answer_set.all.count }}
+        </div>
+      </div>
+    </div>
+
+    <div class="mdc-card__action-icons">
+
+      <i class="mdc-icon-toggle material-icons mdc-theme--primary remove-btn"
+         data-id="{{ g.pk|safe }}"
+         role="button"
+         aria-pressed="false"
+         aria-label="{% trans 'See another question' %}"
+         tabindex="0"
+         title="{% trans 'See another question' %}">
+         autorenew
+      </i>
+      {% if request.user.teacher %}
+      <i class="mdc-icon-toggle material-icons mdc-theme--primary favourite-btn"
+         id="favourite-btn-{{ g.pk|safe }}"
+         data-id="{{ g.pk|safe }}"
+         role="button"
+         aria-pressed="false"
+         aria-label="{% trans 'Add to favorites' %}"
+         tabindex="0"
+         title="{% trans 'Add to favorites' %}"
+         {% if g in request.user.teacher.favourite_questions.all %}
+         data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
+         data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+         {% else %}
+         data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
+         data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
+         {% endif %}>
+         favorite_border
+      </i>
+      <div class="flag-question" data-id="{{ g.pk }}">
+        <i class="mdc-icon-toggle material-icons mdc-theme--primary flag-question__btn"
+           role="button"
+           aria-pressed="false"
+           aria-label="{% trans 'Flag question' %}"
+           tabindex="0"
+           title="{% trans 'Flag question' %}">
+           outlined_flag
+        </i>
+        <div class="flag-question__form" hidden>
+          <h3>{% trans 'Flag question' %}</h3>
+          <form>
+            <select class="flag-question__form__select"
+                    title="{% trans 'Possible reasons' %}"
+                    aria-label="{% trans 'Possible reasons' %}">
+            </select>
+            <input type="submit"
+                   class="mdc-button mdc-button--raised"
+                   value="{% trans 'Flag' %}">
+          </form>
+          <svg class="icon flag-question__close">
+            <use xlink:href="#close"></use>
+          </svg>
+        </div>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+{% endfor %}

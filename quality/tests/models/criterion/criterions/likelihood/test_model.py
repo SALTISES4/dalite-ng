@@ -193,8 +193,6 @@ def test_predict__french__english(french, english):
     )
     predict_english = create_model(*english)
     predict_french = create_model(*french)
-    print([predict_french(t) for t in test])
-    print([predict_english(t) for t in test])
     result = [
         1 - min(1, exp(predict_english(t)[0] - predict_french(t)[0]))
         for t in test

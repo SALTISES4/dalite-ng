@@ -1,4 +1,4 @@
-{% extends 'peerinst/base.html' %}
+{% extends 'peerinst/teacher/base.html' %}
 
 {% load i18n add_class %}
 
@@ -27,7 +27,6 @@
     </div>
   </div>
 
-  {{create_form.errors}}
   <form method="post">
     {% csrf_token %}
     {% for field in create_form %}
@@ -57,7 +56,7 @@
   <ul class="mdc-list mdc-list--two-line mdc-list--interactive">
     {% for g in teacher.current_groups.all %}
     <li role="separator" class="mdc-list-divider"></li>
-    <li class="mdc-list-item" onclick="window.location.href='{% url 'group-details' g.hash %}'" style="cursor:pointer;">
+    <li class="mdc-list-item pointer group-link">
       <span class="mdc-list-item__graphic mdc-theme--primary">
         <i class="mdc-theme--primary material-icons md-48">group</i>
       </span>
@@ -75,7 +74,7 @@
             {% csrf_token %}
             <input type="hidden" id="id_group" name="group" value="{{g.pk}}"/>
             <div class="mdc-ripple-surface input-ripple-wrapper">
-              <input class="material-icons md-24 mdc-button small-button" style="padding:0pt;margin:0pt;" type="submit" value="remove"/>
+              <input class="material-icons md-24 mdc-button small-button no-whitespace" type="submit" value="remove"/>
             </div>
         </form>
       </span>
@@ -109,7 +108,7 @@
             {% csrf_token %}
             <input type="hidden" id="id_group" name="group" value="{{g.pk}}"/>
             <div class="mdc-ripple-surface input-ripple-wrapper">
-              <input class="material-icons md-24 mdc-button small-button" style="padding:0pt;margin:0pt;" type="submit" value="add"/>
+              <input class="material-icons md-24 mdc-button small-button no-whitespace" type="submit" value="add"/>
             </div>
         </form>
       </span>
@@ -122,4 +121,17 @@
 
   </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ request.csp_nonce }}">
+  window.addEventListener("load", function() {
+    const links = document.getElementsByClassName("group-link")
+    {% for g in teacher.current_groups.all %}
+      links[{{ forloop.counter0 }}].addEventListener("click", function() {
+        window.location.href='{% url 'group-details' g.hash %}'
+      })
+    {% endfor %}
+  })
+</script>
 {% endblock %}

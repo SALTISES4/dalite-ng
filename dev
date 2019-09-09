@@ -1,0 +1,11 @@
+#!/bin/bash
+tmux send-keys './manage.py runserver 8000' 'C-m'
+tmux split-window -v 'zsh'
+tmux send-keys 'gulp watch' 'C-m'
+tmux split-window -h 'redis-server'
+tmux split-window -v 'celery -A dalite beat -l debug --scheduler django_celery_beat.schedulers:DatabaseScheduler'
+tmux select-pane -D
+tmux split-window -h 'zsh'
+tmux send-keys 'celery -A dalite worker -l debug' 'C-m'
+tmux select-pane -L
+tmux split-window -v 'zsh'

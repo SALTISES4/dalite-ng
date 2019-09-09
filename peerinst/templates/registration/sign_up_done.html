@@ -1,4 +1,4 @@
-{% extends 'peerinst/base.html' %}
+{% extends 'peerinst/_base.html' %}
 
 {% load i18n %}
 
@@ -13,7 +13,7 @@
       <a href="{% url 'landing_page' %}">{% trans 'About myDALITE' %}</a>
     </div>
 
-    <p class="mdc-typography--body1"> A member of our team will contact you once your account has been created.</p>
+    <p class="mdc-typography--body1"> {% trans 'A member of our team will contact you once your account has been created.' %}</p>
   </section>
 </main>
 {% endblock %}

@@ -5,7 +5,8 @@ from itertools import chain
 
 from django.db import models
 
-from ..custom_fields import CommaSepField, ProbabilityField
+from dalite.models.custom_fields import CommaSepField, ProbabilityField
+
 from ..quality_type import QualityType, QualityUseType
 
 

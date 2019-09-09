@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import django.db.models.deletion
-import quality.models.custom_fields
+import dalite.models.custom_fields
 
 
 class Migration(migrations.Migration):
@@ -26,13 +26,10 @@ class Migration(migrations.Migration):
                 ),
                 ("answer", models.PositiveIntegerField()),
                 ("hash", models.CharField(db_index=True, max_length=32)),
-                (
-                    "likelihood",
-                    quality.models.custom_fields.ProbabilityField(),
-                ),
+                ("likelihood", dalite.models.custom_fields.ProbabilityField()),
                 (
                     "likelihood_random",
-                    quality.models.custom_fields.ProbabilityField(),
+                    dalite.models.custom_fields.ProbabilityField(),
                 ),
                 (
                     "language",

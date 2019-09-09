@@ -1,0 +1,15 @@
+@import "../../variables.scss";
+
+#dalite-messages {
+  & .dalite-message__authors {
+    display: inline-flex;
+
+    & .dalite-message__authors_author {
+      border-radius: 50%;
+      height: 50px;
+      margin-right: -10px;
+      max-height: 7vh;
+      width: auto;
+    }
+  }
+}

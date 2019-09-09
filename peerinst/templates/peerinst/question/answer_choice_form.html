@@ -3,6 +3,7 @@
 {% load compress staticfiles add_class i18n %}
 
 {% block stylesheets %}
+{{ block.super }}
 <!-- Self-hosted tinyMCE -->
 <script src="{% static 'peerinst/js/tinymce/js/tinymce/tinymce.min.js' %}"></script>
 {% endblock %}
@@ -27,7 +28,7 @@
           <div class="mdc-text-field mdc-text-field--textarea">
             {{ form.text }}
           </div>
-          <p style='margin-left:16px;margin-right:16px;' class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
+          <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent m-left-right-16" aria-hidden="true">
             {{ form.text.help_text|safe }}
           </p>
           {{ form.text.errors }}
@@ -93,35 +94,24 @@
     </div>
     {% endif %}
 
-    <div style="margin-top:20px;">
+    <div class="m-top-20">
       <span class="padded">
-        <form style="display:inline" id="back" action="{% url 'question-update' pk=question.id %}" method="get">
+        <form class="inline" id="back" action="{% url 'question-update' pk=question.id %}" method="get">
           <button form="back" type="submit" class="mdc-button mdc-button--raised">Back</button>
         </form>
       </span>
       {% if formset %}
-      {% if question.answerchoice_set.count > 0 %}
-      <span class="padded">
-        <form style="display:inline" id="next" action="{% url 'research-fix-expert-rationale' question_id=question.id %}" method="get">
-          <button form="next" type="submit" class="mdc-button mdc-button--raised">{% trans 'Next' %}</button>
-        </form>
-      </span>
-      <span class="padded">
-        <input form="next" class="mdc-button mdc-button--raised submit_button" type="submit" value="{% trans 'Save and next' %}" />
-      </span>
-      {% else %}
       <span class="padded">
         <input form="answer-choice-form" class="mdc-button mdc-button--raised submit_button" type="submit" value="{% trans 'Save and next' %}" />
       </span>
-      {% endif %}
       {% else %}
       <span class="padded">
-        <form style="display:inline" id="next" action="{% url 'research-fix-expert-rationale' question_id=question.id %}" method="get">
+        <form class="inline" id="next" action="{% url 'research-fix-expert-rationale' question_id=question.id %}" method="get">
           <button form="next" type="submit" class="mdc-button mdc-button--raised">{% trans 'Next' %}</button>
         </form>
       </span>
       <span class="padded">
-        <button type="button" class="mdc-button mdc-button--raised" onclick="window.location.href='{% url 'question-clone' pk=question.id %}'">{% trans 'Clone' %}</button>
+        <button id="clone-btn" type="button" class="mdc-button mdc-button--raised">{% trans 'Clone' %}</button>
       </span>
       {% endif %}
     </div>
@@ -129,18 +119,27 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
+{{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
   // TinyMCE bind to textarea
   tinymce.init({
     selector: 'textArea',
     elementpath: false,
     branding: false,
-    plugins: ['autolink', 'autosave', 'charmap', 'code', 'link', 'paste', 'textcolor'],
+    plugins: ['autolink', 'autosave', 'charmap', 'code', 'link', 'paste'],
     menubar: false,
-    toolbar: 'undo redo | bold italic  underline superscript subscript forecolor | link | charmap',
+    toolbar: 'undo redo | bold italic  underline superscript subscript | link | charmap',
     content_css: "{% static 'peerinst/css/tiny.min.css' %}",
     link_assume_external_targets: true,
     default_link_target: '_blank',
   });
+window.addEventListener("load", function() {
+  var cloneBtn = document.getElementById("clone-btn");
+  if (cloneBtn != null) {
+    cloneBtn.addEventListener("click", function() {
+      window.location.href="{% url 'question-clone' pk=question.id %}";
+    });
+  }
+});
 </script>
 {% endblock %}

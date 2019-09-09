@@ -3,7 +3,7 @@
 {% load staticfiles compress i18n %}
 
 {% block stylesheets %}
-<style>
+<style nonce="{{ request.csp_nonce }}">
   td {
     border: 1px solid rgb(190,190,190);
     padding: 10px;
@@ -21,7 +21,7 @@
       <a href="{% url 'research-discipline-question-index-by-discipline' discipline_title=discipline_title %}#{{ question.pk }}">{% trans 'Back to Question List' %}</a>
     {% elif assignment_id %}
       <a href="{% url 'research-assignment-question-index-by-assignment' assignment_id=assignment_id%}#{{ question.pk }}">{% trans 'Back to Question List' %}</a>
-      <span style="padding-left:0.3em;padding-right:0.5em;">|</span><a href="{% url 'question-list' assignment_id=assignment_id %}">{% trans 'Back to Assignment' %}</a>
+      <span class="admin-link--padded">|</span><a href="{% url 'question-list' assignment_id=assignment_id %}">{% trans 'Back to Assignment' %}</a>
     {% endif %}
 </div>
 

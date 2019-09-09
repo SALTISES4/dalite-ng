@@ -1,4 +1,4 @@
-{% extends './errors.html' %}
+{% extends 'errors.html' %}
 
 {% load i18n %}
 
@@ -10,9 +10,9 @@
 </p>
 
 <p>
-  {% trans 'You may need to refresh your session by logging in again: ' %}<a style="color:white;" href="{% url 'logout' %}">{% trans 'Go to login' %}</a>
+  {% trans 'You may need to refresh your session by logging in again: ' %}<a href="{% url 'logout' %}">{% trans 'Go to login' %}</a>
 </p>
 
-<i class="corner-icon material-icons" style="vertical-align:middle;">block</i>
+<i class="corner-icon material-icons">block</i>
 
 {% endblock %}

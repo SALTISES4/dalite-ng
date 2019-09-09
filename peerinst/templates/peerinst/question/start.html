@@ -1,6 +1,6 @@
 {% extends 'peerinst/question/base.html' %}
 
-{% load add_class i18n %}
+{% load add_class compress i18n staticfiles %}
 
 {% block body %}
 <main>
@@ -19,11 +19,11 @@
         {% if not lti %}
         <a href="{% url 'question-list' assignment_id=assignment.pk %}">{% trans 'Back to assignment' %}</a>
         {% if question.user == user or user in question.collaborators.all %}
-        <span style="padding-left:0.3em;padding-right:0.5em;">|</span><a href="{% url 'question-update' question.id %}">{% trans 'Edit question' %}</a>
+        <span class="admin-link--padded">|</span><a href="{% url 'question-update' question.id %}">{% trans 'Edit question' %}</a>
         {% endif %}
         {% endif %}
         {% if first_choice_label and second_choice_label or first_choice_label and question.type == 'RO' %}
-        <span style="padding-left:0.3em;padding-right:0.5em;">|</span><a href="{% url 'reset-question' assignment_id=assignment.pk question_id=question.id %}">{% trans 'Reset answers' %}</a>
+        <span class="admin-link--padded">|</span><a href="{% url 'reset-question' assignment_id=assignment.pk question_id=question.id %}">{% trans 'Reset answers' %}</a>
         {% endif %}
       </div>
       {% endif %}
@@ -32,6 +32,7 @@
 
       <h2 class="mdc-typography--display1 mdc-theme--secondary">{{question.title}}</h2>
 
+      {% block messages %}
       {% if messages %}
       <ul class="messages">
         {% for message in messages %}
@@ -39,6 +40,7 @@
         {% endfor %}
       </ul>
       {% endif %}
+      {% endblock %}
 
       <div class="mdc-typography--body1">
         {{ question.text|safe }}
@@ -100,11 +102,6 @@
         <div>
           <input id="answer-form"
                  class="mdc-button mdc-button--raised padded-top"
-                 onclick="question.validateFormSubmit(
-                  event,
-                  '{% url 'quality:validate' %}',
-                  {{ quality|default_if_none:'null' }}
-                 )"
                  type="submit"
                  value="{% block submit_button %}{% trans 'Next' %}{% endblock %}" />
         </div>
@@ -118,7 +115,7 @@
   </div>
 
   {% if not lti and assignment %}
-  <div class='nav-question' style='border-top:solid;border-width:1px;border-color:LightGray;'>
+  <div class='nav-question'>
 
     {% if not assignment_first %}
     <a class='prev-question' href="{% url 'navigate-assignment' assignment_id=assignment.pk question_id=question.id direction='prev' index='x' %}">
@@ -128,14 +125,14 @@
     </a>
     {% endif %}
 
-    <div style='position:absolute;bottom:50%;left:50%;transform:translate(-50%,50%);'>
+    <div class="nav-disks">
       {% for q in group_assignment.questions %}
       <a href="{% url 'navigate-assignment' assignment_id=assignment.pk question_id=q.id direction='goto' index=forloop.counter0 %}">
         <svg height="12" width="20">
           {% if q.id == question.id %}
-            <circle cx="10" cy="6" r="5" fill="#54c0db" stroke="#54c0db" style="cursor:pointer;"></circle>
+            <circle class="pointer" cx="10" cy="6" r="5" fill="#54c0db" stroke="#54c0db" ></circle>
           {% else %}
-            <circle cx="10" cy="6" r="5" fill="white" stroke="#54c0db" style="cursor:pointer;"></circle>
+            <circle class="pointer" cx="10" cy="6" r="5" fill="white" stroke="#54c0db"></circle>
           {% endif %}
         </svg>
       </a>
@@ -161,4 +158,19 @@
 
 </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+{% compress js %}
+<script src="{% static 'peerinst/js/question.min.js' %}"></script>
+{% endcompress %}
+<script nonce="{{ request.csp_nonce }}">
+  window.addEventListener("load", function() {
+    question.initStart(
+      '{% url 'quality:validate' %}',
+      {{ quality|default_if_none:'null' }}
+    )
+  })
+</script>
 {% endblock %}

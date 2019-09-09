@@ -1,0 +1,11 @@
+@import "../variables";
+
+.logged-in-layout {
+  & .site-content {
+    position: relative;
+    top: 60px;
+    @media (max-width: $breakpoint-two) {
+      top: 40px;
+    }
+  }
+}

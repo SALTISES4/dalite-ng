@@ -3,6 +3,7 @@
 {% load i18n get_value %}
 
 {% block stylesheets %}
+{{ block.super }}
 <!--
 DataTables
 https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
@@ -11,7 +12,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/dataTables.jqueryui.min.css">
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.5.2/css/buttons.jqueryui.min.css">
 
-<style>
+<style nonce="{{ request.csp_nonce }}">
   .dataTables_wrapper {
     font-size: smaller;
   }
@@ -36,7 +37,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
 
     <div class="admin-link">
       <a href="{% url 'teacher' pk=teacher.pk %}">{% trans 'Back to My Account' %}</a>
-      <span style="padding-left:0.3em;padding-right:0.5em;">|</span><a href="{% url 'report_selector' %}">{% trans 'Back to Custom Reports' %}</a>
+      <span class="admin-link--padded">|</span><a href="{% url 'report_selector' %}">{% trans 'Back to Custom Reports' %}</a>
     </div>
 
     <h2 id='question_gradebook' class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Question-level gradebook' %}</h2>
@@ -110,7 +111,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
         {% for question in assignment.questions %}
           {% if question.show %}
             <h4 id="{{ question.title }}" class="mdc-typography--title bold">{% trans 'Question' %}: {{ question.title|safe }}</h4>
-            <div class="admin-link" style="margin-top:">
+            <div class="admin-link">
                 <a href="#question_gradebook">{% trans 'Back to top' %}</a>
             </div>
 
@@ -134,22 +135,22 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
 
             <h4>{% trans 'Statistics' %}</h4>
             <h5>{% trans 'Historical performance (all students in database)' %}</h5>
-            <div id="analytics-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" style="width:fit-content;margin:auto;">
-              <svg id="first-frequency-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" style="vertical-align:middle"></svg>
-              <svg id="matrix-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="60" height="60" style="vertical-align:middle"></svg>
-              <svg id="second-frequency-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" style="vertical-align:middle"></svg>
+            <div id="analytics-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" class="width-auto">
+              <svg id="first-frequency-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" class="vertical-align"></svg>
+              <svg id="matrix-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="60" height="60" class="vertical-align"></svg>
+              <svg id="second-frequency-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" class="vertical-align"></svg>
             </div>
 
 
             <h5>{% trans 'Performance of this group ' %}({{ question.num_responses}} {% trans 'students' %})</h5>
-            <div id="analytics-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" style="width:fit-content;margin:auto;">
-              <svg id="first-frequency-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" style="vertical-align:middle"></svg>
-              <svg id="matrix-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="60" height="60" style="vertical-align:middle"></svg>
-              <svg id="second-frequency-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" style="vertical-align:middle"></svg>
+            <div id="analytics-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" class="width-auto">
+              <svg id="first-frequency-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" class="vertical-align"></svg>
+              <svg id="matrix-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="60" height="60" class="vertical-align"></svg>
+              <svg id="second-frequency-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" class="vertical-align"></svg>
             </div>
 
               {% for distribution in question.answer_distributions %}
-              <div style="display:inline-block;width:175px;vertical-align:top;">
+              <div class="analytics-div">
               <h5>{{ distribution.label }}</h5>
                   <ul>
                   {% for answer_choice in distribution.data %}
@@ -163,7 +164,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
               </div>
               {% endfor %}
 
-              <div style="display:inline-block;width:175px;vertical-align:top;">
+              <div class="analytics-div">
               {% for transition in question.transitions %}
               <h5>{% trans "Overall Transitions" %}</h5>
                   <ul>
@@ -175,7 +176,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
               </div>
 
               {% if question.confusion_matrix %}
-              <div style="display:inline-block;width:175px;vertical-align:top;">
+              <div class="analytics-div">
                 <h5>{% trans "Confusion Matrix" %}</h5>
                 <table>
                     {% for first_ans in question.confusion_matrix %}
@@ -216,12 +217,15 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
                         <th>{% trans "Chosen Rationale" %}</th>
                       {% endif %}
                       <th>{% trans "Submitted" %}</th>
+                      <th>{% trans "Evaluate" %}</th>
                   </tr>
                   </thead>
                   <tbody>
                   {% for student_response in question.student_responses %}
 
-                  <tr>
+                  <tr class="custom-report__rationale"
+                      data-id="{{ student_response.id }}"
+                      data-score="{{ student_response.score }}">
                       <th id="{{student_response.student}}{{ question.title|safe }}" class="mdc-ripple-surface">
                           <a href="#{{ student_response.student }}">{{ student_response.student }}</a></th>
                       {% if question.type == "PI" %}
@@ -241,6 +245,44 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
                       {% endif %}
 
                       <td>{{ student_response.submitted }}</td>
+                      <td class="custom-report__rationale__evaluation">
+                        <i
+                          class="mdc-icon-toggle material-icons mdc-theme--primary star"
+                          role="button"
+                          aria-pressed="false"
+                          aria-label="{% trans 'Score' %}"
+                          tabindex="0"
+                          title="{% trans 'This rationale should be shown OFTEN to students' %}">
+                            star_border
+                        </i>
+                        <i
+                          class="mdc-icon-toggle material-icons mdc-theme--primary star"
+                          role="button"
+                          aria-pressed="false"
+                          aria-label="{% trans 'Score' %}"
+                          tabindex="0"
+                          title="{% trans 'This rationale could be shown SOMETIMES to students' %}">
+                            star_border
+                        </i>
+                        <i
+                          class="mdc-icon-toggle material-icons mdc-theme--primary star"
+                          role="button"
+                          aria-pressed="false"
+                          aria-label="{% trans 'Score' %}"
+                          tabindex="0"
+                          title="{% trans 'This rationale should RARELY be shown to students' %}">
+                            star_border
+                        </i>
+                        <i
+                          class="mdc-icon-toggle material-icons mdc-theme--primary flag"
+                          role="button"
+                          aria-pressed="false"
+                          aria-label="{% trans 'Flag' %}"
+                          tabindex="0"
+                          title="{% trans 'This rationale should NEVER be shown to students' %}">
+                            outlined_flag
+                        </i>
+                      </td>
                   </tr>
 
                   {% endfor %}
@@ -254,6 +296,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
 {% endblock %}
 
 {% block scripts %}
+{{ block.super }}
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/dataTables.jqueryui.min.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
@@ -261,7 +304,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 $(document).ready( function () {
   $('table.display').each(function() {
     var table = $(this).DataTable({
@@ -290,22 +333,16 @@ bundle.selectAll("#second_choice-group-"+id).transition().delay(1000).duration(1
 {% endfor %}
 {% endfor %}
 
-// var json = {{ json|safe }}
-
-// $(document).ready( function () {
-//   $('#question_gradebook_table').DataTable();
-// });
-
-// $(document).ready( function () {
-//   $('#student_gradebook_table').DataTable({
-//         "scrollX": true
-//     }
-//     );
-// });
-
-// $(document).ready( function () {
-//   $('#student_responses_table').DataTable();
-// });
-
 </script>
+<script nonce="{{ request.csp_nonce }}">
+  window.addEventListener("load", function() {
+  teacher.initCustomReport(
+    {
+      evaluateRationale: "{% url 'teacher-dashboard--evaluate-rationale' %}"
+
+    }
+  )
+  })
+</script> 
+
 {% endblock %}

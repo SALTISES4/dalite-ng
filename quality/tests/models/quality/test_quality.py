@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import time
+
 import mock
 import pytest
 
 from quality.models import (
     MinWordsCriterionRules,
     NegWordsCriterionRules,
+    QualityCache,
     UsesCriterion,
 )
 from quality.tests.fixtures import *  # noqa
@@ -114,6 +117,60 @@ def test_evaluate__different_weights(assignment_validation_quality):
             assert q["weight"] == i + 1
 
 
+def test_evaluate__cached(assignment_validation_quality):
+    answer = mock.Mock()
+    answer.pk = 0
+    answer.rationale = "test"
+
+    for i in range(3):
+        UsesCriterion.objects.create(
+            quality=assignment_validation_quality,
+            name="fake_{}".format(i + 1),
+            version=0,
+            rules=0,
+            weight=1,
+        )
+
+    with mock.patch("quality.models.quality.get_criterion") as get_criterion:
+
+        criterion_class = mock.Mock()
+        get_criterion.return_value = {
+            "criterion": criterion_class,
+            "rules": mock.Mock(),
+        }
+
+        criterion = mock.MagicMock()
+        criterion.__iter__.side_effect = {}.__iter__
+
+        def evaluate():
+            i = 0
+            while True:
+                time.sleep(0.1)
+                i += 1
+                yield {"quality": i + 1, "threshold": 1}
+
+        evaluations = evaluate()
+        criterion.evaluate = lambda answer, rules: next(evaluations)
+
+        criterion_class.objects.get.return_value = criterion
+
+        start = time.time()
+        quality_1, qualities_1 = assignment_validation_quality.evaluate(
+            answer, cache=True
+        )
+        time_taken_1 = time.time() - start
+
+        start = time.time()
+        quality_2, qualities_2 = assignment_validation_quality.evaluate(
+            answer, cache=True
+        )
+        time_taken_2 = time.time() - start
+
+        assert time_taken_2 < time_taken_1
+        assert quality_1 == quality_2
+        assert qualities_1 == qualities_2
+
+
 def test_batch_evaluate__no_criterions(assignment_validation_quality):
     answers = [mock.Mock() for _ in range(3)]
 
@@ -199,6 +256,132 @@ def test_batch_evaluate__different_weights(assignment_validation_quality):
             for i, q in enumerate(_qualities):
                 assert q["quality"]["quality"] == i + 1
                 assert q["weight"] == i + 1
+
+
+def test_batch_evaluate__cached_all(assignment_validation_quality):
+    answers = [mock.Mock() for _ in range(3)]
+    for i, answer in enumerate(answers):
+        answer.pk = i
+        answer.rationale = "test" + str(i)
+
+    for i in range(3):
+        UsesCriterion.objects.create(
+            quality=assignment_validation_quality,
+            name="fake_{}".format(i + 1),
+            version=0,
+            rules=0,
+            weight=1,
+        )
+
+    with mock.patch("quality.models.quality.get_criterion") as get_criterion:
+
+        criterion_class = mock.Mock()
+        get_criterion.return_value = {
+            "criterion": criterion_class,
+            "rules": mock.Mock(),
+        }
+
+        criterion = mock.MagicMock()
+        criterion.__iter__.side_effect = {}.__iter__
+
+        def evaluate():
+            i = 0
+            while True:
+                time.sleep(0.1)
+                i += 1
+                yield [
+                    {"quality": i + 1, "threshold": 1}
+                    for _ in range(len(answers))
+                ]
+
+        evaluations = evaluate()
+        criterion.batch_evaluate = lambda answer, rules: next(evaluations)
+
+        criterion_class.objects.get.return_value = criterion
+
+        start = time.time()
+        qualities_1 = assignment_validation_quality.batch_evaluate(
+            answers, cache=True
+        )
+        time_taken_1 = time.time() - start
+
+        evaluations = evaluate()
+        criterion.batch_evaluate = lambda answer, rules: next(evaluations)
+
+        start = time.time()
+        qualities_2 = assignment_validation_quality.batch_evaluate(
+            answers, cache=True
+        )
+        time_taken_2 = time.time() - start
+
+        assert time_taken_2 < time_taken_1
+        assert qualities_1 == qualities_2
+
+
+def test_batch_evaluate__cached_some(assignment_validation_quality):
+    answers = [mock.Mock() for _ in range(3)]
+    for i, answer in enumerate(answers):
+        answer.pk = i
+        answer.rationale = "test" + str(i)
+
+    for i in range(3):
+        UsesCriterion.objects.create(
+            quality=assignment_validation_quality,
+            name="fake_{}".format(i + 1),
+            version=0,
+            rules=0,
+            weight=1,
+        )
+
+    with mock.patch("quality.models.quality.get_criterion") as get_criterion:
+
+        criterion_class = mock.Mock()
+        get_criterion.return_value = {
+            "criterion": criterion_class,
+            "rules": mock.Mock(),
+        }
+
+        criterion = mock.MagicMock()
+        criterion.__iter__.side_effect = {}.__iter__
+
+        def evaluate():
+            i = 0
+            while True:
+                time.sleep(0.1)
+                i += 1
+                yield [
+                    {"quality": i + 1, "threshold": 1}
+                    for _ in range(len(answers))
+                ]
+
+        evaluations = evaluate()
+        criterion.batch_evaluate = lambda answer, rules: next(evaluations)
+
+        criterion_class.objects.get.return_value = criterion
+
+        start = time.time()
+        qualities_1 = assignment_validation_quality.batch_evaluate(
+            answers, cache=True
+        )
+        time_taken_1 = time.time() - start
+
+        for c in QualityCache.objects.all()[:2]:
+            c.delete()
+
+        evaluations = evaluate()
+        criterion.batch_evaluate = lambda answer, rules: next(evaluations)
+
+        evaluations = evaluate()
+        criterion.batch_evaluate = lambda answer, rules: next(evaluations)
+
+        start = time.time()
+        qualities_2 = assignment_validation_quality.batch_evaluate(
+            answers, cache=True
+        )
+        time_taken_2 = time.time() - start
+
+        assert time_taken_2 < time_taken_1
+        assert qualities_1 == qualities_2
 
 
 def test_add_criterion(assignment_validation_quality):

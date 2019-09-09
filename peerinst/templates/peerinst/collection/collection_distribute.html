@@ -1,0 +1,161 @@
+{% extends 'peerinst/base.html' %}
+
+{% load get_value bleach_html staticfiles compress i18n %}
+
+{% block stylesheets %}
+{{ block.super }}
+{% compress css %}
+<link href="{% static 'peerinst/css/collection.min.css' %}" rel="stylesheet">
+{% endcompress %}
+{% endblock %}
+{% block body %}
+<main>
+  <section>
+    <h1 class="mdc-typography--display3">{% trans 'Collections' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
+    <div>
+      <div class="admin-link">
+        {% if user.is_staff %}
+        <a href="{% url 'admin_index_wrapper' %}">Click here to access admin</a>
+        <span class="links-divider">|</span>{% endif %}<a href="{% url 'teacher' request.user.teacher.pk %}">{% trans 'Back to My Account' %}</a>
+        <span class="links-divider">|</span><a href="{% url 'collection-detail' object.pk %}">{% trans 'Back to Collection' %}</a>
+      </div>
+    </div>
+    <div>
+      <h2 class="mdc-typography--display1 mdc-theme--secondary">
+        {{ object.title|bleach_html|safe }}
+        <div class="mdc-typography--caption">
+        {% trans 'Created by' %} {{ object.owner.user.username }}
+      </div></h2>
+    </div>
+
+    <div class="mdc-typography--body1">
+      {{ object.description|bleach_html|safe }}
+    </div>
+    <br>
+    <div>
+    <p><b>{% trans 'Collection Information' %}</b></p>
+    <div class="mdc-typography--caption">
+      <div>
+        {% trans 'Discipline' %}: {{ object.discipline|bleach_html|safe }}
+      </div>
+      <div>
+        {% trans 'Published on' %} {{ object.created_on }}
+      </div>
+      <div>
+        {% trans 'Total Answers' %}:
+        {{ collection_data.total_answers }}
+      </div>
+      <div>
+        {% trans 'Answers Switched' %}:
+        {{ collection_data.switches }}
+      </div>
+      <div>
+        {% trans 'Correct Answers on First Attempt' %}:
+        {{ collection_data.correct_first_answers }}
+      </div>
+      <div>
+        {% trans 'Correct Answers on Second Attempt' %}:
+        {{ collection_data.correct_second_answers }}
+      </div>
+    </div>
+    <div class='field-container' id="distribute-help">
+      <div class='number-box'><span class='number'>?</span></div>
+      <div class='field'>
+          <p><small>
+          {% blocktrans %}
+          Your may assign the this collection to one of your student groups by
+          clicking on the assign button below. You may also unassign a collection's
+          assignments. However, this function will only unassign assignments that
+          have not already been distributed.
+          {% endblocktrans %}
+        </small></p>
+      </div>
+    </div>
+  </div>
+
+    {% if not student_groups %}
+    <p class='mdc-typography--body1'>
+      {% blocktrans %}
+      You have no active student groups that may receive this collection.
+      {% endblocktrans %}
+    </p>
+    {% endif %}
+    <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
+      {% for g in student_groups %}
+      <li role="separator" class="mdc-list-divider"></li>
+      <li class="mdc-list-item pointer group-link">
+        <span class="mdc-list-item__graphic mdc-theme--primary">
+          <i class="clickable mdc-theme--primary material-icons md-48"
+             id="{{ g.hash|safe }}">group</i>
+        </span>
+        <span class="clickable mdc-list-item__text mdc-theme--secondary bold">
+          <a id="group-title"
+             class="mdc-theme--secondary"
+             href="{% url 'group-details' g.hash %}">
+            {% if not g.title %} {{ g.name|bleach_html|safe }} {% else %}
+            {{ g.title|bleach_html|safe }} {% endif %}
+          </a>
+          <span class="mdc-list-item__secondary-text">
+            {% trans "Created: " %} {{ g.creation_date }}
+          </span>
+          <span class="mdc-list-item__secondary-text">
+            {% trans "Students: " %} {{ g.student_set.count  }}
+          </span>
+        </span>
+        <span class="mdc-list-item__meta">
+          {% if group_data|get_value:g.pk is False %}
+          <button class="mdc-button mdc-button--raised collection-toggle-assign removed"
+                  id_pk="{{ g.pk|safe }}"
+                  id_ppk="{{ object.pk|safe }}"
+                  id="{{ g.pk|safe }}"
+                  name="{{ g.title|safe }}">
+                  {% trans 'Assign' %}
+          </button>
+          {% else %}
+          <button class="mdc-button mdc-button--raised collection-toggle-assign added"
+                  id_pk="{{ g.pk|safe }}"
+                  id_ppk="{{ object.pk|safe }}"
+                  id="{{ g.pk|safe }}"
+                  name="{{ g.title|safe }}">
+                  {% trans 'Unassign' %}
+          </button>
+          {% endif %}
+        </span>
+      </li>
+      {% endfor %}
+      <li role="separator" class="mdc-list-divider"></li>
+    </ul>
+    <div class="mdc-snackbar mdc-snackbar--align-start"
+         aria-live="assertive"
+         aria-atomic="true"
+         aria-hidden="true">
+      <div class="mdc-snackbar__text bold"></div>
+      <div class="mdc-snackbar__action-wrapper" hidden>
+        <button type="button" class="mdc-snackbar__action-button"></button>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+{% compress js %}
+<script src="{% static 'peerinst/js/collection.min.js' %}"></script>
+{% endcompress %}
+<script nonce="{{ request.csp_nonce }}">
+window.addEventListener("load", function() {
+  collection.initCollectionDistribute(
+    "{% url 'collection-assign' %}",
+    "{% url 'collection-unassign' %}",
+    "{% trans 'Assign' %}",
+    "{% trans 'Unassign' %}",
+    "{% trans 'Assigned to ' %}",
+    "{% trans 'Unassigned from ' %}",
+    "{% trans 'Unable to contact server' %}",
+    "{% url 'group-details' 0 %}",
+  );
+});
+</script>
+{% endblock %}

@@ -1,4 +1,5 @@
 import pytest
+
 from .generators import add_users, new_users
 
 

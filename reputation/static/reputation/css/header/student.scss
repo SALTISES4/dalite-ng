@@ -1,0 +1,32 @@
+@import "./header";
+
+#container {
+  & #list {
+    box-shadow: 0 1px 1px #bdbdbd;
+    grid-template-columns: minmax(125px, max-content) 1fr;
+    width: 400px;
+
+    & .badge {
+      height: 100%;
+      width: 100%;
+
+      & svg {
+        height: 100%;
+        width: 100%;
+      }
+
+      & .badge__reputation {
+        fill: var(--reputation-colour, #000000);
+        user-select: none;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  #container {
+    & #list {
+      width: auto;
+    }
+  }
+}

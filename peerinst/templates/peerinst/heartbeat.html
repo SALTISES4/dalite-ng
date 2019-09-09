@@ -5,7 +5,7 @@
 {% block body %}
     <ul>
     {% for check in checks %}
-        <li {% if check.is_ok %}style="color: greenyellow"{% else %} style="color: red" {% endif %}>{{ check.message }}</li>
+        <li {% if check.is_ok %} class="greenyellow" {% else %} class="red" {% endif %}>{{ check.message }}</li>
     {% endfor %}
     </ul>
 {% endblock %}

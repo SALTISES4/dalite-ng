@@ -2,10 +2,35 @@
 
 {% load i18n %}
 
+{% block stylesheets %}
+{{ block.super }}
+<!--
+DataTables
+https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
+-->
+<link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/dataTables.jqueryui.min.css">
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.5.2/css/buttons.jqueryui.min.css">
+
+<style nonce="{{ request.csp_nonce }}">
+  .dataTables_wrapper {
+    font-size: smaller;
+  }
+  .dt-button {
+    font-family: inherit;
+  }
+  .small {
+    font-size: smaller;
+  }
+  ul {
+    padding-left:0px;
+  }
+</style>
+{% endblock %}
+
 {% block body %}
 <main>
   <section>
-
     <h1 class="mdc-typography--display3">{% trans 'Group Details' %}
       <svg class="underline" width=150 height=4></svg>
     </h1>
@@ -36,7 +61,7 @@
                 </span>
               </span>
               <span class="mdc-list-item__meta">
-                <i onclick="group.editField(event, 'text', 'mdc-list-item__secondary-text')" title="Edit" class="material-icons md-24 mdc-ripple-surface icon-list">edit</i>
+                <i title="Edit" class="material-icons md-24 mdc-ripple-surface icon-list edit-btn">edit</i>
               </span>
             </li>
             <li class="mdc-list-divider" role="separator"></li>
@@ -52,7 +77,7 @@
                 </span>
               </span>
               <span class="mdc-list-item__meta">
-                <i onclick="group.editField(event, 'text', 'mdc-list-item__secondary-text')" title="Edit" class="material-icons md-24 mdc-ripple-surface icon-list">edit</i>
+                <i title="Edit" class="material-icons md-24 mdc-ripple-surface icon-list edit-btn">edit</i>
               </span>
             </li>
             <li class="mdc-list-divider" role="separator"></li>
@@ -77,7 +102,7 @@
               <span class="mdc-list-item__text mdc-theme--secondary bold no-icon">
                 {% trans 'Signup link' %}
                 <span class="mdc-list-item__secondary-text no-icon">
-                {{ request.get_host }}{% url 'signup-through-link' group_hash=group.hash %}
+                  {{ request.scheme }}&colon;//{{ request.get_host }}{% url 'signup-through-link' group_hash=group.hash %}
                 </span>
                 <span class="mdc-list-item__secondary-text no-icon">
                 {{ group.student_set.count }} {% trans 'students registered' %}
@@ -101,19 +126,13 @@
                 <div class="switch-button">
                   {% if group.student_id_needed %}
                   <input type="checkbox"
+                         id="toggle-id-btn"
                          class="switch-button__input"
-                         onclick="group.toggleStudentIdNeeded(
-                            event,
-                           '{% url 'group-details-update' group.hash %}'
-                         )"
                          checked>
                   {% else %}
                   <input type="checkbox"
-                         class="switch-button__input"
-                         onclick="group.toggleStudentIdNeeded(
-                            event,
-                           '{% url 'group-details-update' group.hash %}'
-                         )">
+                         id="toggle-id-btn"
+                         class="switch-button__input">
                   {% endif %}
                   <div class="switch-button__background"></div>
                   <div class="switch-button__button"></div>
@@ -122,14 +141,14 @@
             </li>
             <li class="mdc-list-divider" role="separator"></li>
 
-            <li class="mdc-list-item" style="height:auto;padding: 12px 12px;">
+            <li class="mdc-list-item verified_user">
               <span class="mdc-list-item__graphic mdc-theme--primary">
                 <i class="mdc-theme--primary material-icons md-48">verified_user</i>
               </span>
               <span class="mdc-list-item__text mdc-theme--secondary bold">
                 {% trans 'Teachers with access' %}
                 <div name="teacher" class="mdc-list-item__secondary-text">
-                  <ul style="padding-left:0px;">
+                  <ul id="teachers-with-access-list">
                     {% for t in group.teacher.all %}
                     <li class="mdc-list-item__secondary-text">
                       {{ t.user.username }}
@@ -139,39 +158,39 @@
                 </div>
               </span>
               <span class="mdc-list-item__meta">
-                <i onclick="group.editField(event, 'textList', 'mdc-list-item__secondary-text')" title="Add" class="material-icons md-24 mdc-ripple-surface icon-list">add</i>
+                <i title="Add" class="material-icons md-24 mdc-ripple-surface icon-list edit-btn">add</i>
               </span>
             </li>
-            <li class="mdc-list-divider" role="separator"></li>
-            <li class="mdc-list-item"
-                title="{% trans 'Quality evaluation for allowing rationale submission' %}">
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">
-                  assistant
-                </i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {% trans 'Submission quality' %}
-                <div class="mdc-list-item__secondary-text">
-                  {% if group.quality %}
-                  <ul style="padding-left:0px;">
-                    {% for criterion in assignment.quality.criterions.all %}
-                    <li class="mdc-list-item__secondary-text">
-                      {{ criterion.name }} v{{ criterion.version }}
-                    </li>
-                    {% endfor %}
-                  </ul>
-                  {% endif %}
-                </div>
-              </span>
-              <span class="mdc-list-item__meta">
-                <a href="{% url 'quality:edit' %}?type=validation&group={{ group.pk }}&next={{ request.path }}">
-                  <i class="material-icons md-24 mdc-ripple-surface icon-list">
-                    edit
-                  </i>
-                </a>
-              </span>
-            </li>
+            {% comment %} <li class="mdc-list-divider" role="separator"></li> {% endcomment %}
+            {% comment %} <li class="mdc-list-item" {% endcomment %}
+                {% comment %} title="{% trans 'Quality evaluation for allowing rationale submission' %}"> {% endcomment %}
+              {% comment %} <span class="mdc-list-item__graphic mdc-theme--primary"> {% endcomment %}
+                {% comment %} <i class="mdc-theme--primary material-icons md-48"> {% endcomment %}
+                  {% comment %} assistant {% endcomment %}
+                {% comment %} </i> {% endcomment %}
+              {% comment %} </span> {% endcomment %}
+              {% comment %} <span class="mdc-list-item__text mdc-theme--secondary bold"> {% endcomment %}
+                {% comment %} {% trans 'Submission quality' %} {% endcomment %}
+                {% comment %} <div class="mdc-list-item__secondary-text"> {% endcomment %}
+                  {% comment %} {% if group.quality %} {% endcomment %}
+                  {% comment %} <ul class="p-left-0"> {% endcomment %}
+                    {% comment %} {% for criterion in assignment.quality.criterions.all %} {% endcomment %}
+                    {% comment %} <li class="mdc-list-item__secondary-text"> {% endcomment %}
+                      {% comment %} {{ criterion.name }} v{{ criterion.version }} {% endcomment %}
+                    {% comment %} </li> {% endcomment %}
+                    {% comment %} {% endfor %} {% endcomment %}
+                  {% comment %} </ul> {% endcomment %}
+                  {% comment %} {% endif %} {% endcomment %}
+                {% comment %} </div> {% endcomment %}
+              {% comment %} </span> {% endcomment %}
+              {% comment %} <span class="mdc-list-item__meta"> {% endcomment %}
+                {% comment %} <a href="{% url 'quality:edit' %}?type=validation&group={{ group.pk }}&next={{ request.path }}"> {% endcomment %}
+                  {% comment %} <i class="material-icons md-24 mdc-ripple-surface icon-list"> {% endcomment %}
+                    {% comment %} edit {% endcomment %}
+                  {% comment %} </i> {% endcomment %}
+                {% comment %} </a> {% endcomment %}
+              {% comment %} </span> {% endcomment %}
+            {% comment %} </li> {% endcomment %}
             <li class="mdc-list-divider" role="separator"></li>
           </ul>
         </div>
@@ -179,16 +198,22 @@
     </div>
 
     <div class="foldable">
-      <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
+
+      <h2 id="assignments-title" class="foldable--title mdc-typography--display1 mdc-theme--secondary">
         {% trans 'Assignments' %}
+      <span>
+
+      </span>
       </h2>
       <div class="foldable--body">
+        <div id="collection-select"
+                class="admin-link clickable"
+                data-pk="{{ group.pk|safe }}">{% trans 'Add to Collection' %}
+        </div>
         <ul id="assignment-list" class="mdc-list mdc-list--two-line">
-
           {% for a in assignments %}
-
           <li class="mdc-list-divider" role="separator"></li>
-          <li onclick="window.location.href='{% url 'group-assignment' a.hash %}'" class="mdc-list-item" style="cursor: pointer;">
+          <li class="mdc-list-item pointer assignment-link">
             <span class="mdc-list-item__graphic mdc-theme--primary">
               <i class="mdc-theme--primary material-icons md-48">work</i>
             </span>
@@ -202,13 +227,19 @@
               </span>
             </span>
             <span class="mdc-list-item__meta">
-              <i onclick="group.removeAssignment(event, '{% url 'group-assignment' a.hash %}')" class="material-icons md-24 mdc-ripple-surface icon-list">delete</i>
+              <i class="material-icons md-24 mdc-ripple-surface icon-list delete-btn">
+                delete
+              </i>
               <a href="{% url 'group-assignment' a.hash %}">
               <i class="material-icons md-24 mdc-ripple-surface icon-list">edit</i>
               </a>
-              <a href="{% url 'group-assignment-gradebook' group_hash=group.hash assignment_hash=a.hash %}">
-              <i class="material-icons md-24 mdc-ripple-surface icon-list">bar_chart</i>
-              </a>
+              <button class="gradebook-button"
+                      data-group="{{ group.pk }}"
+                      data-assignment="{{ a.pk }}">
+                <i class="material-icons md-24 mdc-ripple-surface icon-list">
+                  bar_chart
+                </i>
+              </button>
             </span>
           </li>
           {% empty %}
@@ -221,7 +252,6 @@
 
           {% endfor %}
           <li class="mdc-list-divider" role="separator"></li>
-
         </ul>
       </div>
     </div>
@@ -230,42 +260,67 @@
       <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
         {% trans 'Student list' %}
       </h2>
+
       <div class="foldable--body">
-        <ul id="student-list" class="mdc-list mdc-list--two-line mdc-list--non-interactive">
 
-          {% for student in group.students %}
-
-          <li class="mdc-list-item">
-            <span class="mdc-list-item__graphic mdc-theme--primary">
-              <i class="mdc-theme--primary material-icons md-48">person</i>
-            </span>
-            <span class="mdc-list-item__text mdc-theme--secondary">
-              {% if student.student.email %}
-              {{ student.student.email }}
-              {% else %}
-              {{ student.student.username }}
-              {% endif %}
-              <span class="mdc-list-item__secondary-text">
-                {% trans "Last login: " %}{{ student.student.last_login }}
-              </span>
-            </span>
-            <span class="mdc-list-item__meta">
-              <span class="bold" style="font-size:20px;">{{ forloop.counter }}</span>
-              </a>
-            </span>
-          </li>
-
-          {% empty %}
-
-          <p class='mdc-typography--body1'>{% trans 'No student has signed up yet' %}</p>
-
-          {% endfor %}
-
-        </ul>
-
-      </div>
-    </div>
-
+    <table id='student_reputation_table' class="display">
+      <thead>
+        <tr>
+          <th>{% trans 'Email' %}</th>
+          <th>{% trans 'Last Login' %}</th>
+          <th title='{% trans "Measure of how many times the rationales written by this student have been chosen by others." %}'>{% trans 'Popularity' %}</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
   </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/dataTables.jqueryui.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.jqueryui.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+
+<script nonce="{{ request.csp_nonce }}">
+  $(document).ready( function () {
+    $('table.display').each(function() {
+      var table = $(this).DataTable({
+        pageLength: 50,
+        dom: '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"Bf>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"ip>',
+        buttons: ['csv', 'colvis']
+      });
+    });
+  });
+
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+          }
+      }
+  });
+
+  $("#collection-select").one("click",
+    () => {;
+      group.createCollection(
+        $("#collection-select").attr('data-pk'),
+        "{% url 'collection-add-assignment' %}",
+        "{% url 'collection-update' 0 %}"
+      );
+      return;
+  });
+
+  window.addEventListener("load", () => {
+    group.initDetails({{ data|safe }});
+  })
+
+</script>
 {% endblock %}

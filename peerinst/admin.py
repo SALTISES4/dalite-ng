@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape, format_html
 from django.utils.translation import ugettext_lazy as _
 
+from . import models
 from .models import (
     Answer,
     AnswerChoice,
@@ -126,6 +127,7 @@ class QuestionAdmin(admin.ModelAdmin):
             {
                 "fields": [
                     "title",
+                    "difficulty",
                     "user",
                     "collaborators",
                     "text",
@@ -161,12 +163,28 @@ class QuestionAdmin(admin.ModelAdmin):
         "rationale_selection_algorithm": admin.HORIZONTAL,
         "grading_scheme": admin.HORIZONTAL,
     }
-    readonly_fields = ["id", "parent", "created_on", "last_modified"]
+    readonly_fields = [
+        "id",
+        "parent",
+        "created_on",
+        "last_modified",
+        "difficulty",
+    ]
     inlines = [AnswerChoiceInline, AnswerInline]
-    list_display = ["title", "discipline"]
-    list_filter = ["category"]
+    list_display = ["title", "discipline", "difficulty"]
+    list_filter = ["category", "discipline"]
     ordering = ["discipline"]
     search_fields = ["title", "text", "category__title"]
+
+    def difficulty(self, obj):
+        try:
+            difficulty = obj.meta_search.get(
+                meta_feature__key="difficulty", meta_feature__type="S"
+            ).meta_feature.value
+        except exceptions.ObjectDoesNotExist:
+            difficulty = None
+
+        return difficulty
 
 
 @admin.register(QuestionFlagReason)
@@ -429,4 +447,24 @@ class LogEntryAdmin(admin.ModelAdmin):
         )
 
 
+class MessageAdmin(admin.ModelAdmin):
+    def save_related(self, req, form, *args, **kwargs):
+        super(MessageAdmin, self).save_related(req, form, *args, **kwargs)
+        for_users = [t.type for t in form.instance.for_users.all()]
+        if "teacher" in for_users:
+            for teacher in Teacher.objects.all():
+                models.UserMessage.objects.get_or_create(
+                    user=teacher.user, message=form.instance
+                )
+        if "student" in for_users:
+            for student in Student.objects.all():
+                models.UserMessage.objects.get_or_create(
+                    user=student.student, message=form.instance
+                )
+
+
 admin.site.register(LogEntry, LogEntryAdmin)
+admin.site.register(models.Message, MessageAdmin)
+admin.site.register(models.MessageType)
+admin.site.register(models.SaltiseMember)
+admin.site.register(models.UserType)

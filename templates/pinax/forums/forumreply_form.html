@@ -1,4 +1,4 @@
-{% extends './base.html' %}
+{% extends 'pinax/forums/base.html' %}
 
 {% load i18n add_class %}
 
@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-<span class="links-divider">|</span><a href="{% url 'pinax_forums:thread' object.thread.id %}">{% trans 'Back to post' %}</a>
+<span class="links-divider">|</span><a href="{% url 'pinax_forums:thread' object.thread.id %}">{% trans 'Back to Post' %}</a>
 {% endblock %}
 
 {% block content %}
@@ -21,7 +21,7 @@
   {% if post.reply %}
   <input type="hidden" name="reply" value="{{post.reply.id}}"/>
   {% endif %}
-  <input type="submit" class="mdc-button mdc-button--raised" value="{% trans 'Update' %}"/>
-  <a class="mdc-button mdc-button--raised delete" href="{% url 'pinax_forums:post_delete_reply' post.pk %}">{% trans 'Delete' %}</a>
+  <input type="submit" class="mdc-button mdc-button--raised padded-top" value="{% trans 'Update' %}"/>
+  <a class="mdc-button mdc-button--raised delete padded-top" href="{% url 'pinax_forums:post_delete_reply' post.pk %}">{% trans 'Delete' %}</a>
 </form>
 {% endblock %}

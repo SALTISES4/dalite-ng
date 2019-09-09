@@ -26,6 +26,7 @@ from ..models import (
     StudentAssignment,
     StudentGroup,
     StudentGroupAssignment,
+    StudentGroupMembership,
     Teacher,
 )
 from ..students import authenticate_student
@@ -119,6 +120,18 @@ def live(request, token, assignment_hash):
             ),
             log=logger.warning,
         )
+
+    group = group_assignment.group
+    if group.student_id_needed:
+        group_membership = StudentGroupMembership.objects.get(
+            student=user.student, group=group
+        )
+        if not group_membership.student_school_id:
+            return HttpResponseRedirect(
+                reverse("student-page")
+                + "?group-student-id-needed="
+                + group.name
+            )
 
     student_assignment = StudentAssignment.objects.get(
         student=user.student, group_assignment=group_assignment

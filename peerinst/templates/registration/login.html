@@ -1,9 +1,9 @@
-{% extends "peerinst/base.html" %}
+{% extends "peerinst/_base.html" %}
 
 {% load add_class i18n %}
 
 {% block stylesheets %}
-<style>
+<style nonce="{{ request.csp_nonce }}">
   h2 {
     margin-bottom:0px;
   }
@@ -19,7 +19,7 @@
 
   <div class="admin-link">
     <a href="{% url 'password_reset' %}">{% trans 'Forgot password' %}</a>
-    <span style="padding-left:0.3em;padding-right:0.5em;">|</span><a href="{% url 'sign_up' %}">{% trans 'Sign up' %}</a>
+    <span class="links-divider">|</span><a href="{% url 'sign_up' %}">{% trans 'Sign up' %}</a>
   </div>
 
 
@@ -75,9 +75,23 @@
 
     <div class='padded-top'>
       <input type="hidden" name="next" value="{{ next }}"/>
-      <input class="mdc-button mdc-button--raised" onclick="this.form.submit();if (this.form.reportValidity()){this.disabled=true;}" type="submit" value="{% trans 'Submit' %}"/>
+      <input id="submit-btn" class="mdc-button mdc-button--raised" type="submit" value="{% trans 'Submit' %}"/>
     </div>
   </form>
 </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
+  window.addEventListener("load", function() {
+    document.getElementById("submit-btn").addEventListener("click", function() {
+      this.form.submit();
+      if (this.form.reportValidity()) {
+        this.disabled=true;
+      }
+    })
+  })
+</script>
 {% endblock %}

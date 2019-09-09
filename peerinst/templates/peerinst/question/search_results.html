@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load bleach_html i18n %}
 
 <h2 id="results_list" class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Results' %}</h2>
 
@@ -10,7 +10,7 @@
       <div class="pagination">
           <span>
               {% if paginator.has_previous %}
-                  <span class="search-nav" onclick="pageNav({{ paginator.previous_page_number }})"><i class="icon ion-ios-arrow-back"></i></span>
+                  <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
               {% endif %}
 
               <span class="current">
@@ -18,7 +18,7 @@
               </span>
 
               {% if paginator.has_next %}
-                  <span class="search-nav" onclick="pageNav({{ paginator.next_page_number }})"><i class="icon ion-ios-arrow-forward"></i></span>
+                  <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
               {% endif %}
           </span>
       </div>
@@ -49,12 +49,12 @@
         #{{ g.id|safe }} {% if g.user %}{% trans 'by' %} {{ g.user.username|safe }}{% endif %}
       </div>
 
-      <div class="mdc-typography--body1" style="margin-top:5px;">
-        {{ g.text|safe }}
+      <div class="mdc-typography--body1 question-text">
+        {{ g.text|bleach_html|safe }}
       </div>
 
       {% if g.image %}
-        <img class="question-image" style="display:none;" src="{{ g.image.url|safe }}" alt="g.image_alt_text">
+        <img class="question-image display-none" src="{{ g.image.url|safe }}" alt="g.image_alt_text">
       {% endif %}
 
       {% if g.video_url %}
@@ -63,15 +63,14 @@
       </div>
       {% endif %}
 
-
-      <div class="question-answers" style="display:none;">
+      <div class="question-answers display-none">
         <ul>
           {% for label, choice in g.get_choices %}
-            <li class="dense-list">{{ label }}. {{ choice|safe }}
+            <li class="dense-list">{{ label }}. {{ choice|bleach_html|safe }}
             {% for c in g.answerchoice_set.all %}
               {% if forloop.counter == forloop.parentloop.counter %}
                 {% if c.correct %}
-                  <i id="check" class="material-icons" style="-webkit-transform: translateY(3px);font-size:12pt;">check</i>
+                  <i class="check material-icons">check</i>
                 {% endif %}
               {% endif %}
             {% endfor %}
@@ -82,7 +81,7 @@
 
       <div class="mdc-card__actions">
 
-        <div class="mdc-card__action-buttons" style="color:grey;">
+        <div class="mdc-card__action-buttons">
           <div class="mdc-typography--caption">
             <div>
               {% trans 'Discipline' %}: {{ g.discipline|safe }}
@@ -110,30 +109,52 @@
           </div>
 
           {% if assignment %}
-          <button onclick="ajax.updateAssignmentQuestionList('{% url 'assignment-edit-ajax' %}', '{{ g.id|safe }}', '{{ assignment.identifier|safe }}')" class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" style="margin-left:20px;">add</button>
+
+            {% if request.user == g.user or request.user in g.collaborators.all %}
+            <a title="{% trans 'Edit' %}" id="edit-question-{{ g.pk }}" href="{% url 'question-update' g.pk %}">
+              <i class="material-icons md-24 mdc-ripple-surface card-icon-list mdc-theme--primary">mode_edit</i>
+            </a>
+            {% else %}
+            <a title="{% trans 'Copy and edit' %}" id="clone-question-{{ g.pk }}" href="{% url 'question-clone' g.pk %}">
+              <i class="material-icons md-24 mdc-ripple-surface card-icon-list mdc-theme--primary">file_copy</i>
+            </a>
+            {% endif %}
+
+            <i class="material-icons mdc-theme--primary md-24 mdc-ripple-surface icon-list update-questions-btn"
+                data-url="{% url 'assignment-edit-ajax' %}"
+                data-id="{{ g.id|safe }}"
+                data-assignment-id="{{ assignment.identifier|safe }}">
+              add
+            </i>
+
           {% elif type == None %}
-          {% if request.user.teacher %}
-          <i class="mdc-icon-toggle material-icons mdc-theme--primary"
-              role="button"
-              aria-pressed="false"
-              aria-label="Add to favorites" tabindex="0"
-              {% if g in request.user.teacher.favourite_questions.all %}
-              data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
-              data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
-              {% else %}
-              data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
-              data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
-              {% endif %}
-              onclick="toggleFavourite({{ g.pk|safe }})">
-              favorite_border
-          </i>
-          {% endif %}
+
+            {% if request.user.teacher %}
+            <i class="mdc-icon-toggle material-icons mdc-theme--primary favourite-btn"
+                id="favourite-btn-{{ g.pk|safe }}"
+                role="button"
+                aria-pressed="false"
+                aria-label="Add to favorites" tabindex="0"
+                data-id="{{ g.pk|safe }}"
+                {% if g in request.user.teacher.favourite_questions.all %}
+                data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
+                data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+                {% else %}
+                data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
+                data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
+                {% endif %}>
+                favorite_border
+            </i>
+            {% endif %}
+
           {% else %}
-          <form style="display:inline" method="post" action="#{{ g.id|slugify }}">
-            {% csrf_token %}
-            <input type="hidden" name="{{ form_field_name|safe }}" value="{{ g.pk|safe }}" />
-            <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" style="margin-left:20px;" type="submit" value="add" />
-          </form>
+
+            <form class="display-inline" method="post" action="#{{ g.id|slugify }}">
+              {% csrf_token %}
+              <input type="hidden" name="{{ form_field_name|safe }}" value="{{ g.pk|safe }}" />
+              <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised m-left-20" id="add-{{g.pk}}" type="submit" value="add" />
+            </form>
+
           {% endif %}
         </div>
       </div>
@@ -149,17 +170,17 @@
     {% if r.count > 0 %}
       <div class="pagination">
           <span>
-              {% if paginator.has_previous %}
-                  <span class="search-nav" onclick="pageNav({{ paginator.previous_page_number }})"><i class="icon ion-ios-arrow-back"></i></span>
-              {% endif %}
+            {% if paginator.has_previous %}
+                <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
+            {% endif %}
 
-              <span class="current">
-                  {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
-              </span>
+            <span class="current">
+                {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
+            </span>
 
-              {% if paginator.has_next %}
-                  <span class="search-nav" onclick="pageNav({{ paginator.next_page_number }})"><i class="icon ion-ios-arrow-forward"></i></span>
-              {% endif %}
+            {% if paginator.has_next %}
+                <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
+            {% endif %}
           </span>
       </div>
     {% endif %}

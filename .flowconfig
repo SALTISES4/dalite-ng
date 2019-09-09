@@ -1,0 +1,14 @@
+[ignore]
+**/*.min.js*
+
+[include]
+
+[libs]
+node_modules/iflow-jquery/index.js.flow
+
+[lints]
+
+[options]
+esproposal.optional_chaining=enable
+
+[strict]

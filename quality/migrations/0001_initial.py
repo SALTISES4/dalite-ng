@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import django.db.models.deletion
-import quality.models.custom_fields
+import dalite.models.custom_fields
 
 
 class Migration(migrations.Migration):
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "threshold",
-                    quality.models.custom_fields.ProbabilityField(
+                    dalite.models.custom_fields.ProbabilityField(
                         help_text="Minimum value for the answer to be accepted",
                         verbose_name="Threshold",
                     ),
@@ -105,7 +105,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "threshold",
-                    quality.models.custom_fields.ProbabilityField(
+                    dalite.models.custom_fields.ProbabilityField(
                         help_text="Minimum value for the answer to be accepted",
                         verbose_name="Threshold",
                     ),
@@ -158,14 +158,14 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "threshold",
-                    quality.models.custom_fields.ProbabilityField(
+                    dalite.models.custom_fields.ProbabilityField(
                         help_text="Minimum value for the answer to be accepted",
                         verbose_name="Threshold",
                     ),
                 ),
                 (
                     "neg_words",
-                    quality.models.custom_fields.CommaSepField(
+                    dalite.models.custom_fields.CommaSepField(
                         blank=True,
                         help_text="Words considered to be negative.",
                         null=True,

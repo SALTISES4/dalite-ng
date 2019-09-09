@@ -1,0 +1,94 @@
+{% extends 'peerinst/teacher/base.html' %}
+
+{% load static compress i18n %}
+
+{% block stylesheets %}
+{{ block.super }}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+<style nonce="{{request.csp_nonce}}">
+  .progress-chart {
+    margin-bottom: 40px;
+  }
+  .mdc-typography--display3 {
+    font-size: 2.5rem;
+  }
+  .mdc-button.delete {
+    background-color: #004266 !important;
+  }
+  @media (max-height: 650px) {
+    .mdc-card__action-buttons {
+      display: none;
+    }
+  }
+  @media (max-width: 450px) {
+    .mdc-typography--display3 {
+      font-size: 2.0rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<main id="teacher-dashboard">
+  <section id="dalite-messages" class="hidden">
+    <h1 class="mdc-typography--display3">{% trans 'Messages' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
+    <br>
+  </section>
+  <section id="questions">
+    <h1 class="mdc-typography--display3">{% trans 'Question of the Day' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
+    <br>
+    {% include "peerinst/question/cards/question_card.html" %}
+  </section>
+  <section id="rationales">
+    <h1 class="mdc-typography--display3">{% trans 'Rationales to Score' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
+    <br>
+    {% include "peerinst/teacher/cards/rationale_to_score_card.html" with rationales=rationales %}
+  </section>
+  <section id="student-activity">
+    <h1 class="mdc-typography--display3">{% trans 'Student Activity' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
+    <br>
+    {% include "peerinst/teacher/cards/student_activity_card.html" with data=student_activity_data %}
+  </section>
+  <!--
+  <section id="collections">
+    <h1 class="mdc-typography--display3">{% trans 'Featured Collection' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
+    <br>
+  </section>
+  -->
+</main>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script nonce="{{ request.csp_nonce }}">
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+          }
+      }
+  });
+  window.addEventListener("load", async () => {
+    teacher.initDashboard({{ data|safe }});
+    await teacher.initQuestionCards(
+      "{% url 'teacher-toggle-favourite' %}",
+      "{% url 'teacher-dashboard--new-questions' %}",
+      "{% url 'question--flag--reasons' %}",
+      "{% url 'question--flag--flag' %}"
+    );
+    teacher.initStudentActivityCards({{ student_activity_json|safe }});
+    teacher.initRationalesToScoreCards("{% url 'teacher-dashboard--evaluate-rationale' %}");
+  })
+</script>
+{% endblock %}

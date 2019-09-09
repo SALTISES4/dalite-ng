@@ -11,6 +11,7 @@ import * as ripple from "@material/ripple/index";
 import * as selectbox from "@material/select/index";
 import * as textField from "@material/textfield/index";
 import * as toolbar from "@material/toolbar/index";
+import * as snackbar from "@material/snackbar/index";
 
 autoInit.register("MDCCheckbox", checkbox.MDCCheckbox);
 autoInit.register("MDCChip", chips.MDCChip);
@@ -24,6 +25,7 @@ autoInit.register("MDCSelect", selectbox.MDCSelect);
 autoInit.register("MDCTextField", textField.MDCTextField);
 autoInit.register("MDCTextFieldHelperText", helperText.MDCTextFieldHelperText);
 autoInit.register("MDCToolbar", toolbar.MDCToolbar);
+autoInit.register("MDCSnackbar", snackbar.MDCSnackbar);
 
 export {
   autoInit,
@@ -37,6 +39,7 @@ export {
   selectbox,
   textField,
   toolbar,
+  snackbar,
 };
 
 // D3
@@ -83,35 +86,28 @@ export function csrfSafeMethod(method) {
   return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
 }
 
-/** Get csrf token using jQuery
- *   https://docs.djangoproject.com/en/1.8/ref/csrf/
- * @function
- * @param {String} name
- * @return {String}
- */
-export function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie != "") {
-    const cookies = document.cookie.split(";");
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = jQuery.trim(cookies[i]);
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) == name + "=") {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
+// Get csrf token
+export { getCsrfToken } from "./ajax.js";
 
 /** Replace element with text input form using Ajax
  * @function
  * @param {String} idToBind
  * @param {String} formToReplace
- * @param {String} url
+ * @param {String} createUrl
+ * @param {String} formUrl
+ * @param {Function} init
+ * @param {String} searchUrl
+ * @param {Function} completionHook
  */
-export function bindAjaxTextInputForm(idToBind, formToReplace, url) {
+export function bindAjaxTextInputForm(
+  idToBind,
+  formToReplace,
+  createUrl,
+  formUrl,
+  init,
+  searchUrl,
+  completionHook,
+) {
   const d = document.getElementById(idToBind);
   if (d) {
     d.onclick = function() {
@@ -123,10 +119,335 @@ export function bindAjaxTextInputForm(idToBind, formToReplace, url) {
         bundle.autoInit();
         const input = this.querySelector(".mdc-text-field__input");
         input.focus();
+        init(
+          idToBind,
+          formToReplace,
+          createUrl,
+          formUrl,
+          init,
+          searchUrl,
+          completionHook,
+        );
       }
-      $("#" + formToReplace).load(url, callback);
+      $("#" + formToReplace).load(createUrl, callback);
     };
   }
+}
+
+/** Callback for category creation
+ * @function
+ * @param {String} idToBind
+ * @param {String} formToReplace
+ * @param {String} createUrl
+ * @param {String} formUrl
+ * @param {Function} init
+ * @param {String} searchUrl
+ * @param {Function} completionHook
+ */
+export function categoryForm(
+  idToBind,
+  formToReplace,
+  createUrl,
+  formUrl,
+  init,
+  searchUrl,
+  completionHook,
+) {
+  // Define ENTER key
+  const form = $("#category_form").find("#id_title");
+  if (form.length) {
+    $(form).keypress(function(event) {
+      if (event.which == 13) {
+        $("#submit_category_form").click();
+      }
+    });
+  }
+
+  // Handle clear
+  $("#clear_category_form").click(function() {
+    $("#category_form").load(formUrl, function() {
+      bundle.bindAjaxTextInputForm(
+        idToBind,
+        formToReplace,
+        createUrl,
+        formUrl,
+        init,
+        searchUrl,
+        completionHook,
+      );
+      if (completionHook) {
+        completionHook();
+      }
+      bundle.bindCategoryAutofill(searchUrl);
+      bundle.autoInit();
+    });
+  });
+
+  // Setup ajax call and attach a submit handler to the form
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+      if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+        xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+      }
+    },
+  });
+
+  $("#submit_category_form").click(function() {
+    const title = $("#category_form")
+      .find("input[name='title']")
+      .val();
+
+    // Send the data using post
+    const posting = $.post(createUrl, { title: title });
+
+    // Put the results in a div
+    posting.success(function(data, status) {
+      $("#category_form")
+        .empty()
+        .append(data);
+
+      const formType = $("#create_new_category");
+      if (formType.length) {
+        categoryForm(
+          idToBind,
+          formToReplace,
+          createUrl,
+          formUrl,
+          init,
+          searchUrl,
+          completionHook,
+        );
+        bundle.autoInit();
+        $("#category_form")
+          .find("input[name='title']")[0]
+          .focus();
+      } else {
+        bundle.bindAjaxTextInputForm(
+          idToBind,
+          formToReplace,
+          createUrl,
+          formUrl,
+          init,
+          searchUrl,
+          completionHook,
+        );
+        bundle.bindCategoryAutofill(searchUrl);
+        bundle.autoInit();
+        $("#autofill_categories")
+          .val(title)
+          .focus()
+          .autocomplete("search");
+        if (completionHook) {
+          completionHook();
+        }
+      }
+    });
+  });
+}
+
+/** Callback for category autofill
+ * @function
+ * @param {String} source
+ */
+export function bindCategoryAutofill(source) {
+  function updateSelect(el, formId) {
+    el.remove();
+    $(formId)
+      .find("[value=" + $(el).attr("v") + "]")
+      .remove();
+  }
+
+  // Generators for autocomplete
+  const response = function(searchClass, spinnerId) {
+    return function(event, ui) {
+      // NB: Pass by reference.  ui can be modified, but not recreated.
+      const currentList = $.map($(searchClass), function(obj, i) {
+        return $(obj).attr("d");
+      });
+
+      const tmp = ui.content.filter(function(el) {
+        return !currentList.includes(el.label);
+      });
+
+      let l = ui.content.length;
+      while (l > 0) {
+        ui.content.pop();
+        l = ui.content.length;
+      }
+
+      for (let i = 0; i < tmp.length; i++) {
+        ui.content.push(tmp[i]);
+      }
+
+      if (ui.content.length == 0) {
+        // Could add hint that there are no results
+      }
+
+      $(spinnerId).css("opacity", 0);
+      return;
+    };
+  };
+
+  const search = function(spinnerId) {
+    return function(event, ui) {
+      $(spinnerId).css("opacity", 1);
+    };
+  };
+
+  const focus = function(event, ui) {
+    event.preventDefault();
+    $(this).val(ui.item.label); // eslint-disable-line no-invalid-this
+  };
+
+  const select = function(currentIds, className, formId) {
+    return function(event, ui) {
+      event.preventDefault();
+      $(this).val(""); // eslint-disable-line no-invalid-this
+
+      const newDiv = document.createElement("div");
+      newDiv.setAttribute("d", ui.item.label);
+      newDiv.setAttribute("v", ui.item.value);
+      newDiv.setAttribute("tabindex", "0");
+      newDiv.setAttribute("data-mdc-auto-init", "MDCChip");
+      newDiv.classList.add("mdc-chip", "mdc-typography--caption", className);
+      newDiv.addEventListener("click", function() {
+        updateSelect(this, formId); // eslint-disable-line no-invalid-this
+      });
+      const text = document.createElement("div");
+      text.classList.add("mdc-chip__text");
+      text.textContent = ui.item.label;
+      newDiv.appendChild(text);
+      const icon = document.createElement("i");
+      icon.classList.add(
+        "material-icons",
+        "mdc-chip__icon",
+        "mdc-chip__icon--trailing",
+      );
+      icon.setAttribute("tabindex", "0");
+      icon.setAttribute("role", "button");
+      icon.textContent = "cancel";
+      newDiv.appendChild(icon);
+      document.getElementById(currentIds).appendChild(newDiv);
+
+      $(formId).append(
+        "<option selected='selected' value=" +
+          ui.item.value +
+          ">" +
+          ui.item.label +
+          "</option>",
+      );
+    };
+  };
+
+  $("#autofill_categories").autocomplete({
+    delay: 700,
+    minLength: 3,
+    classes: {
+      "ui-autocomplete": "mdc-typography--body1",
+    },
+    source: source,
+    response: response(".category", "#search_categories"),
+    search: search("#search_categories"),
+    focus: focus,
+    select: select("current_categories", "category", "#id_category"),
+    autoFocus: true,
+  });
+}
+
+// Create disciplines
+/** Callback for discipline creation
+ * @function
+ * @param {String} idToBind
+ * @param {String} formToReplace
+ * @param {String} createUrl
+ * @param {String} formUrl
+ * @param {Function} init
+ * @param {String} searchUrl
+ * @param {Function} completionHook
+ */
+export function disciplineForm(
+  idToBind,
+  formToReplace,
+  createUrl,
+  formUrl,
+  init,
+  searchUrl,
+  completionHook,
+) {
+  // Bind form submit to icon
+  $("#submit_discipline_form").click(function() {
+    $("#discipline_create_form").submit();
+  });
+
+  // Handle clear
+  $("#clear_discipline_form").click(function() {
+    $("#discipline_form").load(formUrl, function() {
+      bundle.bindAjaxTextInputForm(
+        idToBind,
+        formToReplace,
+        createUrl,
+        formUrl,
+        init,
+        searchUrl,
+        completionHook,
+      );
+      if (completionHook) {
+        completionHook();
+      }
+    });
+  });
+
+  // Setup ajax call and attach a submit handler to the form
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+      if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+        xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+      }
+    },
+  });
+
+  $("#submit_discipline_form").click(function() {
+    const title = $("#discipline_form")
+      .find("input[name='title']")
+      .val();
+
+    // Send the data using post
+    const posting = $.post(createUrl, { title: title });
+
+    // Put the results in a div
+    posting.success(function(data, status) {
+      $("#discipline_form")
+        .empty()
+        .append(data);
+
+      const formType = $("#discipline_create_form");
+      if (formType.length) {
+        disciplineForm(
+          idToBind,
+          formToReplace,
+          createUrl,
+          formUrl,
+          init,
+          searchUrl,
+          completionHook,
+        );
+        bundle.autoInit();
+      } else {
+        bundle.bindAjaxTextInputForm(
+          idToBind,
+          formToReplace,
+          createUrl,
+          formUrl,
+          init,
+          searchUrl,
+          completionHook,
+        );
+        if (completionHook) {
+          completionHook();
+        }
+      }
+    });
+  });
 }
 
 // Custom functions
@@ -305,13 +626,14 @@ export function difficulty(matrix, id) {
       }
     }
   }
+  const stats = document.getElementById("stats-" + id);
   if (max > 0) {
     const rating = document.getElementById("rating-" + id);
     rating.innerHTML =
       label.substring(0, 1).toUpperCase() + label.substring(1);
-
-    const stats = document.getElementById("stats-" + id);
     stats.style.color = colour[label];
+  } else {
+    stats.style.display = "none";
   }
 }
 

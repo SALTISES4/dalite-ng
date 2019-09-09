@@ -71,7 +71,7 @@ def _base_selection_algorithm(
         .filter(accepted=False)
         .values_list("user__username")
     )
-    all_rationales = models.Answer.objects.filter(
+    all_rationales = models.Answer.may_show.filter(
         question=question, show_to_others=True
     ).exclude(user_token__in=usernames_to_exclude)
 

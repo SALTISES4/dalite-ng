@@ -1,27 +1,29 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 import string
+
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Count
 from django.forms import (
     ModelForm,
     ModelMultipleChoiceField,
     modelformset_factory,
 )
-from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.shortcuts import get_object_or_404, render
-from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import UpdateView
 
-from ..mixins import student_check
+from ..mixins import student_check, LoginRequiredMixin, NoStudentsMixin
 from ..models import (
-    Assignment,
     Answer,
     AnswerAnnotation,
+    Assignment,
     Discipline,
     Question,
     QuestionFlag,
@@ -68,14 +70,14 @@ def get_question_annotation_counts(discipline_title, annotator, assignment_id):
         d1["total_annotations_by_user"] = AnswerAnnotation.objects.filter(
             score__isnull=False, answer__question_id=q.pk, annotator=annotator
         ).count()
-        flagged_questions = QuestionFlag.objects.filter(flag=True).values_list(
-            "question", flat=True
-        )
-        flagged_by_user = flagged_questions.filter(user=annotator)
+        flagged_questions = Question.flagged_objects.all()
+        flagged_by_user = QuestionFlag.objects.filter(
+            user=annotator
+        ).values_list("question", flat=True)
         if q.pk in flagged_by_user:
             d1["flag_color_code"] = "red"
-        elif q.pk in flagged_questions:
-            d1["flag_color_code"] = "#EDAA1E"
+        elif q in flagged_questions:
+            d1["flag_color_code"] = "goldenrod"
             d1["flagged_reasons"] = "; ".join(
                 (
                     [
@@ -141,6 +143,9 @@ def research_discipline_question_index(
     return render(request, template, context)
 
 
+@require_http_methods(["GET", "POST"])
+@login_required
+@user_passes_test(student_check, login_url="/access_denied_and_logout/")
 def research_question_answer_list(
     request,
     question_pk,
@@ -195,7 +200,7 @@ def research_question_answer_list(
         .values("answer")
         .order_by("answer")
         .annotate(times_scored=Count("answer"))
-        .filter(times_scored__gte=2)
+        .filter(times_scored__gte=3)
         .values_list("answer__id", flat=True)
     )
 
@@ -372,7 +377,7 @@ def flag_question_form(
     return render(request, template, context)
 
 
-class AnswerExpertUpdateView(UpdateView):
+class AnswerExpertUpdateView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
     model = Answer
     fields = ["expert"]
     template_name = "peerinst/research/answer-expert-update.html"
@@ -381,6 +386,7 @@ class AnswerExpertUpdateView(UpdateView):
         context = super(AnswerExpertUpdateView, self).get_context_data(
             **kwargs
         )
+        context["teacher"] = self.request.user.teacher
         context["question"] = Question.objects.get(pk=self.object.question_id)
         return context
 

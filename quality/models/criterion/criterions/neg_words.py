@@ -2,10 +2,10 @@
 from __future__ import unicode_literals
 
 from django.db import models
-
-from quality.models.custom_fields import CommaSepField
-from quality.models.quality_type import QualityType, QualityUseType
 from django.utils.translation import ugettext_lazy as _
+
+from dalite.models.custom_fields import CommaSepField
+from quality.models.quality_type import QualityType, QualityUseType
 
 from ..criterion import Criterion, CriterionRules
 

@@ -12,9 +12,9 @@
           {% if forloop.counter == forloop.parentloop.counter %}
             {% if not group_assignment or group_assignment.show_correct_answers %}
             {% if c.correct %}
-              <i id="check" class="material-icons" style="-webkit-transform: translateY(3px);font-size:12pt;">check</i>
+              <i id="check" class="material-icons check-12">check</i>
             {% else %}
-              <i id="check" class="material-icons" style="-webkit-transform: translateY(3px);font-size:12pt;">close</i>
+              <i id="check" class="material-icons check-12">close</i>
             {% endif %}
             {% endif %}
           {% endif %}

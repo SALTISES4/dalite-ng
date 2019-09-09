@@ -8,6 +8,7 @@ from itertools import chain, islice
 import jwt
 import pytz
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as translate
 
 
 def create_token(payload, exp=timedelta(weeks=16)):
@@ -56,3 +57,41 @@ def batch(iterable, size):
     while True:
         batch_iter = islice(source_iter, size)
         yield chain([batch_iter.next()], batch_iter)
+
+
+def format_time(seconds):
+    if seconds is None:
+        return None
+
+    days = seconds / 60 / 60 / 24
+    seconds = seconds - days * 60 * 60 * 24
+    hours = seconds / 60 / 60
+    seconds = seconds - hours * 60 * 60
+    minutes = seconds / 60
+    seconds = seconds - minutes * 60
+
+    text = ""
+    if days:
+        text = "{} {}".format(
+            text, days, translate("day" if days == 1 else "days")
+        )
+    if hours:
+        text = "{}{} {}".format(
+            "{}, ".format(text) if text else "",
+            hours,
+            translate("hour" if hours == 1 else "hours"),
+        )
+    if minutes:
+        text = "{}{} {}".format(
+            "{}, ".format(text) if text else "",
+            minutes,
+            translate("minute" if minutes == 1 else "minutes"),
+        )
+    if seconds:
+        text = "{}{} {}".format(
+            "{}, ".format(text) if text else "",
+            seconds,
+            translate("second" if seconds == 1 else "seconds"),
+        )
+
+    return text.strip()

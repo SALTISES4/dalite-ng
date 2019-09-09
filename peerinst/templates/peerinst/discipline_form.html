@@ -1,65 +1,23 @@
 {% load i18n add_class %}
 
-<form id="discipline_create_form" action="{% url 'discipline-create' %}" method="post">
-  {% csrf_token %}
-  <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
-    {{ form.title|add_class:"mdc-text-field__input" }}
-    {{ form.title.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-    <div class="mdc-notched-outline">
-      <svg>
-        <path class="mdc-notched-outline__path"/>
-      </svg>
-    </div>
-    <div class="mdc-notched-outline__idle"></div>
+<div id="discipline_create_form" class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+  {{ form.title|add_class:"mdc-text-field__input" }}
+  {{ form.title.label_tag|add_class:"mdc-floating-label"|cut:":" }}
+  <div class="mdc-notched-outline">
+    <svg>
+      <path class="mdc-notched-outline__path"/>
+    </svg>
   </div>
-  <i id="submit_discipline_form" class="material-icons md-24 mdc-icon-button mdc-theme--primary mdc-ripple-surface icon-list">
-    add
-  </i>
-  <i id="clear_discipline_form" class="material-icons md-24 mdc-icon-button mdc-theme--primary mdc-ripple-surface icon-list ">
-    clear
-  </i>
-  {{ form.title.errors }}
-</form>
+  <div class="mdc-notched-outline__idle"></div>
+</div>
+<i id="submit_discipline_form" class="material-icons md-24 mdc-icon-button mdc-theme--primary mdc-ripple-surface icon-list">
+  check
+</i>
+<i id="clear_discipline_form" class="material-icons md-24 mdc-icon-button mdc-theme--primary mdc-ripple-surface icon-list ">
+  clear
+</i>
 
-<script>
-'use strict';
-
-// Bind form submit to icon
-$( "#submit_discipline_form" ).click(function() {
-  $( "#discipline_create_form" ).submit();
-});
-
-// Handle clear
-$( "#clear_discipline_form" ).click(function() {
-  $( "#discipline_form" ).load("{% url 'discipline-form' %}", function(){
-    bundle.bindAjaxTextInputForm('show_discipline_form', 'discipline_form', "{% url 'discipline-create' %}");
-  });
-});
-
-// Setup ajax call and attach a submit handler to the form
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", bundle.getCookie('csrftoken'));
-        }
-    }
-});
-$( "#discipline_create_form" ).submit(function( event ) {
-  event.preventDefault();
-
-  // Get some values from elements on the page:
-  var $form = $( this );
-  var title = $form.find( "input[name='title']" ).val();
-  var url = $form.attr( "action" );
-
-  // Send the data using post
-  var posting = $.post( url, { title: title } );
-
-  // Put the results in a div
-  posting.done(function(data) {
-    $('#discipline_form').empty().append(data);
-    bundle.bindAjaxTextInputForm('show_discipline_form', 'discipline_form', "{% url 'discipline-create' %}");
-    bundle.autoInit();
-  });
-});
-</script>
+<p class="form-helper-text" aria-hidden="true">
+  {{ form.title.help_text|safe }}
+</p>
+{{ form.title.errors }}

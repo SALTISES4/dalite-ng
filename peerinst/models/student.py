@@ -2,21 +2,22 @@
 from __future__ import unicode_literals
 
 import logging
-import smtplib
 from datetime import datetime
 from operator import itemgetter
 
 import pytz
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError, models
 from django.template import loader
 from django.utils.translation import ugettext_lazy as _
 
+from reputation.models import Reputation
+
 from ..students import create_student_token, get_student_username_and_password
-from .answer import Answer
+from ..tasks import send_mail_async
+from .answer import Answer, ShownRationale
 from .assignment import StudentGroupAssignment
 from .group import StudentGroup
 
@@ -34,9 +35,12 @@ class Student(models.Model):
     )
     send_reminder_email_every_day = models.BooleanField(default=False)
     send_reminder_email_day_before = models.BooleanField(default=True)
+    reputation = models.OneToOneField(
+        Reputation, blank=True, null=True, on_delete=models.SET_NULL
+    )
 
     def __unicode__(self):
-        return self.student.username
+        return self.student.email
 
     class Meta:
         verbose_name = _("student")
@@ -92,7 +96,7 @@ class Student(models.Model):
 
         return student, created
 
-    def send_email(self, mail_type, group=None):
+    def send_email(self, mail_type, group=None, request=None):
         """
         Sends an email to announce a new assignment or an assignment update.
 
@@ -175,20 +179,17 @@ class Student(models.Model):
                 context = {"signin_link": signin_link, "group": group}
 
                 if err is None:
-                    try:
-                        send_mail(
-                            subject,
-                            message,
-                            "noreply@myDALITE.org",
-                            [user_email],
-                            fail_silently=False,
-                            html_message=loader.render_to_string(
-                                template, context=context
-                            ),
-                        )
-                    except smtplib.SMTPException:
-                        err = "There was an error sending the email."
-                        logger.error(err)
+                    send_mail_async(
+                        subject,
+                        message,
+                        "noreply@myDALITE.org",
+                        [user_email],
+                        fail_silently=False,
+                        html_message=loader.render_to_string(
+                            template, context=context
+                        ),
+                    )
+
         return err
 
     def join_group(self, group, mail_type=None):
@@ -294,6 +295,33 @@ class Student(models.Model):
 
         return err
 
+    def evaluate_reputation(self, criterion=None):
+        """
+        Calculates the reputation for the student on all criteria or on a
+        specific criterion, creating the Reputation for them if it doesn't
+        already exist.
+
+        Parameters
+        ----------
+        criterion : Optional[str] (default : none)
+            Criterion on which to evaluate
+
+        Returns
+        -------
+        float
+            Evaluated reputation
+
+        Raises
+        ------
+        ValueError
+            If the given criterion isn't part of the list for this reputation
+            type
+        """
+        if self.reputation is None:
+            self.reputation = Reputation.create("student")
+            self.save()
+        return self.reputation.evaluate(criterion)[0]
+
     @property
     def current_groups(self):
         # TODO add lti_student groups
@@ -317,6 +345,40 @@ class Student(models.Model):
     @property
     def notifications(self):
         return self.studentnotification_set.order_by("-created_on").all()
+
+    @property
+    def answers(self):
+        return Answer.objects.filter(user_token=self.student.username)
+
+    @property
+    def answers_chosen_by_others(self):
+        return Answer.objects.filter(
+            chosen_rationale_id__in=self.answers.values_list("pk", flat=True)
+        )
+
+    @property
+    def answers_shown_to_others(self):
+        return ShownRationale.objects.filter(shown_answer__in=self.answers)
+
+    @property
+    def answers_also_chosen_by_others(self):
+        chosen_by_student = self.answers.exclude(
+            chosen_rationale_id__isnull=True
+        ).values_list("chosen_rationale_id", flat=True)
+
+        return (
+            Answer.objects.exclude(chosen_rationale_id__isnull=True)
+            .exclude(pk__in=self.answers)
+            .filter(chosen_rationale_id__in=chosen_by_student)
+        )
+
+    @property
+    def convincing_rationale_reputation(self):
+        if self.reputation is None:
+            self.reputation = Reputation.create("student")
+            self.save()
+
+        return self.reputation.evaluate("convincing_rationales")[0]
 
 
 class StudentGroupMembership(models.Model):
@@ -479,25 +541,21 @@ class StudentAssignment(models.Model):
                 }
 
                 if err is None:
-                    try:
-                        send_mail(
-                            subject,
-                            message,
-                            "noreply@myDALITE.org",
-                            [user_email],
-                            fail_silently=False,
-                            html_message=loader.render_to_string(
-                                template, context=context
-                            ),
-                        )
-                        logger.info(
-                            "Email of type %s send for student assignment %d",
-                            mail_type,
-                            self.pk,
-                        )
-                    except smtplib.SMTPException:
-                        err = "There was an error sending the email."
-                        logger.error(err)
+                    send_mail_async(
+                        subject,
+                        message,
+                        "noreply@myDALITE.org",
+                        [user_email],
+                        fail_silently=False,
+                        html_message=loader.render_to_string(
+                            template, context=context
+                        ),
+                    )
+                    logger.info(
+                        "Email of type %s sent for student assignment %d",
+                        mail_type,
+                        self.pk,
+                    )
 
         return err
 
@@ -669,6 +727,10 @@ class StudentAssignment(models.Model):
             "n_correct": sum(map(itemgetter("correct"), results)),
             "grade": sum(map(itemgetter("grade"), results)),
         }
+
+    @property
+    def grade(self):
+        return sum(map(itemgetter("grade"), self.detailed_results))
 
 
 class StudentNotificationType(models.Model):

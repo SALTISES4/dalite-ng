@@ -16,7 +16,7 @@
       </a>
 
 
-      <a style='visibility: hidden;' class="mdc-list-item" href="{% url 'logout' %}" id='logout-no-iframe'>
+      <a class="mdc-list-item logout" href="{% url 'logout' %}" id='logout-no-iframe'>
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
            aria-hidden="true">
           logout
@@ -28,7 +28,7 @@
   </nav>
 </aside>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 if (parent == window) {
   document.getElementById('logout-no-iframe').style.visibility = 'visible';
 }

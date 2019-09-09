@@ -1,13 +1,16 @@
 {% extends 'peerinst/base.html' %}
 
-{% load add_class staticfiles i18n compress %}
+{% load add_class compress i18n staticfiles %}
 
 {% block stylesheets %}
+  {{ block.super }}
   {% compress css %}
     <link rel="stylesheet" href="{% static 'tos/css/styles.min.css' %}"></link>
   {% endcompress %}
   {% if user.student %}
+  {% compress css %}
   <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
+  {% endcompress %}
   {% endif %}
 {% endblock %}
 
@@ -37,7 +40,7 @@
         </div>
       </div>
 
-      <form action="{% url 'tos:email_change' role %}" method="post">
+      <form action="{% url 'tos:email_change' role %}?next={{next}}" method="post">
         {% csrf_token %}
 
         {% for field in form %}
@@ -57,7 +60,7 @@
           {{ field.errors }}
         {% endfor %}
 
-        <input class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Save' %}" />
+        <input id="submit-email-change-btn" class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Save' %}" />
       </form>
 
       <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Notifications' %}</h2>
@@ -67,14 +70,14 @@
         <div class='field'>
           <p><small>
             {% blocktrans %}
-            Use the toggle buttons below to control which types of emails myDALITE is permitted to send you.
+            Use the toggle buttons below to control which types of emails myDALITE is permitted to send you.  Certain emails will be sent regardless of the settings below (for example a password reset link).
             {% endblocktrans %}
           </small></p>
         </div>
       </div>
       <br>
 
-      <form id="email-settings-form" action="{% url 'tos:email_update' role %}" method="post">
+      <form id="email-settings-form" action="{% url 'tos:email_update' role %}?next={{next}}" method="post">
         {% csrf_token %}
 
         <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
@@ -109,7 +112,7 @@
           </li>
           {% endfor %}
           <li role="separator" class="mdc-list-divider"></li>
-          <input type="submit" class="mdc-button mdc-button--raised padded-top" value='{% trans 'Save' %}'></input>
+          <input id="submit-notification-change-btn" type="submit" class="mdc-button mdc-button--raised padded-top" disabled value="{% trans 'Save' %}"></input>
         </form>
 
     </section>
@@ -117,10 +120,26 @@
 {% endblock %}
 
 {% block scripts %}
-  <script src="{% static 'tos/js/email.min.js' %}" type="text/javascript"></script>
+  {% compress js %}
+  <script src="{% static 'tos/js/email.min.js' %}"></script>
+  {% endcompress %}
+
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      $(".btn-toggle").each(function(i, el) {
+        el.addEventListener("click", function() {
+          document.getElementById("submit-notification-change-btn").disabled = false;
+        });
+      })
+    });
+  </script>
+
   {% if user.student %}
+  {% compress js %}
   <script src="{% static 'peerinst/js/student.min.js' %}"></script>
-  <script type="text/javascript">
+  {% endcompress %}
+
+  <script nonce="{{ request.csp_nonce }}">
     window.addEventListener("load", function() {
       student.initStudentHeader(
         "{% url 'student-get-notifications' %}"

@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import quality.models.custom_fields
+import dalite.models.custom_fields
 
 
 class Migration(migrations.Migration):
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("left_to_right", models.BooleanField(default=True)),
-                ("n_gram_urls", quality.models.custom_fields.CommaSepField()),
+                ("n_gram_urls", dalite.models.custom_fields.CommaSepField()),
             ],
         ),
         migrations.RemoveField(

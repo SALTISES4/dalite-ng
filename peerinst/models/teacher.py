@@ -12,6 +12,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from quality.models import Quality
+from reputation.models import Reputation
 
 from .answer import Answer
 from .assignment import Assignment
@@ -48,6 +49,14 @@ class Teacher(models.Model):
     quality = models.ForeignKey(
         Quality, blank=True, null=True, on_delete=models.SET_NULL
     )
+    reputation = models.OneToOneField(
+        Reputation, blank=True, null=True, on_delete=models.SET_NULL
+    )
+    last_dashboard_access = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text="Last time the teacher went on their teacher dashboard.",
+    )
 
     def get_absolute_url(self):
         return reverse("teacher", kwargs={"pk": self.pk})
@@ -64,16 +73,19 @@ class Teacher(models.Model):
             group__in=current_groups
         ).values("assignment")
 
-        activity = (
-            Answer.objects.filter(assignment__in=all_assignments)
-            .filter(user_token__in=all_current_students)
-            .filter(
-                Q(datetime_start__gt=last_login)
-                | Q(datetime_first__gt=last_login)
-                | Q(datetime_second__gt=last_login)
+        if last_login is not None:
+            activity = (
+                Answer.objects.filter(assignment__in=all_assignments)
+                .filter(user_token__in=all_current_students)
+                .filter(
+                    Q(datetime_start__gt=last_login)
+                    | Q(datetime_first__gt=last_login)
+                    | Q(datetime_second__gt=last_login)
+                )
+                .count()
             )
-            .count()
-        )
+        else:
+            activity = 0
 
         return activity
 

@@ -1,0 +1,115 @@
+@import "../../variables.scss";
+
+#questions {
+  & .question {
+    & .flag-question {
+      position: relative;
+
+      & .flag-question__btn {
+        cursor: pointer;
+      }
+
+      & .flag-question__form {
+        align-items: center;
+        background: $mdc-theme-background;
+        border-radius: 10px;
+        bottom: 55px;
+        box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+          0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+          0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+        display: flex;
+        flex-direction: column;
+        grid-gap: 10px;
+        grid-template-columns: max-content;
+        min-width: 200px;
+        padding: 10px;
+        position: absolute;
+        right: 0;
+        transform: scale(1);
+        transform-origin: right bottom;
+        transition: right 300ms, bottom 300ms, transform 300ms,
+          visibility 0ms 0ms;
+        visibility: visible;
+        width: max-content;
+
+        & h3 {
+          color: $mdc-theme-secondary;
+          margin: 0;
+        }
+
+        & form {
+          display: contents;
+
+          & select {
+            background: white;
+            border: 1px solid rgba($mdc-theme-secondary, 0.5);
+            border-radius: 3px;
+            color: $mdc-theme-secondary;
+            font-family: inherit;
+            font-size: 0.85rem;
+            margin: 10px 0;
+            max-width: 100%;
+            overflow: hidden;
+            text-align: center;
+            text-overflow: ellipsis;
+          }
+
+          & input {
+            background-color: $mdc-theme-secondary;
+            grid-column: 1 / -1;
+          }
+        }
+
+        & .flag-question__close {
+          border-radius: 50%;
+          cursor: pointer;
+          fill: $mdc-theme-secondary;
+          height: 22px;
+          padding: 3px;
+          position: absolute;
+          right: 5px;
+          top: 5px;
+          transition: background 300ms;
+          width: 22px;
+
+          &:hover {
+            background: #f5f5f5;
+          }
+
+          &:active {
+            background: #d3d3d3;
+          }
+        }
+
+        &[hidden] {
+          bottom: 26px;
+          right: 26px;
+          transform: scale(0);
+          transition: right 300ms, bottom 300ms, transform 300ms,
+            visibility 0ms 300ms;
+          visibility: hidden;
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  #questions {
+    & .question {
+      position: relative;
+      & .flag-question {
+        position: static;
+        & .flag-question__form {
+          bottom: 70px;
+          justify-content: center;
+          left: 0;
+          position: absolute;
+          right: 0;
+          top: 0;
+          width: auto;
+        }
+      }
+    }
+  }
+}

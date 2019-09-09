@@ -19,5 +19,5 @@ def all_email_type(role):
         "role": role,
         "type": "all",
         "title": "All emails",
-        "description": "Only receive administrative emails from Dalite.",
+        "description": "Receive all emails from myDALITE",
     }

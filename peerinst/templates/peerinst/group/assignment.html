@@ -13,7 +13,7 @@
 
     <div class="admin-link">
       <a href="{% url 'teacher' request.user.teacher.id %}">{% trans 'Back to My Account' %}</a>
-      <span style="padding-left:0.3em;padding-right:0.5em;">|</span><a href="{% url 'group-details' group.hash %}">{% trans 'Back to group' %}</a>
+      <span class="admin-link--padded">|</span><a href="{% url 'group-details' group.hash %}">{% trans 'Back to group' %}</a>
     </div>
 
     <div class="foldable foldable__unfolded">
@@ -45,7 +45,7 @@
                 </span>
               </span>
               <span class="mdc-list-item__meta">
-                <i onclick="group.editField(event, 'datetime', 'mdc-list-item__secondary-text')" title="Edit" class="material-icons md-24 mdc-ripple-surface icon-list">edit</i>
+                <i title="Edit" class="material-icons md-24 mdc-ripple-surface icon-list edit-btn">edit</i>
               </span>
             </li>
             <li class="mdc-list-divider" role="separator"></li>
@@ -72,36 +72,36 @@
               </span>
               {% endif %}
             </li>
-            <li class="mdc-list-divider" role="separator"></li>
-            <li class="mdc-list-item"
-                title="{% trans 'Quality evaluation for allowing rationale submission' %}">
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">
-                  assistant
-                </i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {% trans 'Submission quality' %}
-                <div class="mdc-list-item__secondary-text">
-                  {% if assignment.quality %}
-                  <ul style="padding-left:0px;">
-                    {% for criterion in assignment.quality.criterions.all %}
-                    <li class="mdc-list-item__secondary-text">
-                      {{ criterion.name }} v{{ criterion.version }}
-                    </li>
-                    {% endfor %}
-                  </ul>
-                  {% endif %}
-                </div>
-              </span>
-              <span class="mdc-list-item__meta">
-                <a href="{% url 'quality:edit' %}?type=validation&assignment={{ assignment.pk }}&next={{ request.path }}">
-                  <i class="material-icons md-24 mdc-ripple-surface icon-list">
-                    edit
-                  </i>
-                </a>
-              </span>
-            </li>
+            {% comment %} <li class="mdc-list-divider" role="separator"></li> {% endcomment %}
+            {% comment %} <li class="mdc-list-item" {% endcomment %}
+                {% comment %} title="{% trans 'Quality evaluation for allowing rationale submission' %}"> {% endcomment %}
+              {% comment %} <span class="mdc-list-item__graphic mdc-theme--primary"> {% endcomment %}
+                {% comment %} <i class="mdc-theme--primary material-icons md-48"> {% endcomment %}
+                  {% comment %} assistant {% endcomment %}
+                {% comment %} </i> {% endcomment %}
+              {% comment %} </span> {% endcomment %}
+              {% comment %} <span class="mdc-list-item__text mdc-theme--secondary bold"> {% endcomment %}
+                {% comment %} {% trans 'Submission quality' %} {% endcomment %}
+                {% comment %} <div class="mdc-list-item__secondary-text"> {% endcomment %}
+                  {% comment %} {% if assignment.quality %} {% endcomment %}
+                  {% comment %} <ul class="p-left-0"> {% endcomment %}
+                    {% comment %} {% for criterion in assignment.quality.criterions.all %} {% endcomment %}
+                    {% comment %} <li class="mdc-list-item__secondary-text"> {% endcomment %}
+                      {% comment %} {{ criterion.name }} v{{ criterion.version }} {% endcomment %}
+                    {% comment %} </li> {% endcomment %}
+                    {% comment %} {% endfor %} {% endcomment %}
+                  {% comment %} </ul> {% endcomment %}
+                  {% comment %} {% endif %} {% endcomment %}
+                {% comment %} </div> {% endcomment %}
+              {% comment %} </span> {% endcomment %}
+              {% comment %} <span class="mdc-list-item__meta"> {% endcomment %}
+                {% comment %} <a href="{% url 'quality:edit' %}?type=validation&assignment={{ assignment.pk }}&next={{ request.path }}"> {% endcomment %}
+                  {% comment %} <i class="material-icons md-24 mdc-ripple-surface icon-list"> {% endcomment %}
+                    {% comment %} edit {% endcomment %}
+                  {% comment %} </i> {% endcomment %}
+                {% comment %} </a> {% endcomment %}
+              {% comment %} </span> {% endcomment %}
+            {% comment %} </li> {% endcomment %}
             <li class="mdc-list-divider" role="separator"></li>
           </ul>
         </div>
@@ -112,7 +112,7 @@
       <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
         {% trans 'Questions' %}
       </h2>
-      <div class="foldable--body" style="padding-bottom:3px;">
+      <div class="foldable--body p-bot-3">
         <ul id="question-list" class="mdc-list mdc-list--two-line mdc-list--non-interactive">
           {% for q in questions %}
           <li class="draggable mdc-list-item" data-draggable-name="{{ q.title }}" draggable="true">
@@ -146,19 +146,10 @@
       </h2>
       <div class="foldable--body">
         <div class="admin-link">
-          <a href="{% url 'report_selector' %}">{% trans 'Generate report' %}</a>
+          <a href="{% url 'report-custom' %}?groups={{group.pk}}&assignments={{assignment.assignment.identifier}}">{% trans 'Generate report' %}</a>
         </div>
         <ul id="student-progress"
             class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-          <li class="mdc-list-item">
-              <span class="mdc-list-item__graphic mdc-theme--primary"></span>
-            <span></span>
-            <span id="student-progress-legend" class="mdc-list-item__meta">
-              <span>Question done</span>
-              <span>First answer correct</span>
-              <span>Second answer correct</span>
-            </span>
-          </li>
         </ul>
       </div>
     </div>
@@ -219,7 +210,7 @@
 {% endblock %}
 
 {% block init-scripts %}
-<script>
+<script nonce="{{ request.csp_nonce }}">
   window.addEventListener("load", function() {
     group.initAssignment(
       {{ data|safe }}

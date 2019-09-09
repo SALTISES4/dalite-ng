@@ -1,9 +1,13 @@
+bleach
+celery[redis]
+django-celery-beat
 django-analytical
-django-compressor
+django-compressor>=2.3
+django-cookie-law
 django-grappelli
 django-htmlmin
 django-password-validation
-django
+django>1.11.22
 mysqlclient==1.3.14
 pillow
 pyjwt
@@ -11,9 +15,12 @@ pyjwt
 python-memcached==1.59
 pytz
 requests
+django-security-headers
+packaging
 
 -e git+https://github.com/open-craft/ansible-sanity-checker@v0.0.2#egg=sanity_checker
 -e git+https://github.com/tophatmonocle/ims_lti_py.git@979244d83c2e6420d2c1941f58e52f641c56ad12#egg=ims_lti_py
 -e git+https://github.com/SALTISES4/django-lti-tool-provider#egg=django_lti_tool_provider
 -e git+https://github.com/edx/opaque-keys@27dc382ea587483b1e3889a3d19cbd90b9023a06#egg=opaque-keys
 -e git+https://github.com/SALTISES4/pinax-forums@c3b3f4ec22882490337593653540da2d89773980#egg=pinax_forums
+-e git+https://github.com/SALTISES4/django-cookies-samesite#egg=django_cookies_samesite

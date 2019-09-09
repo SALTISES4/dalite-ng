@@ -5,7 +5,8 @@
 {% block title %}{% trans 'Error' %}{% endblock %}
 
 {% block stylesheets %}
-<style>
+{{ block.super }}
+<style nonce="{{ request.csp_nonce }}">
 p {
   margin: 20px 20px;
 }

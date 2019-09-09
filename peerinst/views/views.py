@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import base64
 import json
 import logging
 import random
@@ -14,14 +15,15 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group, User
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_admins, send_mail
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.urlresolvers import reverse
 
 # reports
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.expressions import Func
 from django.forms import Textarea, inlineformset_factory
 
@@ -36,6 +38,7 @@ from django.shortcuts import (
 from django.template import loader
 from django.template.response import TemplateResponse
 from django.utils import timezone
+from django.utils.encoding import force_bytes
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -50,7 +53,7 @@ from django_lti_tool_provider.signals import Signals
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from dalite.views.errors import response_400, response_404, response_500
+from dalite.views.errors import response_400, response_404
 
 # tos
 from tos.models import Consent, Tos
@@ -75,6 +78,7 @@ from ..models import (
     BlinkQuestion,
     BlinkRound,
     Category,
+    Collection,
     Discipline,
     Question,
     RationaleOnlyQuestion,
@@ -87,6 +91,7 @@ from ..models import (
 from ..util import (
     SessionStageData,
     get_object_or_none,
+    get_student_activity_data,
     int_or_none,
     question_search_function,
     report_data_by_assignment,
@@ -185,7 +190,7 @@ def admin_check(user):
 @user_passes_test(admin_check, login_url="/welcome/", redirect_field_name=None)
 def dashboard(request):
 
-    html_email_template_name = "registration/account_activated_html.html"
+    html_email_template_name = "registration/verification_email.html"
 
     if request.method == "POST":
         form = forms.ActivateForm(request.POST)
@@ -201,29 +206,37 @@ def dashboard(request):
             if not settings.EMAIL_BACKEND.startswith(
                 "django.core.mail.backends"
             ):
-                return response_500(request)
+                return HttpResponse(status=503)
 
-            host = request.get_host()
-            if host == "localhost" or host == "127.0.0.1":
-                protocol = "http"
-                host = "{}:{}".format(host, settings.DEV_PORT)
-            else:
-                protocol = "https"
+            link = "{}://{}{}".format(
+                request.scheme,
+                request.get_host(),
+                reverse(
+                    "password_reset_confirm",
+                    kwargs={
+                        "uidb64": base64.urlsafe_b64encode(
+                            force_bytes(user.pk)
+                        ),
+                        "token": default_token_generator.make_token(user),
+                    },
+                ),
+            )
 
             # Notify user
-            email_context = dict(username=user.username, site_name="myDALITE")
             send_mail(
-                _("Your myDALITE account has been activated"),
+                _("Please verify your myDalite account"),
                 "Dear {},".format(user.username)
-                + "\n\nYour account has been recently activate."
-                "\n\nYou can login at:\n\n{}://{}".format(protocol, host)
+                + "\n\nYour account has been recently activated. Please visit "
+                "the following link to verify your email address and "
+                "to set your password:\n\n"
+                + link
                 + "\n\nCheers,\nThe myDalite Team",
                 "noreply@myDALITE.org",
                 [user.email],
                 fail_silently=True,
                 html_message=loader.render_to_string(
                     html_email_template_name,
-                    context=email_context,
+                    context={"username": user.username, "link": link},
                     request=request,
                 ),
             )
@@ -254,14 +267,7 @@ def sign_up(request):
             if not settings.EMAIL_BACKEND.startswith(
                 "django.core.mail.backends"
             ):
-                return response_500(request)
-
-            host = request.get_host()
-            if host == "localhost" or host == "127.0.0.1":
-                protocol = "http"
-                host = "{}:{}".format(host, settings.DEV_PORT)
-            else:
-                protocol = "https"
+                return HttpResponse(status=503)
 
             email_context = dict(
                 user=form.cleaned_data["username"],
@@ -280,7 +286,9 @@ def sign_up(request):
                 + "\nVerification url: {}".format(form.cleaned_data["url"])
                 + "\n\nAccess your administrator account to activate this "
                 "new user."
-                "\n\n{}://{}{}".format(protocol, host, reverse("dashboard"))
+                "\n\n{}://{}{}".format(
+                    request.scheme, request.get_host(), reverse("dashboard")
+                )
                 + "\n\nCheers,"
                 "\nThe myDalite Team",
                 fail_silently=True,
@@ -290,7 +298,6 @@ def sign_up(request):
                     request=request,
                 ),
             )
-            mail_admins("", "")
 
             return TemplateResponse(request, "registration/sign_up_done.html")
         else:
@@ -310,7 +317,7 @@ def terms_teacher(request):
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect(reverse("landing_page"))
+    return HttpResponseRedirect(reverse("login"))
 
 
 @login_required
@@ -322,13 +329,16 @@ def welcome(request):
         if teacher_group:
             if teacher_group not in teacher.user.groups.all():
                 teacher.user.groups.add(teacher_group)
-        return HttpResponseRedirect(reverse("browse-database"))
+        #  return HttpResponseRedirect(reverse("browse-database"))
+        return HttpResponseRedirect(reverse("teacher-dashboard"))
 
     elif Student.objects.filter(student=request.user).exists():
         return HttpResponseRedirect(reverse("student-page"))
 
-    else:
+    elif request.user.is_staff:
         return HttpResponseRedirect(reverse("assignment-list"))
+    else:
+        return logout_view(request)
 
 
 def access_denied(request):
@@ -686,7 +696,7 @@ def answer_choice_form(request, question_id):
         AnswerChoice,
         form=forms.AnswerChoiceForm,
         fields=("text", "correct"),
-        widgets={"text": Textarea(attrs={"style": "width: 100%;", "rows": 3})},
+        widgets={"text": Textarea(attrs={"rows": 3})},
         formset=admin.AnswerChoiceInlineFormSet,
         max_num=5,
         extra=5,
@@ -712,7 +722,7 @@ def answer_choice_form(request, question_id):
                 instances = formset.save()
                 return HttpResponseRedirect(
                     reverse(
-                        "sample-answer-form",
+                        "research-fix-expert-rationale",
                         kwargs={"question_id": question.pk},
                     )
                 )
@@ -781,7 +791,10 @@ class DisciplineCreateView(
     fields = ["title"]
 
     def get_success_url(self):
-        return reverse("discipline-form", kwargs={"pk": self.object.pk})
+        if self.request.GET.get("multiselect", False):
+            return reverse("disciplines-form", kwargs={"pk": self.object.pk})
+        else:
+            return reverse("discipline-form", kwargs={"pk": self.object.pk})
 
 
 @login_required
@@ -804,39 +817,34 @@ def discipline_select_form(request, pk=None):
     )
 
 
-class DisciplinesCreateView(LoginRequiredMixin, NoStudentsMixin, CreateView):
-    """View to create a new discipline outside of admin."""
-
-    model = Discipline
-    fields = ["title"]
-    template_name = "peerinst/disciplines_form.html"
-
-    def get_success_url(self):
-        return reverse("disciplines-form")
-
-
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
-def disciplines_select_form(request):
+def disciplines_select_form(request, pk=None):
     """
     AJAX view simply renders the DisciplinesSelectForm. Preselects instance
     with teachers current set.
     """
+
+    disciplines = request.user.teacher.disciplines.values_list("pk", flat=True)
+
+    if pk:
+        disciplines = Discipline.objects.filter(
+            Q(pk=pk) | Q(pk__in=disciplines)
+        )
+
+    form = forms.DisciplinesSelectForm(initial={"disciplines": disciplines})
+
     return TemplateResponse(
         request,
         "peerinst/disciplines_select_form.html",
-        context={
-            "form": forms.DisciplinesSelectForm(
-                initial={"disciplines": request.user.teacher.disciplines.all()}
-            )
-        },
+        context={"form": form},
     )
 
 
 class CategoryCreateView(
     LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, CreateView
 ):
-    """View to create a new discipline outside of admin."""
+    """ View to create a new category outside of admin. """
 
     model = Category
     fields = ["title"]
@@ -1697,6 +1705,12 @@ def question(request, assignment_id, question_id):
     elif stage_data.get("completed_stage") == "sequential-review":
         stage_class = QuestionReviewView
     else:
+        if stage_data.get("datetime_start") is None:
+            stage_data.update(
+                datetime_start=datetime.now(pytz.utc).strftime(
+                    "%Y-%m-%d %H:%M:%S.%f"
+                )
+            )
         stage_class = QuestionStartView
 
     # Delegate to the view
@@ -1813,6 +1827,10 @@ class TeacherDetailView(TeacherBase, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(TeacherDetailView, self).get_context_data(**kwargs)
+        # provides collection data to collection foldable
+        context["owned_collections"] = Collection.objects.filter(
+            owner=self.request.user.teacher
+        )
         context["LTI_key"] = str(settings.LTI_CLIENT_KEY)
         context["LTI_secret"] = str(settings.LTI_CLIENT_SECRET)
         context["LTI_launch_url"] = str(
@@ -1999,172 +2017,90 @@ def teacher_toggle_favourite(request):
 
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
+def teacher_toggle_follower(request):
+    # follow/unfollow heart function
+    collection = get_object_or_404(Collection, pk=request.POST.get("pk"))
+    teacher = get_object_or_404(Teacher, user=request.user)
+    if teacher not in collection.followers.all():
+        collection.followers.add(teacher)
+        return JsonResponse({"action": "added"})
+    else:
+        collection.followers.remove(teacher)
+        return JsonResponse({"action": "removed"})
+
+
+@login_required
+@user_passes_test(student_check, login_url="/access_denied_and_logout/")
+def collection_toggle_assignment(request):
+    # add/remove assignment from collection function for hearts on update view
+    collection = get_object_or_404(Collection, pk=request.POST.get("ppk"))
+    assignment = get_object_or_404(Assignment, pk=request.POST.get("pk"))
+    if assignment not in collection.assignments.all():
+        collection.assignments.add(assignment)
+        return JsonResponse({"action": "added"})
+    else:
+        collection.assignments.remove(assignment)
+        return JsonResponse({"action": "removed"})
+
+
+@login_required
+@user_passes_test(student_check, login_url="/access_denied_and_logout/")
+def collection_assign(request):
+    # assign button on distribute view
+    collection = get_object_or_404(Collection, pk=request.POST.get("ppk"))
+    student_group = get_object_or_404(StudentGroup, pk=request.POST.get("pk"))
+    is_assigned = False
+    for assign in collection.assignments.all():
+        if not StudentGroupAssignment.objects.filter(
+            group=student_group, assignment=assign
+        ).exists():
+            is_assigned = True
+            StudentGroupAssignment.objects.create(
+                group=student_group, assignment=assign
+            )
+    if is_assigned:
+        return JsonResponse({"action": "added"})
+    else:
+        return JsonResponse({"action": "existing"})
+
+
+@login_required
+@user_passes_test(student_check, login_url="/access_denied_and_logout/")
+def collection_unassign(request):
+    """
+    unassign button on distribute view, assures assignments are not distributed
+    """
+    collection = get_object_or_404(Collection, pk=request.POST.get("ppk"))
+    student_group = get_object_or_404(StudentGroup, pk=request.POST.get("pk"))
+    is_unassigned = False
+    for assign in collection.assignments.all():
+        if StudentGroupAssignment.objects.filter(
+            group=student_group, assignment=assign
+        ).exists():
+            if StudentGroupAssignment.objects.filter(
+                group=student_group,
+                assignment=assign,
+                distribution_date__isnull=True,
+            ):
+                is_unassigned = True
+                StudentGroupAssignment.objects.filter(
+                    group=student_group, assignment=assign
+                ).delete()
+    if is_unassigned:
+        return JsonResponse({"action": "removed"})
+    else:
+        return JsonResponse({"action": "unexisting"})
+
+
+@login_required
+@user_passes_test(student_check, login_url="/access_denied_and_logout/")
 def student_activity(request):
 
     teacher = request.user.teacher
-    current_groups = teacher.current_groups.all()
 
-    all_current_students = Student.objects.filter(groups__in=current_groups)
-
-    # Standalone
-    standalone_assignments = StudentGroupAssignment.objects.filter(
-        group__in=current_groups
-    ).filter(distribution_date__isnull=False)
-
-    standalone_answers = Answer.objects.filter(
-        assignment__in=standalone_assignments.values("assignment")
-    ).filter(user_token__in=all_current_students.values("student__username"))
-
-    # LTI
-    lti_assignments = [
-        a
-        for a in teacher.assignments.all()
-        if a not in [b.assignment for b in standalone_assignments.all()]
-    ]
-
-    lti_answers = Answer.objects.filter(assignment__in=lti_assignments).filter(
-        user_token__in=all_current_students.values("student__username")
+    all_answers_by_group, json_data = get_student_activity_data(
+        teacher=teacher
     )
-
-    all_answers_by_group = {}
-    for g in current_groups:
-        all_answers_by_group[g] = {}
-        student_list = g.student_set.all().values_list(
-            "student__username", flat=True
-        )
-        if len(student_list) > 0:
-            # Keyed on studentgroupassignment
-            for ga in standalone_assignments:
-                if ga.assignment.questions.count() > 0:
-                    all_answers_by_group[g][ga] = {}
-                    all_answers_by_group[g][ga]["answers"] = [
-                        a
-                        for a in standalone_answers
-                        if a.user_token in student_list
-                        and a.assignment == ga.assignment
-                    ]
-                    all_answers_by_group[g][ga]["new"] = [
-                        a
-                        for a in standalone_answers
-                        if a.user_token in student_list
-                        and a.assignment == ga.assignment
-                        and (
-                            (
-                                a.datetime_start
-                                and a.datetime_start > request.user.last_login
-                            )
-                            or (
-                                a.datetime_first
-                                and a.datetime_first > request.user.last_login
-                            )
-                            or (
-                                a.datetime_second
-                                and a.datetime_second > request.user.last_login
-                            )
-                        )
-                    ]
-                    all_answers_by_group[g][ga]["percent_complete"] = int(
-                        100.0
-                        * len(all_answers_by_group[g][ga]["answers"])
-                        / (len(student_list) * ga.assignment.questions.count())
-                    )
-
-            # Keyed on assignment
-            for l in lti_assignments:
-                if l.questions.count() > 0:
-                    all_answers_by_group[g][l] = {}
-                    all_answers_by_group[g][l]["answers"] = [
-                        a
-                        for a in lti_answers
-                        if a.user_token in student_list and a.assignment == l
-                    ]
-                    all_answers_by_group[g][l]["new"] = [
-                        a
-                        for a in lti_answers
-                        if a.user_token in student_list
-                        and a.assignment == l
-                        and (
-                            (
-                                a.datetime_start
-                                and a.datetime_start > request.user.last_login
-                            )
-                            or (
-                                a.datetime_first
-                                and a.datetime_first > request.user.last_login
-                            )
-                            or (
-                                a.datetime_second
-                                and a.datetime_second > request.user.last_login
-                            )
-                        )
-                    ]
-                    all_answers_by_group[g][l]["percent_complete"] = int(
-                        100.0
-                        * len(all_answers_by_group[g][l]["answers"])
-                        / (len(student_list) * l.questions.count())
-                    )
-
-    # JSON
-    json_data = {}
-    for group_key, group_assignments in all_answers_by_group.items():
-        json_data[group_key.name] = {}
-        for key, value_list in group_assignments.items():
-            if len(value_list["answers"]) > 0:
-                try:
-                    assignment = key.assignment
-                    id = key.assignment.identifier
-
-                    date = (
-                        value_list["answers"][0].datetime_first
-                        if value_list["answers"][0].datetime_first
-                        else value_list["answers"][0].datetime_second
-                    )
-
-                    if key.distribution_date < date:
-                        start_date = key.distribution_date
-                    else:
-                        start_date = date
-
-                    date = (
-                        value_list["answers"][-1].datetime_first
-                        if value_list["answers"][-1].datetime_first
-                        else value_list["answers"][-1].datetime_second
-                    )
-
-                    if key.due_date > date:
-                        end_date = key.due_date
-                    else:
-                        end_date = date
-                except Exception:
-                    assignment = key
-                    id = key.identifier
-                    start_date = value_list["answers"][0].datetime_first
-                    end_date = value_list["answers"][-1].datetime_first
-
-                json_data[group_key.name][id] = {}
-                json_data[group_key.name][id]["distribution_date"] = str(
-                    start_date
-                )
-                json_data[group_key.name][id]["due_date"] = str(end_date)
-                json_data[group_key.name][id]["last_login"] = str(
-                    request.user.last_login
-                )
-                json_data[group_key.name][id]["now"] = str(
-                    datetime.utcnow().replace(tzinfo=pytz.utc)
-                )
-                json_data[group_key.name][id]["total"] = (
-                    group_key.student_set.count()
-                    * assignment.questions.count()
-                )
-                json_data[group_key.name][id]["answers"] = []
-                for answer in value_list["answers"]:
-                    json_data[group_key.name][id]["answers"].append(
-                        str(
-                            answer.datetime_first
-                            if answer.datetime_first
-                            else answer.datetime_second
-                        )
-                    )
 
     return TemplateResponse(
         request,
@@ -2421,9 +2357,14 @@ class BlinkQuestionDetailView(DetailView):
                 r = BlinkRound.objects.get(
                     question=self.object, deactivate_time__isnull=True
                 )
-                elapsed_time = (timezone.now() - r.activate_time).seconds
-                time_left = max(self.object.time_limit - elapsed_time, 0)
-            except Exception:
+                elapsed_time = timezone.now() - r.activate_time
+                time_left = max(
+                    self.object.time_limit
+                    - elapsed_time.seconds
+                    - elapsed_time.microseconds / 1e6,
+                    0,
+                )
+            except Exception as e:
                 time_left = 0
 
             # Get latest vote, if any
@@ -2706,6 +2647,17 @@ def question_search(request):
             q_qs = []
             form_field_name = None
 
+        # Establish pool of questions for search
+        search_list = Question.unflagged_objects.all()
+
+        if limit_search == "true":
+            search_list = search_list.filter(
+                discipline__in=request.user.teacher.disciplines.all()
+            )
+
+        # if meta_search:
+        #    search_list = filter(meta_search, search_list)
+
         # All matching questions
         search_string_split_list = search_string.split()
         search_terms = [search_string]
@@ -2719,12 +2671,7 @@ def question_search(request):
         # top that have the entire search_string included
         query_meta = {}
         for term in search_terms:
-            query_term = question_search_function(term)
-
-            if limit_search == "true":
-                query_term = query_term.filter(
-                    discipline__in=request.user.teacher.disciplines.all()
-                )
+            query_term = question_search_function(term, search_list)
 
             query_term = query_term.exclude(id__in=q_qs).distinct()
 
@@ -2789,23 +2736,21 @@ def blink_get_current_url(request, username):
     try:
         # Return url of current active blinkquestion, if any
         blinkquestion = teacher.blinkquestion_set.get(active=True)
-        return HttpResponse(
-            reverse("blink-question", kwargs={"pk": blinkquestion.pk})
-        )
+        url = reverse("blink-question", kwargs={"pk": blinkquestion.pk})
+        return JsonResponse({"action": url})
     except Exception:
         if not teacher.blinkassignment_set.filter(active=True).exists():
-            return HttpResponse("stop")
+            return JsonResponse({"action": "stop"})
         try:
             latest_round = BlinkRound.objects.filter(
                 question__in=teacher.blinkquestion_set.all()
             ).latest("activate_time")
-            return HttpResponse(
-                reverse(
-                    "blink-summary", kwargs={"pk": latest_round.question.pk}
-                )
+            url = reverse(
+                "blink-summary", kwargs={"pk": latest_round.question.pk}
             )
+            return JsonResponse({"action": url})
         except Exception:
-            return HttpResponse("stop")
+            return JsonResponse({"action": "stop"})
 
 
 def blink_count(request, pk):
@@ -3079,7 +3024,7 @@ def report_selector(request):
 
     return TemplateResponse(
         request,
-        "peerinst/report_selector.html",
+        "peerinst/teacher/report_selector.html",
         {
             "report_select_form": forms.ReportSelectForm(
                 teacher_username=teacher.user.username
@@ -3117,7 +3062,7 @@ def report(request, assignment_id="", group_id=""):
         )
 
     assignment_data = report_data_by_assignment(
-        assignment_list, student_groups
+        assignment_list, student_groups, teacher
     )
 
     context = {}

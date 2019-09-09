@@ -1,4 +1,5 @@
 import re
+import time
 
 from django.core.urlresolvers import reverse
 from selenium.webdriver.common.keys import Keys
@@ -10,7 +11,7 @@ from peerinst.students import (
 )
 
 
-def signin(browser, student, new=False):
+def signin(browser, student, mailoutbox, new=False):
     email = student.student.email
 
     browser.get("{}{}".format(browser.server_url, reverse("login")))
@@ -23,12 +24,13 @@ def signin(browser, student, new=False):
     input_.send_keys(email)
     input_.send_keys(Keys.ENTER)
 
-    username, _ = get_student_username_and_password(email)
-    token = create_student_token(username, email)
+    assert len(mailoutbox) == 1
+    assert list(mailoutbox[0].to) == [email]
 
-    signin_link = "{}{}?token={}".format(
-        browser.server_url, reverse("student-page"), token
-    )
+    m = re.search(
+        "http[s]*://.*/student/\?token=.*", mailoutbox[0].body
+    )  # noqa W605
+    signin_link = m.group(0)
 
     browser.get(signin_link)
 
@@ -50,12 +52,16 @@ def access_logged_in_account_from_landing_page(browser, student):
     assert re.search(r"student/", browser.current_url)
 
 
-def logout(browser):
+def logout(browser, assert_):
     icon = browser.find_element_by_xpath("//i[contains(text(), 'menu')]")
     icon.click()
 
-    link = browser.find_element_by_xpath("//a[contains(text(), 'Logout')]")
-    link.click()
+    logout_button = browser.find_element_by_link_text("Logout")
+    browser.wait_for(assert_(logout_button.is_enabled()))
+    # FIXME:
+    # Assertion shoud include logout_button.is_displayed() but throws w3c error
+    time.sleep(2)
+    logout_button.click()
 
     assert browser.current_url == browser.server_url + "/en/"
 
@@ -64,10 +70,7 @@ def logout(browser):
 
 
 def consent_to_tos(browser):
-    share = browser.find_element_by_xpath(
-        "//button[contains(text(), 'Share')]"
-    )
-    share.click()
+    browser.find_element_by_id("tos-accept").click()
 
     sharing = browser.find_element_by_id("student-tos-sharing--sharing")
     assert sharing.text == "Sharing"
@@ -93,12 +96,12 @@ def test_fake_link(browser):
     browser.find_element_by_xpath("//*[contains(text(), '{}')]".format(err))
 
 
-def test_student_login_logout(browser, student):
-    signin(browser, student, new=False)
+def test_student_login_logout(browser, assert_, mailoutbox, student):
+    signin(browser, student, mailoutbox, new=False)
     access_logged_in_account_from_landing_page(browser, student)
-    logout(browser)
+    logout(browser, assert_)
 
 
-def test_new_student_login(browser, student_new):
-    signin(browser, student_new, new=True)
+def test_new_student_login(browser, student_new, mailoutbox):
+    signin(browser, student_new, mailoutbox, new=True)
     consent_to_tos(browser)

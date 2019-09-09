@@ -1,0 +1,5 @@
+.logged-in-layout .site-content{position:relative;top:60px}@media (max-width: 450px){.logged-in-layout .site-content{top:40px}}
+
+.logged-in-layout #header{height:50px;position:fixed;top:0;width:100%;z-index:1}.logged-in-layout #header #header-background{background-image:linear-gradient(90deg, #54c0db 0%, #004266 100%);bottom:0;box-shadow:0px 1px 2px grey;left:0;position:absolute;right:0;top:0;z-index:0}#header{-webkit-align-items:center;align-items:center;background:#ffffff;color:white;display:-webkit-flex;display:flex;-webkit-flex-direction:row;flex-direction:row;font-size:18pt;-webkit-justify-content:space-between;justify-content:space-between;position:relative;z-index:1}#header .mdc-toolbar{height:auto}#header #header-left{z-index:2}#header #header-left #header-menu{z-index:1}#header #header-right{z-index:1}
+
+/*# sourceMappingURL=layout.min.css.map */

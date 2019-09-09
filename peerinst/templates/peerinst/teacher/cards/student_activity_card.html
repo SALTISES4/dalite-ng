@@ -1,0 +1,42 @@
+{% load bleach_html i18n %}
+
+{% for group, dataset in data.items %}
+  {% for assignment, answers in dataset.items %}
+    {% if answers.answers|length > 0 %}
+      <div class="mdc-card">
+        <div class="mdc-typography--title bold">
+          {{ group.title|title|bleach_html|safe }}
+        </div>
+
+        <div class="mdc-typography--caption">
+          {% if assignment.assignment %}
+          <a href="{% url 'group-assignment' assignment.hash %}">{{ assignment.assignment }}</a>
+          {% else %}
+          {{ assignment }}
+          {% endif %}
+        </div>
+
+        <svg class="progress-chart" group="{{group.name}}" assignment="{% if assignment.assignment %}{{assignment.assignment}}{% else %}{{ assignment }}{% endif %}" width=400 height=70></svg>
+
+        <div class="mdc-card__actions">
+
+          <div class="mdc-card__action-buttons">
+            <div class="mdc-typography--caption">
+              <div>
+                {% trans 'Answers submitted:' %} {{ answers.answers|length }}
+              </div>
+              <div>
+                {% trans 'New answers since last login:' %} {{ answers.new|length }}
+              </div>
+              <div>
+                {% trans 'Percent complete:' %} {{ answers.percent_complete }}%
+              </div>
+            </div>
+          </div>
+
+          <div class="mdc-card__action-icons"></div>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endfor %}

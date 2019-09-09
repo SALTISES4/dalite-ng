@@ -591,12 +591,15 @@ class QuestionPreviewViewBase(
             )
         else:
             save_allowed = False
+
+        assignment_form = AssignmentMultiselectForm(
+            self.request.user, self.question
+        )
         context.update(
             question=self.question,
             answer_choices=self.answer_choices,
-            assignment_form=AssignmentMultiselectForm(
-                self.request.user, self.question
-            ),
+            assignment_form=assignment_form,
+            assignment_count=assignment_form.queryset.count(),
             save_allowed=save_allowed,
         )
         return context
@@ -615,7 +618,7 @@ class QuestionPreviewViewBase(
         )
         answer.save()
         messages.add_message(
-            self.request, messages.INFO, _("Example answer saved.")
+            self.request, messages.INFO, _("Sample answer saved.")
         )
         return super(QuestionPreviewViewBase, self).form_valid(form)
 
@@ -654,21 +657,30 @@ class QuestionExpertRationaleView(QuestionPreviewViewBase):
 
     def get_context_data(self, **kwargs):
         """
-        show currently saved expert rationales, and define context variable
-        that does not render completion button until a expert rationale exists
-        for each correct answerchoice (FIXME: currently comparison is to number
-        of correct answer choices; should be at least one expert rationale
-        per correct answer choice)
+        Show currently saved expert rationales, and define context variable
+        that does not render completion button until an expert rationale exists
+        for each correct answerchoice.
         """
 
         context = super(QuestionExpertRationaleView, self).get_context_data(
             **kwargs
         )
+        answerchoice_correct = self.question.answerchoice_set.values_list(
+            "correct", flat=True
+        )
+        correct_answer_choices = list(
+            itertools.compress(itertools.count(1), answerchoice_correct)
+        )
         expert_rationales = self.question.answer_set.filter(expert=True)
-        save_allowed = len(expert_rationales) >= sum(
-            self.question.answerchoice_set.all().values_list(
-                "correct", flat=True
-            )
+
+        save_allowed = all(
+            [
+                cac
+                in expert_rationales.values_list(
+                    "first_answer_choice", flat=True
+                )
+                for cac in correct_answer_choices
+            ]
         )
         assignment_id = self.request.session.get("assignment_id")
         question_id = self.request.session.get("question_id")

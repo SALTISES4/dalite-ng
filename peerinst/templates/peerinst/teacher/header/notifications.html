@@ -1,0 +1,15 @@
+{% load i18n %}
+
+<div class="notifications notifications--hidden">
+  <div class="notifications__icon header__icon" title="Notifications">
+    <i class="material-icons md-32 header-icon">notifications</i>
+    <div class="notifications__icon__badge"></div>
+    <loading-spinner class="notifications__spinner"
+                     nonce="{{ request.csp_nonce }}">
+    </loading-spinner>
+  </div>
+  <div class="notifications__list">
+    <div class="notifications__notifications"></div>
+    <div class="notifications__clear-all-btn">{% trans 'Clear all' %}</div>
+  </div>
+</div>

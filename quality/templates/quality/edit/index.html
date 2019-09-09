@@ -3,18 +3,21 @@
 {% load compress i18n staticfiles %}
 
 {% block stylesheets %}
+{{ block.super }}
 {% compress css %}
 <link href="{% static 'quality/css/edit.min.css' %}" rel="stylesheet">
 {% endcompress %}
 {% endblock %}
 
 {% block scripts %}
+{{ block.super }}
 {% compress js %}
 <script src="{% static 'quality/js/edit.min.js' %}"></script>
-<script type="text/javascript">
+{% endcompress %}
+
+<script nonce="{{ request.csp_nonce }}">
   edit.init({{ data|safe }})
 </script>
-{% endcompress %}
 {% endblock %}
 
 
@@ -48,8 +51,6 @@
 
   <div id="criterions">
   </div>
-
-
 
 </main>
 {% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'peerinst/base.html' %}
+{% load compress staticfiles add_class i18n %}
+{% block body %}
+<main>
+  <section>
+      <h1 class="mdc-typography--display3">{% trans 'Collections' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
+      <div>
+        <div class="admin-link">
+          {% if user.is_staff %}
+          <a href="{% url 'admin_index_wrapper' %}">Click here to access admin</a>
+          <span class="links-divider">|</span>{% endif %}<a href="{% url 'teacher' request.user.teacher.pk %}">{% trans 'Back to My Account' %}</a>
+          <span class="links-divider">|</span><a href="{% url 'collection-detail' object.pk %}">{% trans 'Cancel' %}</a>
+        </div>
+      </div>
+      <h2 class="mdc-typography--display1
+                 mdc-theme--secondary">{% trans 'Delete Collection' %}</h2>
+      <div class='field-container'>
+        <div class='number-box'><span class='number'><b>!</b></span></div>
+        <div class='field'>
+          <p><small>
+            {% blocktrans %}
+            Are you sure you would like to delete your collection of assignments?
+            {% endblocktrans %}
+          </small></p>
+          <p><small>
+            {% blocktrans %}
+            You will be unable to retrieve any information regarding this collection.
+            {% endblocktrans %}
+          </small></p>
+        </div>
+      </div>
+      <form id="collection-delete-form" method="post">
+        {% csrf_token %}
+        <input class="mdc-button mdc-button--raised padded-top"
+               id="id_delete"
+               type="submit"
+               value="Confirm" />
+      </form>
+  </section>
+</main>
+{% endblock %}

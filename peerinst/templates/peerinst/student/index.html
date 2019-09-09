@@ -16,10 +16,9 @@
         {% trans 'Identity' %}
       </h2>
       <div class="foldable--body">
-        <ul class="mdc-list mdc-list--non-interactive mdc-list--two-line"
-            style="padding-bottom:0px;">
+        <ul class="mdc-list mdc-list--non-interactive mdc-list--two-line p-bottom-0">
           <li role="separator" class="mdc-list-divider"></li>
-          <li class="mdc-list-item" onclick="edit_user()">
+          <li id="edit-user-btn" class="mdc-list-item">
             <span class="mdc-list-item__graphic mdc-theme--primary">
               <i class="material-icons md-48">
                 account_circle
@@ -35,10 +34,8 @@
           </li>
           <li role="separator" class="mdc-list-divider"></li>
         </ul>
-        <ul class="mdc-list mdc-list--two-line" style="padding-top: 0px;">
-          <li class="mdc-list-item"
-              onclick="student.modifyTos()"
-              style="cursor: pointer;">
+        <ul class="mdc-list mdc-list--two-line">
+          <li id="modify-tos-btn" class="mdc-list-item pointer">
             <span class="mdc-list-item__graphic mdc-theme--primary">
               <i id="student-tos-sharing--icon"
                  class="material-icons md-48">
@@ -69,14 +66,12 @@
       </h2>
       <div class="foldable--body">
         <div id="student-add-group">
-          <span class="admin-link"
-                onclick="student.toggleJoinGroup()">
+          <span class="admin-link">
             {% trans 'Add group' %}
           </span>
           <div id="student-add-group--box"
-               style="display: none;"
-               onclick="event.stopPropagation; student.toggleJoinGroup()">
-              <div onclick="event.stopPropagation();">
+               class="hidden">
+              <div>
                 <h3>{% trans 'Join group' %}</h3>
                 <p>
                   {% blocktrans %}
@@ -84,20 +79,18 @@
                   the link in the box below.
                   {% endblocktrans %}
                 </p>
+                <p id="student-add-group__error" hidden></p>
                 <input type="text"
                        name="new-group"
                        value=""
-                       placeholder="Url link"
-                       onkeyup="student.handleJoinGroupLinkInput(event)">
-                <select id="student-old-groups"
-                        style="display: none;">
-                </select>
+                       placeholder="Url link">
+                <select id="student-old-groups"></select>
                 <button class="mdc-button mdc-button--unelevated"
-                        onclick="student.joinGroup()">
+                        id="join-group-btn">
                   {% trans 'Join' %}
                 </button>
                 <button class="mdc-button"
-                        onclick="student.toggleJoinGroup()">
+                        id="cancel-join-group-btn">
                   {% trans 'Cancel' %}
                 </button>
               </div>
@@ -111,10 +104,10 @@
   </section>
 </main>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
   window.addEventListener("load", function() {
     student.initStudentPage(
-      {{ data|safe }}
+      {{ data|safe }}, "{{ group_student_id_needed }}"
     )
   });
 </script>

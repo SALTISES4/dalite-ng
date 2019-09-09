@@ -1,31 +1,48 @@
-import { buildReq } from "../_ajax/utils.js";
+import { buildReq } from "../ajax.js";
 import { clear } from "../utils.js";
+
+/*********/
+/* model */
+/*********/
+
+let model;
+
+function initModel(submitUrl, quality) {
+  model = {
+    urls: {
+      submitUrl: submitUrl,
+    },
+    quality: quality,
+  };
+}
 
 /**********/
 /* update */
 /**********/
 
-export function validateFormSubmit(event, url, quality) {
-  event.preventDefault();
-  const data = {
-    quality: quality,
-    rationale: document.querySelector("#id_rationale").value,
-  };
+function validateFormSubmit(event) {
+  if (!document.getElementById("your-rationale")) {
+    event.preventDefault();
+    const data = {
+      quality: model.quality,
+      rationale: document.querySelector("#id_rationale").value,
+    };
 
-  const req = buildReq(data, "post");
-  fetch(url, req)
-    .then(resp => resp.json())
-    .then(failed => {
-      if (failed.failed.length) {
-        toggleQualityError(failed.failed, failed.error_msg);
-        document.querySelector("#answer-form").disabled = false;
-      } else {
-        toggleQualityError();
-        document.querySelector("#answer-form").disabled = true;
-        document.querySelector("#submit-answer-form").submit();
-      }
-    })
-    .catch(err => console.log(err));
+    const req = buildReq(data, "post");
+    fetch(model.urls.submitUrl, req)
+      .then(resp => resp.json())
+      .then(failed => {
+        if (failed.failed.length) {
+          toggleQualityError(failed.failed, failed.error_msg);
+          document.querySelector("#answer-form").disabled = false;
+        } else {
+          toggleQualityError();
+          document.querySelector("#answer-form").disabled = true;
+          document.querySelector("#submit-answer-form").submit();
+        }
+      })
+      .catch(err => console.log(err));
+  }
 }
 
 /********/
@@ -61,4 +78,30 @@ function toggleQualityError(data, errorMsg) {
       err.parentNode.removeChild(err);
     }
   }
+}
+
+/*************/
+/* listeners */
+/*************/
+
+function initListeners() {
+  addSubmitListener();
+}
+
+function addSubmitListener() {
+  const input = document.getElementById("answer-form");
+  if (input) {
+    input.addEventListener("click", event => {
+      validateFormSubmit(event);
+    });
+  }
+}
+
+/********/
+/* init */
+/********/
+
+export function init(submitUrl, quality) {
+  initModel(submitUrl, quality);
+  initListeners();
 }

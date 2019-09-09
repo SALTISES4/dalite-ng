@@ -3,6 +3,7 @@
 coverage
 ddt
 factory_boy==2.6
+Faker
 mixer
 mock
 pytest

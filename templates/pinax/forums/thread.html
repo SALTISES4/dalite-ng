@@ -1,13 +1,13 @@
-{% extends './base.html' %}
+{% extends 'pinax/forums/base.html' %}
 
-{% load add_class compress i18n staticfiles %}
+{% load add_class compress i18n static %}
 
 {% block heading %}
 {{ thread.forum }}
 {% endblock %}
 
 {% block breadcrumbs %}
-<span class="links-divider">|</span><a href="{% url 'pinax_forums:forum' thread.forum.pk %}">{% trans 'Back to forum' %}</a>
+<span class="links-divider">|</span><a href="{% url 'pinax_forums:forum' thread.forum.pk %}">{% trans 'Back to Forum' %}</a>
 {% endblock %}
 
 {% block content %}
@@ -16,16 +16,15 @@
 <div>
   <h2 class="mdc-typography--display1 mdc-theme--secondary with-follow">{{ thread.title }}
     <i class="mdc-icon-toggle material-icons mdc-theme--primary follow"
-        role="button"
-        aria-label="{% trans 'Follow' %}" tabindex="0"
-        data-toggle-on='{"label": "{% trans 'Unfollow' %}", "content": "favorite"}'
-        data-toggle-off='{"label": "{% trans 'Follow' %}", "content": "favorite_border"}'
-        {% if subscribed %}
-        aria-pressed="true"
-        {% else %}
-        aria-pressed="false"
-        {% endif %}
-        onclick="thread.toggleFollow(this, '{% url 'pinax_forums:subscribe' thread.id %}', '{% url 'pinax_forums:unsubscribe' thread.id %}');">
+       role="button"
+       aria-label="{% trans 'Follow' %}" tabindex="0"
+       data-toggle-on='{"label": "{% trans 'Unfollow' %}", "content": "favorite"}'
+       data-toggle-off='{"label": "{% trans 'Follow' %}", "content": "favorite_border"}'
+       {% if subscribed %}
+       aria-pressed="true"
+       {% else %}
+       aria-pressed="false"
+       {% endif %}>
         favorite_border
     </i>
   </h2>
@@ -75,7 +74,7 @@
 
     <div class="mdc-card__action-icons">
       {% if can_create_reply %}
-        <i class="material-icons md-18 icon-list mdc-ripple-surface mdc-theme--primary" onclick="thread.showReplyForm('reply-{{p.id}}')">reply</i>
+        <i data-post="{{p.id}}" class="material-icons md-18 icon-list mdc-ripple-surface mdc-theme--primary reply-btn">reply</i>
       {% endif %}
       {% if request.user == p.author and p.editable %}
         <a class="mdc-theme--primary" href="{% url 'pinax_forums:post_edit_reply' p.pk %}"><i class="material-icons md-18 icon-list mdc-ripple-surface mdc-theme--primary">mode_edit</i></a>
@@ -93,7 +92,7 @@
 
   <div class="mdc-card__actions">
     <div class="mdc-card__action-buttons">
-        <div class="mdc-typography--caption" style="color:white;">
+        <div class="mdc-typography--caption white">
         {% if r.created|date:"d M" != right_now %}
           {{ r.author }} &middot; {{ r.created|date:"SHORT_DATE_FORMAT" }}
         {% else %}
@@ -104,7 +103,7 @@
 
     <div class="mdc-card__action-icons">
       {% if request.user == r.author and r.editable %}
-        <a class="mdc-theme--primary" href="{% url 'pinax_forums:post_edit_reply' r.pk %}"><i class="material-icons md-18 icon-list mdc-ripple-surface" style="color: white;">mode_edit</i></a>
+        <a class="mdc-theme--primary" href="{% url 'pinax_forums:post_edit_reply' r.pk %}"><i class="material-icons md-18 icon-list mdc-ripple-surface white">mode_edit</i></a>
       {% endif %}
     </div>
   </div>
@@ -140,14 +139,30 @@
       {{ reply_form.content|add_class:"mdc-text-field__input" }}
       <label for="id_content" class="mdc-floating-label">{% trans 'Post' %}</label>
     </div>
-    <input type="submit" class="mdc-button mdc-button--raised" value="{% trans 'Post' %}"/>
+    <input type="submit" class="mdc-button mdc-button--raised padded-top" value="{% trans 'Post' %}"/>
   </form>
 </div>
 {% endif %}
 {% endblock %}
 
-{% block extrascripts %}
-{% compress js %}
+{% block scripts %}
+{{ block.super }}
+{% compress js file forums__thread %}
 <script src="{% static 'pinax/forums/js/thread.min.js' %}"></script>
 {% endcompress %}
+
+<script nonce="{{ request.csp_nonce }}">
+  window.addEventListener("load", function() {
+    document.getElementsByClassName("follow")[0].addEventListener("click", function() {
+      thread.toggleFollow(this, "{% url 'pinax_forums:subscribe' thread.id %}", "{% url 'pinax_forums:unsubscribe' thread.id %}");
+    })
+
+    const replyButtons = document.getElementsByClassName("reply-btn");
+    [].forEach.call(replyButtons, function(el) {
+      el.addEventListener("click", function() {
+        thread.showReplyForm('reply-'+el.getAttribute('data-post'));
+      });
+    });
+  })
+</script>
 {% endblock %}

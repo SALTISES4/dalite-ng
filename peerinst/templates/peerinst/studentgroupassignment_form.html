@@ -3,9 +3,10 @@
 {% load compress staticfiles add_class i18n %}
 
 {% block stylesheets %}
+{{ block.super }}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<style>
+<style nonce="{{ request.csp_nonce }}">
 .flatpickr-input {
   width: 150px;
 }
@@ -23,7 +24,7 @@
 
         <div class="admin-link">
           <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
-          <span style="padding-left:0.3em;padding-right:0.5em;">|</span><a href="{% url 'teacher-assignments' teacher.id %}">{% trans 'Back to My Assignments' %}</a>
+          <span class="admin-link--padded">|</span><a href="{% url 'teacher-assignments' teacher.id %}">{% trans 'Back to My Assignments' %}</a>
         </div>
 
         <h2 class="mdc-typography--display1 mdc-theme--secondary">{{ assignment.title }}</h2>
@@ -49,7 +50,7 @@
             <div class='field'>
               <div class='mdc-form-field'>
                 <label for='id_group'>{{ form.group.label }}:</label>
-                <div class='mdc-select' style='margin-right:20px;'>
+                <div class='mdc-select m-right-20'>
                   {{ form.group|add_class:"mdc-select__native-control" }}
                   <div class="mdc-select__bottom-line"></div>
                 </div>
@@ -104,7 +105,8 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
+{{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
 $("#create-group-assignment").submit(function(event) {
   event.preventDefault();
   var $form = $(this);

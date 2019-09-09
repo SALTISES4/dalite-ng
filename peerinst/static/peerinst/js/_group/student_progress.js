@@ -1,7 +1,5 @@
-"use strict";
-
 import * as d3 from "d3";
-import { buildReq } from "../_ajax/utils.js";
+import { buildReq } from "../ajax.js";
 import { clear, createSvg } from "../utils.js";
 
 /*********/
@@ -25,6 +23,7 @@ function initModel(data) {
       nCompleted: question.n_completed,
       nFirstCorrect: question.n_first_correct,
       nCorrect: question.n_correct,
+      timeSpent: question.time_spent,
     })),
   };
   progressView();
@@ -68,9 +67,34 @@ function loadingView() {
 function progressView() {
   const progress = document.querySelector("#student-progress");
   clear(progress);
+  progress.appendChild(legendView());
   model.results.map(function(question) {
     progress.append(questionView(question));
   });
+}
+
+function legendView() {
+  const li = document.createElement("li");
+  li.classList.add("mdc-list-item");
+
+  const legend = document.createElement("span");
+  legend.id = "student-progress-legend";
+  legend.classList.add("mdc-list-item__meta");
+  li.appendChild(legend);
+
+  const done = document.createElement("span");
+  done.textContent = "Question done";
+  legend.appendChild(done);
+
+  const first = document.createElement("span");
+  first.textContent = "First answer correct";
+  legend.appendChild(first);
+
+  const second = document.createElement("span");
+  second.textContent = "Second answer correct";
+  legend.appendChild(second);
+
+  return li;
 }
 
 function questionView(question) {
@@ -91,7 +115,16 @@ function questionView(question) {
   const nStudents = document.createElement("span");
   nStudents.classList.add("mdc-list-item__secondary-text");
   nStudents.textContent = question.nStudents + " students";
+  const timeSpent = document.createElement("span");
+  timeSpent.classList.add(
+    "mdc-list-item__secondary-text",
+    "student-progress__time_taken",
+  );
+  if (question.timeSpent) {
+    timeSpent.textContent = question.timeSpent;
+  }
   title.append(nStudents);
+  title.append(timeSpent);
   li.append(title);
 
   const progress = document.createElement("span");

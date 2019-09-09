@@ -1,15 +1,17 @@
 from __future__ import unicode_literals
+
 import pytest
 
+from peerinst.tests.fixtures import *  # noqa
 from peerinst.util import report_data_by_assignment
 
 from .fixtures import *  # noqa F403
 
 
 @pytest.mark.django_db
-def test_report_data_by_assignment_no_answers(assignments, groups):
+def test_report_data_by_assignment_no_answers(assignments, groups, teacher):
     full_report = report_data_by_assignment(
-        assignments, [g.pk for g in groups]
+        assignments, [g.pk for g in groups], teacher
     )
 
     for assignment, report in zip(assignments, full_report):

@@ -11,8 +11,8 @@ from django.db import models
 from django.db.utils import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 
+from dalite.models.custom_fields import CommaSepField, ProbabilityField
 from quality.models.criterion.criterion import Criterion, CriterionRules
-from quality.models.custom_fields import CommaSepField, ProbabilityField
 from quality.models.quality_type import QualityType, QualityUseType
 
 from .model import create_model

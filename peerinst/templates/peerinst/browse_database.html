@@ -1,11 +1,17 @@
 {% extends 'peerinst/base.html' %}
 
-{% load staticfiles compress i18n %}
+{% load csp staticfiles compress i18n %}
 
 {% block stylesheets %}
+{{ block.super }}
 {% compress css %}
 <link href="{% static 'peerinst/css/search.min.css' %}" rel="stylesheet">
 {% endcompress %}
+<style nonce="{{ request.csp_nonce }}">
+  #category-filters {
+    margin-top: 10px;
+  }
+</style>
 {% endblock %}
 
 {% block body %}
@@ -67,6 +73,7 @@
     <div class="mdc-form-field">
       <span class="mdc-theme--secondary">{% trans 'Show answers' %}</span>
       <i class="mdc-icon-toggle material-icons toggle-answers mdc-theme--secondary" role="button" aria-pressed="false"
+      id="toggle-answers"
       aria-label="Toggle answers" tabindex="0"
       data-toggle-on='{"label": "Hide images", "content": "check_box"}'
       data-toggle-off='{"label": "Show images", "content": "check_box_outline_blank"}'>
@@ -85,15 +92,15 @@
       </div>
     </div>
 
-    <div id="filters" style="display:none;">
+    <div id="filters" class="display-none">
       <h2 class='mdc-typography--display1  mdc-theme--secondary'>{% trans 'Filters' %}</h2>
 
       <div id="select-filters">
-        <div id="discipline-filters" style="display:none;"><div style="margin-bottom:5px;">{% trans 'Disciplines: ' %}</div><span id="filter-on-discipline"></span></div>
+        <div id="discipline-filters" class="display-none"><div>{% trans 'Disciplines: ' %}</div><span id="filter-on-discipline"></span></div>
 
-        <div id="category-filters" style="margin-top:10px;display:none;"><div style="margin-bottom:5px;">{% trans 'Keywords: ' %}</div><span id="filter-on-category"></span></div>
+        <div id="category-filters" class="display-none"><div>{% trans 'Keywords: ' %}</div><span id="filter-on-category"></span></div>
 
-        <button id="reset-filters" type="button" class='mdc-button mdc-button--raised padded-top' disabled=true onclick='search.reset()'>{% trans 'Clear' %}</button>
+        <button id="reset-filters" type="button" class='mdc-button mdc-button--raised padded-top' disabled=true'>{% trans 'Clear' %}</button>
       </div>
     </div>
 
@@ -104,41 +111,49 @@
 {% endblock %}
 
 {% block scripts %}
+{{ block.super }}
+{% compress js %}
 <script src="{% static 'peerinst/js/search.min.js' %}"></script>
-{% compress js inline %}
-<script>
-bundle.toggleImages();
-bundle.toggleAnswers();
+{% endcompress %}
 
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", bundle.getCookie('csrftoken'));
-        }
+<script nonce="{{ request.csp_nonce }}">
+  bundle.toggleImages();
+  bundle.toggleAnswers();
+
+  const input = document.getElementById('search-bar');
+  input.onchange = function() {
+    if (input.value != "") {
+      search.setupSearch();
+      console.info("Searching: "+input.value);
+      $('#search_results').load("{% url 'question-search' %}", "search_string="+input.value, search.processResponse);
     }
-});
+  }
 
-var input = document.getElementById('search-bar');
-input.onchange = function() {
-  if (input.value != "") {
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+          }
+      }
+  });
+
+  function pageNav(page) {
     search.setupSearch();
     console.info("Searching: "+input.value);
-    $('#search_results').load("{% url 'question-search' %}", "search_string="+input.value, search.processResponse);
+    $('#search_results').load("{% url 'question-search' %}?page="+page, "search_string="+input.value, search.processResponse);
   }
-}
 
-function pageNav(page) {
-  search.setupSearch();
-  console.info("Searching: "+input.value);
-  $('#search_results').load("{% url 'question-search' %}?page="+page, "search_string="+input.value, search.processResponse);
-}
+  function toggleFavourite(pk) {
+    const posting = $.post("{% url 'teacher-toggle-favourite' %}", {pk: pk});
+    posting.done(function(data) {
+      console.info(data);
+    });
+  }
 
-function toggleFavourite(pk) {
-  var posting = $.post("{% url 'teacher-toggle-favourite' %}", {pk: pk});
-  posting.done(function(data) {
-    console.info(data);
-  })
-}
+  window.addEventListener("load", function() {
+    document.getElementById("reset-filters").addEventListener("click", () => {
+      search.reset();
+    });
+  });
 </script>
-{% endcompress %}
 {% endblock %}

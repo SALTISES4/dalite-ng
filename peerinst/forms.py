@@ -4,10 +4,9 @@ from __future__ import unicode_literals
 import re
 from datetime import datetime
 
-import password_validation
 import pytz
 from django import forms
-from django.contrib.auth.forms import PasswordResetForm, UserCreationForm
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.db.models import Count, Q
 from django.forms import ModelForm
@@ -52,11 +51,6 @@ class FirstAnswerForm(forms.Form):
     )
     rationale = forms.CharField(
         widget=forms.Textarea(attrs={"cols": 100, "rows": 7})
-    )
-
-    datetime_start = forms.CharField(
-        widget=forms.HiddenInput(),
-        initial=datetime.now(pytz.utc).strftime("%Y-%m-%d %H:%M:%S.%f"),
     )
 
     def __init__(self, answer_choices, *args, **kwargs):
@@ -195,6 +189,9 @@ class AssignmentMultiselectForm(forms.Form):
                 num_student_rationales=num_student_rationales
             ).filter(Q(num_student_rationales=0))
 
+        # Add queryset to form object to keep logic in one spot
+        self.queryset = queryset
+
         self.fields["assignments"] = forms.ModelMultipleChoiceField(
             queryset=queryset,
             required=False,
@@ -300,10 +297,13 @@ class AddBlinkForm(forms.Form):
     blink = forms.ModelChoiceField(queryset=BlinkQuestion.objects.all())
 
 
-class SignUpForm(UserCreationForm):
+class SignUpForm(ModelForm):
     """Form to register a new user (teacher) with e-mail address.
 
     The clean method is overridden to add basic password validation."""
+
+    email = forms.CharField(label=_("Email address"))
+    username = forms.CharField(label=_("Username"))
 
     url = forms.URLField(
         label=_("Website"),
@@ -314,14 +314,6 @@ class SignUpForm(UserCreationForm):
             "faculty member and showing your e-mail address."
         ),
     )
-
-    def clean(self):
-        cleaned_data = super(SignUpForm, self).clean()
-        pwd = cleaned_data.get("password1")
-        if pwd:
-            password_validation.validate_password(pwd)
-
-        return cleaned_data
 
     class Meta:
         model = User
@@ -354,7 +346,13 @@ class DisciplineForm(forms.ModelForm):
 
 
 class DisciplineSelectForm(forms.Form):
-    discipline = forms.ModelChoiceField(queryset=Discipline.objects.all())
+    discipline = forms.ModelChoiceField(
+        queryset=Discipline.objects.all(),
+        help_text=_(
+            "Optional. Select the discipline to which this item should "
+            "be associated."
+        ),
+    )
 
 
 class DisciplinesSelectForm(forms.Form):
@@ -364,7 +362,13 @@ class DisciplinesSelectForm(forms.Form):
 
 
 class CategorySelectForm(forms.Form):
-    category = forms.ModelMultipleChoiceField(queryset=Category.objects.all())
+    category = forms.ModelMultipleChoiceField(
+        queryset=Category.objects.all(),
+        help_text=_(
+            "Type to search and select at least one category for this "
+            "question. You can select multiple categories."
+        ),
+    )
 
 
 class ReportSelectForm(forms.Form):
