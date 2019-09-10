@@ -20,7 +20,7 @@
     {% endif %}
 
     {{ form.non_field_errors }}
-
+  
     <form method="post">
       {% csrf_token %}
       <span class="mdc-typography--body1">{{ form.first_answer_choice.label }}</span>
