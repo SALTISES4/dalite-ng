@@ -7,7 +7,7 @@ from functional_tests.fixtures import *  # noqa
 from functional_tests.teacher.utils import accept_cookies, go_to_account, login
 
 
-TIME = 15
+TIME = 30
 
 
 def make_blink_script(browser, q):
@@ -65,24 +65,20 @@ def validate_teacher_page(browser, q):
     assert q.title in browser.find_element_by_tag_name("h2").text
 
 
-def validate_student_page(second_browser, q):
+def validate_student_page(some_browser, q):
     time.sleep(2)
-    assert (
-        "Blink Question" in second_browser.find_element_by_tag_name("h1").text
-    )
-    assert q.title in second_browser.find_element_by_tag_name("h2").text
-    assert len(second_browser.find_elements_by_class_name("mdc-radio")) > 0
+    assert "Blink Question" in some_browser.find_element_by_tag_name("h1").text
+    assert q.title in some_browser.find_element_by_tag_name("h2").text
+    assert len(some_browser.find_elements_by_class_name("mdc-radio")) > 0
 
 
-def answer_blink(second_browser, q, choice):
-    second_browser.find_elements_by_class_name("mdc-radio")[choice].click()
-    second_browser.find_element_by_id("submit-answer").click()
+def answer_blink(some_browser, q, choice):
+    some_browser.find_elements_by_class_name("mdc-radio")[choice].click()
+    some_browser.find_element_by_id("submit-answer").click()
 
-    assert (
-        "Blink Question" in second_browser.find_element_by_tag_name("h1").text
-    )
-    assert q.title in second_browser.find_element_by_tag_name("h2").text
-    assert len(second_browser.find_elements_by_class_name("mdc-radio")) == 0
+    assert "Blink Question" in some_browser.find_element_by_tag_name("h1").text
+    assert q.title in some_browser.find_element_by_tag_name("h2").text
+    assert len(some_browser.find_elements_by_class_name("mdc-radio")) == 0
 
 
 def test_blink_script(
@@ -196,20 +192,6 @@ def test_blink_multiple_students(
     answer_blink(fourth_browser, realistic_questions[0], 0)
     answer_blink(fifth_browser, realistic_questions[0], 0)
     assert browser.find_element_by_id("round").text == "1"
-    assert browser.find_element_by_id("counter").text == "4"
-
-    browser.find_element_by_id("reset_button").click()
-    validate_teacher_page(browser, realistic_questions[0])
-    validate_student_page(second_browser, realistic_questions[0])
-    validate_student_page(third_browser, realistic_questions[0])
-    validate_student_page(fourth_browser, realistic_questions[0])
-    validate_student_page(fifth_browser, realistic_questions[0])
-
-    answer_blink(second_browser, realistic_questions[0], 1)
-    answer_blink(third_browser, realistic_questions[0], 1)
-    answer_blink(fourth_browser, realistic_questions[0], 1)
-    answer_blink(fifth_browser, realistic_questions[0], 1)
-    assert browser.find_element_by_id("round").text == "2"
     assert browser.find_element_by_id("counter").text == "4"
 
     browser.find_element_by_id("next_button").click()

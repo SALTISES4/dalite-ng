@@ -40,14 +40,14 @@ def assert_():
     return fct
 
 
-@pytest.yield_fixture
-def browser(live_server):
+def create_browser(live_server, browser_id=1):
     if hasattr(settings, "TESTING_BROWSER"):
         browser = settings.TESTING_BROWSER.lower()
     else:
         browser = "firefox"
 
     options = webdriver.ChromeOptions()
+    # options.add_argument("--user-data-dir=/tmp/temp_user{}".format(browser_id))
     options.add_experimental_option("w3c", False)
 
     if hasattr(settings, "HEADLESS_TESTING") and settings.HEADLESS_TESTING:
@@ -128,13 +128,45 @@ def browser(live_server):
                 )
 
     driver.server_url = live_server.url
-    yield driver
-    driver.close()
+    return driver
+
+
+def close_browser(browser):
+    browser.close()
     if os.path.exists("geckodriver.log"):
         os.remove("geckodriver.log")
 
 
-second_browser = browser
-third_browser = browser
-fourth_browser = browser
-fifth_browser = browser
+@pytest.yield_fixture
+def browser(live_server):
+    browser = create_browser(live_server, 1)
+    yield browser
+    close_browser(browser)
+
+
+@pytest.yield_fixture
+def second_browser(live_server):
+    second_browser = create_browser(live_server, 2)
+    yield second_browser
+    close_browser(second_browser)
+
+
+@pytest.yield_fixture
+def third_browser(live_server):
+    third_browser = create_browser(live_server, 3)
+    yield third_browser
+    close_browser(third_browser)
+
+
+@pytest.yield_fixture
+def fourth_browser(live_server):
+    fourth_browser = create_browser(live_server, 4)
+    yield fourth_browser
+    close_browser(fourth_browser)
+
+
+@pytest.yield_fixture
+def fifth_browser(live_server):
+    fifth_browser = create_browser(live_server, 5)
+    yield fifth_browser
+    close_browser(fifth_browser)
