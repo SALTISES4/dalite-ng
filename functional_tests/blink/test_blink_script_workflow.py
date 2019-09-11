@@ -117,6 +117,8 @@ def test_blink_script(
 
     answer_blink(second_browser, realistic_questions[0], 0)
     assert browser.find_element_by_id("round").text == "1"
+    time.sleep(1)
+    assert browser.find_element_by_id("counter").text == "1"
 
     try:
         reset_btn = WebDriverWait(browser, TIME).until(
@@ -131,6 +133,8 @@ def test_blink_script(
 
     answer_blink(second_browser, realistic_questions[0], 1)
     assert browser.find_element_by_id("round").text == "2"
+    time.sleep(1)
+    assert browser.find_element_by_id("counter").text == "1"
 
     try:
         next_btn = WebDriverWait(browser, TIME).until(
@@ -145,6 +149,8 @@ def test_blink_script(
 
     answer_blink(second_browser, realistic_questions[1], 2)
     assert browser.find_element_by_id("round").text == "1"
+    time.sleep(1)
+    assert browser.find_element_by_id("counter").text == "1"
 
     try:
         next_btn = WebDriverWait(browser, TIME).until(
@@ -162,7 +168,7 @@ def test_blink_script(
     assert "My Account" in browser.find_element_by_tag_name("h1").text
 
 
-def blink_multiple_students(
+def test_blink_multiple_students(
     browser,
     second_browser,
     third_browser,
@@ -270,7 +276,7 @@ def blink_multiple_students(
     assert "My Account" in browser.find_element_by_tag_name("h1").text
 
 
-def blink_annoying_student(
+def test_blink_annoying_student(
     browser,
     second_browser,
     third_browser,
