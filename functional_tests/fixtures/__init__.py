@@ -28,7 +28,6 @@ __all__ = [
     "students",
     "teacher",
     "teachers",
-    "third_browser",
     "tos_student",
     "tos_teacher",
     "undistributed_assignment",

@@ -40,7 +40,7 @@ def assert_():
     return fct
 
 
-def create_browser(live_server, browser_id=1):
+def create_browser(live_server, browser_id=1, devtools=False):
     if hasattr(settings, "TESTING_BROWSER"):
         browser = settings.TESTING_BROWSER.lower()
     else:
@@ -49,7 +49,8 @@ def create_browser(live_server, browser_id=1):
     options = webdriver.ChromeOptions()
     # options.add_argument("--user-data-dir=/tmp/temp_user{}".format(browser_id))
     options.add_experimental_option("w3c", False)
-    options.add_argument("auto-open-devtools-for-tabs")
+    if devtools:
+        options.add_argument("auto-open-devtools-for-tabs")
 
     if hasattr(settings, "HEADLESS_TESTING") and settings.HEADLESS_TESTING:
         os.environ["MOZ_HEADLESS"] = "1"
@@ -140,34 +141,34 @@ def close_browser(browser):
 
 @pytest.yield_fixture
 def browser(live_server):
-    browser = create_browser(live_server, 1)
+    browser = create_browser(live_server, 1, devtools=False)
     yield browser
     close_browser(browser)
 
 
 @pytest.yield_fixture
 def second_browser(live_server):
-    second_browser = create_browser(live_server, 2)
+    second_browser = create_browser(live_server, 2, devtools=True)
     yield second_browser
     close_browser(second_browser)
 
 
 @pytest.yield_fixture
 def third_browser(live_server):
-    third_browser = create_browser(live_server, 3)
+    third_browser = create_browser(live_server, 3, devtools=True)
     yield third_browser
     close_browser(third_browser)
 
 
 @pytest.yield_fixture
 def fourth_browser(live_server):
-    fourth_browser = create_browser(live_server, 4)
+    fourth_browser = create_browser(live_server, 4, devtools=True)
     yield fourth_browser
     close_browser(fourth_browser)
 
 
 @pytest.yield_fixture
 def fifth_browser(live_server):
-    fifth_browser = create_browser(live_server, 5)
+    fifth_browser = create_browser(live_server, 5, devtools=True)
     yield fifth_browser
     close_browser(fifth_browser)
