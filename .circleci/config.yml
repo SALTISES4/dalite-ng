@@ -42,7 +42,7 @@ jobs:
             echo 'PIWIK_SITE_ID = "1"' >> dalite/local_settings.py
             echo 'PASSWORD_GENERATOR_NONCE = "secret key"' >> dalite/local_settings.py
             echo 'import os' >> dalite/local_settings.py
-            echo 'DEBUG = FALSE' >> dalite/local_settings.py
+            echo 'DEBUG = False' >> dalite/local_settings.py
 
             echo 'BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))' >> dalite/local_settings.py
             echo 'EMAIL_SUBJECT_PREFIX = "SALTISE/S4 @ Dawson College: "' >> dalite/local_settings.py
