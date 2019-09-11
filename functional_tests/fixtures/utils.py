@@ -47,7 +47,6 @@ def create_browser(live_server, browser_id=1, devtools=False):
         browser = "firefox"
 
     options = webdriver.ChromeOptions()
-    # options.add_argument("--user-data-dir=/tmp/temp_user{}".format(browser_id))
     options.add_experimental_option("w3c", False)
     if devtools:
         options.add_argument("auto-open-devtools-for-tabs")

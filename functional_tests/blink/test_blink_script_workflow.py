@@ -69,25 +69,25 @@ def validate_teacher_page(browser, q):
     assert q.title in browser.find_element_by_tag_name("h2").text
 
 
-def validate_student_page(some_browser, q):
+def validate_student_page(browser, q):
     time.sleep(2)
-    assert "Blink Question" in some_browser.find_element_by_tag_name("h1").text
-    assert q.title in some_browser.find_element_by_tag_name("h2").text
+    assert "Blink Question" in browser.find_element_by_tag_name("h1").text
+    assert q.title in browser.find_element_by_tag_name("h2").text
 
 
-def answer_late_blink(some_browser, q, choice):
-    some_browser.find_elements_by_class_name("mdc-radio")[choice].click()
-    some_browser.find_element_by_id("submit-answer").click()
+def answer_late_blink(browser, q, choice):
+    browser.find_elements_by_class_name("mdc-radio")[choice].click()
+    browser.find_element_by_id("submit-answer").click()
 
-    assert "Blink" in some_browser.find_element_by_tag_name("h1").text
+    assert "Blink" in browser.find_element_by_tag_name("h1").text
 
 
-def answer_blink(some_browser, q, choice):
-    some_browser.find_elements_by_class_name("mdc-radio")[choice].click()
-    some_browser.find_element_by_id("submit-answer").click()
+def answer_blink(browser, q, choice):
+    browser.find_elements_by_class_name("mdc-radio")[choice].click()
+    browser.find_element_by_id("submit-answer").click()
 
-    assert "Blink Question" in some_browser.find_element_by_tag_name("h1").text
-    assert q.title in some_browser.find_element_by_tag_name("h2").text
+    assert "Blink Question" in browser.find_element_by_tag_name("h1").text
+    assert q.title in browser.find_element_by_tag_name("h2").text
 
 
 def test_blink_script(
@@ -119,7 +119,14 @@ def test_blink_script(
     assert browser.find_element_by_id("round").text == "1"
     assert browser.find_element_by_id("counter").text == "1"
 
-    browser.find_element_by_id("reset_button").click()
+    try:
+        reset_btn = WebDriverWait(browser, TIME).until(
+            EC.element_to_be_clickable((By.ID, "reset_button"))
+        )
+        time.sleep(1)
+        reset_btn.click()
+    except NoSuchElementException:
+        pass
     validate_teacher_page(browser, realistic_questions[0])
     validate_student_page(second_browser, realistic_questions[0])
 
