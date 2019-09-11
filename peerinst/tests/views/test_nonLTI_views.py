@@ -1028,7 +1028,6 @@ class TeacherTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-        print(response)
         self.assertContains(
             response,
             '<form enctype="multipart/form-data" id="collection-update-form" method="post">',  # noqa
