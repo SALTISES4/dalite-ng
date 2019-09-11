@@ -69,7 +69,6 @@ def validate_student_page(some_browser, q):
     time.sleep(2)
     assert "Blink Question" in some_browser.find_element_by_tag_name("h1").text
     assert q.title in some_browser.find_element_by_tag_name("h2").text
-    assert len(some_browser.find_elements_by_class_name("mdc-radio")) > 0
 
 
 def answer_blink(some_browser, q, choice):
@@ -78,7 +77,6 @@ def answer_blink(some_browser, q, choice):
 
     assert "Blink Question" in some_browser.find_element_by_tag_name("h1").text
     assert q.title in some_browser.find_element_by_tag_name("h2").text
-    assert len(some_browser.find_elements_by_class_name("mdc-radio")) == 0
 
 
 def test_blink_script(

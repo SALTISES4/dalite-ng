@@ -39,6 +39,7 @@
 
     {% else %}
     <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Waiting for teacher' %}</h2>
+    <div id="empty"></div>
     {% endif %}
 
   </section>
@@ -50,22 +51,25 @@
 {{ block.super }}
 {% if not request.user.is_authenticated %}
 <script nonce="{{ request.csp_nonce }}">
-function processResponse(response, status, obj) {
-  const action = response["action"];
+  function processResponse(response, status, obj) {
+    console.info(response);
 
-  if (action !== "stop") {
-    if (status === "success" & window.location.pathname != action) {
-      clearInterval(status);
-      window.location = action;
+    const action = response["action"];
+
+    if (action !== "stop") {
+      if (status === "success" & window.location.pathname != action) {
+        clearInterval(status);
+        window.location = action;
+      }
     }
   }
-}
 
-function checkURL() {
-  $.get("{% url 'blink-get-current-url' username=teacher.user.username %}", processResponse);
-}
+  function checkURL() {
+    console.info('Checking status of teacher...');
+    $.get("{% url 'blink-get-current-url' username=teacher.user.username %}", processResponse);
+  }
 
-const status = window.setInterval(checkURL, 1000);
+  const status = window.setInterval(checkURL, 1000);
 </script>
 {% endif %}
 {% endblock %}
