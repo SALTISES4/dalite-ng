@@ -53,7 +53,8 @@ def new_student_group_assignments(n, groups, assignments, due_date=None):
                 "group": random.choice(groups),
                 "assignment": random.choice(assignments),
                 "due_date": due_date,
-                "distribution_date": datetime.now(pytz.utc),
+                "distribution_date": datetime.now(pytz.utc)
+                - timedelta(days=random.randint(1, 6)),
             }
 
     gen = generator(groups, assignments, due_date)

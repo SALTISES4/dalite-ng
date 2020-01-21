@@ -9,19 +9,18 @@ from peerinst.models import (
     StudentGroupMembership,
     StudentNotification,
 )
-from peerinst.tests.generators import add_answers, new_student_assignments
+from peerinst.tests.fixtures.student.generators import new_student_assignments
+from peerinst.tests.fixtures import add_answers
 from peerinst.models import Assignment
 
-from .fixtures import *  # noqa F403
 
-
-def test_new_student_assignment(student, group_assignment):
-    data = new_student_assignments(1, group_assignment, student)[0]
+def test_new_student_assignment(student, student_group_assignment):
+    data = new_student_assignments(1, student_group_assignment, student)[0]
 
     assignment = StudentAssignment.objects.create(**data)
     assert isinstance(assignment, StudentAssignment)
     assert assignment.student == student
-    assert assignment.group_assignment == group_assignment
+    assert assignment.group_assignment == student_group_assignment
 
 
 def test_send_email__new_assignment(student_assignment):
@@ -154,17 +153,13 @@ def test_get_current_question__some_first_answers_done(student_assignment):
     student = student_assignment.student
     questions = student_assignment.group_assignment.questions
     n_done = random.randrange(1, len(questions))
+
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": student_assignment.group_assignment.assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-            }
-            for question in questions[:n_done]
-        ]
+        student,
+        questions[:n_done],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=False,
     )
 
     question = student_assignment.get_current_question()
@@ -174,17 +169,13 @@ def test_get_current_question__some_first_answers_done(student_assignment):
 def test_get_current_question__all_first_answers_done(student_assignment):
     student = student_assignment.student
     questions = student_assignment.group_assignment.questions
+
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": student_assignment.group_assignment.assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-            }
-            for question in questions
-        ]
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=False,
     )
 
     question = student_assignment.get_current_question()
@@ -195,31 +186,21 @@ def test_get_current_question__some_second_answers_done(student_assignment):
     student = student_assignment.student
     questions = student_assignment.group_assignment.questions
     n_second = random.randrange(1, len(questions))
+
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": student_assignment.group_assignment.assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-            }
-            for question in questions[n_second:]
-        ]
+        student,
+        questions[n_second:],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=False,
     )
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": student_assignment.group_assignment.assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-                "second_answer_choice": 1,
-                "chosen_rationale": None,
-            }
-            for question in questions[:n_second]
-        ]
+        student,
+        questions[:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
     )
 
     question = student_assignment.get_current_question()
@@ -231,18 +212,12 @@ def test_get_current_question__all_second_answers_done(student_assignment):
     questions = student_assignment.group_assignment.questions
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": student_assignment.group_assignment.assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-                "second_answer_choice": 1,
-                "chosen_rationale": None,
-            }
-            for question in questions
-        ]
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
     )
 
     question = student_assignment.get_current_question()
@@ -388,18 +363,12 @@ def test_send_reminder__completed(student_assignment):
     student = student_assignment.student
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-                "second_answer_choice": 1,
-                "chosen_rationale": None,
-            }
-            for i, question in enumerate(questions)
-        ]
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
     )
 
     assert not student_assignment.reminder_sent
@@ -456,16 +425,11 @@ def test_completed__some_first_answers(student_assignment):
     n_first = random.randint(1, n - 1)
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-            }
-            for i, question in enumerate(questions[:n_first])
-        ]
+        student,
+        questions[:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=False,
     )
 
     assert not student_assignment.completed
@@ -480,28 +444,19 @@ def test_completed__some_first_and_second_answers(student_assignment):
     n_second = random.randint(1, n_first)
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-                "second_answer_choice": 1,
-                "chosen_rationale": None,
-            }
-            for i, question in enumerate(questions[:n_second])
-        ]
-        + [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-            }
-            for i, question in enumerate(questions[n_second:n_first])
-        ]
+        student,
+        questions[:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+    )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=False,
     )
 
     assert not student_assignment.completed
@@ -515,28 +470,19 @@ def test_completed__all_first_and_some_second_answers(student_assignment):
     n_second = random.randint(1, n - 1)
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-                "second_answer_choice": 1,
-                "chosen_rationale": None,
-            }
-            for i, question in enumerate(questions[:n_second])
-        ]
-        + [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-            }
-            for i, question in enumerate(questions[n_second:])
-        ]
+        student,
+        questions[n_second:],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=False,
+    )
+    add_answers(
+        student,
+        questions[:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
     )
 
     assert not student_assignment.completed
@@ -548,18 +494,12 @@ def test_completed__all_first_and_second_answers(student_assignment):
     student = student_assignment.student
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-                "second_answer_choice": 1,
-                "chosen_rationale": None,
-            }
-            for i, question in enumerate(questions)
-        ]
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
     )
 
     assert student_assignment.completed
@@ -571,18 +511,12 @@ def test_completed__multiple_same_assignment(student_assignment):
     student = student_assignment.student
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-                "second_answer_choice": 1,
-                "chosen_rationale": None,
-            }
-            for i, question in enumerate(questions)
-        ]
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
     )
 
     assert student_assignment.completed
@@ -594,16 +528,11 @@ def test_completed__multiple_same_assignment(student_assignment):
         assignment_clone.questions.add(question)
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-            }
-            for i, question in enumerate(questions)
-        ]
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=False,
     )
 
     assert not student_assignment.completed
@@ -631,18 +560,12 @@ def test_results__all_answered_correct(student_assignment):
     n = len(questions)
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-                "second_answer_choice": 1,
-                "chosen_rationale": None,
-            }
-            for question in questions
-        ]
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
     )
 
     correct = {
@@ -666,29 +589,29 @@ def test_results__some_answered_correct_second(student_assignment):
     n_correct_second = random.randint(1, n_second)
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 2,
-                "rationale": "test",
-            }
-            for i, question in enumerate(questions[n_second:])
-        ]
-        + [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 2,
-                "rationale": "test",
-                "second_answer_choice": 1 + (i >= n_correct_second),
-                "chosen_rationale": None,
-            }
-            for i, question in enumerate(questions[:n_second])
-        ]
+        student,
+        questions[n_second:],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=False,
     )
+    add_answers(
+        student,
+        questions[:n_correct_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=True,
+    )
+    add_answers(
+        student,
+        questions[n_correct_second:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+    )
+
     correct = {
         "n_completed": n_second,
         "n_first_correct": 0,
@@ -706,35 +629,43 @@ def test_results__some_answered_correct_first_and_second(student_assignment):
     questions = assignment.questions.all()
     student = student_assignment.student
     n = len(questions)
-    n_first = random.randint(1, n - 1)
-    n_second = random.randint(1, n_first)
-    n_correct_first = random.randint(1, n_first)
-    n_correct_second = random.randint(1, n_second)
+    n_first = random.randint(4, n - 1)
+    n_second = random.randint(3, n_first)
+    n_correct_first = random.randint(2, n_second)
+    n_correct_second = random.randint(1, n_correct_first)
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1 + (i >= n_correct_first),
-                "rationale": "test",
-                "second_answer_choice": 1 + (i >= n_correct_second),
-                "chosen_rationale": None,
-            }
-            for i, question in enumerate(questions[:n_second])
-        ]
-        + [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1 + (i >= n_correct_first - n_second),
-                "rationale": "test",
-            }
-            for i, question in enumerate(questions[n_second:n_first])
-        ]
+        student,
+        questions[:n_correct_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
     )
+    add_answers(
+        student,
+        questions[n_correct_second:n_correct_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_correct_first:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=False,
+    )
+
     correct = {
         "n_completed": n_second,
         "n_first_correct": n_correct_first,
@@ -758,29 +689,21 @@ def test_results__all_answered_correct_first_and_none_second(
     n_second = random.randint(1, n_first)
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-                "second_answer_choice": 2,
-                "chosen_rationale": None,
-            }
-            for i, question in enumerate(questions[:n_second])
-        ]
-        + [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 1,
-                "rationale": "test",
-            }
-            for i, question in enumerate(questions[n_second:n_first])
-        ]
+        student,
+        questions[:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=False,
     )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=False,
+    )
+
     correct = {
         "n_completed": n_second,
         "n_first_correct": n_first,
@@ -804,29 +727,21 @@ def test_results__none_answered_correct_first_and_all_second(
     n_second = random.randint(1, n_first)
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 2,
-                "rationale": "test",
-                "second_answer_choice": 1,
-                "chosen_rationale": None,
-            }
-            for i, question in enumerate(questions[:n_second])
-        ]
-        + [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 2,
-                "rationale": "test",
-            }
-            for i, question in enumerate(questions[n_second:n_first])
-        ]
+        student,
+        questions[:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=True,
     )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=False,
+    )
+
     correct = {
         "n_completed": n_second,
         "n_first_correct": 0,
@@ -848,29 +763,21 @@ def test_results__none_answered_correct_first_and_second(student_assignment):
     n_second = random.randint(1, n_first)
 
     add_answers(
-        [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 2,
-                "rationale": "test",
-                "second_answer_choice": 2,
-                "chosen_rationale": None,
-            }
-            for i, question in enumerate(questions[:n_second])
-        ]
-        + [
-            {
-                "question": question,
-                "assignment": assignment,
-                "user_token": student.student.username,
-                "first_answer_choice": 2,
-                "rationale": "test",
-            }
-            for i, question in enumerate(questions[n_second:n_first])
-        ]
+        student,
+        questions[:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
     )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=False,
+    )
+
     correct = {
         "n_completed": n_second,
         "n_first_correct": 0,
@@ -881,3 +788,744 @@ def test_results__none_answered_correct_first_and_second(student_assignment):
 
     result = student_assignment.results
     assert result == correct
+
+
+def test_grade__no_answers(student_assignment):
+    assert not student_assignment.grade
+
+
+def test_grade__all_answered_correct(student_assignment):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+    )
+
+    assert student_assignment.grade == n
+
+
+def test_grade__some_answered_correct_second(student_assignment):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_second = random.randint(1, n - 1)
+    n_correct_second = random.randint(1, n_second)
+
+    add_answers(
+        student,
+        questions[:n_correct_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=True,
+    )
+    add_answers(
+        student,
+        questions[n_correct_second:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_second:],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=False,
+    )
+
+    assert student_assignment.grade == float(n_correct_second) / 2
+
+
+def test_grade__some_answered_correct_first_and_second(student_assignment):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(4, n - 1)
+    n_second = random.randint(3, n_first)
+    n_correct_first = random.randint(2, n_second)
+    n_correct_second = random.randint(1, n_correct_first)
+
+    add_answers(
+        student,
+        questions[:n_correct_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+    )
+    add_answers(
+        student,
+        questions[n_correct_second:n_correct_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_correct_second:n_correct_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_correct_first:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=False,
+    )
+
+    assert student_assignment.grade == n_correct_second + 0.5 * (
+        n_correct_first - n_correct_second
+    )
+
+
+def test_grade__all_answered_correct_first_and_none_second(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+
+    add_answers(
+        student,
+        questions[:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=False,
+    )
+
+    assert student_assignment.grade == float(n_first) / 2
+
+
+def test_grade__none_answered_correct_first_and_all_second(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+
+    add_answers(
+        student,
+        questions[:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=True,
+    )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=False,
+    )
+
+    assert student_assignment.grade == float(n_second) / 2
+
+
+def test_grade__none_answered_correct_first_and_second(student_assignment):
+    print(student_assignment.group_assignment.distribution_date)
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+
+    add_answers(
+        student,
+        questions[:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=False,
+    )
+
+
+def test_grade__other_assignments__no_answers(student_assignment):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=2)
+    new_datetime = now + timedelta(weeks=2)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=1
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=old_datetime,
+    )
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=new_datetime,
+    )
+
+    assert not student_assignment.grade
+
+
+def test_grade__other_assignments__all_answered_correct(student_assignment):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=2)
+    new_datetime = now + timedelta(weeks=2)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=1
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+        datetime_start=old_datetime,
+    )
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+        datetime_start=new_datetime,
+    )
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+    )
+
+    assert student_assignment.grade == n
+
+
+def test_grade__other_assignments__some_answered_correct_second(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_second = random.randint(1, n - 1)
+    n_correct_second = random.randint(1, n_second)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=2)
+    new_datetime = now + timedelta(weeks=2)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=1
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=old_datetime,
+    )
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=new_datetime,
+    )
+
+    add_answers(
+        student,
+        questions[:n_correct_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=True,
+    )
+    add_answers(
+        student,
+        questions[n_correct_second:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_second:],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=False,
+    )
+
+    assert student_assignment.grade == float(n_correct_second) / 2
+
+
+def test_grade__other_assignments__some_answered_correct_first_and_second(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(4, n - 1)
+    n_second = random.randint(3, n_first)
+    n_correct_first = random.randint(2, n_second)
+    n_correct_second = random.randint(1, n_correct_first)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=2)
+    new_datetime = now + timedelta(weeks=2)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=1
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=old_datetime,
+    )
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=new_datetime,
+    )
+
+    add_answers(
+        student,
+        questions[:n_correct_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+    )
+    add_answers(
+        student,
+        questions[n_correct_second:n_correct_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_correct_first:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=False,
+    )
+
+    assert student_assignment.grade == n_correct_second + 0.5 * (
+        n_correct_first - n_correct_second
+    )
+
+
+def test_grade__other_assignments__all_answered_correct_first_and_none_second(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=2)
+    new_datetime = now + timedelta(weeks=2)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=1
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=old_datetime,
+    )
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=new_datetime,
+    )
+
+    add_answers(
+        student,
+        questions[:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=False,
+    )
+
+    assert student_assignment.grade == float(n_first) / 2
+
+
+def test_grade__other_assignments__none_answered_correct_first_and_all_second(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=2)
+    new_datetime = now + timedelta(weeks=2)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=1
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=old_datetime,
+    )
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=new_datetime,
+    )
+
+    add_answers(
+        student,
+        questions[:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=True,
+    )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=False,
+    )
+
+    assert student_assignment.grade == float(n_second) / 2
+
+
+def test_grade__other_assignments__none_answered_correct_first_and_second(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=2)
+    new_datetime = now + timedelta(weeks=2)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=1
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=old_datetime,
+    )
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=new_datetime,
+    )
+
+    add_answers(
+        student,
+        questions[:n_second],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+    )
+    add_answers(
+        student,
+        questions[n_second:n_first],
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=False,
+    )
+
+    assert not student_assignment.grade
+
+
+def test_grade__other_assignments__same_time__old_correct_new_incorrect(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=1)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=2
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=old_datetime,
+    )
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+    )
+
+    assert student_assignment.grade == n
+
+
+def test_grade__other_assignments__same_time__old_incorrect_new_correct(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=1)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=2
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+        datetime_start=old_datetime,
+    )
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+    )
+
+    assert student_assignment.grade == n
+
+
+def test_grade__other_assignments__same_time__both_correct(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=1)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=2
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=old_datetime,
+    )
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+    )
+
+    assert student_assignment.grade == n
+
+
+def test_grade__other_assignments__same_time__both_incorrect(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=1)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=2
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+        datetime_start=old_datetime,
+    )
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+    )
+
+    assert not student_assignment.grade

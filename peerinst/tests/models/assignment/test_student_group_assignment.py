@@ -289,6 +289,7 @@ def test_student_progress__some_first_answers_done(
                 "user_token": student.student.username,
                 "first_answer_choice": 1 + (i >= n_correct[question.pk]),
                 "rationale": "test",
+                "datetime_start": datetime.now(pytz.utc),
             }
             for question in questions
             for i, student in enumerate(
@@ -331,6 +332,7 @@ def test_student_progress__all_first_answers_done(
                 "user_token": student.student.username,
                 "first_answer_choice": 1 + (i >= n_correct[question.pk]),
                 "rationale": "test",
+                "datetime_start": datetime.now(pytz.utc),
             }
             for question in questions
             for i, student in enumerate(students_with_assignment)
@@ -385,6 +387,7 @@ def test_student_progress__some_second_answers_done(
                     >= n_first_correct[question.pk]
                 ),
                 "rationale": "test",
+                "datetime_start": datetime.now(pytz.utc),
             }
             for question in questions
             for i, student in enumerate(
@@ -409,6 +412,7 @@ def test_student_progress__some_second_answers_done(
                 "chosen_rationale": random.choice(
                     [a for a in answers if a.question == question]
                 ),
+                "datetime_start": datetime.now(pytz.utc),
             }
             for question in questions
             for i, student in enumerate(
@@ -458,6 +462,7 @@ def test_student_progress__all_second_answers_done(
                 "second_answer_choice": 1
                 + (i >= n_second_correct[question.pk]),
                 "chosen_rationale": None,
+                "datetime_start": datetime.now(pytz.utc),
             }
             for question in questions
             for i, student in enumerate(students_with_assignment)
@@ -529,6 +534,7 @@ def test_student_progress__all_answers_correct_some_first_answers_done(
                 "user_token": student.student.username,
                 "first_answer_choice": 1 + (i >= n_correct[question.pk]),
                 "rationale": "test",
+                "datetime_start": datetime.now(pytz.utc),
             }
             for question in questions_all_answers_correct
             for i, student in enumerate(
@@ -581,6 +587,7 @@ def test_student_progress__all_answers_correct_all_first_answers_done(
                 "user_token": student.student.username,
                 "first_answer_choice": 1 + (i >= n_correct[question.pk]),
                 "rationale": "test",
+                "datetime_start": datetime.now(pytz.utc),
             }
             for question in questions_all_answers_correct
             for i, student in enumerate(
@@ -644,6 +651,7 @@ def test_student_progress__all_answers_correct_some_second_answers_done(
                     >= n_first_correct[question.pk]
                 ),
                 "rationale": "test",
+                "datetime_start": datetime.now(pytz.utc),
             }
             for question in questions_all_answers_correct
             for i, student in enumerate(
@@ -668,6 +676,7 @@ def test_student_progress__all_answers_correct_some_second_answers_done(
                 "chosen_rationale": random.choice(
                     [a for a in answers if a.question == question]
                 ),
+                "datetime_start": datetime.now(pytz.utc),
             }
             for question in questions_all_answers_correct
             for i, student in enumerate(
@@ -731,6 +740,7 @@ def test_student_progress__all_answers_correct_all_second_answers_done(
                 "second_answer_choice": 1
                 + (i >= n_second_correct[question.pk]),
                 "chosen_rationale": None,
+                "datetime_start": datetime.now(pytz.utc),
             }
             for question in questions_all_answers_correct
             for i, student in enumerate(

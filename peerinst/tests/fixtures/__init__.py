@@ -30,6 +30,7 @@ __all__ = [
     "student_group_assignments",
     "student_new",
     "students",
+    "students_with_assignment",
     "teacher",
     "teachers",
     "thread",
@@ -71,6 +72,7 @@ from .student import (
     student_assignments,
     student_new,
     students,
+    students_with_assignment,
 )
 from .teacher import teacher, teachers
 from .tos import tos_student, tos_teacher

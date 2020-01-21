@@ -1,7 +1,9 @@
 import pytest
 
-from ..assignment import student_group_assignment  # noqa
-from ..assignment import student_group_assignments  # noqa
+from ..assignment import (  # noqa
+    student_group_assignment,
+    student_group_assignments,
+)
 from ..tos import consent_to_tos, tos_student  # noqa
 from .generators import (
     add_student_assignments,
@@ -9,6 +11,7 @@ from .generators import (
     new_student_assignments,
     new_students,
 )
+from .utils import add_to_group
 
 
 @pytest.fixture
@@ -52,3 +55,15 @@ def student_assignments(students, student_group_assignments):
             students,
         )
     )
+
+
+@pytest.fixture
+def students_with_assignment(student_group_assignment):
+    students = add_students(new_students(20))
+    add_to_group(students, student_group_assignment.group)
+    add_student_assignments(
+        new_student_assignments(
+            len(students), student_group_assignment, students
+        )
+    )
+    return students

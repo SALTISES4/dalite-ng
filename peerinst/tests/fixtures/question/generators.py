@@ -10,6 +10,7 @@ def new_questions(n, teacher):
                 "title": "question{}".format(i),
                 "text": "question{}".format(i),
                 "user": teacher.user,
+                "grading_scheme": 1,
             }
 
     gen = generator()

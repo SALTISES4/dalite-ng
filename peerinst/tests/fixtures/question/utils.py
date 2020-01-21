@@ -12,6 +12,9 @@ def add_answers(
     correct_first=True,
     answer_second=True,
     correct_second=True,
+    datetime_start=None,
+    datetime_first=None,
+    datetime_second=None,
 ):
     if not hasattr(questions, "__iter__"):
         questions = [questions]
@@ -29,8 +32,14 @@ def add_answers(
             assignment=assignment,
             user_token=student.student.username,
             first_answer_choice=2 - correct_first,
-            second_answer_choice=2 - correct_second,
-            datetime_start=datetime.now(pytz.utc),
-            datetime_first=datetime.now(pytz.utc),
-            datetime_second=datetime.now(pytz.utc),
+            second_answer_choice=2 - correct_second if answer_second else None,
+            datetime_start=datetime.now(pytz.utc)
+            if datetime_start is None
+            else datetime_start,
+            datetime_first=datetime.now(pytz.utc)
+            if datetime_first is None
+            else datetime_first,
+            datetime_second=datetime.now(pytz.utc)
+            if datetime_second is None
+            else datetime_second,
         )

@@ -6,6 +6,7 @@ __all__ = [
     "student_assignments",
     "student_new",
     "students",
+    "students_with_assignment",
 ]
 
 from .fixtures import (
@@ -14,5 +15,6 @@ from .fixtures import (
     student_assignments,
     student_new,
     students,
+    students_with_assignment,
 )
 from .utils import add_to_group, login_student
