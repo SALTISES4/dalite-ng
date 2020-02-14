@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-
-
 import base64
 import hashlib
 import logging
 from datetime import timedelta
+from typing import Tuple
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -131,13 +129,16 @@ def authenticate_student(req, token):
     return user, is_lti
 
 
-def get_student_username_and_password(email, max_username_length=30):
-    key = settings.SECRET_KEY
+def get_student_username_and_password(
+    email, max_username_length=30
+) -> Tuple[str, str]:
+    if hasattr(settings, "PASSWORD_KEY"):
+        key = settings.PASSWORD_KEY
+    else:
+        key = settings.SECRET_KEY
 
     username = hashlib.md5(email.encode()).hexdigest()[:max_username_length]
-    password = hashlib.md5(
-        ("{}:{}".format(username, key)).encode()
-    ).hexdigest()
+    password = generate_password(username, key)
 
     return username, password
 
@@ -188,3 +189,7 @@ def get_lti_passwords(hashed_username):
     passwords = [hashlib.md5(u + key).digest() for u in usernames]
 
     return passwords
+
+
+def generate_password(username: str, key: str) -> str:
+    return hashlib.md5(("{}:{}".format(username, key)).encode()).hexdigest()

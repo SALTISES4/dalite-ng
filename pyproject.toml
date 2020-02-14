@@ -5,3 +5,10 @@ exclude = '''
     \.git
 /)
 '''
+
+[tool.coverage.run]
+source = ["dalite", "peerinst", "quality", "tos"]
+omit = ["*/tests/*", "*/migrations/*"]
+
+[tool.coverage.report]
+show_missing = true

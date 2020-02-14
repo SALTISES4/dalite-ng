@@ -8,3 +8,9 @@ ignore = D100 \  # missing docstring in module
          W503 \  # linebreak before binary operator
          W504 \  # linebreak after binary operator
          F841 \  # local variable 'instances' is assigned to but never used
+select = B,B9,BLK,C,D,F,F,S,W
+application-import-names = peerinst,dalite,reputation,quality,tos,analytics
+import-order-style = google
+max-line-length = 79
+per-file-ignores = */tests/*:S101
+docstring-convention = numpy
