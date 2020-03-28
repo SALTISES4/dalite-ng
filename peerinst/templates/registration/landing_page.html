@@ -123,7 +123,16 @@ if (desktop) {
     <h1 class="mdc-typography--display3 mdc-theme--background">{% trans 'A Guided Tour' %}
       <svg class="underline" width=150 height=4></svg>
     </h1>
-    <div id="player" class="embedded-video"></div>
+    <div id="player-1" class="embedded-video"></div>
+  </section>
+
+  <section>
+    <h1 class="mdc-typography--display3 mdc-theme--background">{% trans 'Tutorials' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
+    <div id="player-2" class="small-embedded-video"></div>
+    <div id="player-3" class="small-embedded-video"></div>
+    <div id="player-4" class="small-embedded-video"></div>
   </section>
 
   <section>
@@ -1455,33 +1464,62 @@ window.addEventListener('resize', pillars);
 </script>
 
 <script nonce="{{ request.csp_nonce }}">
+
 // Async load video as per API
 // https://developers.google.com/youtube/iframe_api_reference#Loading_a_Video_Player
-var tag = document.createElement('script');
+let tag = document.createElement('script');
 tag.setAttribute("nonce", "{{ request.csp_nonce }}");
 tag.src = "https://www.youtube.com/iframe_api?enablejsapi=1&origin="+window.location.origin;
-var firstScriptTag = document.getElementsByTagName('script')[0];
+let firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-var player;
-var ytWidth = Math.min(700,document.querySelector("section").offsetWidth-30);
-var ytHeight = 315/560*ytWidth;
+let player1, player2, player3, player4;
+const ytWidth = Math.min(700,document.querySelector("section").offsetWidth-30);
+const ytHeight = 315/560*ytWidth;
 function onYouTubeIframeAPIReady() {
-  player = new YT.Player('player', {
+  player1 = new YT.Player('player-1', {
     height: ytHeight,
     width: ytWidth,
     videoId: '0tJVVy2ay7c',
     playerVars: {
-      playlist: '0tJVVy2ay7c',
+      playlist: '',
+      loop: 1,
+    }
+  });
+  player2 = new YT.Player('player-2', {
+    height: ytHeight/3,
+    width: ytWidth/3,
+    videoId: 'JP0TE24MX50',
+    playerVars: {
+      playlist: '',
+      loop: 1,
+    }
+  });
+  player3 = new YT.Player('player-3', {
+    height: ytHeight/3,
+    width: ytWidth/3,
+    videoId: 'oOd87b6lGjc',
+    playerVars: {
+      playlist: '',
+      loop: 1,
+    }
+  });
+  player4 = new YT.Player('player-4', {
+    height: ytHeight/3,
+    width: ytWidth/3,
+    videoId: 'CN3ynmvnfeI&t=',
+    playerVars: {
+      playlist: '',
       loop: 1,
     }
   });
 }
+
 window.addEventListener("resize", function() {
-  var yt = document.querySelector('#player');
+  var yt = document.querySelector('#player-1');
   var w = Math.min(700,document.querySelector("section").offsetWidth-30);
   yt.setAttribute("width",w);
   yt.setAttribute("height",315/560*w);
-})
+});
 
 // IE11 sticky patch
 // Assumes style reverts to position:relative if sticky is unsupported
