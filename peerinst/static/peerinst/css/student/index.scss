@@ -115,6 +115,11 @@ i {
   }
 }
 
+.group-review-button {
+  cursor: pointer;
+  transform: translate(-5px, 4px);
+}
+
 #student-groups {
   display: flex;
   flex-direction: row;

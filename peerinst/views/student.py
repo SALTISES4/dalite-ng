@@ -5,17 +5,20 @@ import re
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_POST, require_safe
-
 from dalite.views.errors import response_400, response_403
+from django.views.generic import DetailView
 from tos.models import Consent
 
+from ..mixins import LoginRequiredMixin
 from ..models import (
+    Answer,
     Student,
     StudentAssignment,
     StudentGroup,
@@ -32,6 +35,66 @@ from ..students import (
 from .decorators import student_required
 
 logger = logging.getLogger("peerinst-views")
+
+
+class StudentGroupReviewDetailView(LoginRequiredMixin, DetailView):
+    model = StudentGroup
+    template_name = "peerinst/student/review.html"
+
+    def dispatch(self, *args, **kwargs):
+        student = get_object_or_404(Student, student=self.request.user)
+        if StudentGroupMembership.objects.filter(
+            student=student, group=self.get_object()
+        ):
+            return super(StudentGroupReviewDetailView, self).dispatch(
+                *args, **kwargs
+            )
+        else:
+            raise PermissionDenied
+
+    def get_context_data(self, **kwargs):
+        context = super(StudentGroupReviewDetailView, self).get_context_data(
+            **kwargs
+        )
+        student_group = self.get_object()
+        student = get_object_or_404(Student, student=self.request.user)
+        student_assignments = StudentAssignment.objects.filter(
+            student=student, group_assignment__group=student_group
+        ).order_by("-group_assignment__due_date")
+        student_assignments_dict = [
+            {
+                "completed": student_assignment.completed,
+                "title": student_assignment.group_assignment.assignment.title,
+                "show_correct_answers": student_assignment.group_assignment.show_correct_answers,
+                "questions": [
+                    (
+                        question,
+                        Answer.objects.filter(
+                            expert=True, show_to_others=True, question=question
+                        ).first()
+                        if Answer.objects.filter(
+                            expert=True, show_to_others=True, question=question
+                        )
+                        else None,
+                        Answer.objects.filter(
+                            question=question,
+                            user_token=self.request.user.username,
+                            assignment=student_assignment.group_assignment.assignment,
+                        ).first()
+                        if Answer.objects.filter(
+                            question=question,
+                            user_token=self.request.user.username,
+                            assignment=student_assignment.group_assignment.assignment,
+                        )
+                        else None,
+                    )
+                    for question in student_assignment.group_assignment.assignment.questions.all()
+                ],
+            }
+            for student_assignment in student_assignments
+        ]
+        context["student_assignments"] = student_assignments_dict
+        return context
 
 
 def validate_group_data(req):
@@ -337,6 +400,9 @@ def index_page(req):
                         ).course.pk
                     },
                 ),
+                "group_review_url": reverse(
+                    "group-review", kwargs={"pk": group.group.pk},
+                ),
                 "name": group.group.name,
                 "title": group.group.title,
                 "notifications": group.send_emails,
@@ -385,6 +451,7 @@ def index_page(req):
             "assignment_expired": ugettext("Past due date"),
             "cancel": ugettext("Cancel"),
             "course_flow_button": ugettext("Visit this group's CourseFlow"),
+            "group_review_button": ugettext("Review this course"),
             "completed": ugettext("Completed"),
             "day": ugettext("day"),
             "days": ugettext("days"),

@@ -1,0 +1,103 @@
+{% extends 'peerinst/student/base.html' %}
+
+{% load i18n bleach_html static %}
+
+{% block body %}
+
+<main>
+  <section id="student-page">
+
+    <h1 class="mdc-typography--display3">{% trans 'Review Completed Questions' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
+    {% for student_assignment in student_assignments %}
+      {% if True %}
+      <h2 class="dc-typography--display1 mdc-theme--secondary">
+      {{student_assignment.title}}
+      </h2>
+      {% for question, expert_answer, student_answer in student_assignment.questions %}
+      <div class="mdc-card">
+        <div class="mdc-typography--title bold m-bot-5">
+          {{question.title|bleach_html|safe}}
+        </div>
+
+        <div class="mdc-typography--body1">
+          {{question.text|bleach_html|safe}}
+        </div>
+
+        {% if question.image %}
+        <img class="question-image" src="{{ question.image.url }}" alt="{{ question.image_alt_text }}">
+        {% endif %}
+
+        {% if question.video_url %}
+        <div id="question-video">
+          <object class="question-image" width="640" height="390" data="{{ question.video_url }}"></object>
+        </div>
+        {% endif %}
+
+        <div class="question-answers">
+          <ul>
+            {% for label, choice in question.get_choices %}
+              <li class="dense-list">{{ label }}. {{ choice|bleach_html|safe }}
+              {% for answer_choice in question.answerchoice_set.all %}
+                {% if forloop.counter == forloop.parentloop.counter %}
+                  {% if answer_choice.correct and student_assignment.show_correct_answers %}
+                    <i class="check material-icons">check</i>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        {% if expert_answer %}
+        <div class="mdc-typography--body1">
+          <b>{% trans 'Expert Rationale' %}</b>
+        </div>
+        <blockquote id="chosen-rationale">{{ expert_answer.rationale }}</blockquote>
+        {% endif %}
+        {% if student_answer %}
+        <div class="mdc-typography--body1">
+          <b>{% trans 'Your Rationale' %}</b>
+        </div>
+        <blockquote id="chosen-rationale">{{ student_answer.rationale }}</blockquote>
+        {% endif %}
+
+        <div class="mdc-card__actions">
+          <div class="mdc-card__action-buttons grey">
+            <div class="mdc-typography--caption">
+              <div>
+                {% trans 'Discipline' %}: {{question.discipline}}
+              </div>
+              <div>
+                {% trans 'Categories' %}:
+                {% for category in question.category.all %}
+                {{ category.title|safe }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                {% trans 'Uncategorized' %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <ul>
+        <li><strong>Note: </strong>{% trans 'There are currently no questions in this assignment' %}.</li>
+      </ul>
+      {% endfor %}
+      {% else %}
+        <ul>
+          <li><strong>Note: </strong>{% trans 'You have not yet completed this assignment' %}.</li>
+        </ul>
+      {% endif %}
+    {% endfor %}
+  </section>
+</main>
+
+<script nonce="{{ request.csp_nonce }}">
+
+</script>
+
+{% endblock %}

@@ -23,6 +23,7 @@ function initModel(data) {
     },
     groups: data.groups.map(group => ({
       connectedCourseUrl: group.connected_course_url,
+      groupReviewUrl: group.group_review_url,
       name: group.name,
       title: group.title,
       notifications: group.notifications,
@@ -55,6 +56,7 @@ function initModel(data) {
       cancel: data.translations.cancel,
       completed: data.translations.completed,
       courseFlowButton: data.translations.course_flow_button,
+      groupReviewButton: data.translations.group_review_button,
       day: data.translations.day,
       days: data.translations.days,
       dueOn: data.translations.due_on,
@@ -421,6 +423,21 @@ function groupTitleView(group) {
     courseButton.textContent = "calendar_today";
     courseButtonContainer.appendChild(courseButton);
   }
+
+  const reviewButtonContainer = document.createElement("div");
+  reviewButtonContainer.classList.add("student-group--course");
+  icons.appendChild(reviewButtonContainer);
+
+  const reviewButton = document.createElement("i");
+  reviewButton.classList.add("material-icons", "md-28");
+  reviewButton.title = model.translations.groupReviewButton;
+  reviewButton.addEventListener(
+    "click",
+    () => (window.location.href = group.groupReviewUrl),
+  );
+  reviewButton.classList.add("group-review-button");
+  reviewButton.textContent = "chrome_reader_mode";
+  reviewButtonContainer.appendChild(reviewButton);
 
   const notifications = document.createElement("div");
   notifications.classList.add("student-group--notifications");

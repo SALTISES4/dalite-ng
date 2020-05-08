@@ -405,6 +405,11 @@ def group_patterns():
             views.distribute_assignment,
             name="distribute-assignment",
         ),
+        path(
+            "group/review/<int:pk>",
+            views.student.StudentGroupReviewDetailView.as_view(),
+            name="group-review",
+        ),
     ]
 
 
