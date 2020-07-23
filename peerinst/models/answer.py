@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from quality.models import Quality
 
-from .assignment import Assignment
+from .assignment import Assignment, StudentGroupAssignment
 from .question import GradingScheme, Question
 
 
@@ -41,6 +41,7 @@ class AnswerChoice(models.Model):
 
 
 class Answer(models.Model):
+
     objects = models.Manager()
     may_show = AnswerMayShowManager()
 
@@ -48,6 +49,10 @@ class Answer(models.Model):
     assignment = models.ForeignKey(
         Assignment, blank=True, null=True, on_delete=models.CASCADE
     )
+    student_group_assignment = models.ForeignKey(
+        StudentGroupAssignment, blank=True, null=True, on_delete=models.CASCADE
+    )
+
     first_answer_choice = models.PositiveSmallIntegerField(
         _("First answer choice")
     )

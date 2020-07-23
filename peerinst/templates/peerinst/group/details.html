@@ -22,7 +22,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
   .small {
     font-size: smaller;
   }
-  ul {
+  #teachers-with-access-list {
     padding-left:0px;
   }
 </style>
@@ -290,8 +290,8 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
         <ul id="assignment-list" class="mdc-list mdc-list--two-line">
           {% for a in assignments %}
           <li class="mdc-list-divider" role="separator"></li>
-          <li class="mdc-list-item pointer assignment-link">
-            <span class="mdc-list-item__graphic mdc-theme--primary">
+          <li class="mdc-list-item">
+            <span class="mdc-list-item__graphic mdc-theme--primary pointer assignment-link">
               <i class="mdc-theme--primary material-icons md-48">work</i>
             </span>
             <span class="mdc-list-item__text mdc-theme--secondary bold">
@@ -304,6 +304,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
               </span>
             </span>
             <span class="mdc-list-item__meta">
+              <i id="activate-dialog-{{a.pk|slugify}}" class="material-icons md-24 mdc-ripple-surface icon-list">info</i>
               <i class="material-icons md-24 mdc-ripple-surface icon-list delete-btn">
                 delete
               </i>
@@ -319,6 +320,46 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
               </button>
             </span>
           </li>
+
+          <aside id="dialog-{{a.pk|slugify}}"
+            class="mdc-dialog"
+            role="alertdialog"
+            aria-labelledby="assignment-parameters-label"
+            aria-describedby="assignment-parameters-description">
+            <div class="mdc-dialog__surface">
+              <header class="mdc-dialog__header">
+                <h2 id="assignment-parameters-label" class="mdc-dialog__header__title">
+                  {% trans 'How to use in your course through LTI' %}
+                </h2>
+              </header>
+              <section id="assignment-parameters-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
+                <p class="mdc-typography--body1">{% blocktrans %}Use the following to configure the LTI tool in your Learning Management System (e.g. Moodle, OpenEdx){% endblocktrans %}:</p>
+                <ul>
+                    <li>{% trans 'LTI Launch URL' %} : {{ LTI_launch_url }}</li>
+                    <li>{% trans 'LTI Consumer Key' %} : {{ LTI_key }}</li>
+                    <li>{% trans 'LTI Shared Secret' %} : {{ LTI_secret }}</li>
+                </ul>
+                <p class="mdc-typography--body1">{% blocktrans %}To import any of the questions below, copy and paste the text below the question title into the <em>Custom Paramaters</em> box of your LTI tool{% endblocktrans %}:</p>
+                <ul>
+                {% for q in a.assignment.questions.all %}
+                  <li><span class="bold">{{ q.title }}:</span>
+                    <ul>
+                      <li>student_group_assignment_id={{ a.pk }}</li>
+                      <li>assignment_id={{ a.assignment.identifier }}</li>
+                      <li>question_id={{ q.id }}</li>
+                      <li>teacher_id={{ teacher.hash }}</li>
+                    </ul>
+                {% endfor %}
+                </ul>
+              </section>
+              <footer class="mdc-dialog__footer">
+                <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
+              </footer>
+            </div>
+            <div class="mdc-dialog__backdrop"></div>
+          </aside>
+
+
           {% empty %}
 
           <p class='mdc-typography--body1'> {% trans "There aren't any assignments for this group yet." %}</p>

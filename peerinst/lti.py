@@ -1,13 +1,23 @@
 import base64
 import hashlib
 import logging
+from datetime import datetime, timedelta
 
 from django.contrib.auth import get_permission_codename, login
 from django.contrib.auth.models import Permission, User
 from django.urls import reverse
 from django_lti_tool_provider import AbstractApplicationHookManager
+from django_lti_tool_provider.models import LtiUserData
 
 from peerinst.auth import authenticate_student
+from .students import create_student_token
+from peerinst.models import (
+    Assignment,
+    StudentGroup,
+    StudentGroupAssignment,
+    Teacher,
+)
+from .util import get_object_or_none
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +60,7 @@ def get_permissions_for_staff_user():
 
 
 class ApplicationHookManager(AbstractApplicationHookManager):
-    LTI_KEYS = ["custom_assignment_id", "custom_question_id"]
+    LTI_KEYS = ["custom_assignment_id"]
     ADMIN_ACCESS_ROLES = {LTIRoles.INSTRUCTOR, LTIRoles.STAFF}
 
     @classmethod
@@ -76,7 +86,22 @@ class ApplicationHookManager(AbstractApplicationHookManager):
     def authenticated_redirect_to(self, request, lti_data):
         action = lti_data.get("custom_action")
         assignment_id = lti_data.get("custom_assignment_id")
-        question_id = lti_data.get("custom_question_id")
+
+        question_id = lti_data.get("custom_question_id", None)
+        if (
+            question_id is not None
+            and "custom_question_id" not in self.LTI_KEYS
+        ):
+            self.LTI_KEYS.append("custom_question_id")
+        student_group_assignment_id = lti_data.get(
+            "custom_student_group_assignment_id", None
+        )
+        if (
+            student_group_assignment_id is not None
+            and "custom_student_group_assignment_id" not in self.LTI_KEYS
+        ):
+            self.LTI_KEYS.append("custom_student_group_assignment_id")
+
         show_results_view = lti_data.get("custom_show_results_view", "false")
 
         if action == "launch-admin":
@@ -85,13 +110,112 @@ class ApplicationHookManager(AbstractApplicationHookManager):
             return reverse(
                 "admin:peerinst_question_change", args=(question_id,)
             )
+        elif question_id is None:
+            if student_group_assignment_id is None:
+                lti_user_data_object = get_object_or_none(
+                    LtiUserData,
+                    user=request.user,
+                    custom_key=str(assignment_id)
+                    + ":"
+                    + str(
+                        Assignment.objects.get(pk=assignment_id)
+                        .questions.all()
+                        .first()
+                        .pk
+                    ),
+                )
+                course_id = lti_user_data_object.edx_lti_parameters.get(
+                    "context_id"
+                )
+                course_title = lti_user_data_object.edx_lti_parameters.get(
+                    "context_title"
+                )
+                try:
+                    group = StudentGroup.objects.get(name=course_id)
+                except StudentGroup.DoesNotExist:
+                    if course_title:
+                        group = StudentGroup(
+                            name=course_id, title=course_title
+                        )
+                    else:
+                        group = StudentGroup(name=course_id)
+                    group.save()
+                teacher_hash = lti_user_data_object.edx_lti_parameters.get(
+                    "custom_teacher_id"
+                )
+                if teacher_hash is not None:
+                    teacher = Teacher.get(teacher_hash)
+                    if teacher not in group.teacher.all():
+                        group.teacher.add(teacher)
+                        teacher.current_groups.add(group)
+                        teacher.save()
+                if hasattr(request.user, "student"):
+                    request.user.student.groups.add(group)
+                try:
+                    student_group_assignment = StudentGroupAssignment.objects.get(
+                        group=group,
+                        assignment=Assignment.objects.get(pk=assignment_id),
+                    )
+                except StudentGroupAssignment.DoesNotExist:
+                    student_group_assignment = StudentGroupAssignment.objects.create(
+                        group=group,
+                        assignment=Assignment.objects.get(pk=assignment_id),
+                        distribution_date=datetime.now(),
+                        due_date=datetime.now() + timedelta(days=365),
+                    )
+
+                return (
+                    reverse(
+                        "live",
+                        kwargs=dict(
+                            token=create_student_token(
+                                request.user.username, request.user.email,
+                            ),
+                            assignment_hash=student_group_assignment.hash,
+                        ),
+                    )
+                    + "&is_lti=true"
+                )
+            else:
+                student_group_assignment = StudentGroupAssignment.objects.filter(
+                    pk=student_group_assignment_id
+                ).first()
+                if hasattr(request.user, "student"):
+                    request.user.student.groups.add(
+                        student_group_assignment.group
+                    )
+                return (
+                    reverse(
+                        "live",
+                        kwargs=dict(
+                            token=create_student_token(
+                                request.user.username, request.user.email,
+                            ),
+                            assignment_hash=student_group_assignment.hash,
+                        ),
+                    )
+                    + "&is_lti=true"
+                )
 
         redirect_url = reverse(
             "question",
             kwargs=dict(assignment_id=assignment_id, question_id=question_id),
         )
+
         if show_results_view == "true":
-            redirect_url += "?show_results_view=true"
+            if student_group_assignment_id is None:
+                redirect_url += "?show_results_view=true"
+            else:
+                redirect_url += (
+                    "?student_group_assignment_pk="
+                    + str(student_group_assignment_id)
+                    + "&show_results_view=true"
+                )
+        elif student_group_assignment_id is not None:
+            redirect_url += "?student_group_assignment_pk=" + str(
+                student_group_assignment_id
+            )
+
         return redirect_url
 
     def authentication_hook(
@@ -157,6 +281,20 @@ class ApplicationHookManager(AbstractApplicationHookManager):
         user.save()
 
     def vary_by_key(self, lti_data):
+        question_id = lti_data.get("custom_question_id", None)
+        if (
+            question_id is not None
+            and "custom_question_id" not in self.LTI_KEYS
+        ):
+            self.LTI_KEYS.append("custom_question_id")
+        student_group_assignment_id = lti_data.get(
+            "custom_student_group_assignment_id", None
+        )
+        if (
+            student_group_assignment_id is not None
+            and "custom_student_group_assignment_id" not in self.LTI_KEYS
+        ):
+            self.LTI_KEYS.append("custom_student_group_assignment_id")
         return ":".join(str(lti_data[k]) for k in self.LTI_KEYS)
 
     def optional_lti_parameters(self):

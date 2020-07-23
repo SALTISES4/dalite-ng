@@ -100,10 +100,12 @@ def live(request, token, assignment_hash):
     login(request, user, backend="peerinst.backends.CustomPermissionsBackend")
 
     # Register access type
-    request.session["LTI"] = False
+    is_lti = request.POST.get("is_lti", None)
+
+    request.session["LTI"] = True if is_lti else False
 
     # Get assignment for this token and current question
-    group_assignment = StudentGroupAssignment.get(assignment_hash)
+    group_assignment = StudentGroupAssignment.get(assignment_hash + "===")
     if group_assignment is None:
         return response_404(
             request,
@@ -129,26 +131,32 @@ def live(request, token, assignment_hash):
                 + "?group-student-id-needed="
                 + group.name
             )
-
-    student_assignment = StudentAssignment.objects.get(
-        student=user.student, group_assignment=group_assignment
-    )
+    try:
+        student_assignment = StudentAssignment.objects.get(
+            student=user.student, group_assignment=group_assignment
+        )
+    except StudentAssignment.DoesNotExist:
+        student_assignment = StudentGroup(
+            student=user.student, group_assignment=group_assignment
+        )
+        student_assignment.save()
 
     # Register assignment
     request.session["assignment"] = assignment_hash
 
     # Register quality
-    if group_assignment.quality:
-        request.session["quality"] = group_assignment.quality.pk
-    elif group_assignment.group.quality:
-        request.session["quality"] = group_assignment.group.quality.pk
-    elif (
-        group_assignment.group.teacher.exists()
-        and group_assignment.group.teacher.first().quality
-    ):
-        request.session[
-            "quality"
-        ] = group_assignment.group.teacher.first().quality.pk
+    if not is_lti:
+        if group_assignment.quality:
+            request.session["quality"] = group_assignment.quality.pk
+        elif group_assignment.group.quality:
+            request.session["quality"] = group_assignment.group.quality.pk
+        elif (
+            group_assignment.group.teacher.exists()
+            and group_assignment.group.teacher.first().quality
+        ):
+            request.session[
+                "quality"
+            ] = group_assignment.group.teacher.first().quality.pk
 
     assignment = student_assignment.group_assignment
     current_question = student_assignment.get_current_question()
@@ -173,6 +181,8 @@ def live(request, token, assignment_hash):
                 "question_id": current_question.id,
             },
         )
+        + "?student_group_pk="
+        + str(group_assignment.pk)
     )
 
 
@@ -245,6 +255,10 @@ def navigate_assignment(request, assignment_id, question_id, direction, index):
             request.session["assignment_expired"] = assignment.expired
             return HttpResponseRedirect(reverse("finish-assignment"))
 
+        group_assignment_pk_param = "?student_group_assignment_pk=" + str(
+            assignment.pk
+        )
+
     # Redirect
     return HttpResponseRedirect(
         reverse(
@@ -254,6 +268,7 @@ def navigate_assignment(request, assignment_id, question_id, direction, index):
                 "question_id": new_question.id,
             },
         )
+        + group_assignment_pk_param
     )
 
 

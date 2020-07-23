@@ -1319,18 +1319,36 @@ class QuestionReviewView(QuestionReviewBaseView):
         else:
             # We stuck with our own rationale.
             chosen_rationale = None
-        self.answer = models.Answer(
-            question=self.question,
-            assignment=self.assignment,
-            first_answer_choice=self.first_answer_choice,
-            rationale=self.rationale,
-            second_answer_choice=self.second_answer_choice,
-            chosen_rationale=chosen_rationale,
-            user_token=self.user_token,
-            datetime_start=self.datetime_start,
-            datetime_first=self.datetime_first,
-            datetime_second=datetime.now(pytz.utc),
-        )
+        if self.stage_data.get("student_group_assignment_pk", None) is None:
+            self.answer = models.Answer(
+                question=self.question,
+                assignment=self.assignment,
+                first_answer_choice=self.first_answer_choice,
+                rationale=self.rationale,
+                second_answer_choice=self.second_answer_choice,
+                chosen_rationale=chosen_rationale,
+                user_token=self.user_token,
+                datetime_start=self.datetime_start,
+                datetime_first=self.datetime_first,
+                datetime_second=datetime.now(pytz.utc),
+            )
+        else:
+            self.answer = models.Answer(
+                question=self.question,
+                assignment=self.assignment,
+                first_answer_choice=self.first_answer_choice,
+                rationale=self.rationale,
+                second_answer_choice=self.second_answer_choice,
+                chosen_rationale=chosen_rationale,
+                user_token=self.user_token,
+                datetime_start=self.datetime_start,
+                datetime_first=self.datetime_first,
+                datetime_second=datetime.now(pytz.utc),
+                student_group_assignment=models.StudentGroupAssignment.objects.filter(
+                    pk=self.stage_data.get("student_group_assignment_pk")
+                ).first(),
+            )
+
         self.answer.save()
         if chosen_rationale is not None:
             self.record_fake_attribution_vote(
@@ -1600,6 +1618,22 @@ def question(request, assignment_id, question_id):
     custom_key = str(assignment.pk) + ":" + str(question.pk)
     stage_data = SessionStageData(request.session, custom_key)
     user_token = request.user.username
+
+    if request.GET.get("student_group_assignment_pk", None) is not None:
+        student_group_assignment = StudentGroupAssignment.objects.get(
+            pk=int(request.GET.get("student_group_assignment_pk"))
+        )
+        latest_answer = models.Answer.objects.filter(
+            assignment=assignment,
+            question=question,
+            user_token=user_token,
+            student_group_assignment=student_group_assignment,
+        ).last()
+    else:
+        latest_answer = models.Answer.objects.filter(
+            assignment=assignment, question=question, user_token=user_token,
+        ).last()
+
     view_data = dict(
         request=request,
         assignment=assignment,
@@ -1611,9 +1645,7 @@ def question(request, assignment_id, question_id):
         lti_data=get_object_or_none(
             LtiUserData, user=request.user, custom_key=custom_key
         ),
-        answer=models.Answer.objects.filter(
-            assignment=assignment, question=question, user_token=user_token,
-        ).last(),
+        answer=latest_answer,
     )
 
     # Determine stage and view class
@@ -1633,6 +1665,12 @@ def question(request, assignment_id, question_id):
             stage_data.update(
                 datetime_start=datetime.now(pytz.utc).strftime(
                     "%Y-%m-%d %H:%M:%S.%f"
+                )
+            )
+        if request.GET.get("student_group_assignment_pk", None) is not None:
+            stage_data.update(
+                student_group_assignment_pk=int(
+                    request.GET.get("student_group_assignment_pk")
                 )
             )
         stage_class = QuestionStartView

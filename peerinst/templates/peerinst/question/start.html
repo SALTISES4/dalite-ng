@@ -165,7 +165,7 @@
 <script nonce="{{ request.csp_nonce }}">
   window.addEventListener("load", function() {
     question.initStart(
-      '{% url 'quality:validate' %}',
+      "{% url 'quality:validate' %}",
       {{ quality|default_if_none:'null' }}
     )
   })

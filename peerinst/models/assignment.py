@@ -69,7 +69,9 @@ class Assignment(models.Model):
 
 
 class StudentGroupAssignment(models.Model):
-    group = models.ForeignKey(StudentGroup, on_delete=models.CASCADE)
+    group = models.ForeignKey(
+        StudentGroup, on_delete=models.CASCADE, blank=True, null=True
+    )
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
     distribution_date = models.DateTimeField(
         editable=False, null=True, blank=True

@@ -30,6 +30,7 @@
   <form method="post">
     {% csrf_token %}
     {% for field in create_form %}
+      {% if forloop.counter0 < 2 %}
       <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
         {{ field|add_class:"mdc-text-field__input" }}
         {{ field.label_tag|add_class:"mdc-floating-label"|cut:":" }}
@@ -44,6 +45,23 @@
         {{ field.help_text|safe }}
       </p>
       {{ field.errors }}
+      {% else %}
+      <div class='field'>
+        <div>
+          <div class='mdc-form-field'>
+            <label for='id_discipline'>{{ field.label }}:</label>
+            <div class='mdc-select'>
+              {{ field|add_class:"mdc-select__native-control" }}
+              <div class="mdc-select__bottom-line"></div>
+            </div>
+          </div>
+        </div>
+        <p class="form-helper-text" aria-hidden="true">
+          {{ field.help_text|safe }}
+        </p>
+          {{ field.discipline.errors }}
+      </div>
+      {% endif %}
     {% endfor %}
     <input class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Create' %}" />
   </form>

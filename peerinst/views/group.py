@@ -2,6 +2,7 @@ import json
 import re
 import logging
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.http import HttpResponse, JsonResponse
@@ -106,6 +107,9 @@ def group_details_page(req, group_hash, teacher, group):
         "connected_course": StudentGroupCourse.objects.filter(
             student_group=group
         ).first(),
+        "LTI_key": str(settings.LTI_CLIENT_KEY),
+        "LTI_secret": str(settings.LTI_CLIENT_SECRET),
+        "LTI_launch_url": str("https://" + req.get_host() + "/lti/"),
     }
     context["is_connected_to_course"] = False
     if StudentGroupCourse.objects.filter(student_group=group).first():
