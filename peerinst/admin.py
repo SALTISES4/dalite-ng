@@ -271,7 +271,11 @@ class AnswerAdmin(admin.ModelAdmin):
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    pass
+    readonly_fields = [
+        "user",
+        "reputation",
+        "quality",
+    ]
 
 
 @admin.register(TeacherNotification)
