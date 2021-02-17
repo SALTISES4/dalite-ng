@@ -276,6 +276,10 @@ class TeacherAdmin(admin.ModelAdmin):
         "reputation",
         "quality",
     ]
+    filter_horizontal = [
+        "assignments",
+        "current_groups",
+    ]
 
 
 @admin.register(TeacherNotification)
