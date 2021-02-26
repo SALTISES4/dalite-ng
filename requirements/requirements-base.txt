@@ -16,7 +16,7 @@ amqp==2.5.2               # via kombu
 asgiref==3.2.10           # via -r requirements/../blink/requirements.txt, channels, channels-redis, daphne
 async-timeout==3.0.1      # via -r requirements/../blink/requirements.txt, aioredis
 attrs==20.2.0             # via -r requirements/../blink/requirements.txt, automat, service-identity, twisted
-autobahn==20.7.1          # via -r requirements/../blink/requirements.txt, daphne
+autobahn==21.2.2          # via -r requirements/../blink/requirements.txt, daphne
 automat==20.2.0           # via -r requirements/../blink/requirements.txt, twisted
 beautifulsoup4==4.8.2     # via django-htmlmin, pynliner
 billiard==3.6.3.0         # via celery
@@ -24,13 +24,13 @@ bleach==3.1.4             # via -r requirements/requirements-base.in
 celery[redis]==4.4.0      # via -r requirements/requirements-base.in, django-celery-beat
 certifi==2019.11.28       # via requests
 cffi==1.14.2              # via -r requirements/../blink/requirements.txt, cryptography
-channels-redis==3.1.0     # via -r requirements/../blink/requirements.txt
-channels==2.4.0           # via -r requirements/../blink/requirements.txt, channels-redis
+channels-redis==3.2.0     # via -r requirements/../blink/requirements.txt
+channels==3.0.3           # via -r requirements/../blink/requirements.txt, channels-redis
 chardet==3.0.4            # via requests
 constantly==15.1.0        # via -r requirements/../blink/requirements.txt, twisted
-cryptography==3.3.1       # via -r requirements/../blink/requirements.txt, autobahn, pyopenssl, service-identity
+cryptography==3.4.6       # via -r requirements/../blink/requirements.txt, autobahn, pyopenssl, service-identity
 cssutils==1.0.2           # via pynliner
-daphne==2.5.0             # via -r requirements/../blink/requirements.txt, channels
+daphne==3.0.1             # via -r requirements/../blink/requirements.txt, channels
 django-analytical==2.5.0  # via -r requirements/requirements-base.in
 django-appconf==1.0.3     # via django-axes, django-compressor, pinax-forums
 django-axes==5.3.4        # via -r requirements/requirements-base.in
@@ -54,7 +54,7 @@ filetype==1.0.5           # via pinax-forums
 future==0.18.2            # via django-inlinecss
 hiredis==1.1.0            # via -r requirements/../blink/requirements.txt, aioredis
 html5lib==1.0.1           # via django-htmlmin
-hyperlink==20.0.1         # via -r requirements/../blink/requirements.txt, twisted
+hyperlink==21.0.0         # via -r requirements/../blink/requirements.txt, autobahn, twisted
 idna==2.10                # via -r requirements/../blink/requirements.txt, hyperlink, requests, twisted
 incremental==17.5.0       # via -r requirements/../blink/requirements.txt, twisted
 jsonfield==3.1.0          # via django-lti-tool-provider
@@ -89,12 +89,12 @@ requests-oauthlib==1.3.0  # via lti
 requests==2.23.0          # via -r requirements/requirements-base.in, requests-oauthlib
 rjsmin==1.1.0             # via django-compressor
 service-identity==18.1.0  # via -r requirements/../blink/requirements.txt, twisted
-six==1.15.0               # via -r requirements/../blink/requirements.txt, automat, bleach, cryptography, django-appconf, django-classy-tags, django-compressor, django-grappelli, django-lti-tool-provider, edx-opaque-keys, html5lib, packaging, pyopenssl, python-dateutil, python-memcached, stevedore
+six==1.15.0               # via -r requirements/../blink/requirements.txt, automat, bleach, django-appconf, django-classy-tags, django-compressor, django-grappelli, django-lti-tool-provider, html5lib, packaging, pyopenssl, python-dateutil, python-memcached, stevedore
 soupsieve==2.0            # via beautifulsoup4
 sqlparse==0.3.1           # via -r requirements/../blink/requirements.txt, django
 stevedore==1.32.0         # via edx-opaque-keys
 twisted[tls]==20.3.0      # via -r requirements/../blink/requirements.txt, daphne
-txaio==20.4.1             # via -r requirements/../blink/requirements.txt, autobahn
+txaio==21.2.1             # via -r requirements/../blink/requirements.txt, autobahn
 urllib3==1.25.10          # via -r requirements/requirements-base.in, requests
 vine==1.3.0               # via amqp, celery
 webencodings==0.5.1       # via bleach, html5lib
