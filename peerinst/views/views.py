@@ -8,7 +8,6 @@ import urllib.request
 from datetime import datetime
 
 import pytz
-from course_flow.views import setup_link_to_group, setup_unlink_from_group
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -72,7 +71,6 @@ from ..models import (
     Student,
     StudentGroup,
     StudentGroupAssignment,
-    StudentGroupCourse,
     Subject,
     Teacher,
     UserType,
@@ -2556,13 +2554,6 @@ def connect_group_to_course(request):
     students_as_users = User.objects.filter(pk__in=students_as_students)
 
     clone = setup_link_to_group(course_pk, students_as_users)
-
-    try:
-        StudentGroupCourse.objects.create(
-            course=clone, student_group=student_group
-        )
-    except ValidationError:
-        return JsonResponse({"action": "error"})
 
     date = clone.created_on.strftime("%b. %d, %Y, %I:%S %p")
 

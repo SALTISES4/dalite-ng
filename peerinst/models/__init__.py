@@ -13,7 +13,6 @@ from .admin import NewUserRequest, UserType, UserUrl
 from .answer import *  # noqa
 from .assignment import *  # noqa
 from .collection import *  # noqa
-from .course_flow import *  # noqa
 from .lti import *  # noqa
 from .message import Message, MessageType, SaltiseMember, UserMessage
 from .question import *  # noqa
