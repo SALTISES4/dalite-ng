@@ -50,7 +50,7 @@ django-samesite-none==0.0.2  # via -r requirements/requirements-base.txt
 django-security-headers==0.3.1  # via -r requirements/requirements-base.txt
 django-sslserver==0.22    # via -r requirements/requirements-base.txt, django-security-headers
 django-timezone-field==4.0  # via -r requirements/requirements-base.txt, django-celery-beat
-django==2.2.16            # via -r requirements/requirements-base.txt, channels, django-analytical, django-appconf, django-axes, django-celery-beat, django-classy-tags, django-cookie-law, django-csp, django-inlinecss, django-lti-tool-provider, django-security-headers, django-sslserver, django-timezone-field, djangorestframework, jsonfield, pinax-forums
+django==2.2.20            # via -r requirements/requirements-base.txt, channels, django-analytical, django-appconf, django-axes, django-celery-beat, django-classy-tags, django-cookie-law, django-csp, django-inlinecss, django-lti-tool-provider, django-security-headers, django-sslserver, django-timezone-field, djangorestframework, jsonfield, pinax-forums
 djangorestframework==3.12.2  # via -r requirements/requirements-base.txt
 factory_boy==2.6          # via -r requirements/requirements-test.in
 fake-factory==9999.9.9    # via factory-boy
@@ -65,7 +65,7 @@ incremental==17.5.0       # via -r requirements/requirements-base.txt, twisted
 jsonfield==3.1.0          # via -r requirements/requirements-base.txt, django-lti-tool-provider
 kombu==4.6.7              # via -r requirements/requirements-base.txt, celery
 lti==0.9.4                # via -r requirements/requirements-base.txt, django-lti-tool-provider
-lxml==4.6.2               # via -r requirements/requirements-base.txt, lti
+lxml==4.6.3               # via -r requirements/requirements-base.txt, lti
 mixer==6.1.3              # via -r requirements/requirements-test.in
 mock==4.0.1               # via -r requirements/requirements-test.in
 more-itertools==8.2.0     # via pytest
@@ -96,7 +96,7 @@ python-crontab==2.4.0     # via -r requirements/requirements-base.txt, django-ce
 python-dateutil==2.8.1    # via -r requirements/requirements-base.txt, faker, pandas, python-crontab
 python-memcached==1.59    # via -r requirements/requirements-base.txt
 pytz==2020.1              # via -r requirements/requirements-base.txt, -r requirements/requirements-test.in, celery, django, django-timezone-field, pandas
-pyyaml==5.3.1             # via -r requirements/requirements-test.in
+pyyaml==5.4.1             # via -r requirements/requirements-test.in
 rcssmin==1.0.6            # via -r requirements/requirements-base.txt, django-compressor
 redis==3.4.1              # via -r requirements/requirements-base.txt, celery
 requests-oauthlib==1.3.0  # via -r requirements/requirements-base.txt, lti

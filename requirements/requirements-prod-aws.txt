@@ -52,7 +52,7 @@ django-ses==1.0.3         # via -r requirements/requirements-prod-aws.in
 django-sslserver==0.22    # via -r requirements/requirements-base.txt, django-security-headers
 django-storages==1.9.1    # via -r requirements/requirements-prod-aws.in
 django-timezone-field==4.0  # via -r requirements/requirements-base.txt, django-celery-beat
-django==2.2.16            # via -r requirements/requirements-base.txt, channels, django-analytical, django-appconf, django-axes, django-celery-beat, django-classy-tags, django-cookie-law, django-csp, django-inlinecss, django-lti-tool-provider, django-security-headers, django-ses, django-sslserver, django-storages, django-timezone-field, djangorestframework, jsonfield, pinax-forums
+django==2.2.20            # via -r requirements/requirements-base.txt, channels, django-analytical, django-appconf, django-axes, django-celery-beat, django-classy-tags, django-cookie-law, django-csp, django-inlinecss, django-lti-tool-provider, django-security-headers, django-ses, django-sslserver, django-storages, django-timezone-field, djangorestframework, jsonfield, pinax-forums
 djangorestframework==3.12.2  # via -r requirements/requirements-base.txt
 docutils==0.15.2          # via botocore
 filetype==1.0.5           # via -r requirements/requirements-base.txt, pinax-forums
@@ -67,7 +67,7 @@ jmespath==0.9.5           # via boto3, botocore
 jsonfield==3.1.0          # via -r requirements/requirements-base.txt, django-lti-tool-provider
 kombu==4.6.7              # via -r requirements/requirements-base.txt, celery
 lti==0.9.4                # via -r requirements/requirements-base.txt, django-lti-tool-provider
-lxml==4.6.2               # via -r requirements/requirements-base.txt, lti
+lxml==4.6.3               # via -r requirements/requirements-base.txt, lti
 msgpack==1.0.0            # via -r requirements/requirements-base.txt, channels-redis
 mysqlclient==1.4.6        # via -r requirements/requirements-base.txt
 numpy==1.18.1             # via -r requirements/requirements-base.txt, pandas
