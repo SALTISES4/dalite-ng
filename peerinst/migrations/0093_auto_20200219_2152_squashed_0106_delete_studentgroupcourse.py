@@ -11,24 +11,6 @@ import peerinst.models.question
 
 class Migration(migrations.Migration):
 
-    replaces = [
-        ("peerinst", "0093_auto_20200219_2152"),
-        ("peerinst", "0094_subject"),
-        ("peerinst", "0095_newuserrequest_userurl"),
-        ("peerinst", "0096_assignmentquestions_rank"),
-        ("peerinst", "0097_auto_20200714_0404"),
-        ("peerinst", "0098_auto_20200730_1153"),
-        ("peerinst", "0099_auto_20200731_1308"),
-        ("peerinst", "0100_auto_20200731_1330"),
-        ("peerinst", "0101_auto_20200731_1407"),
-        ("peerinst", "0102_auto_20200807_0346"),
-        ("peerinst", "0102_auto_20200807_0403"),
-        ("peerinst", "0103_auto_20200815_1700"),
-        ("peerinst", "0104_auto_20200814_1203"),
-        ("peerinst", "0105_auto_20200903_1343"),
-        ("peerinst", "0106_delete_studentgroupcourse"),
-    ]
-
     dependencies = [
         ("peerinst", "0092_auto_20190902_0345"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
