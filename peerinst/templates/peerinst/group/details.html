@@ -227,6 +227,8 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
                 data-pk="{{ group.pk|safe }}">
                 {% trans 'Add to Collection' %}
         </div>
+
+        <!--
         <div id="activate-dialog-1"
             class="admin-link clickable"
             data-pk="{{ group.pk|safe }}">
@@ -254,7 +256,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
                 </span>
                 <span class="mdc-list-item__text mdc-theme--secondary bold">
                   <a class="mdc-theme--secondary course-title">
-                    {{ connected_course.title|safe }}
+                    {{ connected_course.title|safe|striptags }}
                   </a>
                   <span class="mdc-list-item__secondary-text course-date">
                     {% trans "Created: " %} {{ connected_course.created_on }}
@@ -264,7 +266,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
                   <button class="mdc-button mdc-button--raised course-toggle-link linked"
                           data-group-pk="{{ group.pk|safe }}"
                           data-course-pk="{{ connected_course.pk|safe }}"
-                          data-name="{{ connected_course.title|safe }}">
+                          data-name="{{ connected_course.title|safe|striptags }}">
                           {% trans 'Unlink' %}
                   </button>
                 </span>
@@ -279,7 +281,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
                 </span>
                 <span class="mdc-list-item__text mdc-theme--secondary bold">
                   <a class="mdc-theme--secondary course-title">
-                    {{ course.title|safe }}
+                    {{ course.title|safe|striptags }}
                   </a>
                   <span class="mdc-list-item__secondary-text course-date">
                     {% trans "Created: " %} {{ course.created_on }}
@@ -289,7 +291,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
                   <button class="mdc-button mdc-button--raised course-toggle-link unlinked"{% if is_connected_to_course %} disabled{% endif %}
                           data-group-pk="{{ group.pk|safe }}"
                           data-course-pk="{{ course.pk|safe }}"
-                          data-name="{{ course.title|safe }}">
+                          data-name="{{ course.title|safe|striptags }}">
                           {% trans 'Link' %}
                   </button>
                 </span>
@@ -302,6 +304,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
           </div>
           <div class="mdc-dialog__backdrop"></div>
         </aside>
+        -->
 
         <ul id="assignment-list" class="mdc-list mdc-list--two-line">
           {% for a in assignments %}
@@ -499,6 +502,8 @@ async function courseLinking(
 
   window.addEventListener("load", () => {
     group.initDetails({{ data|safe }});
+
+    {% comment %}
     courseLinking(
       "{% url 'connect-group-course' %}",
       "{% url 'disconnect-group-course' %}",
@@ -509,6 +514,7 @@ async function courseLinking(
       "{% trans 'Unable to contact server' %}",
       "{% url 'course_flow:course-detail-view' pk=0 %}",
     );
+    {% endcomment %}
   })
 
 </script>
