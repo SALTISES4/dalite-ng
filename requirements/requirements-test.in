@@ -2,7 +2,7 @@
 
 coverage
 ddt
-factory_boy==2.6
+factory_boy
 Faker
 mixer
 mock
