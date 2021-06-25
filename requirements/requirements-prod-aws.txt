@@ -74,6 +74,7 @@ celery[redis]==4.4.0
 certifi==2019.11.28
     # via
     #   -r requirements/requirements-base.txt
+    #   elasticsearch
     #   requests
     #   sentry-sdk
 cffi==1.14.2
@@ -163,6 +164,8 @@ django-csp==3.6
     #   -r requirements/requirements-base.txt
     #   django-security-headers
     #   saltise-course-flow
+django-elasticsearch-dsl==7.2.0
+    # via -r requirements/requirements-base.txt
 django-grappelli==2.14.1
     # via -r requirements/requirements-base.txt
 django-htmlmin==0.11.0
@@ -200,6 +203,14 @@ djangorestframework==3.12.2
     #   saltise-user-feedback
 docutils==0.15.2
     # via botocore
+elasticsearch==7.13.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   elasticsearch-dsl
+elasticsearch-dsl==7.3.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   django-elasticsearch-dsl
 filetype==1.0.5
     # via
     #   -r requirements/requirements-base.txt
@@ -327,6 +338,7 @@ python-dateutil==2.8.1
     # via
     #   -r requirements/requirements-base.txt
     #   botocore
+    #   elasticsearch-dsl
     #   pandas
     #   python-crontab
 python-memcached==1.59
@@ -381,8 +393,10 @@ six==1.15.0
     #   django-appconf
     #   django-classy-tags
     #   django-compressor
+    #   django-elasticsearch-dsl
     #   django-grappelli
     #   django-lti-tool-provider
+    #   elasticsearch-dsl
     #   html5lib
     #   packaging
     #   pyopenssl
@@ -413,6 +427,7 @@ urllib3==1.25.10
     # via
     #   -r requirements/requirements-base.txt
     #   botocore
+    #   elasticsearch
     #   requests
     #   sentry-sdk
 vine==1.3.0

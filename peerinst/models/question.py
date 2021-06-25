@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-
-
 import hashlib
 import itertools
 import string
 from datetime import datetime
-import pandas as pd
-import bleach
 
+import bleach
+import pandas as pd
 import pytz
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation

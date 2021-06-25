@@ -28,6 +28,8 @@ django-samesite-none
 urllib3 > 1.25.8  # Reqd by safety
 lxml >= 4.6.2  # Reqd by safety
 
+django-elasticsearch-dsl
+
 SALTISE_course_flow
 SALTISE_user_feedback > 0.1.1
 

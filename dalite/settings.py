@@ -32,6 +32,7 @@ INSTALLED_APPS = (
     "blink",
     # "channels",
     "REST",
+    "django_elasticsearch_dsl",
     "cookielaw",
     "csp",
     "security_headers",

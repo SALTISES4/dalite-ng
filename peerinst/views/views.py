@@ -2,6 +2,7 @@ import json
 import logging
 import random
 import re
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -807,7 +808,7 @@ def disciplines_select_form(request, pk=None):
 class CategoryCreateView(
     LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, CreateView
 ):
-    """ View to create a new category outside of admin. """
+    """View to create a new category outside of admin."""
 
     model = Category
     fields = ["title"]
@@ -1637,7 +1638,9 @@ def question(request, assignment_id, question_id):
             LtiUserData, user=request.user, custom_key=custom_key
         ),
         answer=models.Answer.objects.filter(
-            assignment=assignment, question=question, user_token=user_token,
+            assignment=assignment,
+            question=question,
+            user_token=user_token,
         ).last(),
     )
 
@@ -1678,7 +1681,7 @@ def question(request, assignment_id, question_id):
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
 def reset_question(request, assignment_id, question_id):
-    """ Clear all answers from user (for testing) """
+    """Clear all answers from user (for testing)"""
 
     assignment = get_object_or_404(models.Assignment, pk=assignment_id)
     question = get_object_or_404(models.Question, pk=question_id)
@@ -2177,6 +2180,8 @@ def collection_search_function(search_string, pre_filtered_list=None):
 # AJAX functions
 def question_search(request):
 
+    start = time.perf_counter()
+
     if not Teacher.objects.filter(user=request.user).exists():
         return HttpResponse(
             _(
@@ -2321,6 +2326,33 @@ def question_search(request):
             ]
             query_dict["count"] = len(query_dict["questions"])
             query.append(query_dict)
+
+        end = time.perf_counter()
+
+        print(f"ORM time {end - start}s")
+
+        print(len(query_all))
+
+        from peerinst.documents import QuestionDocument
+
+        start = time.perf_counter()
+        s = QuestionDocument.search().query(
+            "multi_match",
+            query=search_string,
+            fields=[
+                "id",
+                "title",
+                "text",
+                "category__title",
+                "discipline__title",
+                "user",
+            ],
+        )
+        end = time.perf_counter()
+
+        print(f"ElasticSearch time {end - start}s")
+
+        print(s.count())
 
         return TemplateResponse(
             request,
