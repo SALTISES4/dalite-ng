@@ -2336,23 +2336,32 @@ def question_search(request):
         from peerinst.documents import QuestionDocument
 
         start = time.perf_counter()
-        s = QuestionDocument.search().query(
-            "multi_match",
-            query=search_string,
-            fields=[
-                "id",
-                "title",
-                "text",
-                "category__title",
-                "discipline__title",
-                "user",
-            ],
+        s = (
+            QuestionDocument.search()
+            .sort("_score")
+            .query(
+                "multi_match",
+                query=search_string,
+                fields=[
+                    "answerchoice_set.text",
+                    "id",
+                    "title",
+                    "text",
+                    "category.title",
+                    "discipline.title",
+                    "user",
+                ],
+            )
         )
         end = time.perf_counter()
 
         print(f"ElasticSearch time {end - start}s")
 
         print(s.count())
+
+        for hit in s:
+            print(hit.meta.score, hit.to_dict())
+            print()
 
         return TemplateResponse(
             request,

@@ -501,6 +501,10 @@ FEATURE_POLICY = [
 
 REFERRER_POLICY = "no-referrer, strict-origin-when-cross-origin"
 
+ELASTICSEARCH_DSL = {
+    "default": {"hosts": "localhost:9200"},
+}
+
 # External framing
 CSP_FRAME_ANCESTORS = ["*"]
 FRAMING_ALLOWED_FROM = ["*"]
