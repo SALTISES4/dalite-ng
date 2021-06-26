@@ -62,6 +62,8 @@ class Answer(models.Model):
         symmetrical=False,
         related_name="shown_rationales_all",
     )
+    rationale_chosen_counter = models.PositiveIntegerField(default=0)
+    rationale_shown_counter = models.PositiveIntegerField(default=0)
     chosen_rationale = models.ForeignKey(
         "self", blank=True, null=True, on_delete=models.CASCADE
     )
@@ -98,6 +100,14 @@ class Answer(models.Model):
         related_name="filtering_quality",
         on_delete=models.CASCADE,
     )
+
+    def update_rationale_chosen_count(self):
+        self.rationale_chosen_counter = self.answer_set.all().count()
+        self.save()
+
+    def update_rationale_shown_count(self):
+        self.rationale_shown_counter = self.shown_rationales_all.all().count()
+        self.save()
 
     def first_answer_choice_label(self):
         return self.question.get_choice_label(self.first_answer_choice)
