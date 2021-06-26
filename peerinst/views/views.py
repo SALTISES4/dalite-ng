@@ -289,6 +289,15 @@ def browse_database(request):
     )
 
 
+@login_required
+@user_passes_test(student_check, login_url="/access_denied_and_logout/")
+def browse_database_beta(request):
+
+    return TemplateResponse(
+        request, "peerinst/browse_database_beta.html", context={}
+    )
+
+
 class AssignmentListView(LoginRequiredMixin, NoStudentsMixin, ListView):
     """List of assignments used for debugging purposes."""
 
