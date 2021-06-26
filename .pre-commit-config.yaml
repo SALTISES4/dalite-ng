@@ -1,21 +1,24 @@
-exclude: "/tinymce/*"
+exclude: "/tinymce/"
 fail_fast: false
 repos:
   - repo: https://github.com/pycqa/isort
-    rev: 5.6.4
+    rev: 5.8.0
     hooks:
       - id: isort
         args: ["--profile", "black"]
+
   - repo: https://github.com/ambv/black
-    rev: 19.10b0
+    rev: 21.4b2
     hooks:
       - id: black
         exclude: "^.*/migrations/.*.py$"
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.4.0
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 3.9.1
     hooks:
       - id: flake8
         exclude: "^.*/migrations/.*.py$"
+
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v7.3.1
     hooks:
@@ -26,12 +29,14 @@ repos:
           - babel-eslint@10.0.3
           - eslint-config-google@0.14.0
         exclude: "^.*\\.min\\..*$"
-  - repo: https://github.com/prettier/prettier
-    rev: 2.0.5
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.1.0
     hooks:
       - id: prettier
         files: \.js$
         exclude: "^.*\\.min\\..*$"
+
   - repo: https://github.com/awebdeveloper/pre-commit-stylelint
     rev: 0.0.2
     hooks:
@@ -44,6 +49,7 @@ repos:
           - stylelint-config-recommended@3.0.0
           - stylelint-order@4.1.0
           - stylelint-scss@3.18.0
+
   - repo: local
     hooks:
       - id: safety
@@ -55,6 +61,6 @@ repos:
       - id: npm-audit
         name: npm-audit
         language: system
-        entry: npm audit --audit-level=moderate
+        entry: npm audit --audit-level=high
         always_run: true
         exclude: ".*"

@@ -458,6 +458,7 @@ CSP_SCRIPT_SRC = [
     "unpkg.com",
     "cdn.datatables.net",
     "code.jquery.com",
+    "cdn.quilljs.com",
 ]
 CSP_STYLE_SRC = [
     "'self'",
@@ -468,6 +469,7 @@ CSP_STYLE_SRC = [
     "cdn.jsdelivr.net",
     "code.jquery.com",
     "cdn.datatables.net",
+    "cdn.quilljs.com",
 ]
 CSP_FONT_SRC = [
     "'self'",

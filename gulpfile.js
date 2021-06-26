@@ -23,7 +23,7 @@ const cssPolyfills = require("postcss-preset-env"); // autoprefixer + polyfills
 const postcss = require("gulp-postcss"); // css
 //const failOnWarn = require("postcss-fail-on-warn"); // fail on warnings
 const scss = require("postcss-scss"); // understand scss syntax
-const sass = require("@csstools/postcss-sass"); // sass compiler
+const sass = require("csstools-postcss-sass-pre-release"); // sass compiler
 const sourcemaps = require("gulp-sourcemaps"); // sourcemaps
 
 /* Build for icons */

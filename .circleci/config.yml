@@ -31,7 +31,9 @@ jobs:
           command: |
             python -m venv .venv
             . .venv/bin/activate
+            pip install --upgrade pip
             pip install -r requirements/requirements-dev.txt
+            pip freeze
             npm install
             ./node_modules/gulp/bin/gulp.js build
       - run:

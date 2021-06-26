@@ -157,7 +157,13 @@ class ApplicationHookManager(AbstractApplicationHookManager):
         user.save()
 
     def vary_by_key(self, lti_data):
-        return ":".join(str(lti_data[k]) for k in self.LTI_KEYS)
+        try:
+            return ":".join(str(lti_data[k]) for k in self.LTI_KEYS)
+        except KeyError:
+            # D2L myCourses LTI POST request appends trailing "_" at end of
+            # custom parameters
+            _lti_data = {k.rstrip("_"): v for k, v in lti_data.items()}
+            return ":".join(str(_lti_data[k]) for k in self.LTI_KEYS)
 
     def optional_lti_parameters(self):
         """

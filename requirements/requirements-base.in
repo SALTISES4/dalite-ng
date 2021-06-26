@@ -14,7 +14,7 @@ django-inlinecss
 django-ipware==2.1.0  # Temporary pin awaiting django-axes fix
 django<3.0.0
 mysqlclient
-pillow
+pillow>=8.1.2
 pyjwt
 # pymysql
 python-memcached==1.59
@@ -28,8 +28,9 @@ django-samesite-none
 urllib3 > 1.25.8  # Reqd by safety
 lxml >= 4.6.2  # Reqd by safety
 
+SALTISE_course_flow
+SALTISE_user_feedback > 0.1.1
+
 -e git+https://github.com/SALTISES4/django-lti-tool-provider@dev#egg=django_lti_tool_provider
--e git+https://github.com/edx/opaque-keys#egg=opaque-keys
+-e git+https://github.com/edx/opaque-keys#egg=edx_opaque_keys
 -e git+https://github.com/SALTISES4/pinax-forums@dev#egg=pinax_forums
--e git+https://github.com/SALTISES4/CourseFlow@dcf151f7cd908e112f4829e14cc1a405683e1720#egg=CourseFlow
--e git+https://github.com/SALTISES4/UserFeedback@8b25b254ac30a823a500edf7ed60ed1abee32cc6#egg=user_feedback

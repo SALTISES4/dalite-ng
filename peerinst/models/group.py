@@ -5,9 +5,9 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from quality.models import Quality
 
 from .question import Discipline
-from quality.models import Quality
 
 
 def current_year():

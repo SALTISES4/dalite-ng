@@ -8,14 +8,13 @@ import urllib.request
 from datetime import datetime
 
 import pytz
-from course_flow.views import setup_link_to_group, setup_unlink_from_group
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.views import redirect_to_login
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 # reports
@@ -72,7 +71,6 @@ from ..models import (
     Student,
     StudentGroup,
     StudentGroupAssignment,
-    StudentGroupCourse,
     Subject,
     Teacher,
     UserType,
@@ -2543,48 +2541,41 @@ def report_assignment_aggregates(request):
     return JsonResponse(j, safe=False)
 
 
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
-def connect_group_to_course(request):
-
-    course_pk = request.POST.get("course_pk")
-    student_group = StudentGroup.objects.get(pk=request.POST.get("group_pk"))
-
-    students_as_students = student_group.students.values_list(
-        "student", flat=True
-    )
-    students_as_users = User.objects.filter(pk__in=students_as_students)
-
-    clone = setup_link_to_group(course_pk, students_as_users)
-
-    try:
-        StudentGroupCourse.objects.create(
-            course=clone, student_group=student_group
-        )
-    except ValidationError:
-        return JsonResponse({"action": "error"})
-
-    date = clone.created_on.strftime("%b. %d, %Y, %I:%S %p")
-
-    return JsonResponse(
-        {
-            "action": "posted",
-            "linked_course_pk": clone.pk,
-            "linked_course_title": clone.title,
-            "linked_course_created_date": date,
-        }
-    )
-
-
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
-def disconnect_group_from_course(request):
-
-    course_pk = request.POST.get("course_pk")
-
-    try:
-        setup_unlink_from_group(course_pk)
-    except ValidationError:
-        return JsonResponse({"action": "error"})
-
-    return JsonResponse({"action": "posted"})
+# @login_required
+# @user_passes_test(student_check, login_url="/access_denied_and_logout/")
+# def connect_group_to_course(request):
+#
+#     course_pk = request.POST.get("course_pk")
+#     student_group = StudentGroup.objects.get(pk=request.POST.get("group_pk"))
+#
+#     students_as_students = student_group.students.values_list(
+#         "student", flat=True
+#     )
+#     students_as_users = User.objects.filter(pk__in=students_as_students)
+#
+#     clone = setup_link_to_group(course_pk, students_as_users)
+#
+#     date = clone.created_on.strftime("%b. %d, %Y, %I:%S %p")
+#
+#     return JsonResponse(
+#         {
+#             "action": "posted",
+#             "linked_course_pk": clone.pk,
+#             "linked_course_title": clone.title,
+#             "linked_course_created_date": date,
+#         }
+#     )
+#
+#
+# @login_required
+# @user_passes_test(student_check, login_url="/access_denied_and_logout/")
+# def disconnect_group_from_course(request):
+#
+#     course_pk = request.POST.get("course_pk")
+#
+#     try:
+#         setup_unlink_from_group(course_pk)
+#     except ValidationError:
+#         return JsonResponse({"action": "error"})
+#
+#     return JsonResponse({"action": "posted"})

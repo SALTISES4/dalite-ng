@@ -292,16 +292,16 @@ def group_patterns():
             views.group.StudentGroupUpdateView.as_view(),
             name="group-update",
         ),
-        path(
-            "group/connect-course",
-            views.connect_group_to_course,
-            name="connect-group-course",
-        ),
-        path(
-            "group/disconnect-course",
-            views.disconnect_group_from_course,
-            name="disconnect-group-course",
-        ),
+        # path(
+        #     "group/connect-course",
+        #     views.connect_group_to_course,
+        #     name="connect-group-course",
+        # ),
+        # path(
+        #     "group/disconnect-course",
+        #     views.disconnect_group_from_course,
+        #     name="disconnect-group-course",
+        # ),
         path(
             "group-assignment/<assignment_hash>/",
             views.group_assignment_page,

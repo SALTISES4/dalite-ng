@@ -5,14 +5,11 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from blink.models import (
-    BlinkQuestion,
     BlinkAssignment,
     BlinkAssignmentQuestion,
+    BlinkQuestion,
 )
-from peerinst.models import (
-    Question,
-    Teacher,
-)
+from peerinst.models import Question, Teacher
 
 
 def ready_user(pk):

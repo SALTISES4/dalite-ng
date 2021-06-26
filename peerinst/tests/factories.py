@@ -4,12 +4,13 @@ import random
 import factory
 import pytz
 from django.contrib.auth.models import User
+
 from tos.models import Consent, Tos
 
 from .. import models
 
 
-class UserFactory(factory.DjangoModelFactory):
+class UserFactory(factory.django.DjangoModelFactory):
     # This class was adapted from
     # edx-platform/common/djangoapps/student/tests/factories.py.
     class Meta:
@@ -39,14 +40,14 @@ class UserFactory(factory.DjangoModelFactory):
             consent.save()
 
 
-class AnswerFactory(factory.DjangoModelFactory):
+class AnswerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Answer
 
     rationale = factory.Sequence("Rationale {}".format)
 
 
-class AnswerChoiceFactory(factory.DjangoModelFactory):
+class AnswerChoiceFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.AnswerChoice
 
@@ -70,7 +71,7 @@ class AnswerChoiceFactory(factory.DjangoModelFactory):
             )
 
 
-class QuestionFactory(factory.DjangoModelFactory):
+class QuestionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Question
 
@@ -103,7 +104,7 @@ class QuestionFactory(factory.DjangoModelFactory):
             )
 
 
-class AssignmentFactory(factory.DjangoModelFactory):
+class AssignmentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Assignment
 
