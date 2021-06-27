@@ -94,6 +94,7 @@ from ..util import (
 
 LOGGER = logging.getLogger(__name__)
 LOGGER_teacher_activity = logging.getLogger("teacher_activity")
+performance_logger = logging.getLogger("performance")
 
 
 # Views related to Auth
@@ -2187,6 +2188,13 @@ def collection_search_function(search_string, pre_filtered_list=None):
 
 
 # AJAX functions
+def question_search_beta(request):
+    """
+    Use ElasticSearch index to return list of questions
+    """
+    return
+
+
 def question_search(request):
 
     start = time.perf_counter()
@@ -2338,39 +2346,15 @@ def question_search(request):
 
         end = time.perf_counter()
 
-        print(f"ORM time {end - start}s")
-
-        print(len(query_all))
-
-        from peerinst.documents import QuestionDocument
-
-        start = time.perf_counter()
-        s = (
-            QuestionDocument.search()
-            .sort("_score")
-            .query(
-                "multi_match",
-                query=search_string,
-                fields=[
-                    "answerchoice_set.text",
-                    "id",
-                    "title",
-                    "text",
-                    "category.title",
-                    "discipline.title",
-                    "user",
-                ],
-            )
+        performance_logger.info(
+            f"ORM time to query '{search_string}': {end - start:E}s"
         )
-        end = time.perf_counter()
+        performance_logger.info(f"Hit count: {len(query_all)}")
 
-        print(f"ElasticSearch time {end - start}s")
+        # TODO: Remove
+        from peerinst.elasticsearch import question_search as qs_ES
 
-        print(s.count())
-
-        for hit in s:
-            print(hit.meta.score, hit.to_dict())
-            print()
+        qs_ES(search_string)
 
         return TemplateResponse(
             request,

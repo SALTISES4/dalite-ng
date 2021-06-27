@@ -322,6 +322,12 @@ LOGGING = {
             "formatter": "complete",
             "stream": "ext://sys.stdout",
         },
+        "performance_console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
     },
     "loggers": {
         "django.request": {
@@ -391,6 +397,11 @@ LOGGING = {
         },
         "analytics": {
             "handlers": ["analytics_file_log", "analytics_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "performance": {
+            "handlers": ["performance_console_log"],
             "level": "DEBUG" if DEBUG else "INFO",
             "propagate": True,
         },
