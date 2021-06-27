@@ -2194,16 +2194,18 @@ def collection_search_function(search_string, pre_filtered_list=None):
 @ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
 def question_search_beta(request):
 
-    # Get search info
     search_string = request.GET.get("search_string", default="")
 
-    # Search
-    s = qs_ES(search_string)
+    if search_string:
+        # Search
+        s = qs_ES(search_string)
 
-    # Serialize
-    results = [hit.to_dict() for hit in s]
+        # Serialize
+        results = [hit.to_dict() for hit in s]
 
-    return JsonResponse(results, safe=False)
+        return JsonResponse(results, safe=False)
+
+    return JsonResponse({})
 
 
 def question_search(request):
