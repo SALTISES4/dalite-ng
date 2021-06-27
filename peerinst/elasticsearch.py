@@ -1,4 +1,5 @@
 import logging
+import pprint
 import time
 
 from elasticsearch_dsl import Q
@@ -6,6 +7,7 @@ from elasticsearch_dsl import Q
 from peerinst.documents import QuestionDocument
 
 logger = logging.getLogger("performance")
+pp = pprint.PrettyPrinter()
 
 
 def question_search(search_string):
@@ -55,7 +57,10 @@ def question_search(search_string):
     )
     logger.info(f"Hit count: {s.count()}")
 
-    for hit in s:
-        logger.info(f"Score: {hit.meta.score} | #{hit.id}")
+    for i, hit in enumerate(s):
+        if i == 0:
+            logger.debug(f"Top result: \n{pp.pformat(hit.to_dict())}")
+
+        logger.debug(f"Score: {hit.meta.score} | #{hit.id}")
 
     return s

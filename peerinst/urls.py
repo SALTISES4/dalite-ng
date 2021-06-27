@@ -130,6 +130,11 @@ def old_patterns():
             name="question-search",
         ),
         path(
+            "question-search-beta/",
+            views.question_search_beta,
+            name="question-search-beta",
+        ),
+        path(
             "collection-search/",
             views.collection_search,
             name="collection-search",

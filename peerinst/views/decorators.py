@@ -1,6 +1,9 @@
 import logging
+from functools import wraps
 
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.utils.translation import ugettext_lazy as _
 
 from dalite.views.errors import response_400, response_403
@@ -12,6 +15,38 @@ from peerinst.models import (
 )
 
 logger = logging.getLogger("peerinst-views")
+
+
+def ajax_login_required(view_func):
+    """
+    Decorator for ajax views that checks if a user is logged in and returns
+    a 401 status code otherwise.
+    """
+
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return view_func(request, *args, **kwargs)
+        response = JsonResponse({"login_url": settings.LOGIN_URL})
+        response.status_code = 401
+        return response
+
+    return _wrapped_view
+
+
+def ajax_user_passes_test(test_func):
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            if test_func(request.user):
+                return view_func(request, *args, **kwargs)
+            response = JsonResponse({"message": "Forbidden"})
+            response.status_code = 403
+            return response
+
+        return _wrapped_view
+
+    return decorator
 
 
 def group_access_required(fct):

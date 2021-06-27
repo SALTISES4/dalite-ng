@@ -44,6 +44,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
+from peerinst.elasticsearch import question_search as qs_ES
 
 # tos
 from tos.models import Consent, Tos
@@ -91,6 +92,7 @@ from ..util import (
     report_data_by_student,
     roundrobin,
 )
+from .decorators import ajax_login_required, ajax_user_passes_test
 
 LOGGER = logging.getLogger(__name__)
 LOGGER_teacher_activity = logging.getLogger("teacher_activity")
@@ -2188,11 +2190,22 @@ def collection_search_function(search_string, pre_filtered_list=None):
 
 
 # AJAX functions
+@ajax_login_required
+@ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
 def question_search_beta(request):
-    """
-    Use ElasticSearch index to return list of questions
-    """
-    return
+
+    # Get search info
+    search_string = request.GET.get("search_string", default="")
+
+    # Search
+    s = qs_ES(search_string)
+
+    # Serialize
+    results = [hit.to_dict() for hit in s]
+
+    # Need bleaching...
+
+    return JsonResponse(results, safe=False)
 
 
 def question_search(request):
@@ -2351,10 +2364,9 @@ def question_search(request):
         )
         performance_logger.info(f"Hit count: {len(query_all)}")
 
-        # TODO: Remove
-        from peerinst.elasticsearch import question_search as qs_ES
-
-        qs_ES(search_string)
+        # TODO: Remove - for comparison purposes only
+        if settings.DEBUG:
+            qs_ES(search_string)
 
         return TemplateResponse(
             request,

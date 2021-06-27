@@ -224,6 +224,138 @@ AXES_LOCKOUT_TEMPLATE = "registration/lockout.html"
 
 GRAPPELLI_ADMIN_TITLE = "Dalite NG administration"
 
+# LTI integration
+# these are sensitive settings, so it is better to fail early than use some
+# defaults visible on public repo
+LTI_CLIENT_KEY = os.environ.get("LTI_CLIENT_KEY", None)
+LTI_CLIENT_SECRET = os.environ.get("LTI_CLIENT_SECRET", None)
+
+# hint: LTi passport in edX Studio should look like
+# <arbitrary_label>:LTI_CLIENT_KEY:LTI_CLIENT_SECRET
+
+# Used to automatically generate stable passwords from anonymous user ids
+# coming from LTI requests - keep secret as well
+# If compromised, attackers would be able to restore any student passwords
+# knowing his anonymous user ID from LMS
+PASSWORD_GENERATOR_NONCE = os.environ.get("PASSWORD_GENERATOR_NONCE", None)
+# LTI Integration end
+
+# Configureation file for the heartbeat view, should contain json file. See
+# this url for file contents.
+HEARTBEAT_REQUIRED_FREE_SPACE_PERCENTAGE = 20
+
+PINAX_FORUMS_EDIT_TIMEOUT = dict(days=120)
+
+# NB: Object level permissions are checked for certain models, including
+# Question
+# TEACHER_GROUP will be automatically added to teachers at login This group and
+# its permissions need to be set through admin site
+TEACHER_GROUP = "Teacher"
+
+DEFAULT_TIMEZONE = "America/Montreal"
+
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    "max_retries": 3,
+    "interval_start": 0,
+    "interval_step": 0.4,
+    "interval_max": 2,
+}
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_ACKS_LATE = True
+CELERYD_PREFETCH_MULTIPLIER = 1
+CELERY_BROKER_URL = os.environ.get(
+    "CELERY_BROKER_URL", "redis://localhost:6379/0"
+)
+CELERY_RESULT_BACKEND = os.environ.get(
+    "CELERY_RESULT_BACKEND", "redis://localhost:6379/0"
+)
+
+# CSP
+CSP_DEFAULT_SRC = ["'self'", "*.mydalite.org"]
+CSP_SCRIPT_SRC = [
+    "'self'",
+    "*.mydalite.org",
+    "d3js.org",
+    "ajax.googleapis.com",
+    "cdn.polyfill.io",
+    "www.youtube.com",
+    "s.ytimg.com",
+    "cdn.jsdelivr.net",
+    "unpkg.com",
+    "cdn.datatables.net",
+    "code.jquery.com",
+    "cdn.quilljs.com",
+]
+CSP_STYLE_SRC = [
+    "'self'",
+    "*.mydalite.org",
+    "fonts.googleapis.com",
+    "ajax.googleapis.com",
+    "unpkg.com",
+    "cdn.jsdelivr.net",
+    "code.jquery.com",
+    "cdn.datatables.net",
+    "cdn.quilljs.com",
+]
+CSP_FONT_SRC = [
+    "'self'",
+    "*.mydalite.org",
+    "fonts.googleapis.com",
+    "fonts.gstatic.com",
+    "unpkg.com",
+]
+CSP_OBJECT_SRC = [
+    "*.mydalite.org",
+    "phet.colorado.edu",
+    "*.youtube.com",
+    "*.vimeo.com",
+    "docs.google.com",
+]
+
+FEATURE_POLICY = [
+    "autoplay 'none'",
+    "camera 'none'",
+    "encrypted-media 'none'",
+    "fullscreen *",
+    "geolocation 'none'",
+    "microphone 'none'",
+    "midi 'none'",
+    "payment 'none'",
+    "vr *",
+]
+
+REFERRER_POLICY = "no-referrer, strict-origin-when-cross-origin"
+
+ELASTICSEARCH_DSL = {
+    "default": {"hosts": "localhost:9200"},
+}
+ELASTICSEARCH_DSL_AUTOSYNC = False
+
+# External framing
+CSP_FRAME_ANCESTORS = ["*"]
+FRAMING_ALLOWED_FROM = ["*"]
+
+# Functional tests that scrape web console logs currently require chromedriver
+TESTING_BROWSER = "chrome"
+
+try:
+    from .local_settings import *  # noqa F403
+
+    try:
+        INSTALLED_APPS += LOCAL_APPS  # noqa F405
+    except NameError:
+        pass
+except ImportError:
+    import warnings
+
+    warnings.warn(
+        "File local_settings.py not found. You probably want to add it -- "
+        "see README.md."
+    )
+    pass
+
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -407,135 +539,3 @@ LOGGING = {
         },
     },
 }
-
-# LTI integration
-
-# these are sensitive settings, so it is better to fail early than use some
-# defaults visible on public repo
-LTI_CLIENT_KEY = os.environ.get("LTI_CLIENT_KEY", None)
-LTI_CLIENT_SECRET = os.environ.get("LTI_CLIENT_SECRET", None)
-
-# hint: LTi passport in edX Studio should look like
-# <arbitrary_label>:LTI_CLIENT_KEY:LTI_CLIENT_SECRET
-
-# Used to automatically generate stable passwords from anonymous user ids
-# coming from LTI requests - keep secret as well
-# If compromised, attackers would be able to restore any student passwords
-# knowing his anonymous user ID from LMS
-PASSWORD_GENERATOR_NONCE = os.environ.get("PASSWORD_GENERATOR_NONCE", None)
-# LTI Integration end
-
-# Configureation file for the heartbeat view, should contain json file. See
-# this url for file contents.
-HEARTBEAT_REQUIRED_FREE_SPACE_PERCENTAGE = 20
-
-PINAX_FORUMS_EDIT_TIMEOUT = dict(days=120)
-
-# NB: Object level permissions are checked for certain models, including
-# Question
-# TEACHER_GROUP will be automatically added to teachers at login This group and
-# its permissions need to be set through admin site
-TEACHER_GROUP = "Teacher"
-
-DEFAULT_TIMEZONE = "America/Montreal"
-
-CELERY_BROKER_TRANSPORT_OPTIONS = {
-    "max_retries": 3,
-    "interval_start": 0,
-    "interval_step": 0.4,
-    "interval_max": 2,
-}
-CELERY_RESULT_SERIALIZER = "json"
-CELERY_TASK_SERIALIZER = "json"
-CELERY_ACKS_LATE = True
-CELERYD_PREFETCH_MULTIPLIER = 1
-CELERY_BROKER_URL = os.environ.get(
-    "CELERY_BROKER_URL", "redis://localhost:6379/0"
-)
-CELERY_RESULT_BACKEND = os.environ.get(
-    "CELERY_RESULT_BACKEND", "redis://localhost:6379/0"
-)
-
-# CSP
-CSP_DEFAULT_SRC = ["'self'", "*.mydalite.org"]
-CSP_SCRIPT_SRC = [
-    "'self'",
-    "*.mydalite.org",
-    "d3js.org",
-    "ajax.googleapis.com",
-    "cdn.polyfill.io",
-    "www.youtube.com",
-    "s.ytimg.com",
-    "cdn.jsdelivr.net",
-    "unpkg.com",
-    "cdn.datatables.net",
-    "code.jquery.com",
-    "cdn.quilljs.com",
-]
-CSP_STYLE_SRC = [
-    "'self'",
-    "*.mydalite.org",
-    "fonts.googleapis.com",
-    "ajax.googleapis.com",
-    "unpkg.com",
-    "cdn.jsdelivr.net",
-    "code.jquery.com",
-    "cdn.datatables.net",
-    "cdn.quilljs.com",
-]
-CSP_FONT_SRC = [
-    "'self'",
-    "*.mydalite.org",
-    "fonts.googleapis.com",
-    "fonts.gstatic.com",
-    "unpkg.com",
-]
-CSP_OBJECT_SRC = [
-    "*.mydalite.org",
-    "phet.colorado.edu",
-    "*.youtube.com",
-    "*.vimeo.com",
-    "docs.google.com",
-]
-
-FEATURE_POLICY = [
-    "autoplay 'none'",
-    "camera 'none'",
-    "encrypted-media 'none'",
-    "fullscreen *",
-    "geolocation 'none'",
-    "microphone 'none'",
-    "midi 'none'",
-    "payment 'none'",
-    "vr *",
-]
-
-REFERRER_POLICY = "no-referrer, strict-origin-when-cross-origin"
-
-ELASTICSEARCH_DSL = {
-    "default": {"hosts": "localhost:9200"},
-}
-ELASTICSEARCH_DSL_AUTOSYNC = False
-
-# External framing
-CSP_FRAME_ANCESTORS = ["*"]
-FRAMING_ALLOWED_FROM = ["*"]
-
-# Functional tests that scrape web console logs currently require chromedriver
-TESTING_BROWSER = "chrome"
-
-try:
-    from .local_settings import *  # noqa F403
-
-    try:
-        INSTALLED_APPS += LOCAL_APPS  # noqa F405
-    except NameError:
-        pass
-except ImportError:
-    import warnings
-
-    warnings.warn(
-        "File local_settings.py not found. You probably want to add it -- "
-        "see README.md."
-    )
-    pass

@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django_elasticsearch_dsl import Document
 from django_elasticsearch_dsl.fields import (
     BooleanField,
+    IntegerField,
     NestedField,
     ObjectField,
     TextField,
@@ -28,6 +29,7 @@ html_strip = analyzer(
 
 @registry.register_document
 class QuestionDocument(Document):
+    answer_count = IntegerField()
     answerchoice_set = NestedField(
         properties={
             "text": TextField(analyzer=html_strip),
@@ -35,12 +37,22 @@ class QuestionDocument(Document):
     )
     category = NestedField(properties={"title": TextField()})
     collaborators = NestedField(properties={"username": TextField()})
+    difficulty = ObjectField()
     discipline = ObjectField(properties={"title": TextField()})
     id = TextField()
     text = TextField(analyzer=html_strip)
     questionflag_set = BooleanField()
     user = ObjectField(properties={"username": TextField()})
     valid = BooleanField()
+
+    def prepare_answer_count(self, instance):
+        """
+        TODO: Refactor to model
+        """
+        return instance.answer_set.count()
+
+    def prepare_difficulty(self, instance):
+        return instance.get_matrix()
 
     def prepare_id(self, instance):
         return str(instance.id)
