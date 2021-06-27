@@ -1,5 +1,6 @@
 import json
 
+import pytest
 from django.core.management import call_command
 from django.urls import reverse
 
@@ -44,6 +45,7 @@ def test_browse_db_template(client, teacher):
 
 
 # ES-specific tests
+@pytest.mark.skip(reason="Requires elasticsearch service")
 def test_serialize_results(client, teacher, realistic_questions):
     call_command("search_index", "--rebuild", "-f")
     assert login_teacher(client, teacher)

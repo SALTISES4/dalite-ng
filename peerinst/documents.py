@@ -1,3 +1,4 @@
+import bleach
 from django.contrib.auth.models import User
 from django_elasticsearch_dsl import Document
 from django_elasticsearch_dsl.fields import (
@@ -18,6 +19,7 @@ from peerinst.models import (
     Question,
     QuestionFlag,
 )
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 
 html_strip = analyzer(
     "html_strip",
@@ -51,8 +53,47 @@ class QuestionDocument(Document):
         """
         return instance.answer_set.count()
 
+    def prepare_answerchoice_set(self, instance):
+        if instance.answerchoice_set.count() > 0:
+            return [
+                {
+                    "text": bleach.clean(
+                        ac.text,
+                        tags=ALLOWED_TAGS,
+                        styles=[],
+                        strip=True,
+                    )
+                }
+                for ac in instance.answerchoice_set.all()
+            ]
+
+    def prepare_category(self, instance):
+        if instance.category:
+            return [
+                {
+                    "title": bleach.clean(
+                        c.title,
+                        tags=ALLOWED_TAGS,
+                        styles=[],
+                        strip=True,
+                    )
+                }
+                for c in instance.category.all()
+            ]
+
     def prepare_difficulty(self, instance):
         return instance.get_matrix()
+
+    def prepare_discipline(self, instance):
+        if instance.discipline:
+            return {
+                "title": bleach.clean(
+                    instance.discipline.title,
+                    tags=ALLOWED_TAGS,
+                    styles=[],
+                    strip=True,
+                )
+            }
 
     def prepare_id(self, instance):
         return str(instance.id)
@@ -63,6 +104,22 @@ class QuestionDocument(Document):
             any(instance.questionflag_set.all())
             if instance.questionflag_set.exists()
             else False
+        )
+
+    def prepare_text(self, instance):
+        return bleach.clean(
+            instance.text,
+            tags=ALLOWED_TAGS,
+            styles=[],
+            strip=True,
+        )
+
+    def prepare_title(self, instance):
+        return bleach.clean(
+            instance.title,
+            tags=ALLOWED_TAGS,
+            styles=[],
+            strip=True,
         )
 
     def prepare_valid(self, instance):

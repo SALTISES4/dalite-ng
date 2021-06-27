@@ -2203,8 +2203,6 @@ def question_search_beta(request):
     # Serialize
     results = [hit.to_dict() for hit in s]
 
-    # Need bleaching...
-
     return JsonResponse(results, safe=False)
 
 
