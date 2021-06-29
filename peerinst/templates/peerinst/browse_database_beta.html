@@ -4,12 +4,15 @@
 
 {% block stylesheets %}
 {{ block.super }}
-{% compress css file search %}
-<link href="{% static 'peerinst/js/search_beta.min.css' %}" rel="stylesheet">
+{% compress js file preact %}
+<script src="{% static 'peerinst/js/preact.min.js' %}" defer="true"></script>
 {% endcompress %}
-
 {% compress js file search %}
 <script src="{% static 'peerinst/js/search_beta.min.js' %}" defer></script>
+{% endcompress %}
+
+{% compress css file search %}
+<link href="{% static 'peerinst/js/search_beta.min.css' %}" rel="stylesheet">
 {% endcompress %}
 {% endblock %}
 
@@ -29,6 +32,7 @@
 
     <h2 class="mdc-typography--display1  mdc-theme--secondary">{% trans 'Search' %}</h2>
 
+    <div id="search-app"></div>
   </section>
 </main>
 {% endblock %}
@@ -36,6 +40,14 @@
 {% block scripts %}
 {{ block.super }}
 <script nonce="{{ request.csp_nonce }}">
-  window.addEventListener('load', function() {});
+  window.addEventListener('load', function() {
+    const searchApp = () => {
+      return preact.h(
+        search_beta.SearchApp, {
+          url: "{% url 'question-search-beta' %}",
+        });
+    }
+    preact.render(searchApp(), document.getElementById("search-app"));
+  });
 </script>
 {% endblock %}

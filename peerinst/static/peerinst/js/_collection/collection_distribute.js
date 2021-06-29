@@ -27,9 +27,8 @@ export function init(
     });
     posting.done(function (data) {
       console.info(data);
-      document.getElementById(
-        el.getAttribute("id_pk"),
-      ).innerHTML = unassignTrans;
+      document.getElementById(el.getAttribute("id_pk")).innerHTML =
+        unassignTrans;
       document.getElementById(el.getAttribute("id_pk")).classList.add("added");
       document
         .getElementById(el.getAttribute("id_pk"))
@@ -55,9 +54,8 @@ export function init(
     });
     posting.done(function (data) {
       console.info(data);
-      document.getElementById(
-        el.getAttribute("id_pk"),
-      ).innerHTML = assignTrans;
+      document.getElementById(el.getAttribute("id_pk")).innerHTML =
+        assignTrans;
       document
         .getElementById(el.getAttribute("id_pk"))
         .classList.remove("added");

@@ -1,3 +1,4 @@
+import itertools
 import json
 import logging
 import random
@@ -2199,11 +2200,29 @@ def question_search_beta(request):
     if search_string:
         # Search
         s = qs_ES(search_string)
-
         # Serialize
-        results = [hit.to_dict() for hit in s]
+        results = [hit.to_dict() for hit in s[:100]]
+        # Add metadata
+        if results:
+            meta = {
+                "categories": list(
+                    set(
+                        x["title"]
+                        for x in itertools.chain.from_iterable(
+                            map(
+                                lambda x: x["category"],
+                                filter(
+                                    lambda x: hasattr(x, "category"), results
+                                ),
+                            )
+                        )
+                    )
+                )
+            }
+        else:
+            meta = {}
 
-        return JsonResponse(results, safe=False)
+        return JsonResponse({"results": results, "meta": meta}, safe=False)
 
     return JsonResponse({})
 

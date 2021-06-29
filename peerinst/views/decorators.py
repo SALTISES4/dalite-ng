@@ -18,11 +18,6 @@ logger = logging.getLogger("peerinst-views")
 
 
 def ajax_login_required(view_func):
-    """
-    Decorator for ajax views that checks if a user is logged in and returns
-    a 401 status code otherwise.
-    """
-
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         if request.user.is_authenticated:

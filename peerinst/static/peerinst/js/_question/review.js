@@ -43,34 +43,34 @@ function submitButtonView() {
 }
 
 function showMeMore() {
-  [].forEach.call(document.querySelectorAll(".expand-button"), function (
-    el,
-    i,
-  ) {
-    el.addEventListener("click", function () {
-      const els = document.getElementsByClassName(
-        `hidden-${el.getAttribute("data-rationale-iterator")}`,
-      );
-      const showCounter = document.getElementById(
-        `show-counter-${el.getAttribute("data-rationale-iterator")}`,
-      );
-      let shownCounter = 0;
-      for (let i = 0; i < els.length; i++) {
-        if (els[i].hidden == true && shownCounter < 2) {
-          els[i].hidden = false;
-          shownCounter++;
-          if (i == els.length - 1) {
-            el.hidden = true;
-            break;
+  [].forEach.call(
+    document.querySelectorAll(".expand-button"),
+    function (el, i) {
+      el.addEventListener("click", function () {
+        const els = document.getElementsByClassName(
+          `hidden-${el.getAttribute("data-rationale-iterator")}`,
+        );
+        const showCounter = document.getElementById(
+          `show-counter-${el.getAttribute("data-rationale-iterator")}`,
+        );
+        let shownCounter = 0;
+        for (let i = 0; i < els.length; i++) {
+          if (els[i].hidden == true && shownCounter < 2) {
+            els[i].hidden = false;
+            shownCounter++;
+            if (i == els.length - 1) {
+              el.hidden = true;
+              break;
+            }
+            showCounter.setAttribute(
+              "value",
+              +showCounter.getAttribute("value") + 1,
+            );
           }
-          showCounter.setAttribute(
-            "value",
-            +showCounter.getAttribute("value") + 1,
-          );
         }
-      }
-    });
-  });
+      });
+    },
+  );
 }
 
 /*************/
