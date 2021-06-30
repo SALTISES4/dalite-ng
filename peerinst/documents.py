@@ -58,13 +58,14 @@ class QuestionDocument(Document):
         properties={"title": TextField(analyzer=trigram)}
     )  # don't break on spaces?
     collaborators = NestedField(properties={"username": TextField()})
-    difficulty = ObjectField()
+    difficulty = TextField()
     discipline = ObjectField(
         properties={
             "title": TextField(analyzer=autocomplete)
         }  # don't break on spaces?
     )
     id = TextField()
+    matrix = ObjectField()
     text = TextField(analyzer=html_strip)
     questionflag_set = BooleanField()
     user = ObjectField(
@@ -113,7 +114,7 @@ class QuestionDocument(Document):
         return []
 
     def prepare_difficulty(self, instance):
-        return instance.get_matrix()
+        return str(instance.get_difficulty()[1])
 
     def prepare_discipline(self, instance):
         if instance.discipline:
@@ -129,6 +130,9 @@ class QuestionDocument(Document):
 
     def prepare_id(self, instance):
         return str(instance.id)
+
+    def prepare_matrix(self, instance):
+        return instance.get_matrix()
 
     def prepare_questionflag_set(self, instance):
         """Replicate logic for UnflaggedQuestionManager"""

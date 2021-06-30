@@ -409,6 +409,86 @@ class Question(models.Model):
     def is_correct(self, index):
         return self.answerchoice_set.all()[index - 1].correct
 
+    def get_correct_choices(self):
+        answerchoice_correct = self.answerchoice_set.values_list(
+            "correct", flat=True
+        )
+        return list(
+            itertools.compress(itertools.count(1), answerchoice_correct)
+        )
+
+    def get_student_answers(self):
+        return (
+            self.answer_set.filter(expert=False)
+            .filter(second_answer_choice__gt=0)
+            .exclude(user_token="")
+        )
+
+    def get_answers_by_type(self, answer_type):
+        """
+        Arguments:
+        ----------
+            answer_type: string, one of following possible choices:
+                        - *R (second answer choice correct)
+                        - *W (second answer choice wrong)
+                        - RR (right to right),
+                        - RW (right to wrong),
+                        - WR,
+                        - WR
+        Returns:
+        -------
+            queryset of student answers
+
+        """
+        student_answers = self.get_student_answers()
+        correct_choices = self.get_correct_choices()
+
+        if answer_type == "*R":
+            qs = student_answers.filter(
+                second_answer_choice__in=correct_choices
+            )
+        if answer_type == "*W":
+            qs = student_answers.exclude(
+                second_answer_choice__in=correct_choices
+            )
+        elif answer_type == "RR":
+            qs = student_answers.filter(
+                first_answer_choice__in=correct_choices
+            ).filter(second_answer_choice__in=correct_choices)
+        elif answer_type == "RW":
+            qs = student_answers.filter(
+                first_answer_choice__in=correct_choices
+            ).exclude(second_answer_choice__in=correct_choices)
+        elif answer_type == "WR":
+            qs = student_answers.exclude(
+                first_answer_choice__in=correct_choices
+            ).filter(second_answer_choice__in=correct_choices)
+        elif answer_type == "WW":
+            qs = student_answers.exclude(
+                first_answer_choice__in=correct_choices
+            ).exclude(second_answer_choice__in=correct_choices)
+
+        return qs
+
+    def get_difficulty(self):
+        MIN_ANSWERS = 30
+        UPPER_BOUND = 0.50
+        LOWER_BOUND = 0.25
+
+        N = self.get_student_answers().count()
+        if N > MIN_ANSWERS:
+            difficulty = self.get_answers_by_type(answer_type="*W").count() / N
+            if difficulty >= UPPER_BOUND:
+                difficulty_str = _("Difficult")
+            elif difficulty < LOWER_BOUND:
+                difficulty_str = _("Easy")
+            else:
+                difficulty_str = _("Medium")
+        else:
+            difficulty = None
+            difficulty_str = _("Not enough data")
+        return (difficulty, difficulty_str)
+
     def get_matrix(self):
         matrix = {}
         matrix[str("easy")] = 0
@@ -417,46 +497,19 @@ class Question(models.Model):
         matrix[str("peer")] = 0
 
         answer_choices = self.answerchoice_set.all()
-        answerchoice_correct = self.answerchoice_set.values_list(
-            "correct", flat=True
-        )
-        correct_choices = list(
-            itertools.compress(itertools.count(1), answerchoice_correct)
-        )
+        correct_choices = self.get_correct_choices()
 
         # There must be more choices than correct choices for valid matrix
         if answer_choices.count() > len(correct_choices):
-            student_answers = (
-                self.answer_set.filter(expert=False)
-                .filter(second_answer_choice__gt=0)
-                .exclude(user_token="")
-            )
+            student_answers = self.get_student_answers()
             N = len(student_answers)
             if N > 0:
 
-                easy = (
-                    student_answers.filter(
-                        first_answer_choice__in=correct_choices
-                    )
-                    .filter(second_answer_choice__in=correct_choices)
-                    .count()
-                )
+                easy = self.get_answers_by_type(answer_type="RR").count()
 
-                hard = (
-                    student_answers.exclude(
-                        first_answer_choice__in=correct_choices
-                    )
-                    .exclude(second_answer_choice__in=correct_choices)
-                    .count()
-                )
+                hard = self.get_answers_by_type(answer_type="WW").count()
 
-                tricky = (
-                    student_answers.filter(
-                        first_answer_choice__in=correct_choices
-                    )
-                    .exclude(second_answer_choice__in=correct_choices)
-                    .count()
-                )
+                tricky = self.get_answers_by_type(answer_type="RW").count()
 
                 # peer = (
                 #     student_answers.exclude(

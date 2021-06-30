@@ -266,8 +266,9 @@ export class SearchApp extends Component {
             value={this.state.query}
           />
           <TextFieldHelperText persistent>
-            You can search for keywords in question and answer texts, by
-            username, by question id, by category, and by discipline.
+            {this.props.gettext(
+              "You can search for keywords in question and answer texts, by username, by question id, by category, and by discipline.",
+            )}
           </TextFieldHelperText>
         </div>
         {this.results()}
