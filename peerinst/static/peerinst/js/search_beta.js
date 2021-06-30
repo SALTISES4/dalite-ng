@@ -1,23 +1,66 @@
 import { get } from "./_ajax/ajax.js";
 import { Component, h } from "preact";
 
-import { Card, CardPrimaryAction } from "@rmwc/card";
+import {
+  Card,
+  CardPrimaryAction,
+  CardActions,
+  CardAction,
+  CardActionIcons,
+  CardActionButtons,
+} from "@rmwc/card";
 import { CircularProgress } from "@rmwc/circular-progress";
-import { TextField } from "@rmwc/textfield";
+import {
+  TextField,
+  TextFieldIcon,
+  TextFieldHelperText,
+} from "@rmwc/textfield";
 import { Typography } from "@rmwc/typography";
 
 import "@rmwc/card/node_modules/@material/card/dist/mdc.card.css";
 import "@rmwc/circular-progress/circular-progress.css";
+import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-button.min.css";
 import "@rmwc/textfield/node_modules/@material/textfield/dist/mdc.textfield.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
-
-/*
-.mdc-text-field--outlined .mdc-text-field__input {height: 100%}
-*/
 
 export class QuestionCard extends Component {
   state = {
     loaded: false,
+  };
+
+  annotateCorrect = (ac) => {
+    if (Object.prototype.hasOwnProperty.call(ac, "correct")) {
+      if (ac.correct) {
+        return <i class="check material-icons">check</i>;
+      }
+    }
+  };
+
+  answerChoices = () => {
+    if (
+      Object.prototype.hasOwnProperty.call(
+        this.props.question,
+        "answerchoice_set",
+      )
+    ) {
+      return (
+        <div class="question-answers">
+          <ul>
+            {this.props.question.answerchoice_set.map((ac, i) => (
+              <Typography key={i} use="body1" tag="li">
+                {ac.label}.{" "}
+                <span
+                  // This field is bleached and safe
+                  // eslint-disable-next-line
+                  dangerouslySetInnerHTML={{ __html: ac.text }}
+                />
+                {this.annotateCorrect(ac)}
+              </Typography>
+            ))}
+          </ul>
+        </div>
+      );
+    }
   };
 
   byline = () => {
@@ -26,19 +69,64 @@ export class QuestionCard extends Component {
     }
   };
 
+  category = () => {
+    if (this.props.question.category) {
+      return this.props.question.category.map((c) => c.title).join("; ");
+    }
+    return this.props.gettext("Uncategorized");
+  };
+
+  discipline = () => {
+    if (this.props.question.discipline) {
+      return this.props.question.discipline.title;
+    }
+    return this.props.gettext("Unlabelled");
+  };
+
+  image = () => {
+    if (this.props.question.image || this.props.question.image_alt_text) {
+      return (
+        <Typography use="caption">
+          <img
+            class="question-image"
+            src={this.props.staticURL.slice(0, -1) + this.props.question.image}
+            alt={this.props.question.image_alt_text}
+          />
+        </Typography>
+      );
+    }
+  };
+
+  video = () => {
+    if (this.props.question.video_url) {
+      return (
+        <object
+          class="question-image"
+          width="640"
+          height="390"
+          data={this.props.question.video_url}
+        />
+      );
+    }
+  };
+
   render() {
     return (
-      <Card>
+      <Card class="question">
         <CardPrimaryAction>
           <div>
-            <Typography use="headline6" tag="h2">
-              {this.props.question.title}
-            </Typography>
             <Typography
-              use="subtitle2"
-              tag="h3"
+              class="title"
+              use="headline6"
+              tag="h2"
+              // This field is bleached and safe
+              // eslint-disable-next-line
+              dangerouslySetInnerHTML={{ __html: this.props.question.title }}
+            />
+            <Typography
+              use="caption"
+              tag="div"
               theme="text-secondary-on-background"
-              style={{ marginTop: "-1rem" }}
             >
               #{this.props.question.id} {this.byline()}
             </Typography>
@@ -46,14 +134,51 @@ export class QuestionCard extends Component {
               use="body1"
               tag="div"
               theme="text-secondary-on-background"
-            >
-              <div
-                // eslint-disable-next-line
-                dangerouslySetInnerHTML={{ __html: this.props.question.text }}
-              />
-            </Typography>
+              // This field is bleached and safe
+              // eslint-disable-next-line
+              dangerouslySetInnerHTML={{ __html: this.props.question.text }}
+              style={{ marginTop: 10 }}
+            />
+            {this.image()}
+            {this.video()}
+            {this.answerChoices()}
           </div>
         </CardPrimaryAction>
+        <CardActions>
+          <CardActionButtons>
+            <Typography use="caption" tag="div">
+              {this.props.gettext("Discipline")}:{" "}
+              <span class="capitalize">{this.discipline()}</span>
+            </Typography>
+            <Typography use="caption" tag="div">
+              {this.props.gettext("Categories")}:{" "}
+              <span class="capitalize">{this.category()}</span>
+            </Typography>
+            <Typography use="caption" tag="div">
+              {this.props.gettext("Student answers")}:{" "}
+              {this.props.question.answer_count}
+            </Typography>
+          </CardActionButtons>
+          <CardActionIcons>
+            <CardAction
+              theme="primary"
+              onIcon="favorite"
+              icon="favorite_border"
+              title={this.props.gettext("Toggle favourite")}
+            />
+            <CardAction
+              theme="primary"
+              onIcon="flag"
+              icon="outlined_flag"
+              title={this.props.gettext("Flag question for removal")}
+            />
+            <CardAction
+              theme="primary"
+              icon="add"
+              title={this.props.gettext("Add question to an assignment")}
+            />
+          </CardActionIcons>
+        </CardActions>
       </Card>
     );
   }
@@ -93,13 +218,20 @@ export class SearchApp extends Component {
 
   results = () => {
     if (this.state.searching) {
-      return <CircularProgress size="large" />;
+      return <CircularProgress class="spinner" size="xlarge" />;
     }
     if (this.state.questions) {
       return (
-        <div id="results">
+        <div id="results" style={{ marginTop: 20 }}>
           {this.state.questions.map((question, i) => {
-            return <QuestionCard question={question} key={i} />;
+            return (
+              <QuestionCard
+                question={question}
+                key={i}
+                staticURL={this.props.staticURL}
+                gettext={this.props.gettext}
+              />
+            );
           })}
         </div>
       );
@@ -109,16 +241,34 @@ export class SearchApp extends Component {
   render() {
     return (
       <div>
-        <div id="search-form">
+        <div id="search-form" style={{ width: 500 }}>
           <TextField
+            autofocus
+            class="wide tight"
             outlined
-            label="Contains words..."
+            label={this.props.gettext("Type something...")}
             withLeadingIcon="search"
+            withTrailingIcon={
+              <TextFieldIcon
+                style={
+                  this.state.query ? { display: "block" } : { display: "none" }
+                }
+                tabIndex="0"
+                icon="close"
+                onClick={() =>
+                  this.setState({ query: "", questions: [], meta: {} })
+                }
+              />
+            }
             onInput={(evt) => {
               this.setState({ query: evt.target.value }, this.handleSubmit);
             }}
             value={this.state.query}
           />
+          <TextFieldHelperText persistent>
+            You can search for keywords in question and answer texts, by
+            username, by question id, by category, and by discipline.
+          </TextFieldHelperText>
         </div>
         {this.results()}
       </div>

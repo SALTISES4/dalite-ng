@@ -22,7 +22,7 @@ def question_search(search_string):
                 "discipline.title",
                 "id",
                 "text",
-                "title",
+                "title^3",
                 "user.username",
             ],
         )

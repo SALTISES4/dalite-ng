@@ -14,6 +14,9 @@
 {% compress css file search %}
 <link href="{% static 'peerinst/js/search_beta.min.css' %}" rel="stylesheet">
 {% endcompress %}
+{% compress css file rmwc %}
+<link href="{% static 'peerinst/css/rmwc.min.css' %}" rel="stylesheet">
+{% endcompress %}
 {% endblock %}
 
 {% block body %}
@@ -44,6 +47,8 @@
     const searchApp = () => {
       return preact.h(
         search_beta.SearchApp, {
+          gettext: gettext,
+          staticURL: "{{ static_url }}",
           url: "{% url 'question-search-beta' %}",
         });
     }

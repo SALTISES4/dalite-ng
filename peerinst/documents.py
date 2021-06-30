@@ -9,7 +9,7 @@ from django_elasticsearch_dsl.fields import (
     TextField,
 )
 from django_elasticsearch_dsl.registries import registry
-from elasticsearch_dsl import analyzer
+from elasticsearch_dsl import analyzer, token_filter, tokenizer
 
 from peerinst.models import (
     AnswerChoice,
@@ -28,23 +28,48 @@ html_strip = analyzer(
     char_filter=["html_strip"],
 )
 
+autocomplete = analyzer(
+    "autocomplete",
+    tokenizer=tokenizer("autocomplete", "edge_ngram", min_gram=3, max_gram=50),
+)
+
+trigram_filter = token_filter("ngram", "ngram", min_gram=3, max_gram=3)
+trigram = analyzer("trigram", tokenizer="whitespace", filter=[trigram_filter])
+
 
 @registry.register_document
 class QuestionDocument(Document):
+    """
+    Notes:
+    - Need both autocomplete type matching, partial matching, and full-word
+      matching
+    - Need to test on certain keywords: "phy", "physi", "tnagar",
+      "adamsr three blocks" etc.
+    - Consider "boosting" and multifields
+    """
+
     answer_count = IntegerField()
     answerchoice_set = NestedField(
         properties={
             "text": TextField(analyzer=html_strip),
         }
     )
-    category = NestedField(properties={"title": TextField()})
+    category = NestedField(
+        properties={"title": TextField(analyzer=trigram)}
+    )  # don't break on spaces?
     collaborators = NestedField(properties={"username": TextField()})
     difficulty = ObjectField()
-    discipline = ObjectField(properties={"title": TextField()})
+    discipline = ObjectField(
+        properties={
+            "title": TextField(analyzer=autocomplete)
+        }  # don't break on spaces?
+    )
     id = TextField()
     text = TextField(analyzer=html_strip)
     questionflag_set = BooleanField()
-    user = ObjectField(properties={"username": TextField()})
+    user = ObjectField(
+        properties={"username": TextField(analyzer=autocomplete)}
+    )
     valid = BooleanField()
 
     def prepare_answer_count(self, instance):
@@ -57,29 +82,35 @@ class QuestionDocument(Document):
         if instance.answerchoice_set.count() > 0:
             return [
                 {
+                    "correct": instance.is_correct(i),
+                    "label": ac[0],
                     "text": bleach.clean(
-                        ac.text,
+                        ac[1],
                         tags=ALLOWED_TAGS,
                         styles=[],
                         strip=True,
-                    )
+                    ),
                 }
-                for ac in instance.answerchoice_set.all()
+                for i, ac in enumerate(instance.get_choices(), 1)
             ]
+        return []
 
     def prepare_category(self, instance):
         if instance.category:
-            return [
-                {
-                    "title": bleach.clean(
-                        c.title,
+            sorted_category_set = sorted(
+                set(
+                    bleach.clean(
+                        c.title.lower(),
                         tags=ALLOWED_TAGS,
                         styles=[],
                         strip=True,
                     )
-                }
-                for c in instance.category.all()
-            ]
+                    for c in instance.category.all()
+                )
+            )
+
+            return [{"title": c} for c in sorted_category_set]
+        return []
 
     def prepare_difficulty(self, instance):
         return instance.get_matrix()
@@ -94,6 +125,7 @@ class QuestionDocument(Document):
                     strip=True,
                 )
             }
+        return []
 
     def prepare_id(self, instance):
         return str(instance.id)
@@ -148,8 +180,11 @@ class QuestionDocument(Document):
     class Django:
         model = Question
         fields = [
+            "image",
+            "image_alt_text",
             "title",
             "type",
+            "video_url",
         ]
         related_models = [
             AnswerChoice,
