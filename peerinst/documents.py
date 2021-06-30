@@ -39,7 +39,7 @@ class QuestionDocument(Document):
     )
     category = NestedField(properties={"title": TextField()})
     collaborators = NestedField(properties={"username": TextField()})
-    difficulty = ObjectField()
+    difficulty = TextField()
     discipline = ObjectField(properties={"title": TextField()})
     id = TextField()
     text = TextField(analyzer=html_strip)
@@ -82,7 +82,7 @@ class QuestionDocument(Document):
             ]
 
     def prepare_difficulty(self, instance):
-        return instance.get_matrix()
+        return str(instance.get_difficulty()[1])
 
     def prepare_discipline(self, instance):
         if instance.discipline:
