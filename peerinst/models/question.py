@@ -489,6 +489,28 @@ class Question(models.Model):
             difficulty_str = _("Not enough data")
         return (difficulty, difficulty_str)
 
+    def get_peer_impact(self):
+        MIN_ANSWERS = 30
+        UPPER_BOUND = 0.25
+        LOWER_BOUND = 0.05
+        N = self.get_student_answers().count()
+
+        if N > MIN_ANSWERS:
+            peer_impact = (
+                self.get_answers_by_type(answer_type="RW").count()
+                + self.get_answers_by_type(answer_type="WR").count()
+            ) / N
+            if peer_impact >= UPPER_BOUND:
+                peer_impact_str = _("High")
+            elif peer_impact < LOWER_BOUND:
+                peer_impact_str = _("Low")
+            else:
+                peer_impact_str = _("Medium")
+        else:
+            peer_impact = None
+            peer_impact_str = _("Not enough data")
+        return (peer_impact, peer_impact_str)
+
     def get_matrix(self):
         matrix = {}
         matrix[str("easy")] = 0
