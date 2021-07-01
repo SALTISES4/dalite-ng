@@ -90,6 +90,7 @@ class QuestionDocument(Document):
         properties={"username": TextField(analyzer=autocomplete)}
     )
     valid = BooleanField()
+    deleted = BooleanField()
     video_url = TextField(index=False)
 
     def prepare_answer_count(self, instance):
