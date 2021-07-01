@@ -479,11 +479,11 @@ class Question(models.Model):
         if N > MIN_ANSWERS:
             difficulty = self.get_answers_by_type(answer_type="*W").count() / N
             if difficulty >= UPPER_BOUND:
-                difficulty_str = _("Difficult")
+                difficulty_str = _("Hard")
             elif difficulty < LOWER_BOUND:
                 difficulty_str = _("Easy")
             else:
-                difficulty_str = _("Medium")
+                difficulty_str = _("Med")
         else:
             difficulty = None
             difficulty_str = _("Not enough data")

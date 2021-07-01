@@ -1,5 +1,7 @@
 import { get } from "./_ajax/ajax.js";
 import { Component, h } from "preact";
+import { triScale } from "./_theming/colours.js";
+import { scaleThreshold } from "d3";
 
 import {
   Card,
@@ -23,9 +25,11 @@ import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-butto
 import "@rmwc/textfield/node_modules/@material/textfield/dist/mdc.textfield.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
+triScale.reverse();
+
 export class QuestionCard extends Component {
   state = {
-    loaded: false,
+    analyticsOpen: false,
   };
 
   answerChoice = (ac) => {
@@ -82,6 +86,60 @@ export class QuestionCard extends Component {
     return this.props.gettext("Uncategorized");
   };
 
+  difficulty = () => {
+    if (
+      Object.prototype.hasOwnProperty.call(
+        this.props.question.difficulty,
+        "score",
+      )
+    ) {
+      const colourScale = scaleThreshold(triScale).domain([0.25, 0.5]);
+      const color = colourScale(this.props.question.difficulty.score);
+      const opacity = "30";
+      const label = this.state.analyticsOpen
+        ? "close"
+        : this.props.question.difficulty.label;
+      return (
+        <div
+          style={{
+            backgroundColor: color + opacity,
+            borderColor: color,
+            borderRadius: "50%",
+            borderWidth: "thin",
+            borderStyle: "solid",
+            cursor: "pointer",
+            fontSize: "x-small",
+            height: 32,
+            position: "absolute",
+            right: 20,
+            top: 20,
+            width: 32,
+          }}
+          onClick={() =>
+            this.setState({ analyticsOpen: !this.state.analyticsOpen })
+          }
+        >
+          <div
+            style={{
+              color,
+              fontFamily: this.state.analyticsOpen
+                ? "Material Icons"
+                : "inherit",
+              fontSize: this.state.analyticsOpen ? 18 : "inherit",
+              fontWeight: "bold",
+              left: "50%",
+              position: "absolute",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            {label}
+          </div>
+        </div>
+      );
+    }
+  };
+
   discipline = () => {
     if (this.props.question.discipline) {
       return this.props.question.discipline.title;
@@ -103,6 +161,28 @@ export class QuestionCard extends Component {
     }
   };
 
+  innerContent = () => {
+    if (this.state.analyticsOpen) {
+      return <div />;
+    }
+    return (
+      <div>
+        <Typography
+          use="body1"
+          tag="div"
+          theme="text-secondary-on-background"
+          // This field is bleached and safe
+          // eslint-disable-next-line
+          dangerouslySetInnerHTML={{ __html: this.props.question.text }}
+          style={{ marginTop: 10 }}
+        />
+        {this.image()}
+        {this.video()}
+        {this.answerChoices()}
+      </div>
+    );
+  };
+
   video = () => {
     if (this.props.question.video_url) {
       return (
@@ -118,7 +198,8 @@ export class QuestionCard extends Component {
 
   render() {
     return (
-      <Card class="question">
+      <Card class="question" style={{ position: "relative" }}>
+        {this.difficulty()}
         <CardPrimaryAction>
           <div>
             <Typography
@@ -136,18 +217,7 @@ export class QuestionCard extends Component {
             >
               #{this.props.question.id} {this.byline()}
             </Typography>
-            <Typography
-              use="body1"
-              tag="div"
-              theme="text-secondary-on-background"
-              // This field is bleached and safe
-              // eslint-disable-next-line
-              dangerouslySetInnerHTML={{ __html: this.props.question.text }}
-              style={{ marginTop: 10 }}
-            />
-            {this.image()}
-            {this.video()}
-            {this.answerChoices()}
+            {this.innerContent()}
           </div>
         </CardPrimaryAction>
         <CardActions>
@@ -204,21 +274,25 @@ export class SearchApp extends Component {
     const url = new URL(this.props.url, window.location.origin);
     url.search = queryString;
 
-    try {
-      this.setState({ searching: true });
-      const data = await get(url);
-      console.debug(data);
-      this.setState(
-        {
-          meta: data.meta,
-          questions: data.results,
-          searching: false,
-        },
-        () => console.debug(this.state.questions, this.state.meta),
-      );
-    } catch (error) {
-      // Snackbar
-      console.debug(error);
+    if (this.state.query.length > 2) {
+      try {
+        this.setState({ searching: true });
+        const data = await get(url);
+        console.debug(data);
+        this.setState(
+          {
+            meta: data.meta,
+            questions: data.results,
+            searching: false,
+          },
+          () => console.debug(this.state.questions, this.state.meta),
+        );
+      } catch (error) {
+        // Snackbar
+        console.debug(error);
+      }
+    } else {
+      this.setState({ questions: [], meta: {} });
     }
   };
 

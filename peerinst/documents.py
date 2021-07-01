@@ -48,7 +48,8 @@ class QuestionDocument(Document):
     - Consider "boosting" and multifields
     """
 
-    answer_count = IntegerField()
+    answer_count = IntegerField(index=False)
+    answer_style = IntegerField(index=False)
     answerchoice_set = NestedField(
         properties={
             "text": TextField(analyzer=html_strip),
@@ -58,21 +59,24 @@ class QuestionDocument(Document):
         properties={"title": TextField(analyzer=trigram)}
     )  # don't break on spaces?
     collaborators = NestedField(properties={"username": TextField()})
-    difficulty = TextField()
-    peer_impact = TextField()
+    difficulty = ObjectField()
     discipline = ObjectField(
         properties={
             "title": TextField(analyzer=autocomplete)
         }  # don't break on spaces?
     )
     id = TextField()
+    image = TextField(index=False)
+    image_alt_text = TextField(index=False)
     matrix = ObjectField()
+    peer_impact = TextField()
     text = TextField(analyzer=html_strip)
     questionflag_set = BooleanField()
     user = ObjectField(
         properties={"username": TextField(analyzer=autocomplete)}
     )
     valid = BooleanField()
+    video_url = TextField(index=False)
 
     def prepare_answer_count(self, instance):
         """
@@ -114,7 +118,11 @@ class QuestionDocument(Document):
         return []
 
     def prepare_difficulty(self, instance):
-        return str(instance.get_difficulty()[1])
+        d = instance.get_difficulty()
+        return {"score": d[0], "label": str(d[1])}
+
+    def prepare_image(self, instance):
+        return str(instance.image)
 
     def prepare_peer_impact(self, instance):
         return str(instance.get_peer_impact()[1])
@@ -187,12 +195,8 @@ class QuestionDocument(Document):
     class Django:
         model = Question
         fields = [
-            "answer_style",
-            "image",
-            "image_alt_text",
             "title",
             "type",
-            "video_url",
         ]
         related_models = [
             AnswerChoice,
