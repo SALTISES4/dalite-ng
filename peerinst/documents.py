@@ -31,10 +31,13 @@ html_strip = analyzer(
 autocomplete = analyzer(
     "autocomplete",
     tokenizer=tokenizer("autocomplete", "edge_ngram", min_gram=3, max_gram=50),
+    filter=["lowercase"],
 )
 
 trigram_filter = token_filter("ngram", "ngram", min_gram=3, max_gram=3)
-trigram = analyzer("trigram", tokenizer="whitespace", filter=[trigram_filter])
+trigram = analyzer(
+    "trigram", tokenizer="whitespace", filter=["lowercase", trigram_filter]
+)
 
 
 @registry.register_document
@@ -60,11 +63,7 @@ class QuestionDocument(Document):
     )  # don't break on spaces?
     collaborators = NestedField(properties={"username": TextField()})
     difficulty = ObjectField()
-    discipline = ObjectField(
-        properties={
-            "title": TextField(analyzer=autocomplete)
-        }  # don't break on spaces?
-    )
+    discipline = TextField(analyzer=autocomplete)  # don't break on spaces?
     id = TextField()
     image = TextField(index=False)
     image_alt_text = TextField(index=False)
@@ -121,29 +120,27 @@ class QuestionDocument(Document):
         d = instance.get_difficulty()
         return {"score": d[0], "label": str(d[1])}
 
-    def prepare_image(self, instance):
-        return str(instance.image)
-
-    def prepare_peer_impact(self, instance):
-        return str(instance.get_peer_impact()[1])
-
     def prepare_discipline(self, instance):
         if instance.discipline:
-            return {
-                "title": bleach.clean(
-                    instance.discipline.title,
-                    tags=ALLOWED_TAGS,
-                    styles=[],
-                    strip=True,
-                )
-            }
-        return []
+            return bleach.clean(
+                instance.discipline.title,
+                tags=ALLOWED_TAGS,
+                styles=[],
+                strip=True,
+            )
+        return ""
 
     def prepare_id(self, instance):
         return str(instance.id)
 
+    def prepare_image(self, instance):
+        return str(instance.image)
+
     def prepare_matrix(self, instance):
         return instance.get_matrix()
+
+    def prepare_peer_impact(self, instance):
+        return str(instance.get_peer_impact()[1])
 
     def prepare_questionflag_set(self, instance):
         """Replicate logic for UnflaggedQuestionManager"""

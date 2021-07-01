@@ -10,7 +10,7 @@ logger = logging.getLogger("performance")
 pp = pprint.PrettyPrinter()
 
 
-def question_search(search_string):
+def question_search(search_string, filters=[]):
 
     start = time.perf_counter()
 
@@ -50,10 +50,15 @@ def question_search(search_string):
         .exclude("term", questionflag_set=True)
         .exclude("term", valid=False)
     )
+
+    if filters:
+        for f in filters:
+            s = s.filter("term", **{f[0]: f[1]})
+
     end = time.perf_counter()
 
     logger.info(
-        f"ElasticSearch time to query '{search_string}': {end - start:E}s"
+        f"ElasticSearch time to query '{search_string}' with filters '{filters}': {end - start:E}s"  # noqa E501
     )
     logger.info(f"Hit count: {s.count()}")
 

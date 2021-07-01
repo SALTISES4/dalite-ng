@@ -142,7 +142,7 @@ export class QuestionCard extends Component {
 
   discipline = () => {
     if (this.props.question.discipline) {
-      return this.props.question.discipline.title;
+      return this.props.question.discipline;
     }
     return this.props.gettext("Unlabelled");
   };

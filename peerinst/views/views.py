@@ -1,4 +1,3 @@
-import itertools
 import json
 import logging
 import random
@@ -2196,33 +2195,32 @@ def collection_search_function(search_string, pre_filtered_list=None):
 @ajax_login_required
 @ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
 def question_search_beta(request):
+    FILTERS = ["category__title", "discipline"]
 
     search_string = request.GET.get("search_string", default="")
 
     if search_string:
-        # Search
-        s = qs_ES(search_string)
-        # Serialize
-        results = [hit.to_dict() for hit in s[:100]]
-        # Add metadata
-        if results:
-            meta = {
-                "categories": list(
-                    set(
-                        x["title"]
-                        for x in itertools.chain.from_iterable(
-                            map(
-                                lambda x: x["category"],
-                                filter(
-                                    lambda x: hasattr(x, "category"), results
-                                ),
-                            )
-                        )
+        # Parse to remove filter terms from `search string
+        filters = []
+        terms = search_string.split()
+        query = []
+        for t in terms:
+            if t.split("::")[0].lower() in FILTERS:
+                filters.append(
+                    (
+                        f"{t.split('::')[0]}".lower(),
+                        t.split("::")[1].replace("_", " "),
                     )
                 )
-            }
-        else:
-            meta = {}
+            else:
+                query.append(t)
+
+        # Search
+        s = qs_ES(" ".join(query), filters)
+        # Serialize
+        results = [hit.to_dict() for hit in s[:50]]
+        # Add metadata
+        meta = {}
 
         return JsonResponse({"results": results, "meta": meta}, safe=False)
 
