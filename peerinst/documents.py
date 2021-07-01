@@ -18,6 +18,7 @@ from peerinst.models import (
     Discipline,
     Question,
     QuestionFlag,
+    Teacher,
 )
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 
@@ -36,6 +37,19 @@ autocomplete = analyzer(
 trigram_filter = token_filter("ngram", "ngram", min_gram=3, max_gram=3)
 trigram = analyzer("trigram", tokenizer="whitespace", filter=[trigram_filter])
 
+deleted_questions_all = [
+    [
+        q
+        for q in t.deleted_questions.all()
+        if q.get_student_answers().count() == 0
+    ]
+    for t in Teacher.objects.all()
+    if t.deleted_questions.all()
+]
+# flatten
+deleted_questions_all = [
+    item for sublist in deleted_questions_all for item in sublist
+]
 
 @registry.register_document
 class QuestionDocument(Document):
@@ -176,6 +190,13 @@ class QuestionDocument(Document):
         TODO: Refactor to model
         """
         return instance.answerchoice_set.count() > 0 or instance.type == "RO"
+
+    def prepare_deleted(self, instance):
+        """
+        exclude questions which are part of any Teacher's deleted_questions,
+        and have no student answers
+        """
+        return instance in deleted_questions_all
 
     def get_queryset(self):
         return super().get_queryset().select_related("discipline", "user")
