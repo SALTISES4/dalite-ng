@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import bleach
 from django.contrib.auth.models import User
 from django_elasticsearch_dsl import Document
@@ -40,19 +42,25 @@ trigram = analyzer(
     "trigram", tokenizer="whitespace", filter=["lowercase", trigram_filter]
 )
 
-deleted_questions_all = [
-    [
-        q
-        for q in t.deleted_questions.all()
-        if q.get_student_answers().count() == 0
+
+@lru_cache(maxsize=None)
+def get_deleted_questions():
+    deleted_questions_all = [
+        [
+            q
+            for q in t.deleted_questions.all()
+            if q.get_student_answers().count() == 0
+        ]
+        for t in Teacher.objects.all()
+        if t.deleted_questions.all()
     ]
-    for t in Teacher.objects.all()
-    if t.deleted_questions.all()
-]
-# flatten
-deleted_questions_all = [
-    item for sublist in deleted_questions_all for item in sublist
-]
+    # flatten
+    deleted_questions_all = [
+        item for sublist in deleted_questions_all for item in sublist
+    ]
+
+    return deleted_questions_all
+
 
 @registry.register_document
 class QuestionDocument(Document):
@@ -131,6 +139,13 @@ class QuestionDocument(Document):
             return [{"title": c} for c in sorted_category_set]
         return []
 
+    def prepare_deleted(self, instance):
+        """
+        Exclude questions which are part of any Teacher's deleted_questions,
+        and have no student answers
+        """
+        return instance in get_deleted_questions()
+
     def prepare_difficulty(self, instance):
         d = instance.get_difficulty()
         return {"score": d[0], "label": str(d[1])}
@@ -188,13 +203,6 @@ class QuestionDocument(Document):
         TODO: Refactor to model
         """
         return instance.answerchoice_set.count() > 0 or instance.type == "RO"
-
-    def prepare_deleted(self, instance):
-        """
-        exclude questions which are part of any Teacher's deleted_questions,
-        and have no student answers
-        """
-        return instance in deleted_questions_all
 
     def get_queryset(self):
         return super().get_queryset().select_related("discipline", "user")
