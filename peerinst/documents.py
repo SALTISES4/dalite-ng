@@ -59,6 +59,7 @@ class QuestionDocument(Document):
     )  # don't break on spaces?
     collaborators = NestedField(properties={"username": TextField()})
     difficulty = TextField()
+    peer_impact = TextField()
     discipline = ObjectField(
         properties={
             "title": TextField(analyzer=autocomplete)
@@ -114,6 +115,9 @@ class QuestionDocument(Document):
 
     def prepare_difficulty(self, instance):
         return str(instance.get_difficulty()[1])
+
+    def prepare_peer_impact(self, instance):
+        return str(instance.get_peer_impact()[1])
 
     def prepare_discipline(self, instance):
         if instance.discipline:
