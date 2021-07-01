@@ -84,7 +84,6 @@ class QuestionDocument(Document):
             return [
                 {
                     "correct": instance.is_correct(i),
-                    "label": ac[0],
                     "text": bleach.clean(
                         ac[1],
                         tags=ALLOWED_TAGS,
@@ -184,6 +183,7 @@ class QuestionDocument(Document):
     class Django:
         model = Question
         fields = [
+            "answer_style",
             "image",
             "image_alt_text",
             "title",

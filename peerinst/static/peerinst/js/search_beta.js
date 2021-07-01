@@ -28,7 +28,7 @@ export class QuestionCard extends Component {
     loaded: false,
   };
 
-  annotateCorrect = (ac) => {
+  answerChoice = (ac) => {
     if (Object.prototype.hasOwnProperty.call(ac, "correct")) {
       if (ac.correct) {
         return <i class="check material-icons">check</i>;
@@ -45,19 +45,25 @@ export class QuestionCard extends Component {
     ) {
       return (
         <div class="question-answers">
-          <ul>
-            {this.props.question.answerchoice_set.map((ac, i) => (
-              <Typography key={i} use="body1" tag="li">
-                {ac.label}.{" "}
-                <span
-                  // This field is bleached and safe
-                  // eslint-disable-next-line
-                  dangerouslySetInnerHTML={{ __html: ac.text }}
-                />
-                {this.annotateCorrect(ac)}
-              </Typography>
-            ))}
-          </ul>
+          <ol type={this.props.question.answer_style == 0 ? "A" : "l"}>
+            {this.props.question.answerchoice_set.map((ac, i) => {
+              return (
+                <Typography
+                  key={i}
+                  use="body1"
+                  tag="li"
+                  style={{ marginBottom: 2 }}
+                >
+                  <span
+                    // This field is bleached and safe
+                    // eslint-disable-next-line
+                    dangerouslySetInnerHTML={{ __html: ac.text }}
+                  />
+                  {this.answerChoice(ac)}
+                </Typography>
+              );
+            })}
+          </ol>
         </div>
       );
     }
