@@ -49,6 +49,7 @@ def question_search(search_string, filters=[]):
         .query(q)
         .exclude("term", questionflag_set=True)
         .exclude("term", valid=False)
+        .exclude("term", deleted=True)
     )
 
     if filters:
