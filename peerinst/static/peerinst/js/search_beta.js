@@ -322,209 +322,231 @@ export class SearchApp extends Component {
     }
   };
 
-  chips = () => {
-    if (this.state.disciplines.length > 0) {
+  categoryChips = () => {
+    if (this.state.categories.length > 0) {
       return (
-        <div>
-          <div class="chip-container">
-            <Typography
-              use="caption"
-              tag="div"
-              style={{ fontWeight: "bold", paddingLeft: 3 }}
-            >
-              {this.props.gettext("Disciplines")}
-            </Typography>
-            {this.state.disciplines.map((d, i) => {
-              if (d.length > 0) {
-                return (
-                  <Chip
-                    selected={this.state.selectedDiscipline == d}
-                    text={d}
-                    key={i}
-                    onClick={() => {
-                      if (this.state.selectedDiscipline) {
-                        this.setState(
-                          {
-                            selectedDiscipline: "",
-                            query: this.state.query
-                              .replace(/discipline::\w+/i, "")
-                              .replace(/\s+/g, " ")
-                              .trim(),
-                          },
-                          this.handleSubmit,
-                        );
-                      } else {
-                        this.setState(
-                          {
-                            selectedDiscipline: d,
-                            query: `discipline::${d.replaceAll(" ", "_")} ${
-                              this.state.query
-                            }`,
-                          },
-                          this.handleSubmit,
-                        );
-                      }
-                    }}
-                  />
-                );
-              }
-            })}
-            <i
-              class="material-icons"
-              onClick={() => {
-                this.setState(
-                  {
-                    selectedDiscipline: "",
-                    query: this.state.query
-                      .replace(/discipline::\w+/i, "")
-                      .replace(/\s+/g, " ")
-                      .trim(),
-                  },
-                  this.handleSubmit,
-                );
-              }}
-              style={{
-                cursor: "pointer",
-                display: this.state.selectedDiscipline ? "inline" : "none",
-                fontSize: 18,
-                verticalAlign: "middle",
-              }}
-            >
-              close
-            </i>
-          </div>
-          <div class="chip-container">
-            <Typography
-              use="caption"
-              tag="div"
-              style={{ fontWeight: "bold", paddingLeft: 3 }}
-            >
-              {this.props.gettext("Categories")}
-            </Typography>
-            {this.state.categories.map((c, i) => {
-              if (c.length > 0) {
-                return (
-                  <Chip
-                    selected={this.state.selectedCategory == c}
-                    text={c}
-                    key={i}
-                    onClick={() => {
+        <div class="chip-container">
+          <Typography
+            use="caption"
+            tag="div"
+            style={{ fontWeight: "bold", paddingLeft: 3 }}
+          >
+            {this.props.gettext("Categories")}
+          </Typography>
+          {this.state.categories.map((c, i) => {
+            if (c.length > 0) {
+              return (
+                <Chip
+                  selected={this.state.selectedCategory == c}
+                  text={c}
+                  key={i}
+                  onClick={() => {
+                    this.setState(
+                      {
+                        selectedCategory: c,
+                        query: `category__title::${c.replaceAll(" ", "_")} ${
+                          this.state.query
+                        }`,
+                      },
+                      this.handleSubmit,
+                    );
+                  }}
+                />
+              );
+            }
+          })}
+          <i
+            class="material-icons"
+            onClick={() => {
+              this.setState(
+                {
+                  selectedCategory: "",
+                  query: this.state.query
+                    .replace(/category__title::\w+/gi, "")
+                    .replace(/\s+/g, " ")
+                    .trim(),
+                },
+                this.handleSubmit,
+              );
+            }}
+            style={{
+              cursor: "pointer",
+              display: this.state.selectedCategory ? "inline" : "none",
+              fontSize: 18,
+              verticalAlign: "middle",
+            }}
+          >
+            close
+          </i>
+        </div>
+      );
+    }
+  };
+
+  difficultyChips = () => {
+    if (this.state.difficulties.length > 0) {
+      return (
+        <div class="chip-container">
+          <Typography
+            use="caption"
+            tag="div"
+            style={{ fontWeight: "bold", paddingLeft: 3 }}
+          >
+            {this.props.gettext("Difficulty levels")}
+          </Typography>
+          {this.state.difficulties.map((d, i) => {
+            if (d.length > 0) {
+              return (
+                <Chip
+                  selected={this.state.selectedDifficulty == d}
+                  text={d}
+                  key={i}
+                  onClick={() => {
+                    if (this.state.selectedDifficulty) {
                       this.setState(
                         {
-                          selectedCategory: c,
-                          query: `category::${c.replaceAll(" ", "_")} ${
+                          selectedDifficulty: "",
+                          query: this.state.query
+                            .replace(/difficulty.label::\w+/gi, "")
+                            .replace(/\s+/g, " ")
+                            .trim(),
+                        },
+                        this.handleSubmit,
+                      );
+                    } else {
+                      this.setState(
+                        {
+                          selectedDifficulty: d,
+                          query: `difficulty.label::${d.replaceAll(
+                            " ",
+                            "_",
+                          )} ${this.state.query}`,
+                        },
+                        this.handleSubmit,
+                      );
+                    }
+                  }}
+                />
+              );
+            }
+          })}
+          <i
+            class="material-icons"
+            onClick={() => {
+              this.setState(
+                {
+                  selectedDifficulty: "",
+                  query: this.state.query
+                    .replace(/difficulty.label::\w+/gi, "")
+                    .replace(/\s+/g, " ")
+                    .trim(),
+                },
+                this.handleSubmit,
+              );
+            }}
+            style={{
+              cursor: "pointer",
+              display: this.state.selectedDifficulty ? "inline" : "none",
+              fontSize: 18,
+              verticalAlign: "middle",
+            }}
+          >
+            close
+          </i>
+        </div>
+      );
+    }
+  };
+
+  disciplineChips = () => {
+    if (this.state.disciplines.length > 0) {
+      return (
+        <div class="chip-container">
+          <Typography
+            use="caption"
+            tag="div"
+            style={{ fontWeight: "bold", paddingLeft: 3 }}
+          >
+            {this.props.gettext("Disciplines")}
+          </Typography>
+          {this.state.disciplines.map((d, i) => {
+            if (d.length > 0) {
+              return (
+                <Chip
+                  selected={this.state.selectedDiscipline == d}
+                  text={d}
+                  key={i}
+                  onClick={() => {
+                    if (this.state.selectedDiscipline) {
+                      this.setState(
+                        {
+                          selectedDiscipline: "",
+                          query: this.state.query
+                            .replace(/discipline::\w+/gi, "")
+                            .replace(/\s+/g, " ")
+                            .trim(),
+                        },
+                        this.handleSubmit,
+                      );
+                    } else {
+                      this.setState(
+                        {
+                          selectedDiscipline: d,
+                          query: `discipline::${d.replaceAll(" ", "_")} ${
                             this.state.query
                           }`,
                         },
                         this.handleSubmit,
                       );
-                    }}
-                  />
-                );
-              }
-            })}
-            <i
-              class="material-icons"
-              onClick={() => {
-                this.setState(
-                  {
-                    selectedCategory: "",
-                    query: this.state.query
-                      .replace(/category::\w+/i, "")
-                      .replace(/\s+/g, " ")
-                      .trim(),
-                  },
-                  this.handleSubmit,
-                );
-              }}
-              style={{
-                cursor: "pointer",
-                display: this.state.selectedCategory ? "inline" : "none",
-                fontSize: 18,
-                verticalAlign: "middle",
-              }}
-            >
-              close
-            </i>
-          </div>
-          <div class="chip-container">
-            <Typography
-              use="caption"
-              tag="div"
-              style={{ fontWeight: "bold", paddingLeft: 3 }}
-            >
-              {this.props.gettext("Difficulty levels")}
-            </Typography>
-            {this.state.difficulties.map((d, i) => {
-              if (d.length > 0) {
-                return (
-                  <Chip
-                    selected={this.state.selectedDifficulty == d}
-                    text={d}
-                    key={i}
-                    onClick={() => {
-                      if (this.state.selectedDifficulty) {
-                        this.setState(
-                          {
-                            selectedDifficulty: "",
-                            query: this.state.query
-                              .replace(/difficulty.label::\w+/i, "")
-                              .replace(/\s+/g, " ")
-                              .trim(),
-                          },
-                          this.handleSubmit,
-                        );
-                      } else {
-                        this.setState(
-                          {
-                            selectedDifficulty: d,
-                            query: `difficulty.label::${d.replaceAll(
-                              " ",
-                              "_",
-                            )} ${this.state.query}`,
-                          },
-                          this.handleSubmit,
-                        );
-                      }
-                    }}
-                  />
-                );
-              }
-            })}
-            <i
-              class="material-icons"
-              onClick={() => {
-                this.setState(
-                  {
-                    selectedDifficulty: "",
-                    query: this.state.query
-                      .replace(/difficulty.label::\w+/i, "")
-                      .replace(/\s+/g, " ")
-                      .trim(),
-                  },
-                  this.handleSubmit,
-                );
-              }}
-              style={{
-                cursor: "pointer",
-                display: this.state.selectedDifficulty ? "inline" : "none",
-                fontSize: 18,
-                verticalAlign: "middle",
-              }}
-            >
-              close
-            </i>
-          </div>
+                    }
+                  }}
+                />
+              );
+            }
+          })}
+          <i
+            class="material-icons"
+            onClick={() => {
+              this.setState(
+                {
+                  selectedDiscipline: "",
+                  query: this.state.query
+                    .replace(/discipline::\w+/gi, "")
+                    .replace(/\s+/g, " ")
+                    .trim(),
+                },
+                this.handleSubmit,
+              );
+            }}
+            style={{
+              cursor: "pointer",
+              display: this.state.selectedDiscipline ? "inline" : "none",
+              fontSize: 18,
+              verticalAlign: "middle",
+            }}
+          >
+            close
+          </i>
         </div>
       );
     }
+  };
+
+  chips = () => {
+    return (
+      <div>
+        {this.disciplineChips()}
+        {this.categoryChips()}
+        {this.difficultyChips()}
+      </div>
+    );
   };
 
   results = () => {
     if (this.state.searching) {
       return <CircularProgress class="spinner" size="xlarge" />;
     }
-    if (this.state.questions) {
+    if (this.state.questions.length > 0) {
       return (
         <div id="results" style={{ marginTop: 20 }}>
           {this.state.questions.map((question, i) => {
@@ -537,6 +559,30 @@ export class SearchApp extends Component {
               />
             );
           })}
+        </div>
+      );
+    }
+    if (this.state.questions.length == 0 && this.state.query.length >= 3) {
+      return (
+        <div>
+          <h3>{this.props.gettext("No search results")}</h3>
+          <p>
+            {this.props.gettext(
+              "Ugh... doesn't look like there are any questions that match your query.  May we suggest:",
+            )}
+          </p>
+          <ol>
+            <li>
+              {this.props.gettext(
+                "Try the search again, but with different keywords and/or fewer filters;",
+              )}
+            </li>
+            <li>
+              {this.props.gettext(
+                "Create the question you are looking for by selecting 'Create question' from the menu.",
+              )}
+            </li>
+          </ol>
         </div>
       );
     }

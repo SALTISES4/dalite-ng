@@ -2239,7 +2239,11 @@ def question_search_beta(request):
                 "disciplines": disciplines,
             }
         else:
-            meta = {}
+            meta = {
+                "categories": [],
+                "difficulties": [],
+                "disciplines": [],
+            }
 
         return JsonResponse({"results": results, "meta": meta}, safe=False)
 
