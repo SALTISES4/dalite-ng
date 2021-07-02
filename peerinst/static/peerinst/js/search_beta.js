@@ -153,6 +153,49 @@ export class QuestionCard extends Component {
     }
   };
 
+  impact = () => {
+    if (
+      Object.prototype.hasOwnProperty.call(
+        this.props.question.peer_impact,
+        "score",
+      )
+    ) {
+      const colourScale = scaleThreshold(triScale).domain([0.05, 0.25]);
+      const color = colourScale(this.props.question.peer_impact.score);
+      const opacity = "30";
+      return (
+        <div
+          style={{
+            backgroundColor: color + opacity,
+            borderColor: color,
+            borderRadius: "50%",
+            borderWidth: "thin",
+            borderStyle: "solid",
+            fontSize: "x-small",
+            height: 32,
+            position: "absolute",
+            right: 20,
+            top: 60,
+            width: 32,
+          }}
+        >
+          <div
+            style={{
+              color,
+              fontWeight: "bold",
+              left: "50%",
+              position: "absolute",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            {this.props.question.peer_impact.label}
+          </div>
+        </div>
+      );
+    }
+  };
+
   discipline = () => {
     if (this.props.question.discipline) {
       return this.props.question.discipline;
@@ -219,6 +262,7 @@ export class QuestionCard extends Component {
     return (
       <Card class="question" style={{ position: "relative" }}>
         {this.difficulty()}
+        {this.impact()}
         <CardPrimaryAction>
           <div>
             <Typography
@@ -287,10 +331,12 @@ export class SearchApp extends Component {
     categories: [],
     difficulties: [],
     disciplines: [],
+    impacts: [],
     searching: false,
     selectedCategory: "",
     selectedDifficulty: "",
     selectedDiscipline: "",
+    selectedImpact: "",
   };
 
   handleSubmit = async () => {
@@ -309,6 +355,7 @@ export class SearchApp extends Component {
             categories: data.meta.categories,
             difficulties: data.meta.difficulties,
             disciplines: data.meta.disciplines,
+            impacts: data.meta.impacts,
             questions: data.results,
             searching: false,
           },
@@ -533,12 +580,88 @@ export class SearchApp extends Component {
     }
   };
 
+  impactChips = () => {
+    if (this.state.impacts.length > 0) {
+      return (
+        <div class="chip-container">
+          <Typography
+            use="caption"
+            tag="div"
+            style={{ fontWeight: "bold", paddingLeft: 3 }}
+          >
+            {this.props.gettext("Peer impact levels")}
+          </Typography>
+          {this.state.impacts.map((d, i) => {
+            if (d.length > 0) {
+              return (
+                <Chip
+                  selected={this.state.selectedImpact == d}
+                  text={d}
+                  key={i}
+                  onClick={() => {
+                    if (this.state.selectedImpact) {
+                      this.setState(
+                        {
+                          selectedImpact: "",
+                          query: this.state.query
+                            .replace(/peer_impact.label::\w+/gi, "")
+                            .replace(/\s+/g, " ")
+                            .trim(),
+                        },
+                        this.handleSubmit,
+                      );
+                    } else {
+                      this.setState(
+                        {
+                          selectedImpact: d,
+                          query: `peer_impact.label::${d.replaceAll(
+                            " ",
+                            "_",
+                          )} ${this.state.query}`,
+                        },
+                        this.handleSubmit,
+                      );
+                    }
+                  }}
+                />
+              );
+            }
+          })}
+          <i
+            class="material-icons"
+            onClick={() => {
+              this.setState(
+                {
+                  selectedImpact: "",
+                  query: this.state.query
+                    .replace(/peer_impact.label::\w+/gi, "")
+                    .replace(/\s+/g, " ")
+                    .trim(),
+                },
+                this.handleSubmit,
+              );
+            }}
+            style={{
+              cursor: "pointer",
+              display: this.state.selectedImpact ? "inline" : "none",
+              fontSize: 18,
+              verticalAlign: "middle",
+            }}
+          >
+            close
+          </i>
+        </div>
+      );
+    }
+  };
+
   chips = () => {
     return (
       <div>
         {this.disciplineChips()}
         {this.categoryChips()}
         {this.difficultyChips()}
+        {this.impactChips()}
       </div>
     );
   };
@@ -613,6 +736,7 @@ export class SearchApp extends Component {
                     categories: [],
                     difficulties: [],
                     disciplines: [],
+                    impacts: [],
                     selectedCategory: "",
                     selectedDifficulty: "",
                     selectedDiscipline: "",

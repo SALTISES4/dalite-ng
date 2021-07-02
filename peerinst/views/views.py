@@ -2195,7 +2195,12 @@ def collection_search_function(search_string, pre_filtered_list=None):
 @ajax_login_required
 @ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
 def question_search_beta(request):
-    FILTERS = ["category__title", "discipline", "difficulty.label"]
+    FILTERS = [
+        "category__title",
+        "discipline",
+        "difficulty.label",
+        "peer_impact.label",
+    ]
 
     search_string = request.GET.get("search_string", default="")
 
@@ -2233,16 +2238,21 @@ def question_search_beta(request):
                 sorted(set(r["difficulty"]["label"] for r in results))
             )
             disciplines = list(sorted(set(r["discipline"] for r in results)))
+            impacts = list(
+                sorted(set(r["peer_impact"]["label"] for r in results))
+            )
             meta = {
                 "categories": categories,
                 "difficulties": difficulties,
                 "disciplines": disciplines,
+                "impacts": impacts,
             }
         else:
             meta = {
                 "categories": [],
                 "difficulties": [],
                 "disciplines": [],
+                "impacts": [],
             }
 
         return JsonResponse({"results": results, "meta": meta}, safe=False)

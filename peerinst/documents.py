@@ -93,7 +93,7 @@ class QuestionDocument(Document):
     collaborators = NestedField(properties={"username": TextField()})
     difficulty = ObjectField(
         properties={
-            "score": FloatField(),
+            "score": FloatField(index=False),
             "label": TextField(analyzer=full_term),
         }
     )
@@ -102,7 +102,12 @@ class QuestionDocument(Document):
     image = TextField(index=False)
     image_alt_text = TextField(index=False)
     matrix = ObjectField()
-    peer_impact = TextField()
+    peer_impact = ObjectField(
+        properties={
+            "score": FloatField(index=False),
+            "label": TextField(analyzer=full_term),
+        }
+    )
     text = TextField(analyzer=html_strip)
     questionflag_set = BooleanField()
     user = ObjectField(
@@ -182,7 +187,8 @@ class QuestionDocument(Document):
         return instance.get_matrix()
 
     def prepare_peer_impact(self, instance):
-        return str(instance.get_peer_impact()[1])
+        pi = instance.get_peer_impact()
+        return {"score": pi[0], "label": str(pi[1])}
 
     def prepare_questionflag_set(self, instance):
         """Replicate logic for UnflaggedQuestionManager"""

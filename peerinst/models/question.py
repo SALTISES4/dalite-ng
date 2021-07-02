@@ -483,7 +483,7 @@ class Question(models.Model):
             elif difficulty < LOWER_BOUND:
                 difficulty_str = _("Easy")
             else:
-                difficulty_str = _("Med")
+                difficulty_str = _("Avg")
         else:
             difficulty = None
             difficulty_str = _("Not enough data")
@@ -505,7 +505,7 @@ class Question(models.Model):
             elif peer_impact < LOWER_BOUND:
                 peer_impact_str = _("Low")
             else:
-                peer_impact_str = _("Medium")
+                peer_impact_str = _("Med")
         else:
             peer_impact = None
             peer_impact_str = _("Not enough data")
