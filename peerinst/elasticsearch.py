@@ -54,7 +54,17 @@ def question_search(search_string, filters=[]):
 
     if filters:
         for f in filters:
-            s = s.filter("term", **{f[0]: f[1]})
+            if "__" in f[0]:
+                # Nested
+                s = s.filter(
+                    Q(
+                        "nested",
+                        path="category",
+                        query=Q("match", **{f[0]: f[1]}),
+                    )
+                )
+            else:
+                s = s.filter("term", **{f[0]: f[1]})
 
     end = time.perf_counter()
 

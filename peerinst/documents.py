@@ -84,7 +84,11 @@ class QuestionDocument(Document):
         }
     )
     category = NestedField(
-        properties={"title": TextField(analyzer=trigram)}
+        properties={
+            "title": TextField(
+                analyzer=autocomplete,
+            )
+        }
     )  # don't break on spaces?
     collaborators = NestedField(properties={"username": TextField()})
     difficulty = ObjectField(
