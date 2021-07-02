@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django_elasticsearch_dsl import Document
 from django_elasticsearch_dsl.fields import (
     BooleanField,
+    FloatField,
     IntegerField,
     NestedField,
     ObjectField,
@@ -30,6 +31,8 @@ html_strip = analyzer(
     filter=["lowercase", "stop", "snowball"],
     char_filter=["html_strip"],
 )
+
+full_term = analyzer("full_term", tokenizer="keyword", filter=["lowercase"])
 
 autocomplete = analyzer(
     "autocomplete",
@@ -84,7 +87,12 @@ class QuestionDocument(Document):
         properties={"title": TextField(analyzer=trigram)}
     )  # don't break on spaces?
     collaborators = NestedField(properties={"username": TextField()})
-    difficulty = ObjectField()
+    difficulty = ObjectField(
+        properties={
+            "score": FloatField(),
+            "label": TextField(analyzer=full_term),
+        }
+    )
     discipline = TextField(analyzer=autocomplete)  # don't break on spaces?
     id = TextField()
     image = TextField(index=False)

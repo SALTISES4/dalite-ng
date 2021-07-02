@@ -2195,12 +2195,12 @@ def collection_search_function(search_string, pre_filtered_list=None):
 @ajax_login_required
 @ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
 def question_search_beta(request):
-    FILTERS = ["category__title", "discipline"]
+    FILTERS = ["category__title", "discipline", "difficulty.label"]
 
     search_string = request.GET.get("search_string", default="")
 
     if search_string:
-        # Parse to remove filter terms from `search string
+        # Parse to remove filter terms from search string
         filters = []
         terms = search_string.split()
         query = []
@@ -2220,13 +2220,26 @@ def question_search_beta(request):
         # Serialize
         results = [hit.to_dict() for hit in s[:50]]
         # Add metadata
-        _c = []
-        for c in map(lambda x: x["category"], results):
-            for a in c:
-                _c.append(a["title"])
-        categories = list(sorted(set(_c)))
-        disciplines = list(sorted(set(r["discipline"] for r in results)))
-        meta = {"categories": categories, "disciplines": disciplines}
+        if results:
+            _c = []
+            for c in map(
+                lambda x: x["category"] if "category" in x else [],
+                results,
+            ):
+                for a in c:
+                    _c.append(a["title"])
+            categories = list(sorted(set(_c)))
+            difficulties = list(
+                sorted(set(r["difficulty"]["label"] for r in results))
+            )
+            disciplines = list(sorted(set(r["discipline"] for r in results)))
+            meta = {
+                "categories": categories,
+                "difficulties": difficulties,
+                "disciplines": disciplines,
+            }
+        else:
+            meta = {}
 
         return JsonResponse({"results": results, "meta": meta}, safe=False)
 

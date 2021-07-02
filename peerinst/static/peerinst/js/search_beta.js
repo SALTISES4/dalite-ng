@@ -284,6 +284,8 @@ export class SearchApp extends Component {
   state = {
     query: "",
     questions: [],
+    categories: [],
+    difficulties: [],
     disciplines: [],
     searching: false,
     selectedCategory: "",
@@ -304,6 +306,7 @@ export class SearchApp extends Component {
         this.setState(
           {
             categories: data.meta.categories,
+            difficulties: data.meta.difficulties,
             disciplines: data.meta.disciplines,
             questions: data.results,
             searching: false,
@@ -324,61 +327,193 @@ export class SearchApp extends Component {
       return (
         <div>
           <div class="chip-container">
+            <Typography
+              use="caption"
+              tag="div"
+              style={{ fontWeight: "bold", paddingLeft: 3 }}
+            >
+              {this.props.gettext("Disciplines")}
+            </Typography>
             {this.state.disciplines.map((d, i) => {
-              return (
-                <Chip
-                  selected={this.state.selectedDiscipline == d}
-                  text={d}
-                  key={i}
-                  onClick={() => {
-                    if (this.state.selectedDiscipline) {
+              if (d.length > 0) {
+                return (
+                  <Chip
+                    selected={this.state.selectedDiscipline == d}
+                    text={d}
+                    key={i}
+                    onClick={() => {
+                      if (this.state.selectedDiscipline) {
+                        this.setState(
+                          {
+                            selectedDiscipline: "",
+                            query: this.state.query
+                              .replace(/discipline::\w+/i, "")
+                              .replace(/\s+/g, " ")
+                              .trim(),
+                          },
+                          this.handleSubmit,
+                        );
+                      } else {
+                        this.setState(
+                          {
+                            selectedDiscipline: d,
+                            query: `discipline::${d.replaceAll(" ", "_")} ${
+                              this.state.query
+                            }`,
+                          },
+                          this.handleSubmit,
+                        );
+                      }
+                    }}
+                  />
+                );
+              }
+            })}
+            <i
+              class="material-icons"
+              onClick={() => {
+                this.setState(
+                  {
+                    selectedDiscipline: "",
+                    query: this.state.query
+                      .replace(/discipline::\w+/i, "")
+                      .replace(/\s+/g, " ")
+                      .trim(),
+                  },
+                  this.handleSubmit,
+                );
+              }}
+              style={{
+                cursor: "pointer",
+                display: this.state.selectedDiscipline ? "inline" : "none",
+                fontSize: 18,
+                verticalAlign: "middle",
+              }}
+            >
+              close
+            </i>
+          </div>
+          <div class="chip-container">
+            <Typography
+              use="caption"
+              tag="div"
+              style={{ fontWeight: "bold", paddingLeft: 3 }}
+            >
+              {this.props.gettext("Categories")}
+            </Typography>
+            {this.state.categories.map((c, i) => {
+              if (c.length > 0) {
+                return (
+                  <Chip
+                    selected={this.state.selectedCategory == c}
+                    text={c}
+                    key={i}
+                    onClick={() => {
                       this.setState(
                         {
-                          selectedDiscipline: "",
-                          query: this.state.query
-                            .replace(/discipline::\w+/i, "")
-                            .replace(/\s+/g, " ")
-                            .trim(),
-                        },
-                        this.handleSubmit,
-                      );
-                    } else {
-                      this.setState(
-                        {
-                          selectedDiscipline: d,
-                          query: `discipline::${d.replaceAll(" ", "_")} ${
+                          selectedCategory: c,
+                          query: `category::${c.replaceAll(" ", "_")} ${
                             this.state.query
                           }`,
                         },
                         this.handleSubmit,
                       );
-                    }
-                  }}
-                />
-              );
+                    }}
+                  />
+                );
+              }
             })}
+            <i
+              class="material-icons"
+              onClick={() => {
+                this.setState(
+                  {
+                    selectedCategory: "",
+                    query: this.state.query
+                      .replace(/category::\w+/i, "")
+                      .replace(/\s+/g, " ")
+                      .trim(),
+                  },
+                  this.handleSubmit,
+                );
+              }}
+              style={{
+                cursor: "pointer",
+                display: this.state.selectedCategory ? "inline" : "none",
+                fontSize: 18,
+                verticalAlign: "middle",
+              }}
+            >
+              close
+            </i>
           </div>
           <div class="chip-container">
-            {this.state.categories.map((c, i) => {
-              return (
-                <Chip
-                  selected={this.state.selectedCategory == c}
-                  text={c}
-                  key={i}
-                  onClick={() => {
-                    this.setState(
-                      {
-                        selectedCategory: c,
-                        query: `category::${c.replaceAll(" ", "_")} ${
-                          this.state.query
-                        }`,
-                      },
-                      this.handleSubmit,
-                    );
-                  }}
-                />
-              );
+            <Typography
+              use="caption"
+              tag="div"
+              style={{ fontWeight: "bold", paddingLeft: 3 }}
+            >
+              {this.props.gettext("Difficulty levels")}
+            </Typography>
+            {this.state.difficulties.map((d, i) => {
+              if (d.length > 0) {
+                return (
+                  <Chip
+                    selected={this.state.selectedDifficulty == d}
+                    text={d}
+                    key={i}
+                    onClick={() => {
+                      if (this.state.selectedDifficulty) {
+                        this.setState(
+                          {
+                            selectedDifficulty: "",
+                            query: this.state.query
+                              .replace(/difficulty.label::\w+/i, "")
+                              .replace(/\s+/g, " ")
+                              .trim(),
+                          },
+                          this.handleSubmit,
+                        );
+                      } else {
+                        this.setState(
+                          {
+                            selectedDifficulty: d,
+                            query: `difficulty.label::${d.replaceAll(
+                              " ",
+                              "_",
+                            )} ${this.state.query}`,
+                          },
+                          this.handleSubmit,
+                        );
+                      }
+                    }}
+                  />
+                );
+              }
             })}
+            <i
+              class="material-icons"
+              onClick={() => {
+                this.setState(
+                  {
+                    selectedDifficulty: "",
+                    query: this.state.query
+                      .replace(/difficulty.label::\w+/i, "")
+                      .replace(/\s+/g, " ")
+                      .trim(),
+                  },
+                  this.handleSubmit,
+                );
+              }}
+              style={{
+                cursor: "pointer",
+                display: this.state.selectedDifficulty ? "inline" : "none",
+                fontSize: 18,
+                verticalAlign: "middle",
+              }}
+            >
+              close
+            </i>
           </div>
         </div>
       );
@@ -428,7 +563,10 @@ export class SearchApp extends Component {
                   this.setState({
                     query: "",
                     questions: [],
+                    categories: [],
+                    difficulties: [],
                     disciplines: [],
+                    selectedCategory: "",
                     selectedDiscipline: "",
                   })
                 }

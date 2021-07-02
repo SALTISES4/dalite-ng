@@ -154,10 +154,14 @@
 
   &:hover {
     background-color: transparentize($mdc-theme-secondary, 0.90);
+    font-weight: bold;
+    letter-spacing: -0.03em;
   }
 
   &.selected {
     background-color: $mdc-theme-secondary;
     color: white;
+    font-weight: bold;
+    letter-spacing: -0.03em;
   }
 }
