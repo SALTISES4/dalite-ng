@@ -333,7 +333,7 @@ export class SearchApp extends Component {
     disciplines: [],
     impacts: [],
     searching: false,
-    selectedCategory: "",
+    selectedCategories: [],
     selectedDifficulty: "",
     selectedDiscipline: "",
     selectedImpact: "",
@@ -385,16 +385,30 @@ export class SearchApp extends Component {
             if (c.length > 0) {
               return (
                 <Chip
-                  selected={this.state.selectedCategory == c}
+                  selected={this.state.selectedCategories.indexOf(c) >= 0}
                   text={c}
                   key={i}
                   onClick={() => {
+                    const sc = [...this.state.selectedCategories];
+                    const index = sc.indexOf(c);
+                    if (index >= 0) {
+                      sc.splice(index, 1);
+                    } else {
+                      sc.push(c);
+                    }
+                    const _query = this.state.query
+                      .replace(/category__title::\S+/gi, "")
+                      .replace(/\s+/g, " ")
+                      .trim();
                     this.setState(
                       {
-                        selectedCategory: c,
-                        query: `category__title::${c.replaceAll(" ", "_")} ${
-                          this.state.query
-                        }`,
+                        selectedCategories: sc,
+                        query: `${sc
+                          .map(
+                            (_c) =>
+                              `category__title::${_c.replaceAll(" ", "_")}`,
+                          )
+                          .join(" ")} ${_query}`,
                       },
                       this.handleSubmit,
                     );
@@ -408,9 +422,9 @@ export class SearchApp extends Component {
             onClick={() => {
               this.setState(
                 {
-                  selectedCategory: "",
+                  selectedCategories: "",
                   query: this.state.query
-                    .replace(/category__title::\w+/gi, "")
+                    .replace(/category__title::\S+/gi, "")
                     .replace(/\s+/g, " ")
                     .trim(),
                 },
@@ -419,7 +433,8 @@ export class SearchApp extends Component {
             }}
             style={{
               cursor: "pointer",
-              display: this.state.selectedCategory ? "inline" : "none",
+              display:
+                this.state.selectedCategories.length > 0 ? "inline" : "none",
               fontSize: 18,
               verticalAlign: "middle",
             }}
@@ -455,7 +470,7 @@ export class SearchApp extends Component {
                         {
                           selectedDifficulty: "",
                           query: this.state.query
-                            .replace(/difficulty.label::\w+/gi, "")
+                            .replace(/difficulty.label::\S+/gi, "")
                             .replace(/\s+/g, " ")
                             .trim(),
                         },
@@ -485,7 +500,7 @@ export class SearchApp extends Component {
                 {
                   selectedDifficulty: "",
                   query: this.state.query
-                    .replace(/difficulty.label::\w+/gi, "")
+                    .replace(/difficulty.label::\S+/gi, "")
                     .replace(/\s+/g, " ")
                     .trim(),
                 },
@@ -530,7 +545,7 @@ export class SearchApp extends Component {
                         {
                           selectedDiscipline: "",
                           query: this.state.query
-                            .replace(/discipline::\w+/gi, "")
+                            .replace(/discipline::\S+/gi, "")
                             .replace(/\s+/g, " ")
                             .trim(),
                         },
@@ -559,7 +574,7 @@ export class SearchApp extends Component {
                 {
                   selectedDiscipline: "",
                   query: this.state.query
-                    .replace(/discipline::\w+/gi, "")
+                    .replace(/discipline::\S+/gi, "")
                     .replace(/\s+/g, " ")
                     .trim(),
                 },
@@ -604,7 +619,7 @@ export class SearchApp extends Component {
                         {
                           selectedImpact: "",
                           query: this.state.query
-                            .replace(/peer_impact.label::\w+/gi, "")
+                            .replace(/peer_impact.label::\S+/gi, "")
                             .replace(/\s+/g, " ")
                             .trim(),
                         },
@@ -634,7 +649,7 @@ export class SearchApp extends Component {
                 {
                   selectedImpact: "",
                   query: this.state.query
-                    .replace(/peer_impact.label::\w+/gi, "")
+                    .replace(/peer_impact.label::\S+/gi, "")
                     .replace(/\s+/g, " ")
                     .trim(),
                 },
@@ -737,7 +752,7 @@ export class SearchApp extends Component {
                     difficulties: [],
                     disciplines: [],
                     impacts: [],
-                    selectedCategory: "",
+                    selectedCategories: [],
                     selectedDifficulty: "",
                     selectedDiscipline: "",
                   })
