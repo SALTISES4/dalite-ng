@@ -134,3 +134,30 @@
 .capitalize {
   text-transform: capitalize;
 }
+
+.chip-container {
+  border-left: solid thin;
+  margin: 10px 2px;
+  padding-left: 6px;
+}
+
+.chips {
+  border: solid thin;
+  border-radius: 10px;
+  color: $mdc-theme-secondary;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 12px;
+  margin: 4px 2px;
+  padding: 1px 5px;
+  text-transform: capitalize;
+
+  &:hover {
+    background-color: transparentize($mdc-theme-secondary, 0.90);
+  }
+
+  &.selected {
+    background-color: $mdc-theme-secondary;
+    color: white;
+  }
+}

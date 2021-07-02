@@ -1,5 +1,5 @@
 import { get } from "./_ajax/ajax.js";
-import { Component, h } from "preact";
+import { Component, createRef, h } from "preact";
 import { triScale } from "./_theming/colours.js";
 import { scaleThreshold } from "d3";
 
@@ -27,10 +27,23 @@ import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.m
 
 triScale.reverse();
 
+function Chip(props) {
+  return (
+    <div
+      class={this.props.selected ? "selected chips" : "chips"}
+      onClick={() => props.onClick(props.text)}
+    >
+      {props.text}
+    </div>
+  );
+}
+
 export class QuestionCard extends Component {
   state = {
     analyticsOpen: false,
   };
+
+  ref = createRef();
 
   answerChoice = (ac) => {
     if (Object.prototype.hasOwnProperty.call(ac, "correct")) {
@@ -163,10 +176,17 @@ export class QuestionCard extends Component {
 
   innerContent = () => {
     if (this.state.analyticsOpen) {
-      return <div />;
+      const height = this.ref.current.getBoundingClientRect().height + 16;
+      return (
+        <div
+          style={{ backgroundColor: "lightgrey", height, overflowY: "scroll" }}
+        >
+          [Analytics placeholder]
+        </div>
+      );
     }
     return (
-      <div>
+      <div ref={this.ref}>
         <Typography
           use="body1"
           tag="div"
@@ -174,7 +194,6 @@ export class QuestionCard extends Component {
           // This field is bleached and safe
           // eslint-disable-next-line
           dangerouslySetInnerHTML={{ __html: this.props.question.text }}
-          style={{ marginTop: 10 }}
         />
         {this.image()}
         {this.video()}
@@ -214,6 +233,7 @@ export class QuestionCard extends Component {
               use="caption"
               tag="div"
               theme="text-secondary-on-background"
+              style={{ marginBottom: 10 }}
             >
               #{this.props.question.id} {this.byline()}
             </Typography>
@@ -264,8 +284,10 @@ export class SearchApp extends Component {
   state = {
     query: "",
     questions: [],
-    meta: {},
+    disciplines: [],
     searching: false,
+    selectedCategory: "",
+    selectedDiscipline: "",
   };
 
   handleSubmit = async () => {
@@ -281,18 +303,85 @@ export class SearchApp extends Component {
         console.debug(data);
         this.setState(
           {
-            meta: data.meta,
+            categories: data.meta.categories,
+            disciplines: data.meta.disciplines,
             questions: data.results,
             searching: false,
           },
-          () => console.debug(this.state.questions, this.state.meta),
+          () => console.debug(this.state.questions, this.state.disciplines),
         );
       } catch (error) {
         // Snackbar
         console.debug(error);
       }
     } else {
-      this.setState({ questions: [], meta: {} });
+      this.setState({ questions: [], disciplines: [] });
+    }
+  };
+
+  chips = () => {
+    if (this.state.disciplines.length > 0) {
+      return (
+        <div>
+          <div class="chip-container">
+            {this.state.disciplines.map((d, i) => {
+              return (
+                <Chip
+                  selected={this.state.selectedDiscipline == d}
+                  text={d}
+                  key={i}
+                  onClick={() => {
+                    if (this.state.selectedDiscipline) {
+                      this.setState(
+                        {
+                          selectedDiscipline: "",
+                          query: this.state.query
+                            .replace(/discipline::\w+/i, "")
+                            .replace(/\s+/g, " ")
+                            .trim(),
+                        },
+                        this.handleSubmit,
+                      );
+                    } else {
+                      this.setState(
+                        {
+                          selectedDiscipline: d,
+                          query: `discipline::${d.replaceAll(" ", "_")} ${
+                            this.state.query
+                          }`,
+                        },
+                        this.handleSubmit,
+                      );
+                    }
+                  }}
+                />
+              );
+            })}
+          </div>
+          <div class="chip-container">
+            {this.state.categories.map((c, i) => {
+              return (
+                <Chip
+                  selected={this.state.selectedCategory == c}
+                  text={c}
+                  key={i}
+                  onClick={() => {
+                    this.setState(
+                      {
+                        selectedCategory: c,
+                        query: `category::${c.replaceAll(" ", "_")} ${
+                          this.state.query
+                        }`,
+                      },
+                      this.handleSubmit,
+                    );
+                  }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      );
     }
   };
 
@@ -336,7 +425,12 @@ export class SearchApp extends Component {
                 tabIndex="0"
                 icon="close"
                 onClick={() =>
-                  this.setState({ query: "", questions: [], meta: {} })
+                  this.setState({
+                    query: "",
+                    questions: [],
+                    disciplines: [],
+                    selectedDiscipline: "",
+                  })
                 }
               />
             }
@@ -351,6 +445,7 @@ export class SearchApp extends Component {
             )}
           </TextFieldHelperText>
         </div>
+        {this.chips()}
         {this.results()}
       </div>
     );

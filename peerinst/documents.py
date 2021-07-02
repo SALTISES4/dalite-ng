@@ -127,7 +127,7 @@ class QuestionDocument(Document):
             sorted_category_set = sorted(
                 set(
                     bleach.clean(
-                        c.title.lower(),
+                        c.title,
                         tags=ALLOWED_TAGS,
                         styles=[],
                         strip=True,

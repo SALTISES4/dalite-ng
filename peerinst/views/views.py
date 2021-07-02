@@ -2209,7 +2209,7 @@ def question_search_beta(request):
                 filters.append(
                     (
                         f"{t.split('::')[0]}".lower(),
-                        t.split("::")[1].replace("_", " "),
+                        t.split("::")[1].replace("_", " ").lower(),
                     )
                 )
             else:
@@ -2220,7 +2220,13 @@ def question_search_beta(request):
         # Serialize
         results = [hit.to_dict() for hit in s[:50]]
         # Add metadata
-        meta = {}
+        _c = []
+        for c in map(lambda x: x["category"], results):
+            for a in c:
+                _c.append(a["title"])
+        categories = list(sorted(set(_c)))
+        disciplines = list(sorted(set(r["discipline"] for r in results)))
+        meta = {"categories": categories, "disciplines": disciplines}
 
         return JsonResponse({"results": results, "meta": meta}, safe=False)
 
