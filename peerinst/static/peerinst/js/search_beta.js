@@ -289,6 +289,7 @@ export class SearchApp extends Component {
     disciplines: [],
     searching: false,
     selectedCategory: "",
+    selectedDifficulty: "",
     selectedDiscipline: "",
   };
 
@@ -613,6 +614,7 @@ export class SearchApp extends Component {
                     difficulties: [],
                     disciplines: [],
                     selectedCategory: "",
+                    selectedDifficulty: "",
                     selectedDiscipline: "",
                   })
                 }
@@ -622,6 +624,7 @@ export class SearchApp extends Component {
               this.setState({ query: evt.target.value }, this.handleSubmit);
             }}
             value={this.state.query}
+            theme="secondary"
           />
           <TextFieldHelperText persistent>
             {this.props.gettext(

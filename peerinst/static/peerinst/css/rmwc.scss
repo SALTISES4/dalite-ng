@@ -125,6 +125,12 @@
   }
 }
 
+/* Search related css */
+#search-form {
+  & .rmwc-icon {
+    color: $mdc-theme-primary;
+  }
+}
 .spinner {
   display: block;
   margin: auto;
