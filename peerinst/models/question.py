@@ -322,8 +322,26 @@ class Question(models.Model):
 
     @property
     def featured(self):
-        # TODO: add logic
-        return True
+        """
+        self.featured = True if question is part of a featured Collection
+        """
+        from . import Collection
+
+        if self.discipline:
+            featured_collections = Collection.objects.filter(
+                featured=True, discipline=self.discipline
+            )
+        else:
+            featured_collections = Collection.objects.filter(featured=True)
+
+        for c in featured_collections:
+            q_list = [a.questions.all() for a in c.assignments.all()]
+            q_list = list(
+                set([item for sublist in q_list for item in sublist])
+            )
+            if self in q_list:
+                return True
+        return False
 
     def get_start_form_class(self):
         from ..forms import FirstAnswerForm
