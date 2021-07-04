@@ -320,6 +320,11 @@ class Question(models.Model):
             return "{} - {}".format(self.discipline, self.title)
         return self.title
 
+    @property
+    def featured(self):
+        # TODO: add logic
+        return True
+
     def get_start_form_class(self):
         from ..forms import FirstAnswerForm
 

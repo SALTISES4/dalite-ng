@@ -88,7 +88,17 @@ export class QuestionCard extends Component {
 
   byline = () => {
     if (Object.prototype.hasOwnProperty.call(this.props.question, "user")) {
-      return <span>by {this.props.question.user.username}</span>;
+      return (
+        <div style={{ display: "inline" }}>
+          <span>
+            {this.props.gettext("by")} {this.props.question.user.username}
+          </span>{" "}
+          <span class="tag SALTISE">SALTISE</span>{" "}
+          <span class="tag EXPERT">EXPERT</span>{" "}
+          <span class="tag POWER">POWER USER</span>{" "}
+          <span class="tag INFLUENCER">TOP CONTRIBUTOR</span>
+        </div>
+      );
     }
   };
 
@@ -196,6 +206,29 @@ export class QuestionCard extends Component {
     }
   };
 
+  featured = () => {
+    if (this.props.question.featured) {
+      return (
+        <div
+          style={{
+            borderColor: "currentcolor",
+            borderRadius: "50%",
+            borderWidth: "thin",
+            borderStyle: "solid",
+            height: 32,
+            width: 32,
+            position: "absolute",
+            right: 20,
+            top: 100,
+            backgroundImage:
+              "url('/static/peerinst/img/SALTISE-logo-icon.gif')",
+            backgroundSize: "100%",
+          }}
+        />
+      );
+    }
+  };
+
   discipline = () => {
     if (this.props.question.discipline) {
       return this.props.question.discipline;
@@ -263,6 +296,7 @@ export class QuestionCard extends Component {
       <Card class="question" style={{ position: "relative" }}>
         {this.difficulty()}
         {this.impact()}
+        {this.featured()}
         <CardPrimaryAction>
           <div>
             <Typography
@@ -755,6 +789,7 @@ export class SearchApp extends Component {
                     selectedCategories: [],
                     selectedDifficulty: "",
                     selectedDiscipline: "",
+                    selectedImpact: "",
                   })
                 }
               />

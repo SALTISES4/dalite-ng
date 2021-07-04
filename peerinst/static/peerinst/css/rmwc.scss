@@ -172,3 +172,26 @@
     letter-spacing: -0.03em;
   }
 }
+
+/* username tag tests */
+.tag {
+  border-radius: 3px;
+  color: white;
+  font-size: x-small;
+  font-weight: bolder;
+  letter-spacing: -0.02em;
+  padding: 0px 4px;
+
+  &.SALTISE {
+    background-image: linear-gradient( to bottom right, rgb(99 191 85), $mdc-theme-primary);
+  }
+  &.EXPERT {
+    background-image: linear-gradient( to bottom right, $mdc-theme-primary, $mdc-theme-secondary);
+  }
+  &.POWER {
+    background-image: linear-gradient( to bottom right, rgb(226 84 53), rgb(223 171 64));
+  }
+  &.INFLUENCER {
+    background-image: linear-gradient( to bottom right, $mdc-theme-primary, rgb(226 84 53));
+  }
+}

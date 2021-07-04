@@ -98,6 +98,7 @@ class QuestionDocument(Document):
         }
     )
     discipline = TextField(analyzer=autocomplete)  # don't break on spaces?
+    featured = BooleanField()
     id = TextField()
     image = TextField(index=False)
     image_alt_text = TextField(index=False)
@@ -176,6 +177,9 @@ class QuestionDocument(Document):
                 strip=True,
             )
         return ""
+
+    def prepare_featured(self, instance):
+        return instance.featured
 
     def prepare_id(self, instance):
         return str(instance.id)
