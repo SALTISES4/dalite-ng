@@ -50,19 +50,25 @@ def question_search(search_string, filters=[]):
         .query(
             Q(
                 "function_score",
-                field_value_factor={
-                    "field": "assignment_count",
-                    "modifier": "ln1p",
+                **{
+                    "field_value_factor": {
+                        "field": "assignment_count",
+                        "modifier": "ln1p",
+                    },
+                    "boost_mode": "multiply",
                 },
             ),
         )
         .query(
             Q(
                 "function_score",
-                field_value_factor={
-                    "field": "featured",
-                    "modifier": "none",
-                    "factor": 5,
+                **{
+                    "field_value_factor": {
+                        "field": "featured",
+                        "modifier": "none",
+                        "factor": 5,
+                    },
+                    "boost_mode": "multiply",
                 },
             ),
         )
