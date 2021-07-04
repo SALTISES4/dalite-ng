@@ -7,6 +7,9 @@ from .admin import UserType
 class SaltiseMember(models.Model):
     name = models.CharField(max_length=64)
     picture = models.ImageField(blank=True, null=True, upload_to="images")
+    user = models.OneToOneField(
+        User, on_delete=models.SET_NULL, blank=True, null=True
+    )
 
     def __str__(self):
         return self.name

@@ -21,7 +21,7 @@ def question_search(search_string, filters=[]):
             fields=[
                 "discipline.title",
                 "id",
-                "text",
+                "text^2",
                 "title^3",
                 "user.username",
             ],
@@ -45,7 +45,7 @@ def question_search(search_string, filters=[]):
 
     s = (
         QuestionDocument.search()
-        .sort("_score")
+        .sort("_score", "-assignment_count", "-answer_count")
         .query(q)
         .exclude("term", questionflag_set=True)
         .exclude("term", valid=False)
