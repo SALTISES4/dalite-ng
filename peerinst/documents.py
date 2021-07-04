@@ -76,7 +76,8 @@ class QuestionDocument(Document):
     - Consider "boosting" and multifields
     """
 
-    answer_count = IntegerField(index=False)
+    answer_count = IntegerField()
+    assignment_count = IntegerField()
     answer_style = IntegerField(index=False)
     answerchoice_set = NestedField(
         properties={
@@ -121,7 +122,13 @@ class QuestionDocument(Document):
         """
         TODO: Refactor to model
         """
-        return instance.answer_set.count()
+        return instance.get_student_answers().count()
+
+    def prepare_assignment_count(self, instance):
+        """
+        TODO: Refactor to model
+        """
+        return instance.assignment_set.all().count()
 
     def prepare_answerchoice_set(self, instance):
         if instance.answerchoice_set.count() > 0:
