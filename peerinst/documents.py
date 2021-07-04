@@ -229,7 +229,9 @@ class QuestionDocument(Document):
         """
         Replicate valid question logic
 
-        TODO: Refactor to model
+        TODO:
+            - Refactor to model
+            - Also, need to add a check that there are enough sample answers!
         """
         return instance.answerchoice_set.count() > 0 or instance.type == "RO"
 

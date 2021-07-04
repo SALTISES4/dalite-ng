@@ -8,10 +8,11 @@ repos:
         args: ["--profile", "black"]
 
   - repo: https://github.com/ambv/black
-    rev: 21.4b2
+    rev: 21.6b0
     hooks:
       - id: black
         exclude: "^.*/migrations/.*.py$"
+        args: [--line-length=79]
 
   - repo: https://github.com/pycqa/flake8
     rev: 3.9.1
