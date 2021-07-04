@@ -459,12 +459,14 @@ admin.site.register(LogEntry, LogEntryAdmin)
 admin.site.register(models.Message, MessageAdmin)
 admin.site.register(models.MessageType)
 
+
 class SaltiseMemberAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name=="user":
-            teachers = Teacher.objects.all().values_list("user",flat=True)
+        if db_field.name == "user":
+            teachers = Teacher.objects.all().values_list("user", flat=True)
             kwargs["queryset"] = User.objects.filter(pk__in=teachers)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 admin.site.register(models.SaltiseMember, SaltiseMemberAdmin)
 admin.site.register(models.UserType)
