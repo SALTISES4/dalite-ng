@@ -47,6 +47,25 @@ def question_search(search_string, filters=[]):
         QuestionDocument.search()
         .sort("_score", "-assignment_count", "-answer_count")
         .query(q)
+        .query(
+            Q(
+                "function_score",
+                field_value_factor={
+                    "field": "assignment_count",
+                    "modifier": "ln1p",
+                },
+            ),
+        )
+        .query(
+            Q(
+                "function_score",
+                field_value_factor={
+                    "field": "featured",
+                    "modifier": "none",
+                    "factor": 5,
+                },
+            ),
+        )
         .exclude("term", questionflag_set=True)
         .exclude("term", valid=False)
         .exclude("term", deleted=True)
@@ -77,6 +96,6 @@ def question_search(search_string, filters=[]):
         if i == 0:
             logger.debug(f"Top result: \n{pp.pformat(hit.to_dict())}")
 
-        logger.debug(f"Score: {hit.meta.score} | #{hit.id}")
+        logger.debug(f"Score {i+1}: {hit.meta.score} | #{hit.id}")
 
     return s

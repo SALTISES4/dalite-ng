@@ -76,7 +76,7 @@ class QuestionDocument(Document):
     - Consider "boosting" and multifields
     """
 
-    answer_count = IntegerField()
+    answer_count = IntegerField(index=False)
     assignment_count = IntegerField()
     answer_style = IntegerField(index=False)
     answerchoice_set = NestedField(
