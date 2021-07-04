@@ -45,32 +45,27 @@ def question_search(search_string, filters=[]):
 
     s = (
         QuestionDocument.search()
-        .sort("_score", "-assignment_count", "-answer_count")
-        .query(q)
+        .sort("_score")
         .query(
-            Q(
-                "function_score",
-                **{
-                    "field_value_factor": {
-                        "field": "assignment_count",
-                        "modifier": "ln1p",
+            "function_score",
+            **{
+                "query": q,
+                "functions": [
+                    {
+                        "field_value_factor": {
+                            "field": "assignment_count",
+                            "modifier": "log1p",
+                        }
                     },
-                    "boost_mode": "multiply",
-                },
-            ),
-        )
-        .query(
-            Q(
-                "function_score",
-                **{
-                    "field_value_factor": {
-                        "field": "featured",
-                        "modifier": "none",
-                        "factor": 5,
+                    {
+                        "field_value_factor": {
+                            "field": "featured",
+                            "modifier": "none",
+                            "factor": 1.1,
+                        }
                     },
-                    "boost_mode": "multiply",
-                },
-            ),
+                ],
+            },
         )
         .exclude("term", questionflag_set=True)
         .exclude("term", valid=False)
