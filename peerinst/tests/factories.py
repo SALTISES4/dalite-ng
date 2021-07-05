@@ -2,6 +2,7 @@ import datetime
 import random
 
 import factory
+import factory.fuzzy
 import pytz
 from django.contrib.auth.models import User
 
@@ -120,3 +121,40 @@ class AssignmentFactory(factory.django.DjangoModelFactory):
             return
         for i in range(extracted):
             assignment.questions.add(QuestionFactory())
+
+
+class DisciplineFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Discipline
+
+    title = factory.Sequence("Discipline {}".format)
+
+
+class TeacherFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Teacher
+
+    user = factory.SubFactory(UserFactory)
+
+
+class CollectionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Collection
+
+    description = factory.Sequence("Description for collection {}".format)
+    discipline = factory.SubFactory(DisciplineFactory)
+    featured = factory.fuzzy.FuzzyChoice([True, False])
+    owner = factory.SubFactory(TeacherFactory)
+    private = factory.fuzzy.FuzzyChoice([True, False])
+    title = factory.Sequence("Collection {}".format)
+
+    @factory.post_generation
+    def assignments(collection, create, extracted, **kwargs):
+        if not create or not extracted:
+            assert (
+                not extracted
+            ), "Cannot generate assignment when collection is not saved."
+            return
+
+        for i in range(extracted):
+            collection.assignments.add(AssignmentFactory(questions=10))

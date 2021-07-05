@@ -327,21 +327,31 @@ class Question(models.Model):
         """
         from . import Collection
 
-        if self.discipline:
-            featured_collections = Collection.objects.filter(
-                featured=True, discipline=self.discipline
-            )
-        else:
-            featured_collections = Collection.objects.filter(featured=True)
+        featured_collections = Collection.objects.filter(
+            featured=True, private=False
+        )
 
         for c in featured_collections:
             q_list = [a.questions.all() for a in c.assignments.all()]
-            q_list = list(
-                set([item for sublist in q_list for item in sublist])
-            )
+            q_list = list([item for sublist in q_list for item in sublist])
             if self in q_list:
                 return True
         return False
+
+    @property
+    def featured_(self):
+        """
+        self.featured = True if question is part of a featured Collection
+        """
+        from . import Collection
+
+        featured_questions = (
+            Collection.objects.filter(featured=True, private=False)
+            .prefetch_related("assignments__questions")
+            .values_list("assignments__questions", flat=True)
+        )
+
+        return self.id in featured_questions
 
     def get_start_form_class(self):
         from ..forms import FirstAnswerForm

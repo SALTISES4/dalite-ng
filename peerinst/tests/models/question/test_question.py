@@ -1,13 +1,14 @@
-import factory
-import pytest
 import random
 from timeit import default_timer as timer
 
+import factory
+import pytest
 from django.test import TestCase
 
 from peerinst import models
 from peerinst.tests.factories import (
     AnswerFactory,
+    CollectionFactory,
     QuestionFactory,
     UserFactory,
 )
@@ -102,3 +103,54 @@ class QuestionMethodTests(QuestionTestCase):
             )
             self.assertTrue(abs(m["tricky"] / (prob * (1 - prob)) - 1) <= 0.1)
             self.assertTrue(abs(m["peer"] / ((1 - prob) * prob) - 1) <= 0.1)
+
+
+class QuestionPropertyTests(TestCase):
+    def setUp(self):
+        # Create collections
+        for i in range(20):
+            CollectionFactory(assignments=10)
+
+        print(f"{models.Collection.objects.count()} collections created")
+        print(f"{models.Assignment.objects.count()} assignments created")
+        print(f"{models.Question.objects.count()} questions created")
+
+    def test_featured(self):
+
+        start = timer()
+        featured = []
+        for q in models.Question.objects.all():
+            if q.featured:
+                featured.append(q)
+        end = timer()
+        duration = end - start
+        print(duration)
+
+        self.assertEqual(
+            100
+            * models.Collection.objects.filter(
+                featured=True, private=False
+            ).count(),
+            len(featured),
+        )
+
+        start = timer()
+        featured_ = []
+        for q in models.Question.objects.all():
+            if q.featured_:
+                featured_.append(q)
+        end = timer()
+        print(end - start)
+
+        self.assertEqual(
+            100
+            * models.Collection.objects.filter(
+                featured=True, private=False
+            ).count(),
+            len(featured_),
+        )
+
+        print(duration / (end - start))
+
+        for q in featured:
+            self.assertTrue(q in featured_)
