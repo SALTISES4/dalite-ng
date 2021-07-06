@@ -107,7 +107,6 @@ class QuestionMethodTests(QuestionTestCase):
 
 class QuestionPropertyTests(TestCase):
     def setUp(self):
-        # Create collections
         for i in range(20):
             CollectionFactory(assignments=10)
 
@@ -133,24 +132,3 @@ class QuestionPropertyTests(TestCase):
             ).count(),
             len(featured),
         )
-
-        start = timer()
-        featured_ = []
-        for q in models.Question.objects.all():
-            if q.featured_:
-                featured_.append(q)
-        end = timer()
-        print(end - start)
-
-        self.assertEqual(
-            100
-            * models.Collection.objects.filter(
-                featured=True, private=False
-            ).count(),
-            len(featured_),
-        )
-
-        print(duration / (end - start))
-
-        for q in featured:
-            self.assertTrue(q in featured_)

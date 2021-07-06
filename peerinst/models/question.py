@@ -6,6 +6,7 @@ from datetime import datetime
 import bleach
 import pandas as pd
 import pytz
+from django.apps import apps
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core import exceptions
@@ -322,36 +323,10 @@ class Question(models.Model):
 
     @property
     def featured(self):
-        """
-        self.featured = True if question is part of a featured Collection
-        """
-        from . import Collection
-
-        featured_collections = Collection.objects.filter(
-            featured=True, private=False
+        Collection = apps.get_model(
+            app_label="peerinst", model_name="collection"
         )
-
-        for c in featured_collections:
-            q_list = [a.questions.all() for a in c.assignments.all()]
-            q_list = list([item for sublist in q_list for item in sublist])
-            if self in q_list:
-                return True
-        return False
-
-    @property
-    def featured_(self):
-        """
-        self.featured = True if question is part of a featured Collection
-        """
-        from . import Collection
-
-        featured_questions = (
-            Collection.objects.filter(featured=True, private=False)
-            .prefetch_related("assignments__questions")
-            .values_list("assignments__questions", flat=True)
-        )
-
-        return self.id in featured_questions
+        return self.id in Collection.featured_questions()
 
     def get_start_form_class(self):
         from ..forms import FirstAnswerForm
