@@ -322,6 +322,14 @@ class Question(models.Model):
         return self.title
 
     @property
+    def answer_count(self):
+        return self.get_student_answers().count()
+
+    @property
+    def assignment_count(self):
+        return self.assignment_set.all().count()
+
+    @property
     def featured(self):
         Collection = apps.get_model(
             app_label="peerinst", model_name="collection"

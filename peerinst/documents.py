@@ -120,16 +120,10 @@ class QuestionDocument(Document):
     video_url = TextField(index=False)
 
     def prepare_answer_count(self, instance):
-        """
-        TODO: Refactor to model
-        """
-        return instance.get_student_answers().count()
+        return instance.answer_count
 
     def prepare_assignment_count(self, instance):
-        """
-        TODO: Refactor to model
-        """
-        return instance.assignment_set.all().count()
+        return instance.assignment_count
 
     def prepare_answerchoice_set(self, instance):
         if instance.answerchoice_set.count() > 0:
@@ -202,12 +196,7 @@ class QuestionDocument(Document):
         return {"score": pi[0], "label": str(pi[1])}
 
     def prepare_questionflag_set(self, instance):
-        """Replicate logic for UnflaggedQuestionManager"""
-        return (
-            any(instance.questionflag_set.all())
-            if instance.questionflag_set.exists()
-            else False
-        )
+        return Question.flagged_objects.filter(pk=instance.pk).exists()
 
     def prepare_text(self, instance):
         return bleach.clean(
