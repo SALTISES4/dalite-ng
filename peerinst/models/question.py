@@ -330,22 +330,21 @@ class Question(models.Model):
         """
         Teacher = apps.get_model(app_label="peerinst", model_name="teacher")
 
-        deleted_questions = set(
-            Teacher.objects.all()
-            .prefetch_related("deleted_questions__question")
-            .values_list("deleted_questions__question", flat=True)
-        )
-        questions_no_answer = set(
-            cls.objects.all()
-            .annotate(answer_count=Count("answer"))
-            .filter(answer_count=0)
-            .values_list("id", flat=True)
-        )
-
         return cache.get_or_set(
             "deleted_questions",
             cls.objects.filter(
-                pk__in=deleted_questions.intersection(questions_no_answer)
+                pk__in=set(
+                    Teacher.objects.all()
+                    .prefetch_related("deleted_questions__question")
+                    .values_list("deleted_questions__question", flat=True)
+                ).intersection(
+                    set(
+                        cls.objects.all()
+                        .annotate(answer_count=Count("answer"))
+                        .filter(answer_count=0)
+                        .values_list("id", flat=True)
+                    )
+                )
             ),
             60,
         )
@@ -357,6 +356,13 @@ class Question(models.Model):
     @property
     def assignment_count(self):
         return self.assignment_set.all().count()
+
+    @property
+    def collections(self):
+        Collection = apps.get_model(
+            app_label="peerinst", model_name="collection"
+        )
+        return Collection.objects.filter(assignments__questions=self)
 
     @property
     def featured(self):

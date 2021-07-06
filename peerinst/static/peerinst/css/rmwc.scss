@@ -102,8 +102,13 @@
   padding: 20px 20px 12px;
 
   & .mdc-card__primary-action {
+    --mdc-ripple-fg-size: 0 !important;
+    cursor: default;
     padding-right: 40px;
-    pointer-events: none;
+
+    &:hover::before {
+      opacity: 0;
+    }
   }
 
   & .title {
@@ -193,5 +198,23 @@
   }
   &.INFLUENCER {
     background-image: linear-gradient( to bottom right, $mdc-theme-primary, rgb(226 84 53));
+  }
+}
+
+.featured-icon {
+  background-image:
+    url('/static/peerinst/img/SALTISE-badge.png');
+  background-repeat: no-repeat;
+  background-size: 100%;
+  cursor: pointer;
+  display: inline-block;
+  height: 34px;
+  margin-left: 12px;
+  vertical-align: bottom;
+  width: 34px;
+
+  &:hover {
+    background-image:
+      url('/static/peerinst/img/SALTISE-badge-inverted.png');
   }
 }

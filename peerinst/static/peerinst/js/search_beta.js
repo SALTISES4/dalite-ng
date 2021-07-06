@@ -1,5 +1,5 @@
 import { get } from "./_ajax/ajax.js";
-import { Component, createRef, h } from "preact";
+import { Component, createRef, Fragment, h } from "preact";
 import { triScale } from "./_theming/colours.js";
 import { scaleThreshold } from "d3";
 
@@ -137,6 +137,7 @@ export class QuestionCard extends Component {
             right: 20,
             top: 20,
             width: 32,
+            zIndex: 2,
           }}
           onClick={() =>
             this.setState({ analyticsOpen: !this.state.analyticsOpen })
@@ -209,22 +210,18 @@ export class QuestionCard extends Component {
   featured = () => {
     if (this.props.question.featured) {
       return (
-        <div
-          style={{
-            borderColor: "currentcolor",
-            borderRadius: "50%",
-            borderWidth: "thin",
-            borderStyle: "solid",
-            height: 32,
-            width: 32,
-            position: "absolute",
-            right: 20,
-            top: 100,
-            backgroundImage:
-              "url('/static/peerinst/img/SALTISE-logo-icon.gif')",
-            backgroundSize: "100%",
-          }}
-        />
+        <Fragment>
+          <a
+            href={this.props.question.collections[0].url}
+            target="_blank"
+            rel="noreferrer"
+            title={`${this.props.gettext(
+              "This question is part of featured content curated by SALTISE.  Click to open the associated collection ",
+            )}'${this.props.question.collections[0].title}' in a new tab.`}
+          >
+            <div class="featured-icon" />
+          </a>
+        </Fragment>
       );
     }
   };
@@ -296,17 +293,22 @@ export class QuestionCard extends Component {
       <Card class="question" style={{ position: "relative" }}>
         {this.difficulty()}
         {this.impact()}
-        {this.featured()}
         <CardPrimaryAction>
           <div>
-            <Typography
-              class="title"
-              use="headline6"
-              tag="h2"
-              // This field is bleached and safe
-              // eslint-disable-next-line
-              dangerouslySetInnerHTML={{ __html: this.props.question.title }}
-            />
+            <div>
+              <Typography
+                class="title"
+                use="headline6"
+                tag="h2"
+                // This field is bleached and safe
+                // eslint-disable-next-line
+                dangerouslySetInnerHTML={{
+                  __html: this.props.question.title,
+                }}
+                style={{ display: "inline", width: "fit-content" }}
+              />
+              {this.featured()}
+            </div>
             <Typography
               use="caption"
               tag="div"

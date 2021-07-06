@@ -132,3 +132,14 @@ class QuestionPropertyTests(TestCase):
             ).count(),
             len(featured),
         )
+
+    def test_collections(self):
+        question = (
+            models.Collection.objects.first()
+            .assignments.first()
+            .questions.first()
+        )
+        self.assertEqual(question.collections.count(), 1)
+        self.assertEqual(
+            question.collections[0], models.Collection.objects.first()
+        )

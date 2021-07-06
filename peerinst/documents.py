@@ -70,6 +70,12 @@ class QuestionDocument(Document):
         }
     )  # don't break on spaces?
     collaborators = NestedField(properties={"username": TextField()})
+    collections = NestedField(
+        properties={
+            "title": TextField(index=False),
+            "url": TextField(index=False),
+        }
+    )
     difficulty = ObjectField(
         properties={
             "score": FloatField(index=False),
@@ -135,6 +141,12 @@ class QuestionDocument(Document):
 
             return [{"title": c} for c in sorted_category_set]
         return []
+
+    def prepare_collections(self, instance):
+        return [
+            {"title": c.title, "url": c.get_absolute_url()}
+            for c in instance.collections
+        ]
 
     def prepare_deleted(self, instance):
         return instance in type(instance).deleted_questions()
