@@ -10,9 +10,10 @@ from django.apps import apps
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core import exceptions
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.utils.html import escape, strip_tags
 from django.utils.translation import ugettext_lazy as _
 
@@ -320,6 +321,34 @@ class Question(models.Model):
         if self.discipline:
             return "{} - {}".format(self.discipline, self.title)
         return self.title
+
+    @classmethod
+    def deleted_questions(cls):
+        """
+        Exclude questions which are part of any Teacher's deleted_questions,
+        and have no answers
+        """
+        Teacher = apps.get_model(app_label="peerinst", model_name="teacher")
+
+        deleted_questions = set(
+            Teacher.objects.all()
+            .prefetch_related("deleted_questions__question")
+            .values_list("deleted_questions__question", flat=True)
+        )
+        questions_no_answer = set(
+            cls.objects.all()
+            .annotate(answer_count=Count("answer"))
+            .filter(answer_count=0)
+            .values_list("id", flat=True)
+        )
+
+        return cache.get_or_set(
+            "deleted_questions",
+            cls.objects.filter(
+                pk__in=deleted_questions.intersection(questions_no_answer)
+            ),
+            60,
+        )
 
     @property
     def answer_count(self):

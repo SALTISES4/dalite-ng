@@ -1,5 +1,3 @@
-from functools import lru_cache
-
 import bleach
 from django.contrib.auth.models import User
 from django_elasticsearch_dsl import Document
@@ -21,7 +19,6 @@ from peerinst.models import (
     Discipline,
     Question,
     QuestionFlag,
-    Teacher,
 )
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 
@@ -44,25 +41,6 @@ trigram_filter = token_filter("ngram", "ngram", min_gram=3, max_gram=3)
 trigram = analyzer(
     "trigram", tokenizer="whitespace", filter=["lowercase", trigram_filter]
 )
-
-
-@lru_cache(maxsize=None)
-def get_deleted_questions():
-    deleted_questions_all = [
-        [
-            q
-            for q in t.deleted_questions.all()
-            if q.get_student_answers().count() == 0
-        ]
-        for t in Teacher.objects.all()
-        if t.deleted_questions.all()
-    ]
-    # flatten
-    deleted_questions_all = [
-        item for sublist in deleted_questions_all for item in sublist
-    ]
-
-    return deleted_questions_all
 
 
 @registry.register_document
@@ -159,11 +137,7 @@ class QuestionDocument(Document):
         return []
 
     def prepare_deleted(self, instance):
-        """
-        Exclude questions which are part of any Teacher's deleted_questions,
-        and have no student answers
-        """
-        return instance in get_deleted_questions()
+        return instance in type(instance).deleted_questions()
 
     def prepare_difficulty(self, instance):
         d = instance.get_difficulty()
