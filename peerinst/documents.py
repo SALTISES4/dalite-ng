@@ -1,5 +1,6 @@
 import bleach
 from django.contrib.auth.models import User
+from django.template.defaultfilters import title
 from django_elasticsearch_dsl import Document
 from django_elasticsearch_dsl.fields import (
     BooleanField,
@@ -82,7 +83,9 @@ class QuestionDocument(Document):
             "label": TextField(analyzer=full_term),
         }
     )
-    discipline = TextField(analyzer=autocomplete)  # don't break on spaces?
+    discipline = ObjectField(
+        properties={"title": TextField(analyzer=autocomplete)}
+    )  # don't break on spaces?
     featured = BooleanField()
     frequency = ObjectField(
         properties={
@@ -132,18 +135,19 @@ class QuestionDocument(Document):
         return []
 
     def prepare_category(self, instance):
+        """Bleach and ensure title case"""
         if instance.category:
-            sorted_category_set = sorted(
-                set(
+            sorted_category_set = [
+                title(
                     bleach.clean(
                         c.title,
-                        tags=ALLOWED_TAGS,
+                        tags=[],
                         styles=[],
                         strip=True,
                     )
-                    for c in instance.category.all()
                 )
-            )
+                for c in instance.category.all()
+            ]
 
             return [{"title": c} for c in sorted_category_set]
         return []
@@ -162,14 +166,19 @@ class QuestionDocument(Document):
         return {"score": d[0], "label": str(d[1])}
 
     def prepare_discipline(self, instance):
+        """Bleach and ensure title case"""
         if instance.discipline:
-            return bleach.clean(
-                instance.discipline.title,
-                tags=ALLOWED_TAGS,
-                styles=[],
-                strip=True,
-            )
-        return ""
+            return {
+                "title": title(
+                    bleach.clean(
+                        instance.discipline.title,
+                        tags=[],
+                        styles=[],
+                        strip=True,
+                    )
+                )
+            }
+        return {"title": ""}
 
     def prepare_featured(self, instance):
         return instance.featured

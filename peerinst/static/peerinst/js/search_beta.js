@@ -296,7 +296,7 @@ export class SearchApp extends Component {
                         {
                           selectedDiscipline: "",
                           query: this.state.query
-                            .replace(/discipline::\S+/gi, "")
+                            .replace(/discipline.title::\S+/gi, "")
                             .replace(/\s+/g, " ")
                             .trim(),
                         },
@@ -306,9 +306,10 @@ export class SearchApp extends Component {
                       this.setState(
                         {
                           selectedDiscipline: d,
-                          query: `discipline::${d.replaceAll(" ", "_")} ${
-                            this.state.query
-                          }`,
+                          query: `discipline.title::${d.replaceAll(
+                            " ",
+                            "_",
+                          )} ${this.state.query}`,
                         },
                         this.handleSubmit,
                       );
@@ -494,7 +495,7 @@ export class SearchApp extends Component {
       this.setState({
         snackbarIsOpen: true,
         snackbarMessage: this.props.gettext(
-          "Could not load favourites.  Try refreshing this page.",
+          "Error.  Try refreshing this page.",
         ),
       });
     }

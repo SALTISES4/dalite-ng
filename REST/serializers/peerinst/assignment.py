@@ -1,5 +1,4 @@
 import bleach
-
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Max
@@ -28,10 +27,9 @@ class CategorySerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """Bleach and ensure title case"""
         ret = super().to_representation(instance)
-        ret["title"] = bleach.clean(
-            ret["title"], tags=[], styles=[], strip=True
+        ret["title"] = title(
+            bleach.clean(ret["title"], tags=[], styles=[], strip=True)
         )
-        ret["title"] = title(ret["title"])
         return ret
 
 
@@ -43,10 +41,9 @@ class DisciplineSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """Bleach and ensure title case"""
         ret = super().to_representation(instance)
-        ret["title"] = bleach.clean(
-            ret["title"], tags=[], styles=[], strip=True
+        ret["title"] = title(
+            bleach.clean(ret["title"], tags=[], styles=[], strip=True)
         )
-        ret["title"] = title(ret["title"])
         return ret
 
 
@@ -147,10 +144,10 @@ class RankSerializer(serializers.ModelSerializer):
     )
 
     def create(self, validated_data):
-        """ Custom create method to add questions to an assignment based on pk
-            Required POST data:
-                - assignment (validated normally)
-                - question_pk (validated here)
+        """Custom create method to add questions to an assignment based on pk
+        Required POST data:
+            - assignment (validated normally)
+            - question_pk (validated here)
         """
 
         assignment = validated_data["assignment"]

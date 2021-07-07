@@ -2197,7 +2197,7 @@ def collection_search_function(search_string, pre_filtered_list=None):
 def question_search_beta(request):
     FILTERS = [
         "category__title",
-        "discipline",
+        "discipline.title",
         "difficulty.label",
         "peer_impact.label",
     ]
@@ -2237,7 +2237,9 @@ def question_search_beta(request):
             difficulties = list(
                 sorted(set(r["difficulty"]["label"] for r in results))
             )
-            disciplines = list(sorted(set(r["discipline"] for r in results)))
+            disciplines = list(
+                sorted(set(r["discipline"]["title"] for r in results))
+            )
             impacts = list(
                 sorted(set(r["peer_impact"]["label"] for r in results))
             )

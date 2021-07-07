@@ -14,9 +14,11 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Q
+from django.template.defaultfilters import title
 from django.utils.html import escape, strip_tags
 from django.utils.translation import ugettext_lazy as _
 
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 from reputation.models import Reputation
 
 from .. import rationale_choice
@@ -41,27 +43,40 @@ def images(instance, filename):
 
 class Category(models.Model):
     title = models.CharField(
-        _("Category Name"),
+        _("Category"),
         unique=True,
         max_length=100,
-        help_text=_("Enter the name of a new question category."),
+        help_text=_("Enter the title of the question category."),
         validators=[no_hyphens],
     )
+
+    def save(self, *args, **kwargs):
+        """Bleach and ensure title case"""
+        self.title = title(
+            bleach.clean(
+                self.title,
+                tags=[],
+                styles=[],
+                strip=True,
+            )
+        )
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
 
     class Meta:
+        ordering = ("title",)
         verbose_name = _("category")
         verbose_name_plural = _("categories")
 
 
 class Subject(models.Model):
     title = models.CharField(
-        _("Subject name"),
+        _("Subject"),
         unique=True,
         max_length=100,
-        help_text=_("Enter the name of a new subject."),
+        help_text=_("Enter the title of the subject."),
         validators=[no_hyphens],
     )
     discipline = models.ForeignKey(
@@ -71,27 +86,53 @@ class Subject(models.Model):
         Category, related_name="subjects", blank=True
     )
 
+    def save(self, *args, **kwargs):
+        """Bleach and ensure title case"""
+        self.title = title(
+            bleach.clean(
+                self.title,
+                tags=[],
+                styles=[],
+                strip=True,
+            )
+        )
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.title
 
     class Meta:
+        ordering = ("title",)
         verbose_name = _("subject")
         verbose_name_plural = _("subjects")
 
 
 class Discipline(models.Model):
     title = models.CharField(
-        _("Discipline name"),
+        _("Discipline"),
         unique=True,
         max_length=100,
-        help_text=_("Enter the name of a new discipline."),
+        help_text=_("Enter the title of the discipline."),
         validators=[no_hyphens],
     )
+
+    def save(self, *args, **kwargs):
+        """Bleach and ensure title case"""
+        self.title = title(
+            bleach.clean(
+                self.title,
+                tags=[],
+                styles=[],
+                strip=True,
+            )
+        )
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
 
     class Meta:
+        ordering = ("title",)
         verbose_name = _("discipline")
         verbose_name_plural = _("disciplines")
 
@@ -266,7 +307,7 @@ class Question(models.Model):
             "Optional. Select the discipline to which this item should "
             "be associated."
         ),
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
     fake_attributions = models.BooleanField(
         _("Add fake attributions"),

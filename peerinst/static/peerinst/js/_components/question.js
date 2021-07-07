@@ -314,15 +314,15 @@ export class SearchQuestionCard extends Component {
             <CardActionButtons>
               <Typography use="caption" tag="div">
                 {this.props.gettext("Discipline")}:{" "}
-                <span class="capitalize">
+                <span>
                   {this.props.question.discipline
-                    ? this.props.question.discipline
+                    ? this.props.question.discipline.title
                     : this.props.gettext("Unlabelled")}
                 </span>
               </Typography>
               <Typography use="caption" tag="div">
                 {this.props.gettext("Categories")}:{" "}
-                <span class="capitalize">
+                <span>
                   {this.props.question.category
                     ? this.props.question.category
                         .map((c) => c.title)
