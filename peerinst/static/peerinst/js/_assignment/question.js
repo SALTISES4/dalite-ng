@@ -60,9 +60,9 @@ const Checkmark = (props) => {
 
 export class Choices extends Component {
   choiceList = () => {
-    return this.props.choices.map((choice) => {
+    return this.props.choices.map((choice, i) => {
       return (
-        <li className="dense-list">
+        <li className="dense-list" key={i}>
           {/* eslint-disable-next-line */}
           {choice[0]}. <span dangerouslySetInnerHTML={{ __html: choice[1] }} />{" "}
           <Checkmark correct={choice[2]} />
@@ -307,6 +307,7 @@ export class QuestionCard extends Component {
             <PlotConfusionMatrix
               _matrix={this.props.question.matrix}
               freq={this.props.question.freq}
+              plot={this.state.dialogOpen}
             />
           </DialogContent>
           <DialogActions>

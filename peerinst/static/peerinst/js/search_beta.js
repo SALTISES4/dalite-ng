@@ -1,17 +1,12 @@
-import { get } from "./_ajax/ajax.js";
-import { Component, createRef, Fragment, h } from "preact";
-import { triScale } from "./_theming/colours.js";
-import { scaleThreshold } from "d3";
+import { Component, h } from "preact";
 
-import {
-  Card,
-  CardPrimaryAction,
-  CardActions,
-  CardAction,
-  CardActionIcons,
-  CardActionButtons,
-} from "@rmwc/card";
+import { get, submitData } from "./_ajax/ajax.js";
+
+import { SearchQuestionCard } from "./_components/question.js";
+import { Favourites } from "./_components/providers.js";
+
 import { CircularProgress } from "@rmwc/circular-progress";
+import { Snackbar } from "@rmwc/snackbar";
 import {
   TextField,
   TextFieldIcon,
@@ -19,13 +14,10 @@ import {
 } from "@rmwc/textfield";
 import { Typography } from "@rmwc/typography";
 
-import "@rmwc/card/node_modules/@material/card/dist/mdc.card.css";
 import "@rmwc/circular-progress/circular-progress.css";
-import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-button.min.css";
+import "@rmwc/snackbar/node_modules/@material/snackbar/dist/mdc.snackbar.min.css";
 import "@rmwc/textfield/node_modules/@material/textfield/dist/mdc.textfield.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
-
-triScale.reverse();
 
 function Chip(props) {
   return (
@@ -38,328 +30,6 @@ function Chip(props) {
   );
 }
 
-export class QuestionCard extends Component {
-  state = {
-    analyticsOpen: false,
-  };
-
-  ref = createRef();
-
-  answerChoice = (ac) => {
-    if (Object.prototype.hasOwnProperty.call(ac, "correct")) {
-      if (ac.correct) {
-        return <i class="check material-icons">check</i>;
-      }
-    }
-  };
-
-  answerChoices = () => {
-    if (
-      Object.prototype.hasOwnProperty.call(
-        this.props.question,
-        "answerchoice_set",
-      )
-    ) {
-      return (
-        <div class="question-answers">
-          <ol type={this.props.question.answer_style == 0 ? "A" : "l"}>
-            {this.props.question.answerchoice_set.map((ac, i) => {
-              return (
-                <Typography
-                  key={i}
-                  use="body1"
-                  tag="li"
-                  style={{ marginBottom: 2 }}
-                >
-                  <span
-                    // This field is bleached and safe
-                    // eslint-disable-next-line
-                    dangerouslySetInnerHTML={{ __html: ac.text }}
-                  />
-                  {this.answerChoice(ac)}
-                </Typography>
-              );
-            })}
-          </ol>
-        </div>
-      );
-    }
-  };
-
-  byline = () => {
-    if (Object.prototype.hasOwnProperty.call(this.props.question, "user")) {
-      return (
-        <div style={{ display: "inline" }}>
-          <span>
-            {this.props.gettext("by")} {this.props.question.user.username}
-          </span>{" "}
-          <span class="tag SALTISE">SALTISE</span>{" "}
-          <span class="tag EXPERT">EXPERT</span>{" "}
-          <span class="tag POWER">POWER USER</span>{" "}
-          <span class="tag INFLUENCER">TOP CONTRIBUTOR</span>
-        </div>
-      );
-    }
-  };
-
-  category = () => {
-    if (this.props.question.category) {
-      return this.props.question.category.map((c) => c.title).join("; ");
-    }
-    return this.props.gettext("Uncategorized");
-  };
-
-  difficulty = () => {
-    if (
-      Object.prototype.hasOwnProperty.call(
-        this.props.question.difficulty,
-        "score",
-      )
-    ) {
-      const colourScale = scaleThreshold(triScale).domain([0.25, 0.5]);
-      const color = colourScale(this.props.question.difficulty.score);
-      const opacity = "30";
-      const label = this.state.analyticsOpen
-        ? "close"
-        : this.props.question.difficulty.label;
-      return (
-        <div
-          style={{
-            backgroundColor: color + opacity,
-            borderColor: color,
-            borderRadius: "50%",
-            borderWidth: "thin",
-            borderStyle: "solid",
-            cursor: "pointer",
-            fontSize: "x-small",
-            height: 32,
-            position: "absolute",
-            right: 20,
-            top: 20,
-            width: 32,
-            zIndex: 2,
-          }}
-          onClick={() =>
-            this.setState({ analyticsOpen: !this.state.analyticsOpen })
-          }
-        >
-          <div
-            style={{
-              color,
-              fontFamily: this.state.analyticsOpen
-                ? "Material Icons"
-                : "inherit",
-              fontSize: this.state.analyticsOpen ? 18 : "inherit",
-              fontWeight: "bold",
-              left: "50%",
-              position: "absolute",
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-            }}
-          >
-            {label}
-          </div>
-        </div>
-      );
-    }
-  };
-
-  impact = () => {
-    if (
-      Object.prototype.hasOwnProperty.call(
-        this.props.question.peer_impact,
-        "score",
-      )
-    ) {
-      const colourScale = scaleThreshold(triScale).domain([0.05, 0.25]);
-      const color = colourScale(this.props.question.peer_impact.score);
-      const opacity = "30";
-      return (
-        <div
-          style={{
-            backgroundColor: color + opacity,
-            borderColor: color,
-            borderRadius: "50%",
-            borderWidth: "thin",
-            borderStyle: "solid",
-            fontSize: "x-small",
-            height: 32,
-            position: "absolute",
-            right: 20,
-            top: 60,
-            width: 32,
-          }}
-        >
-          <div
-            style={{
-              color,
-              fontWeight: "bold",
-              left: "50%",
-              position: "absolute",
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-            }}
-          >
-            {this.props.question.peer_impact.label}
-          </div>
-        </div>
-      );
-    }
-  };
-
-  featured = () => {
-    if (this.props.question.featured) {
-      return (
-        <Fragment>
-          <a
-            href={this.props.question.collections[0].url}
-            target="_blank"
-            rel="noreferrer"
-            title={`${this.props.gettext(
-              "This question is part of featured content curated by SALTISE.  Click to open the associated collection ",
-            )}'${this.props.question.collections[0].title}' in a new tab.`}
-          >
-            <div class="featured-icon" />
-          </a>
-        </Fragment>
-      );
-    }
-  };
-
-  discipline = () => {
-    if (this.props.question.discipline) {
-      return this.props.question.discipline;
-    }
-    return this.props.gettext("Unlabelled");
-  };
-
-  image = () => {
-    if (this.props.question.image || this.props.question.image_alt_text) {
-      return (
-        <Typography use="caption">
-          <img
-            class="question-image"
-            src={this.props.staticURL.slice(0, -1) + this.props.question.image}
-            alt={this.props.question.image_alt_text}
-          />
-        </Typography>
-      );
-    }
-  };
-
-  innerContent = () => {
-    if (this.state.analyticsOpen) {
-      const height = this.ref.current.getBoundingClientRect().height + 16;
-      return (
-        <div
-          style={{ backgroundColor: "lightgrey", height, overflowY: "scroll" }}
-        >
-          [Analytics placeholder]
-        </div>
-      );
-    }
-    return (
-      <div ref={this.ref}>
-        <Typography
-          use="body1"
-          tag="div"
-          theme="text-secondary-on-background"
-          // This field is bleached and safe
-          // eslint-disable-next-line
-          dangerouslySetInnerHTML={{ __html: this.props.question.text }}
-        />
-        {this.image()}
-        {this.video()}
-        {this.answerChoices()}
-      </div>
-    );
-  };
-
-  video = () => {
-    if (this.props.question.video_url) {
-      return (
-        <object
-          class="question-image"
-          width="640"
-          height="390"
-          data={this.props.question.video_url}
-        />
-      );
-    }
-  };
-
-  render() {
-    return (
-      <Card class="question" style={{ position: "relative" }}>
-        {this.difficulty()}
-        {this.impact()}
-        <CardPrimaryAction>
-          <div>
-            <div>
-              <Typography
-                class="title"
-                use="headline6"
-                tag="h2"
-                // This field is bleached and safe
-                // eslint-disable-next-line
-                dangerouslySetInnerHTML={{
-                  __html: this.props.question.title,
-                }}
-                style={{ display: "inline", width: "fit-content" }}
-              />
-              {this.featured()}
-            </div>
-            <Typography
-              use="caption"
-              tag="div"
-              theme="text-secondary-on-background"
-              style={{ marginBottom: 10 }}
-            >
-              #{this.props.question.id} {this.byline()}
-            </Typography>
-            {this.innerContent()}
-          </div>
-        </CardPrimaryAction>
-        <CardActions>
-          <CardActionButtons>
-            <Typography use="caption" tag="div">
-              {this.props.gettext("Discipline")}:{" "}
-              <span class="capitalize">{this.discipline()}</span>
-            </Typography>
-            <Typography use="caption" tag="div">
-              {this.props.gettext("Categories")}:{" "}
-              <span class="capitalize">{this.category()}</span>
-            </Typography>
-            <Typography use="caption" tag="div">
-              {this.props.gettext("Student answers")}:{" "}
-              {this.props.question.answer_count}
-            </Typography>
-          </CardActionButtons>
-          <CardActionIcons>
-            <CardAction
-              theme="primary"
-              onIcon="favorite"
-              icon="favorite_border"
-              title={this.props.gettext("Toggle favourite")}
-            />
-            <CardAction
-              theme="primary"
-              onIcon="flag"
-              icon="outlined_flag"
-              title={this.props.gettext("Flag question for removal")}
-            />
-            <CardAction
-              theme="primary"
-              icon="add"
-              title={this.props.gettext("Add question to an assignment")}
-            />
-          </CardActionIcons>
-        </CardActions>
-      </Card>
-    );
-  }
-}
-
 export class SearchApp extends Component {
   state = {
     query: "",
@@ -367,12 +37,15 @@ export class SearchApp extends Component {
     categories: [],
     difficulties: [],
     disciplines: [],
+    favourites: [],
     impacts: [],
     searching: false,
     selectedCategories: [],
     selectedDifficulty: "",
     selectedDiscipline: "",
     selectedImpact: "",
+    snackbarIsOpen: false,
+    snackbarMessage: "",
   };
 
   handleSubmit = async () => {
@@ -386,23 +59,65 @@ export class SearchApp extends Component {
         this.setState({ searching: true });
         const data = await get(url);
         console.debug(data);
-        this.setState(
-          {
-            categories: data.meta.categories,
-            difficulties: data.meta.difficulties,
-            disciplines: data.meta.disciplines,
-            impacts: data.meta.impacts,
-            questions: data.results,
-            searching: false,
-          },
-          () => console.debug(this.state.questions, this.state.disciplines),
-        );
+        this.setState({
+          categories: data.meta.categories,
+          difficulties: data.meta.difficulties,
+          disciplines: data.meta.disciplines,
+          impacts: data.meta.impacts,
+          questions: data.results,
+          searching: false,
+        });
       } catch (error) {
-        // Snackbar
         console.debug(error);
+        this.setState({
+          snackbarIsOpen: true,
+          snackbarMessage: this.props.gettext(
+            "An error occurred.  Try refreshing this page.",
+          ),
+        });
       }
     } else {
-      this.setState({ questions: [], disciplines: [] });
+      this.setState({
+        questions: [],
+        categories: [],
+        difficulties: [],
+        disciplines: [],
+        impacts: [],
+        selectedCategories: [],
+        selectedDifficulty: "",
+        selectedDiscipline: "",
+        selectedImpact: "",
+      });
+    }
+  };
+
+  handleToggleFavourite = async (questionPK) => {
+    const currentFavourites = Array.from(this.state.favourites);
+    const _favourites = Array.from(this.state.favourites);
+
+    if (_favourites.includes(questionPK)) {
+      _favourites.splice(_favourites.indexOf(questionPK), 1);
+    } else {
+      _favourites.push(questionPK);
+    }
+
+    try {
+      const data = await submitData(
+        this.props.teacherURL,
+        { favourite_questions: _favourites },
+        "PUT",
+      );
+      this.setState({
+        favourites: data["favourite_questions"],
+        snackbarIsOpen: true,
+        snackbarMessage: data["snackbar_message"],
+      });
+    } catch (error) {
+      this.setState({
+        favourites: currentFavourites,
+        snackbarIsOpen: true,
+        snackbarMessage: this.props.gettext("An error occurred."),
+      });
     }
   };
 
@@ -724,16 +439,19 @@ export class SearchApp extends Component {
     if (this.state.questions.length > 0) {
       return (
         <div id="results" style={{ marginTop: 20 }}>
-          {this.state.questions.map((question, i) => {
-            return (
-              <QuestionCard
-                question={question}
-                key={i}
-                staticURL={this.props.staticURL}
-                gettext={this.props.gettext}
-              />
-            );
-          })}
+          <Favourites.Provider value={this.state.favourites}>
+            {this.state.questions.map((question, i) => {
+              return (
+                <SearchQuestionCard
+                  question={question}
+                  key={i}
+                  staticURL={this.props.staticURL}
+                  gettext={this.props.gettext}
+                  handleToggleFavourite={this.handleToggleFavourite}
+                />
+              );
+            })}
+          </Favourites.Provider>
         </div>
       );
     }
@@ -763,6 +481,29 @@ export class SearchApp extends Component {
     }
   };
 
+  refreshFromDB = async () => {
+    // Load favourites
+    try {
+      const data = await get(this.props.teacherURL);
+      console.debug(data);
+      this.setState({
+        favourites: data["favourite_questions"],
+      });
+    } catch (error) {
+      console.error(error);
+      this.setState({
+        snackbarIsOpen: true,
+        snackbarMessage: this.props.gettext(
+          "Could not load favourites.  Try refreshing this page.",
+        ),
+      });
+    }
+  };
+
+  componentDidMount() {
+    this.refreshFromDB();
+  }
+
   render() {
     return (
       <div>
@@ -772,7 +513,7 @@ export class SearchApp extends Component {
             class="wide tight"
             outlined
             label={this.props.gettext("Type something...")}
-            withLeadingIcon="search"
+            withLeadingIcon={<TextFieldIcon icon="search" theme="primary" />}
             withTrailingIcon={
               <TextFieldIcon
                 style={
@@ -780,6 +521,7 @@ export class SearchApp extends Component {
                 }
                 tabIndex="0"
                 icon="close"
+                theme="primary"
                 onClick={() =>
                   this.setState({
                     query: "",
@@ -810,6 +552,15 @@ export class SearchApp extends Component {
         </div>
         {this.chips()}
         {this.results()}
+        <Snackbar
+          show={this.state.snackbarIsOpen}
+          onHide={(evt) => this.setState({ snackbarIsOpen: false })}
+          message={this.state.snackbarMessage}
+          timeout={5000}
+          actionHandler={() => {}}
+          actionText="OK"
+          dismissesOnAction={true}
+        />
       </div>
     );
   }

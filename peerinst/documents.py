@@ -84,10 +84,16 @@ class QuestionDocument(Document):
     )
     discipline = TextField(analyzer=autocomplete)  # don't break on spaces?
     featured = BooleanField()
+    frequency = ObjectField(
+        properties={
+            "first_choice": ObjectField(enabled=False),
+            "second_choice": ObjectField(enabled=False),
+        }
+    )
     id = TextField()
     image = TextField(index=False)
     image_alt_text = TextField(index=False)
-    matrix = ObjectField()
+    matrix = ObjectField(enabled=False)
     peer_impact = ObjectField(
         properties={
             "score": FloatField(index=False),
@@ -167,6 +173,13 @@ class QuestionDocument(Document):
 
     def prepare_featured(self, instance):
         return instance.featured
+
+    def prepare_frequency(self, instance):
+        freq = instance.get_frequency()
+        return {
+            "first_choice": freq["first_choice"],
+            "second_choice": freq["second_choice"],
+        }
 
     def prepare_id(self, instance):
         return str(instance.id)

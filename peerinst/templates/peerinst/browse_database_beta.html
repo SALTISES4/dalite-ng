@@ -50,6 +50,7 @@
           gettext: gettext,
           staticURL: "{{ static_url }}",
           url: "{% url 'question-search-beta' %}",
+          teacherURL: "{% url 'REST:teacher' request.user.teacher.pk %}",
         });
     }
     preact.render(searchApp(), document.getElementById("search-app"));
