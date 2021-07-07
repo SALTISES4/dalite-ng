@@ -64,12 +64,13 @@ def _base_selection_algorithm(
     # Rationales are selected based on those who have not refused
     # to include rationales prior to implementation of TOS
     usernames_to_exclude = (
-        Consent.objects.filter(tos__role="student")
-        .values("user__username")
-        .annotate(Max("datetime"))
-        .filter(accepted=False)
+        Consent.objects.filter(
+            tos__role="student", tos__current=True, accepted=False
+        )
         .values_list("user__username")
+        .distinct()
     )
+
     all_rationales = models.Answer.may_show.filter(
         question=question, show_to_others=True
     ).exclude(user_token__in=usernames_to_exclude)
