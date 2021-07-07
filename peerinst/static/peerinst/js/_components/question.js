@@ -169,7 +169,7 @@ function QuestionCardHeader(props) {
         theme="text-secondary-on-background"
         style={{ marginBottom: 10 }}
       >
-        #{props.question.id} {byline()}
+        #{props.question.pk} {byline()}
       </Typography>
     </Fragment>
   );
@@ -341,10 +341,10 @@ export class SearchQuestionCard extends Component {
                 gettext={this.props.gettext}
                 handleToggle={() =>
                   this.props.handleToggleFavourite(
-                    parseInt(this.props.question.id),
+                    parseInt(this.props.question.pk),
                   )
                 }
-                question={parseInt(this.props.question.id)}
+                question={parseInt(this.props.question.pk)}
               />
             </CardActionIcons>
           </CardActions>

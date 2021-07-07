@@ -6,6 +6,7 @@ from django_elasticsearch_dsl.fields import (
     BooleanField,
     FloatField,
     IntegerField,
+    KeywordField,
     NestedField,
     ObjectField,
     TextField,
@@ -16,7 +17,6 @@ from elasticsearch_dsl import analyzer, token_filter, tokenizer
 from peerinst.models import (
     AnswerChoice,
     Category,
-    Collection,
     Discipline,
     Question,
     QuestionFlag,
@@ -56,7 +56,7 @@ class QuestionDocument(Document):
     """
 
     answer_count = IntegerField(index=False)
-    assignment_count = IntegerField()
+    assignment_count = IntegerField(index=False)
     answer_style = IntegerField(index=False)
     answerchoice_set = NestedField(
         properties={
@@ -77,6 +77,7 @@ class QuestionDocument(Document):
             "url": TextField(index=False),
         }
     )
+    deleted = BooleanField()
     difficulty = ObjectField(
         properties={
             "score": FloatField(index=False),
@@ -93,7 +94,6 @@ class QuestionDocument(Document):
             "second_choice": ObjectField(enabled=False),
         }
     )
-    id = TextField()
     image = TextField(index=False)
     image_alt_text = TextField(index=False)
     matrix = ObjectField(enabled=False)
@@ -103,13 +103,14 @@ class QuestionDocument(Document):
             "label": TextField(analyzer=full_term),
         }
     )
-    text = TextField(analyzer=html_strip)
+    pk = KeywordField()
     questionflag_set = BooleanField()
+    text = TextField(analyzer=html_strip)
+    title = TextField(analyzer=html_strip)
     user = ObjectField(
         properties={"username": TextField(analyzer=autocomplete)}
     )
     valid = BooleanField()
-    deleted = BooleanField()
     video_url = TextField(index=False)
 
     def prepare_answer_count(self, instance):
@@ -190,9 +191,6 @@ class QuestionDocument(Document):
             "second_choice": freq["second_choice"],
         }
 
-    def prepare_id(self, instance):
-        return str(instance.id)
-
     def prepare_image(self, instance):
         return str(instance.image)
 
@@ -202,6 +200,9 @@ class QuestionDocument(Document):
     def prepare_peer_impact(self, instance):
         pi = instance.get_peer_impact()
         return {"score": pi[0], "label": str(pi[1])}
+
+    def prepare_pk(self, instance):
+        return instance.pk
 
     def prepare_questionflag_set(self, instance):
         return Question.flagged_objects.filter(pk=instance.pk).exists()
@@ -250,7 +251,6 @@ class QuestionDocument(Document):
     class Django:
         model = Question
         fields = [
-            "title",
             "type",
         ]
         related_models = [
@@ -260,16 +260,3 @@ class QuestionDocument(Document):
             QuestionFlag,
             User,
         ]
-
-
-@registry.register_document
-class CollectionDocument(Document):
-    discipline = ObjectField(properties={"title": TextField()})
-
-    class Index:
-        name = "collections"
-        settings = {"number_of_shards": 1, "number_of_replicas": 0}
-
-    class Django:
-        model = Collection
-        fields = ["title", "private", "featured"]

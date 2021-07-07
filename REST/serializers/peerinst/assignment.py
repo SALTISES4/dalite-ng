@@ -54,27 +54,41 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(DynamicFieldsModelSerializer):
-    answer_count = serializers.SerializerMethodField()
+    answer_count = serializers.ReadOnlyField()
+    assignment_count = serializers.ReadOnlyField()
     category = CategorySerializer(many=True, read_only=True)
     choices = serializers.SerializerMethodField()
+    difficulty = serializers.SerializerMethodField()
     discipline = DisciplineSerializer(read_only=True)
     user = UserSerializer(read_only=True)
     most_convincing_rationales = serializers.SerializerMethodField()
     matrix = serializers.SerializerMethodField()
+    peer_impact = serializers.SerializerMethodField()
     freq = serializers.SerializerMethodField()
     collaborators = UserSerializer(many=True, read_only=True)
 
     def get_answer_count(self, obj):
-        return obj.answer_set.count()
+        return obj.answer_count
+
+    def get_assignment_count(self, obj):
+        return obj.assignment_count
 
     def get_choices(self, obj):
         return obj.get_choices()
+
+    def get_difficulty(self, obj):
+        d = obj.get_difficulty()
+        return {"score": d[0], "label": str(d[1])}
 
     def get_most_convincing_rationales(self, obj):
         return obj.get_most_convincing_rationales()
 
     def get_matrix(self, obj):
         return obj.get_matrix()
+
+    def get_peer_impact(self, obj):
+        pi = obj.get_peer_impact()
+        return {"score": pi[0], "label": str(pi[1])}
 
     def get_freq(self, obj):
         return obj.get_frequency()
@@ -86,8 +100,11 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "title",
             "text",
             "user",
+            "difficulty",
             "discipline",
             "answer_count",
+            "answer_style",
+            "assignment_count",
             "category",
             "image",
             "image_alt_text",
@@ -96,6 +113,8 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "matrix",
             "freq",
             "collaborators",
+            "type",
+            "peer_impact",
         ]
 
     def to_representation(self, instance):

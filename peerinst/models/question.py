@@ -843,6 +843,7 @@ class Question(models.Model):
         return r
 
     class Meta:
+        ordering = ("title",)
         verbose_name = _("question")
         verbose_name_plural = _("questions")
 

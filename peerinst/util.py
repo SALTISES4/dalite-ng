@@ -158,9 +158,10 @@ def load_log_archive(json_log_archive):
     import json
     import os
 
-    from django.contrib.auth.models import User
-    from peerinst.models import Student, StudentGroup
     from django.conf import settings
+    from django.contrib.auth.models import User
+
+    from peerinst.models import Student, StudentGroup
 
     path_to_json = os.path.join(settings.BASE_DIR, "log", json_log_archive)
 
@@ -208,9 +209,11 @@ def load_timestamps_from_logs(log_filename_list):
     """
     import json
     import os
-    from django.utils import dateparse, timezone
-    from peerinst.models import Answer
+
     from django.conf import settings
+    from django.utils import dateparse, timezone
+
+    from peerinst.models import Answer
 
     # load logs
     logs = []
@@ -299,6 +302,7 @@ def rename_groups():
 
     """
     from django_lti_tool_provider.models import LtiUserData
+
     from peerinst.models import StudentGroup
 
     id_title_dict = {}
@@ -370,8 +374,8 @@ def question_search_function(
                 | Q(answerchoice__text__icontains=search_string)
                 | Q(user__username__icontains=search_string)
             )
-            .annotate(answer_count=Count("answer", distinct=True))
-            .order_by("-answer_count")
+            .annotate(answer_total=Count("answer", distinct=True))
+            .order_by("-answer_total")
         )
     elif search_string.isdigit():
         query_result = (
@@ -380,8 +384,8 @@ def question_search_function(
                 | Q(title__icontains=search_string)
                 | Q(pk=int(search_string))
             )
-            .annotate(answer_count=Count("answer", distinct=True))
-            .order_by("-answer_count")
+            .annotate(answer_total=Count("answer", distinct=True))
+            .order_by("-answer_total")
         )
     else:
         query_result = (
@@ -389,8 +393,8 @@ def question_search_function(
                 Q(text__icontains=search_string)
                 | Q(title__icontains=search_string)
             )
-            .annotate(answer_count=Count("answer", distinct=True))
-            .order_by("-answer_count")
+            .annotate(answer_total=Count("answer", distinct=True))
+            .order_by("-answer_total")
         )
 
     return query_result
@@ -1064,6 +1068,7 @@ def serialize_events_to_dataframe(events):
 def get_lti_data_as_csv(weeks_ago_start, weeks_ago_stop=0, username=None):
     import datetime
     import os
+
     from django.conf import settings
 
     print("start")
@@ -1291,6 +1296,7 @@ def populate_answer_start_time_from_ltievent_logs(day_of_logs, event_type):
 def get_student_activity_data(teacher):
     # TODO: Refactor to avoid circular import
     from datetime import datetime, timedelta
+
     from .models import Answer, Student, StudentGroupAssignment
 
     current_groups = teacher.current_groups.all()

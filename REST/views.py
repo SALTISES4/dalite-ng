@@ -135,13 +135,13 @@ class QuestionSearchList(generics.ListAPIView):
             )
             return queryset
 
+        if discipline:
+            queryset = queryset.filter(discipline=discipline)
+
         # Call search function
         queryset = question_search_function(
             search_string, pre_filtered_list=queryset, is_old_query=True
         )
-
-        if discipline:
-            queryset = queryset.filter(discipline=discipline)
 
         return queryset
 
@@ -154,8 +154,11 @@ class QuestionSearchList(generics.ListAPIView):
                 "title",
                 "text",
                 "user",
+                "difficulty",
                 "discipline",
                 "answer_count",
+                "assignment_count",
+                "answer_style",
                 "category",
                 "image",
                 "image_alt_text",
@@ -163,6 +166,8 @@ class QuestionSearchList(generics.ListAPIView):
                 "matrix",
                 "freq",
                 "collaborators",
+                "type",
+                "peer_impact",
             ),
             *args,
             **kwargs,

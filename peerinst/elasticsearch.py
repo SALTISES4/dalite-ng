@@ -20,7 +20,7 @@ def question_search(search_string, filters=[]):
             query=search_string,
             fields=[
                 "discipline.title",
-                "id",
+                "pk",
                 "text^2",
                 "title^3",
                 "user.username",
@@ -97,6 +97,6 @@ def question_search(search_string, filters=[]):
         if i == 0:
             logger.debug(f"Top result: \n{pp.pformat(hit.to_dict())}")
 
-        logger.debug(f"Score {i+1}: {hit.meta.score} | #{hit.id}")
+        logger.debug(f"Score {i+1}: {hit.meta.score} | #{hit.pk}")
 
     return s

@@ -256,6 +256,7 @@ class AnswerFeedback extends Component {
           {this.scores.map((score, i) => {
             return (
               <IconButton
+                key={i}
                 icon="star_border"
                 checked={
                   (this.state.score >= score &&
