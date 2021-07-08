@@ -787,7 +787,16 @@ class Question(models.Model):
         )
 
         q_answerchoices = {
-            i: (label, correct, text)
+            i: (
+                label,
+                correct,
+                bleach.clean(
+                    text,
+                    tags=ALLOWED_TAGS,
+                    styles=[],
+                    strip=True,
+                ).strip(),
+            )
             for i, (correct, (label, text)) in enumerate(
                 zip(answerchoice_correct, self.get_choices()), start=1
             )

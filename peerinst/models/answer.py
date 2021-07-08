@@ -1,8 +1,10 @@
+import bleach
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 from quality.models import Quality
 
 from .assignment import Assignment
@@ -31,6 +33,16 @@ class AnswerChoice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     text = models.CharField(_("Text"), max_length=500)
     correct = models.BooleanField(_("Correct?"))
+
+    def save(self, *args, **kwargs):
+        """Bleach"""
+        self.text = bleach.clean(
+            self.text,
+            tags=ALLOWED_TAGS,
+            styles=[],
+            strip=True,
+        ).strip()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.text
@@ -177,7 +189,7 @@ class Answer(models.Model):
 
     @property
     def grade(self):
-        """ Compute grade based on grading scheme of question. """
+        """Compute grade based on grading scheme of question."""
         if (
             self.question.grading_scheme == GradingScheme.STANDARD
             or isinstance(self.question, RationaleOnlyQuestion)
