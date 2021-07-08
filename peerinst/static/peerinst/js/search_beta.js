@@ -449,6 +449,7 @@ export class SearchApp extends Component {
                   staticURL={this.props.staticURL}
                   gettext={this.props.gettext}
                   handleToggleFavourite={this.handleToggleFavourite}
+                  featuredIconURL={this.props.featuredIconURL}
                 />
               );
             })}

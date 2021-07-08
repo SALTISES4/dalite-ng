@@ -213,8 +213,6 @@
 }
 
 .featured-icon {
-  background-image:
-    url('/static/peerinst/img/SALTISE-badge.png');
   background-repeat: no-repeat;
   background-size: 100%;
   cursor: pointer;
@@ -223,9 +221,4 @@
   margin-left: 16px;
   vertical-align: middle;
   width: 34px;
-
-  &:hover {
-    background-image:
-      url('/static/peerinst/img/SALTISE-badge-inverted.png');
-  }
 }

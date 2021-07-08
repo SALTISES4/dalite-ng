@@ -104,6 +104,38 @@ function AnswerChoices(props) {
   }
 }
 
+class Featured extends Component {
+  state = {
+    hovered: false,
+  };
+
+  render() {
+    return (
+      <Fragment>
+        <a
+          href={this.props.collection.url}
+          rel="noreferrer"
+          target="_blank"
+          title={`${this.props.gettext(
+            "This question is part of featured content curated by SALTISE.  Click to open the associated collection ",
+          )}'${this.props.collection.title}' in a new tab.`}
+        >
+          <div
+            class="featured-icon"
+            onMouseEnter={() => this.setState({ hovered: true })}
+            onMouseLeave={() => this.setState({ hovered: false })}
+            style={{
+              backgroundImage: this.state.hovered
+                ? `url('${this.props.url[1]}')`
+                : `url('${this.props.url[0]}')`,
+            }}
+          />
+        </a>
+      </Fragment>
+    );
+  }
+}
+
 function FavouriteIcon(props) {
   return (
     <Favourites.Consumer>
@@ -168,18 +200,11 @@ function QuestionCardHeader(props) {
   const featured = () => {
     if (props.question.featured) {
       return (
-        <Fragment>
-          <a
-            href={props.question.collections[0].url}
-            target="_blank"
-            rel="noreferrer"
-            title={`${props.gettext(
-              "This question is part of featured content curated by SALTISE.  Click to open the associated collection ",
-            )}'${props.question.collections[0].title}' in a new tab.`}
-          >
-            <div class="featured-icon" />
-          </a>
-        </Fragment>
+        <Featured
+          collection={this.props.question.collections[0]}
+          gettext={this.props.gettext}
+          url={this.props.featuredIconURL}
+        />
       );
     }
   };
@@ -337,6 +362,7 @@ export class SearchQuestionCard extends Component {
           />
           <div style={{ paddingRight: 40 }}>
             <QuestionCardHeader
+              featuredIconURL={this.props.featuredIconURL}
               gettext={this.props.gettext}
               question={this.props.question}
             />

@@ -51,6 +51,7 @@
           staticURL: "{{ static_url }}",
           url: "{% url 'question-search-beta' %}",
           teacherURL: "{% url 'REST:teacher' request.user.teacher.pk %}",
+          featuredIconURL: ["{% static 'peerinst/img/SALTISE-badge.png' %}", "{% static 'peerinst/img/SALTISE-badge-inverted.png' %}"],
         });
     }
     preact.render(searchApp(), document.getElementById("search-app"));
