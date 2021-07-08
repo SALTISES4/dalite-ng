@@ -26,9 +26,13 @@ repos:
       - id: eslint
         args: [--fix]
         additional_dependencies:
-          - eslint@7.3.1
           - babel-eslint@10.0.3
+          - eslint@7.30.0
+          - eslint-config-developit@1.2.0
           - eslint-config-google@0.14.0
+          - eslint-config-preact@1.1.4
+          - eslint-config-prettier@6.15.0
+          - eslint-plugin-prettier@3.4.0
         exclude: "^.*\\.min\\..*$"
 
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -36,7 +40,7 @@ repos:
     hooks:
       - id: prettier
         additional_dependencies:
-          - prettier@2.3.1
+          - prettier@2.3.2
         files: \.js$
         exclude: "^.*\\.min\\..*$"
 

@@ -161,7 +161,7 @@
             </div>
             <ul>
               {% for answer_choice in question.get_most_convincing_rationales %}
-                <li id="{{ question.id }}" name="rationale" class="items-for-question">{{ answer_choice.Answer }}. {{ answer_choice.answer_text|safe|striptags }}</li>
+                <li id="{{ question.id }}" name="rationale" class="items-for-question">{{ answer_choice.label }}. {{ answer_choice.text|safe|striptags }}</li>
                 <ul>
                   {% for rationale in answer_choice.most_convincing %}
                       <li id="{{ question.id }}" data-id="{{ rationale.id }}" name="rationale" class="items-for-question"><span class="rationale-stats">({{ rationale.times_chosen }}/{{ rationale.times_shown }})</span> {{ rationale.rationale|safe|striptags }}</li>

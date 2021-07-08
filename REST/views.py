@@ -79,7 +79,7 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_serializer(self, *args, **kwargs):
         return QuestionSerializer(
-            fields=["choices", "pk", "text", "title"], *args, **kwargs
+            fields=["answerchoice_set", "pk", "text", "title"], *args, **kwargs
         )
 
 
@@ -150,24 +150,27 @@ class QuestionSearchList(generics.ListAPIView):
         return QuestionSerializer(
             read_only=True,
             fields=(
-                "pk",
-                "title",
-                "text",
-                "user",
+                "answer_count",
+                "answer_style",
+                "answerchoice_set",
+                "assignment_count",
+                "category",
+                "choices",
+                "collaborators",
                 "difficulty",
                 "discipline",
-                "answer_count",
-                "assignment_count",
-                "answer_style",
-                "category",
+                "frequency",
                 "image",
                 "image_alt_text",
-                "choices",
                 "matrix",
-                "freq",
-                "collaborators",
-                "type",
+                "most_convincing_rationales",
                 "peer_impact",
+                "pk",
+                "text",
+                "title",
+                "type",
+                "user",
+                "video_url",
             ),
             *args,
             **kwargs,

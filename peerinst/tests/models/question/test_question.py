@@ -3,15 +3,36 @@ from timeit import default_timer as timer
 
 import factory
 import pytest
+from django.db import IntegrityError
 from django.test import TestCase
 
 from peerinst import models
+from peerinst.models import Question
 from peerinst.tests.factories import (
     AnswerFactory,
     CollectionFactory,
     QuestionFactory,
     UserFactory,
 )
+
+
+def test_question_custom_save_strip():
+    q = Question.objects.create(title="  question title  ")
+
+    assert q.title == "question title"
+    assert not q.title == "  question title  "
+
+
+def test_question_custom_save_bleach():
+    q = Question.objects.create(title="<script>new title</script>")
+
+    assert q.title == "new title"
+
+
+def test_question_title_unique_case_insensitive():
+    Question.objects.create(title="Title")
+    with pytest.raises(IntegrityError):
+        Question.objects.create(title="title")
 
 
 class QuestionTestCase(TestCase):

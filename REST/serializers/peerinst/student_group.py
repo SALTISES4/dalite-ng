@@ -1,4 +1,5 @@
 from peerinst.models import StudentGroup
+
 from .dynamic_serializer import DynamicFieldsModelSerializer
 
 

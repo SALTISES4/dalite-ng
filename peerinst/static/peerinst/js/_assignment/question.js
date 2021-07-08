@@ -58,25 +58,23 @@ const Checkmark = (props) => {
   }
 };
 
-export class Choices extends Component {
-  choiceList = () => {
-    return this.props.choices.map((choice, i) => {
-      return (
-        <li className="dense-list" key={i}>
-          {/* eslint-disable-next-line */}
-          {choice[0]}. <span dangerouslySetInnerHTML={{ __html: choice[1] }} />{" "}
-          <Checkmark correct={choice[2]} />
-        </li>
-      );
-    });
-  };
-
-  render() {
-    if (this.props.show) {
-      return <ul style={{ marginBottom: "0px" }}>{this.choiceList()}</ul>;
-    }
+export const Choices = (props) => {
+  if (props.show) {
+    return (
+      <ol type={props.answerStyle == 0 ? "A" : "l"}>
+        {props.choices.map((choice, i) => {
+          return (
+            <li className="dense-list" key={i}>
+              {/* eslint-disable-next-line */}
+              <span dangerouslySetInnerHTML={{ __html: choice.text }} />{" "}
+              <Checkmark correct={choice.correct} />
+            </li>
+          );
+        })}
+      </ol>
+    );
   }
-}
+};
 
 export class QuestionCard extends Component {
   state = {
@@ -253,8 +251,9 @@ export class QuestionCard extends Component {
             altText={this.props.question.image_alt_text}
           />
           <Choices
+            answerStyle={this.props.question.answer_style}
             show={this.props.showChoices}
-            choices={this.props.question.choices}
+            choices={this.props.question.answerchoice_set}
           />
         </div>
       );
@@ -306,7 +305,7 @@ export class QuestionCard extends Component {
           <DialogContent>
             <PlotConfusionMatrix
               _matrix={this.props.question.matrix}
-              freq={this.props.question.freq}
+              freq={this.props.question.frequency}
               plot={this.state.dialogOpen}
             />
           </DialogContent>

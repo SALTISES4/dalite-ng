@@ -1,6 +1,11 @@
+"""
+ElasticSearch endpoint
+
+Object serialization must match with REST API for component compatability.
+"""
+
 import bleach
 from django.contrib.auth.models import User
-from django.template.defaultfilters import title
 from django_elasticsearch_dsl import Document
 from django_elasticsearch_dsl.fields import (
     BooleanField,
@@ -97,6 +102,14 @@ class QuestionDocument(Document):
     image = TextField(index=False)
     image_alt_text = TextField(index=False)
     matrix = ObjectField(enabled=False)
+    most_convincing_rationales = NestedField(
+        properties={
+            "label": TextField(index=False),
+            "text": TextField(index=False),
+            "correct": BooleanField(index=False),
+            "most_convincing": ObjectField(enabled=False),
+        }
+    )
     peer_impact = ObjectField(
         properties={
             "score": FloatField(index=False),
@@ -129,24 +142,22 @@ class QuestionDocument(Document):
                         tags=ALLOWED_TAGS,
                         styles=[],
                         strip=True,
-                    ),
+                    ).strip(),
                 }
-                for i, ac in enumerate(instance.get_choices(), 1)
+                for (i, ac) in enumerate(instance.get_choices(), 1)
             ]
         return []
 
     def prepare_category(self, instance):
-        """Bleach and ensure title case"""
+        """Bleach"""
         if instance.category:
             sorted_category_set = [
-                title(
-                    bleach.clean(
-                        c.title,
-                        tags=[],
-                        styles=[],
-                        strip=True,
-                    )
-                )
+                bleach.clean(
+                    c.title,
+                    tags=[],
+                    styles=[],
+                    strip=True,
+                ).strip()
                 for c in instance.category.all()
             ]
 
@@ -167,17 +178,15 @@ class QuestionDocument(Document):
         return {"score": d[0], "label": str(d[1])}
 
     def prepare_discipline(self, instance):
-        """Bleach and ensure title case"""
+        """Bleach"""
         if instance.discipline:
             return {
-                "title": title(
-                    bleach.clean(
-                        instance.discipline.title,
-                        tags=[],
-                        styles=[],
-                        strip=True,
-                    )
-                )
+                "title": bleach.clean(
+                    instance.discipline.title,
+                    tags=[],
+                    styles=[],
+                    strip=True,
+                ).strip()
             }
         return {"title": ""}
 
@@ -192,10 +201,14 @@ class QuestionDocument(Document):
         }
 
     def prepare_image(self, instance):
-        return str(instance.image)
+        if instance.image:
+            return str(instance.image.url)
 
     def prepare_matrix(self, instance):
         return instance.get_matrix()
+
+    def prepare_most_convincing_rationales(self, instance):
+        return instance.get_most_convincing_rationales()
 
     def prepare_peer_impact(self, instance):
         pi = instance.get_peer_impact()
@@ -213,7 +226,7 @@ class QuestionDocument(Document):
             tags=ALLOWED_TAGS,
             styles=[],
             strip=True,
-        )
+        ).strip()
 
     def prepare_title(self, instance):
         return bleach.clean(
@@ -221,7 +234,7 @@ class QuestionDocument(Document):
             tags=ALLOWED_TAGS,
             styles=[],
             strip=True,
-        )
+        ).strip()
 
     def prepare_valid(self, instance):
         """

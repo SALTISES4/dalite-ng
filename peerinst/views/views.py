@@ -2418,10 +2418,6 @@ def question_search(request):
         )
         performance_logger.info(f"Hit count: {len(query_all)}")
 
-        # TODO: Remove - for comparison purposes only
-        if settings.DEBUG:
-            qs_ES(search_string)
-
         return TemplateResponse(
             request,
             "peerinst/question/search_results.html",

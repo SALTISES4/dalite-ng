@@ -102,9 +102,14 @@
   padding: 20px 20px 12px;
 
   & .title {
+    display: inline;
     font-family: $mdc-typography-font-family;
     font-weight: bold;
+    line-height: 34px;
     margin: 0px;
+    text-transform: capitalize;
+    vertical-align: middle;
+    width: fit-content;
   }
   & .mdc-typography--caption {
     font-size: .75rem;
@@ -118,6 +123,7 @@
     align-items: normal;
     color: rgb(0,0,0,0.87);
     flex-direction: column;
+    text-transform: capitalize;
   }
   & .ratings {
     position: absolute;
@@ -214,8 +220,8 @@
   cursor: pointer;
   display: inline-block;
   height: 34px;
-  margin-left: 12px;
-  vertical-align: bottom;
+  margin-left: 16px;
+  vertical-align: middle;
   width: 34px;
 
   &:hover {

@@ -14,7 +14,6 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Q
-from django.template.defaultfilters import title
 from django.utils.html import escape, strip_tags
 from django.utils.translation import ugettext_lazy as _
 
@@ -51,15 +50,13 @@ class Category(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        """Bleach and ensure title case"""
-        self.title = title(
-            bleach.clean(
-                self.title,
-                tags=[],
-                styles=[],
-                strip=True,
-            )
-        )
+        """Bleach"""
+        self.title = bleach.clean(
+            self.title,
+            tags=[],
+            styles=[],
+            strip=True,
+        ).strip()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -87,15 +84,13 @@ class Subject(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        """Bleach and ensure title case"""
-        self.title = title(
-            bleach.clean(
-                self.title,
-                tags=[],
-                styles=[],
-                strip=True,
-            )
-        )
+        """Bleach"""
+        self.title = bleach.clean(
+            self.title,
+            tags=[],
+            styles=[],
+            strip=True,
+        ).strip()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -117,15 +112,13 @@ class Discipline(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        """Bleach and ensure title case"""
-        self.title = title(
-            bleach.clean(
-                self.title,
-                tags=[],
-                styles=[],
-                strip=True,
-            )
-        )
+        """Bleach"""
+        self.title = bleach.clean(
+            self.title,
+            tags=[],
+            styles=[],
+            strip=True,
+        ).strip()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -362,6 +355,22 @@ class Question(models.Model):
         if self.discipline:
             return "{} - {}".format(self.discipline, self.title)
         return self.title
+
+    def save(self, *args, **kwargs):
+        """Bleach"""
+        self.text = bleach.clean(
+            self.text,
+            tags=ALLOWED_TAGS,
+            styles=[],
+            strip=True,
+        ).strip()
+        self.title = bleach.clean(
+            self.title,
+            tags=ALLOWED_TAGS,
+            styles=[],
+            strip=True,
+        ).strip()
+        super().save(*args, **kwargs)
 
     @classmethod
     def deleted_questions(cls):
@@ -816,8 +825,8 @@ class Question(models.Model):
                 "first_answer_choice"
             ):
                 d = {}
-                d["Answer"] = q_answerchoices[first_answer_choice][0]
-                d["answer_text"] = bleach.clean(
+                d["label"] = q_answerchoices[first_answer_choice][0]
+                d["text"] = bleach.clean(
                     q_answerchoices[first_answer_choice][2],
                     tags=ALLOWED_TAGS,
                     styles=[],

@@ -152,14 +152,13 @@ function QuestionCardHeader(props) {
       <div>
         <Typography
           class="title"
-          use="headline6"
+          use="headline5"
           tag="h2"
           // This field is bleached and safe
           // eslint-disable-next-line
           dangerouslySetInnerHTML={{
             __html: props.question.title,
           }}
-          style={{ display: "inline", width: "fit-content" }}
         />
         {featured()}
       </div>

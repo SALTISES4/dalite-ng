@@ -5,19 +5,19 @@ from peerinst.models import Category
 
 
 def test_category_custom_save():
-    c = Category.objects.create(title="case sensitive")
+    c = Category.objects.create(title="  title  ")
 
-    assert c.title == "Case Sensitive"
-    assert not c.title == "case sensitive"
+    assert c.title == "title"
+    assert not c.title == "  title  "
 
 
 def test_category_title_bleach():
     c = Category.objects.create(title="<script>new title</script>")
 
-    assert c.title == "New Title"
+    assert c.title == "new title"
 
 
 def test_category_title_unique_case_insensitive():
-    Category.objects.create(title="Case")
+    Category.objects.create(title="Title")
     with pytest.raises(IntegrityError):
-        Category.objects.create(title="case")
+        Category.objects.create(title="title")
