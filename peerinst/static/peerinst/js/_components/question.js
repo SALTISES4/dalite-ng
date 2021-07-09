@@ -64,15 +64,35 @@ function MostConvincingRationales(props) {
               <ul>
                 {r.most_convincing.map((a, i) => {
                   return (
-                    <Typography
-                      use="body2"
-                      tag="li"
-                      theme="text-secondary-on-background"
-                      key={i}
-                      style={{ marginBottom: 8, listStyleType: "disc" }}
-                    >
-                      {a.rationale}
-                    </Typography>
+                    <Fragment key={i}>
+                      <Typography
+                        use="body2"
+                        tag="li"
+                        theme="text-secondary-on-background"
+                        style={{
+                          marginBottom: 4,
+                          marginTop: 8,
+                          listStyleType: "disc",
+                        }}
+                      >
+                        {a.rationale}
+                      </Typography>
+                      <Typography
+                        class="meta"
+                        use="caption"
+                        tag="div"
+                        dangerouslySetInnerHTML={{
+                          __html: `${props.gettext("Shown:")} ${
+                            a.times_shown
+                          } &middot; ${props.gettext("Chosen:")} ${
+                            a.times_chosen
+                          } &middot; ${props.gettext("Rate:")} ${(
+                            (a.times_chosen / a.times_shown) *
+                            100
+                          ).toFixed(1)}%`,
+                        }}
+                      />
+                    </Fragment>
                   );
                 })}
               </ul>
@@ -472,6 +492,7 @@ export class SearchQuestionCard extends Component {
               />
             </div>
             <MostConvincingRationales
+              gettext={this.props.gettext}
               rationales={this.props.question.most_convincing_rationales}
             />
           </DialogContent>

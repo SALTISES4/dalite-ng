@@ -98,7 +98,7 @@
 /* Customize question cards */
 .info {
   color: $hint;
-  & p {
+  & p, div {
     font-family: $mdc-typography-font-family;
     font-size: 10px;
     -webkit-font-smoothing: auto;
@@ -109,8 +109,18 @@
   }
 }
 
+
 .mdc-dialog__container {
   max-width: 600px;
+
+  & .meta {
+    color: $hint;
+    font-family: $mdc-typography-font-family;
+    font-size: 10px;
+    -webkit-font-smoothing: auto;
+    letter-spacing: -0.01em;
+    line-height: 12px;
+  }
 }
 
 .mdc-card.question {
