@@ -17,12 +17,11 @@ from django.db.models import Count, Q
 from django.utils.html import escape, strip_tags
 from django.utils.translation import ugettext_lazy as _
 
+from peerinst.grammar import basic_syntax
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 from reputation.models import Reputation
 
 from .. import rationale_choice
-
-# from ..spacey import spell_check
 from ..templatetags.bleach_html import ALLOWED_TAGS
 from .search import MetaSearch
 
@@ -850,8 +849,10 @@ class Question(models.Model):
                 most_convincing["rationale"] = most_convincing[
                     "rationale"
                 ].apply(
-                    lambda x: bleach.clean(x, tags=[], styles=[], strip=True)
-                )  # spell_check
+                    lambda x: basic_syntax(
+                        bleach.clean(x, tags=[], styles=[], strip=True)
+                    )
+                )
                 d["most_convincing"] = most_convincing.to_dict(
                     orient="records"
                 )

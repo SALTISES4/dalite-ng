@@ -1,4 +1,5 @@
 import logging
+import re
 
 import bleach
 import contextualSpellCheck
@@ -38,3 +39,36 @@ def spell_check(text):
     logger.debug(processed_text)
 
     return processed_text
+
+
+def basic_syntax(text):
+    """
+    For text:
+    - Remove leading whitespace.
+    - Remove trailing whitespace.
+    - Combine multiple new lines/line returns into one within text.
+
+    For each sentence:
+    - Start with a capital letter.
+    - End with a punctuation mark.
+    """
+    logger.debug(text)
+    _text = re.sub(r"[\n|\r][\n|\r]+", "\n", text.strip())
+    if len(_text) > 1:
+        processed_text = []
+        for p in _text.split("\n"):
+            processed_paragraph = []
+            for s in re.split(r"[.|!|?]\s+", p.strip()):
+                _s = s.strip()
+                if len(_s) > 1:
+                    processed_paragraph.append(
+                        f"{_s[0].upper()}{_s[1:]}{'' if s[-1] in '.?!:;' else '.'}"  # noqa E501
+                    )
+                else:
+                    processed_paragraph.append(_s)
+            processed_text.append(" ".join(processed_paragraph))
+
+        output = "\n".join(processed_text)
+        logger.debug(output)
+        return output
+    return _text
