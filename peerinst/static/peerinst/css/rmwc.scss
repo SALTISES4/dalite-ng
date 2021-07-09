@@ -96,6 +96,23 @@
 }
 
 /* Customize question cards */
+.info {
+  color: $hint;
+  & p {
+    font-family: $mdc-typography-font-family;
+    font-size: 10px;
+    -webkit-font-smoothing: auto;
+    letter-spacing: -0.01em;
+    line-height: 12px;
+    margin-top: 1px;
+    padding-left: 6px;
+  }
+}
+
+.mdc-dialog__container {
+  max-width: 600px;
+}
+
 .mdc-card.question {
   border-radius: 10px;
   margin-bottom: 10px;
@@ -114,7 +131,6 @@
   & .mdc-typography--caption {
     font-size: .75rem;
     font-weight: 400;
-    letter-spacing: .08em;
     line-height: 1.25rem;
     text-decoration: inherit;
     text-transform: inherit;
@@ -125,6 +141,7 @@
     flex-direction: column;
     text-transform: capitalize;
   }
+
   & .ratings {
     position: absolute;
     right: 20px;
@@ -221,4 +238,38 @@
   margin-left: 16px;
   vertical-align: middle;
   width: 34px;
+}
+
+.answer-summary-visualization {
+  font-size: 10px;
+  -webkit-font-smoothing: auto;
+  letter-spacing: -0.01em;
+  margin: 0px auto;
+  overflow: visible;
+  width: fit-content;
+  & .matrix {
+    cursor: pointer;
+    overflow: visible;
+  }
+  & .annotation {
+    fill: white;
+    pointer-events: none;
+    &.small {
+      font-size: 8px;
+      font-weight: bold;
+    }
+  }
+  & .annotation-dark {
+    fill: black;
+  }
+  & .legend {
+    font-size: 8px;
+    font-weight: bold;
+  }
+  & .second-frequency {
+    overflow: visible;
+  }
+  & svg {
+    vertical-align: middle;
+  }
 }

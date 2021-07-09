@@ -31,9 +31,7 @@ export class PlotConfusionMatrix extends Component {
         ? this.props._matrix["peer"]
         : 0;
 
-      const matrixSvg = d3.select(this.ref.current).select("#matrix");
-
-      matrixSvg.selectAll("*").remove();
+      const matrixSvg = d3.select(this.ref.current).select(".matrix");
 
       let size = +matrixSvg.attr("width");
       const g = matrixSvg.append("g");
@@ -41,7 +39,6 @@ export class PlotConfusionMatrix extends Component {
         .attr("class", "legend")
         .attr("x", size / 2)
         .attr("y", -6)
-        .style("font-size", "7pt")
         .attr("text-anchor", "middle")
         .style("opacity", 0)
         .text();
@@ -53,27 +50,33 @@ export class PlotConfusionMatrix extends Component {
         .attr("width", size / 2)
         .attr("height", size / 2)
         .attr("fill", colours["easy"])
-        .style("opacity", 0.5 + 0.5 * this.state.matrix["easy"]);
+        .style("opacity", 0.7 + 0.3 * this.state.matrix["easy"]);
 
-      easy.on("mousemove", () => {
+      easy.on("mouseover", () => {
         g.select(".legend")
           .style("opacity", 1)
           .style("fill", colours["easy"])
-          .text("Right > Right");
+          .text(nextProps.gettext("Right > Right"));
       });
-      easy.on("mouseout", () => {
-        g.select(".legend").transition().duration(100).style("opacity", 0);
+      easy.on("mouseleave", () => {
+        g.select(".legend").style("opacity", 0);
       });
 
       g.append("text")
         .attr("x", size / 4)
         .attr("y", size / 4)
-        .attr("dy", 4)
-        .style("font-size", "8pt")
-        .style("fill", "white")
+        .attr("dy", 10)
+        .attr("class", "annotation")
         .style("text-anchor", "middle")
-        .attr("pointer-events", "none")
         .text(`${parseInt(100 * this.state.matrix["easy"])}%`);
+
+      g.append("text")
+        .attr("x", size / 4)
+        .attr("y", size / 4)
+        .attr("dy", -2)
+        .attr("class", "annotation small")
+        .style("text-anchor", "middle")
+        .text(nextProps.gettext("Easy"));
 
       const hard = g
         .append("rect")
@@ -82,27 +85,33 @@ export class PlotConfusionMatrix extends Component {
         .attr("width", size / 2)
         .attr("height", size / 2)
         .attr("fill", colours["hard"])
-        .style("opacity", 0.5 + 0.5 * this.state.matrix["hard"]);
+        .style("opacity", 0.7 + 0.3 * this.state.matrix["hard"]);
 
-      hard.on("mousemove", () => {
+      hard.on("mouseover", () => {
         g.select(".legend")
           .style("opacity", 1)
           .style("fill", colours["hard"])
-          .text("Wrong > Wrong");
+          .text(nextProps.gettext("Wrong > Wrong"));
       });
-      hard.on("mouseout", () => {
-        g.select(".legend").transition().duration(100).style("opacity", 0);
+      hard.on("mouseleave", () => {
+        g.select(".legend").style("opacity", 0);
       });
 
       g.append("text")
         .attr("x", (3 * size) / 4)
         .attr("y", (3 * size) / 4)
-        .attr("dy", 4)
-        .style("font-size", "8pt")
-        .style("fill", "white")
+        .attr("dy", 10)
+        .attr("class", "annotation")
         .style("text-anchor", "middle")
-        .attr("pointer-events", "none")
         .text(`${parseInt(100 * this.state.matrix["hard"])}%`);
+
+      g.append("text")
+        .attr("x", (3 * size) / 4)
+        .attr("y", (3 * size) / 4)
+        .attr("dy", -2)
+        .attr("class", "annotation small")
+        .style("text-anchor", "middle")
+        .text(nextProps.gettext("Hard"));
 
       const peer = g
         .append("rect")
@@ -111,27 +120,33 @@ export class PlotConfusionMatrix extends Component {
         .attr("width", size / 2)
         .attr("height", size / 2)
         .attr("fill", colours["peer"])
-        .style("opacity", 0.5 + 0.5 * this.state.matrix["peer"]);
+        .style("opacity", 0.7 + 0.3 * this.state.matrix["peer"]);
 
-      peer.on("mousemove", () => {
+      peer.on("mouseover", () => {
         g.select(".legend")
           .style("opacity", 1)
           .style("fill", colours["peer"])
-          .text("Wrong > Right");
+          .text(nextProps.gettext("Wrong > Right"));
       });
-      peer.on("mouseout", () => {
-        g.select(".legend").transition().duration(100).style("opacity", 0);
+      peer.on("mouseleave", () => {
+        g.select(".legend").style("opacity", 0);
       });
 
       g.append("text")
         .attr("x", size / 4)
         .attr("y", (3 * size) / 4)
-        .attr("dy", 4)
-        .style("font-size", "8pt")
-        .style("fill", "white")
+        .attr("dy", 10)
+        .attr("class", "annotation")
         .style("text-anchor", "middle")
-        .attr("pointer-events", "none")
         .text(`${parseInt(100 * this.state.matrix["peer"])}%`);
+
+      g.append("text")
+        .attr("x", size / 4)
+        .attr("y", (3 * size) / 4)
+        .attr("dy", -2)
+        .attr("class", "annotation small")
+        .style("text-anchor", "middle")
+        .text(nextProps.gettext("Peer"));
 
       const tricky = g
         .append("rect")
@@ -140,37 +155,43 @@ export class PlotConfusionMatrix extends Component {
         .attr("width", size / 2)
         .attr("height", size / 2)
         .attr("fill", colours["tricky"])
-        .style("opacity", 0.5 + 0.5 * this.state.matrix["tricky"]);
+        .style("opacity", 0.7 + 0.3 * this.state.matrix["tricky"]);
 
-      tricky.on("mousemove", () => {
+      tricky.on("mouseover", () => {
         g.select(".legend")
           .style("opacity", 1)
           .style("fill", colours["tricky"])
-          .text("Right > Wrong");
+          .text(nextProps.gettext("Right > Wrong"));
       });
-      tricky.on("mouseout", () => {
-        g.select(".legend").transition().duration(100).style("opacity", 0);
+      tricky.on("mouseleave", () => {
+        g.select(".legend").style("opacity", 0);
       });
 
       g.append("text")
         .attr("x", (3 * size) / 4)
         .attr("y", size / 4)
-        .attr("dy", 4)
-        .style("font-size", "8pt")
-        .style("fill", "white")
+        .attr("dy", 10)
+        .attr("class", "annotation")
         .style("text-anchor", "middle")
-        .attr("pointer-events", "none")
         .text(`${parseInt(100 * this.state.matrix["tricky"])}%`);
+
+      g.append("text")
+        .attr("x", (3 * size) / 4)
+        .attr("y", size / 4)
+        .attr("dy", -2)
+        .attr("class", "annotation small")
+        .style("text-anchor", "middle")
+        .text(nextProps.gettext("Tricky"));
 
       const firstFreqSvg = d3
         .select(this.ref.current)
-        .select("#first-frequency");
+        .select(".first-frequency");
 
       firstFreqSvg.selectAll("*").remove();
 
       const secondFreqSvg = d3
         .select(this.ref.current)
-        .select("#second-frequency");
+        .select(".second-frequency");
 
       secondFreqSvg.selectAll("*").remove();
 
@@ -239,7 +260,7 @@ export class PlotConfusionMatrix extends Component {
           firstFreqSvg.attr("height") /
             d3.values(freq["second_choice"]).length,
         )
-        .attr("fill", "gray")
+        .attr("fill", "#757575")
         .style("stroke", "white")
         .style("opacity", 0.2);
 
@@ -268,7 +289,7 @@ export class PlotConfusionMatrix extends Component {
           "height",
           firstFreqSvg.attr("height") / d3.values(freq["first_choice"]).length,
         )
-        .attr("fill", "gray")
+        .attr("fill", "#757575")
         .style("stroke", "white")
         .style("opacity", 0.2);
 
@@ -283,7 +304,7 @@ export class PlotConfusionMatrix extends Component {
           return y(d.key);
         })
         .attr("dy", y.bandwidth() / 2 + 4)
-        .style("font-size", "8pt")
+        .attr("class", "annotation-dark")
         .style("text-anchor", "end")
         .text(function (d) {
           return `${parseInt(100 * d.value)}%`;
@@ -301,7 +322,7 @@ export class PlotConfusionMatrix extends Component {
           return y(d.key);
         })
         .attr("dy", y.bandwidth() / 2 + 4)
-        .style("font-size", "8pt")
+        .attr("class", "annotation-dark")
         .style("text-anchor", "start")
         .text(function (d) {
           return `${parseInt(100 * d.value)}%`;
@@ -313,34 +334,24 @@ export class PlotConfusionMatrix extends Component {
         .enter()
         .append("text")
         .attr("x", x(0))
-        .attr("dx", 2)
+        .attr("dx", 6)
         .attr("y", function (d) {
           return y(d.key);
         })
         .attr("dy", y.bandwidth() / 2 + 4)
-        .style("font-size", "8pt")
+        .attr("class", "annotation-dark")
         .text(function (d) {
-          return d.key;
+          return d.key.length < 30 ? d.key : `${d.key.substring(0, 30)}...`;
         });
     }
   }
 
   render() {
     return (
-      <div style={{ overflow: "visible" }} ref={this.ref}>
-        <svg
-          id="first-frequency"
-          width="200"
-          height="80"
-          className="vertical-align"
-        />
-        <svg id="matrix" width="60" height="60" className="vertical-align" />
-        <svg
-          id="second-frequency"
-          width="200"
-          height="80"
-          className="vertical-align"
-        />
+      <div ref={this.ref} class="answer-summary-visualization">
+        <svg class="first-frequency" width="200" height="80" />
+        <svg class="matrix" width="80" height="80" />
+        <svg class="second-frequency" width="200" height="80" />
       </div>
     );
   }

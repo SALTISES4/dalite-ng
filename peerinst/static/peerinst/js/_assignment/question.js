@@ -306,6 +306,7 @@ export class QuestionCard extends Component {
             <PlotConfusionMatrix
               _matrix={this.props.question.matrix}
               freq={this.props.question.frequency}
+              gettext={this.props.gettext}
               plot={this.state.dialogOpen}
             />
           </DialogContent>

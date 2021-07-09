@@ -2,6 +2,8 @@
 
 {% load csp static compress i18n %}
 
+{% block mdc %}{% endblock %}
+
 {% block stylesheets %}
 {{ block.super }}
 {% compress js file preact %}

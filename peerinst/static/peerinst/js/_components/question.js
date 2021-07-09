@@ -18,19 +18,37 @@ import {
   DialogContent,
   DialogTitle,
 } from "@rmwc/dialog";
+import { Icon } from "@rmwc/icon";
 import { Typography } from "@rmwc/typography";
 
+import "@rmwc/button/node_modules/@material/button/dist/mdc.button.min.css";
 import "@rmwc/card/node_modules/@material/card/dist/mdc.card.css";
 import "@rmwc/dialog/node_modules/@material/dialog/dist/mdc.dialog.min.css";
+import "@rmwc/icon/icon.css";
 import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-button.min.css";
+import "@rmwc/theme/node_modules/@material/theme/dist/mdc.theme.min.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
 triScale.reverse();
 
+function Info(props) {
+  return (
+    <div class="info" style={{ display: "flex" }}>
+      <Icon
+        icon="info"
+        iconOptions={{ strategy: "ligature", size: "small" }}
+      />
+      <Typography use="caption" tag="p">
+        {props.text}
+      </Typography>
+    </div>
+  );
+}
+
 function MostConvincingRationales(props) {
   if (props.rationales) {
     return (
-      <div style={{ maxWidth: 500 }}>
+      <div>
         {props.rationales.map((r, i) => {
           return (
             <div key={i}>
@@ -70,7 +88,17 @@ function AnswerChoices(props) {
   const answerChoice = (ac) => {
     if (Object.prototype.hasOwnProperty.call(ac, "correct")) {
       if (ac.correct) {
-        return <i class="check material-icons">check</i>;
+        return (
+          <Icon
+            icon="check"
+            iconOptions={{ strategy: "ligature", size: "xsmall" }}
+            style={{
+              verticalAlign: "middle",
+              transform: "translate(3px, -1px)",
+            }}
+            theme="primary"
+          />
+        );
       }
     }
   };
@@ -416,22 +444,39 @@ export class SearchQuestionCard extends Component {
         <Dialog open={this.state.dialogOpen} onClose={this.toggleDialog}>
           <DialogTitle>{this.props.question.title}</DialogTitle>
           <DialogContent>
-            <PlotConfusionMatrix
-              _matrix={this.props.question.matrix}
-              freq={this.props.question.frequency}
-              plot={this.state.dialogOpen}
-            />
+            <div style={{ marginBottom: 16 }}>
+              <Info
+                text={this.props.gettext(
+                  `The distribution of first and second choices along with the
+                statistics for each possible outcome is shown in the figure
+                below.  The most convincing rationales submitted by students
+                (i.e. most selected be peers) are listed below for each answer
+                choice.`,
+                )}
+              />
+            </div>
+            <Typography
+              use="body2"
+              tag="p"
+              theme="text-secondary-on-background"
+              style={{ fontWeight: "bold" }}
+            >
+              {this.props.gettext("Distribution of answer choices")}
+            </Typography>
+            <div style={{ margin: "16px 0px" }}>
+              <PlotConfusionMatrix
+                _matrix={this.props.question.matrix}
+                freq={this.props.question.frequency}
+                gettext={this.props.gettext}
+                plot={this.state.dialogOpen}
+              />
+            </div>
             <MostConvincingRationales
               rationales={this.props.question.most_convincing_rationales}
             />
           </DialogContent>
           <DialogActions>
-            <DialogButton
-              ripple
-              action="accept"
-              isDefaultAction
-              theme="secondary"
-            >
+            <DialogButton ripple action="accept" isDefaultAction>
               {this.props.gettext("Done")}
             </DialogButton>
           </DialogActions>
