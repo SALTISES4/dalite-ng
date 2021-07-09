@@ -3,6 +3,7 @@
 
 bleach
 celery[redis]
+contextualSpellCheck
 django-axes
 django-celery-beat
 django-analytical

@@ -28,40 +28,42 @@ import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.m
 triScale.reverse();
 
 function MostConvincingRationales(props) {
-  return (
-    <div style={{ maxWidth: 500 }}>
-      {props.rationales.map((r, i) => {
-        return (
-          <div key={i}>
-            <Typography
-              use="body2"
-              tag="p"
-              theme="text-secondary-on-background"
-              // This field is bleached and safe
-              // eslint-disable-next-line
-              dangerouslySetInnerHTML={{ __html: `${r.label}. ${r.text}` }}
-              style={{ fontWeight: "bold" }}
-            />
-            <ul>
-              {r.most_convincing.map((a, i) => {
-                return (
-                  <Typography
-                    use="body2"
-                    tag="li"
-                    theme="text-secondary-on-background"
-                    key={i}
-                    style={{ marginBottom: 8, listStyleType: "disc" }}
-                  >
-                    {a.rationale}
-                  </Typography>
-                );
-              })}
-            </ul>
-          </div>
-        );
-      })}
-    </div>
-  );
+  if (props.rationales) {
+    return (
+      <div style={{ maxWidth: 500 }}>
+        {props.rationales.map((r, i) => {
+          return (
+            <div key={i}>
+              <Typography
+                use="body2"
+                tag="p"
+                theme="text-secondary-on-background"
+                // This field is bleached and safe
+                // eslint-disable-next-line
+                dangerouslySetInnerHTML={{ __html: `${r.label}. ${r.text}` }}
+                style={{ fontWeight: "bold" }}
+              />
+              <ul>
+                {r.most_convincing.map((a, i) => {
+                  return (
+                    <Typography
+                      use="body2"
+                      tag="li"
+                      theme="text-secondary-on-background"
+                      key={i}
+                      style={{ marginBottom: 8, listStyleType: "disc" }}
+                    >
+                      {a.rationale}
+                    </Typography>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 }
 
 function AnswerChoices(props) {

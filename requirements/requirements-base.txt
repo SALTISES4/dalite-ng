@@ -53,6 +53,15 @@ bleach==3.1.4
     #   -r requirements/requirements-base.in
     #   saltise-course-flow
     #   saltise-user-feedback
+blis==0.7.4
+    # via
+    #   spacy
+    #   thinc
+catalogue==2.0.4
+    # via
+    #   spacy
+    #   srsly
+    #   thinc
 celery[redis]==4.4.0
     # via
     #   -r requirements/requirements-base.in
@@ -73,10 +82,16 @@ channels-redis==3.2.0
     # via -r requirements/../blink/requirements.txt
 chardet==3.0.4
     # via requests
+click==7.1.2
+    # via
+    #   sacremoses
+    #   typer
 constantly==15.1.0
     # via
     #   -r requirements/../blink/requirements.txt
     #   twisted
+contextualspellcheck==0.4.1
+    # via -r requirements/requirements-base.in
 cryptography==3.4.6
     # via
     #   -r requirements/../blink/requirements.txt
@@ -85,6 +100,11 @@ cryptography==3.4.6
     #   service-identity
 cssutils==1.0.2
     # via pynliner
+cymem==2.0.5
+    # via
+    #   preshed
+    #   spacy
+    #   thinc
 daphne==3.0.1
     # via
     #   -r requirements/../blink/requirements.txt
@@ -165,10 +185,16 @@ djangorestframework==3.12.2
     #   -r requirements/requirements-base.in
     #   saltise-course-flow
     #   saltise-user-feedback
+editdistance==0.5.3
+    # via contextualspellcheck
 elasticsearch==7.13.1
     # via elasticsearch-dsl
 elasticsearch-dsl==7.3.0
     # via django-elasticsearch-dsl
+filelock==3.0.12
+    # via
+    #   huggingface-hub
+    #   transformers
 filetype==1.0.5
     # via pinax-forums
 future==0.18.2
@@ -179,6 +205,8 @@ hiredis==1.1.0
     #   aioredis
 html5lib==1.0.1
     # via django-htmlmin
+huggingface-hub==0.0.12
+    # via transformers
 hyperlink==21.0.0
     # via
     #   -r requirements/../blink/requirements.txt
@@ -194,6 +222,10 @@ incremental==17.5.0
     # via
     #   -r requirements/../blink/requirements.txt
     #   twisted
+jinja2==3.0.1
+    # via spacy
+joblib==1.0.1
+    # via sacremoses
 jsonfield==3.1.0
     # via django-lti-tool-provider
 kombu==4.6.7
@@ -204,27 +236,49 @@ lxml==4.6.3
     # via
     #   -r requirements/requirements-base.in
     #   lti
+markupsafe==2.0.1
+    # via jinja2
 msgpack==1.0.0
     # via
     #   -r requirements/../blink/requirements.txt
     #   channels-redis
+murmurhash==1.0.5
+    # via
+    #   preshed
+    #   spacy
+    #   thinc
 mysqlclient==1.4.6
     # via -r requirements/requirements-base.in
 numpy==1.18.1
-    # via pandas
+    # via
+    #   blis
+    #   pandas
+    #   spacy
+    #   thinc
+    #   transformers
 oauthlib==3.1.0
     # via
     #   django-lti-tool-provider
     #   lti
     #   requests-oauthlib
-packaging==20.1
-    # via -r requirements/requirements-base.in
+packaging==21.0
+    # via
+    #   -r requirements/requirements-base.in
+    #   huggingface-hub
+    #   spacy
+    #   transformers
 pandas==1.0.2
     # via -r requirements/requirements-base.in
+pathy==0.6.0
+    # via spacy
 pbr==5.4.4
     # via stevedore
 pillow==8.2.0
     # via -r requirements/requirements-base.in
+preshed==3.0.5
+    # via
+    #   spacy
+    #   thinc
 pyasn1==0.4.8
     # via
     #   -r requirements/../blink/requirements.txt
@@ -238,6 +292,10 @@ pycparser==2.20
     # via
     #   -r requirements/../blink/requirements.txt
     #   cffi
+pydantic==1.8.2
+    # via
+    #   spacy
+    #   thinc
 pyhamcrest==2.0.2
     # via
     #   -r requirements/../blink/requirements.txt
@@ -273,18 +331,29 @@ pytz==2020.1
     #   django
     #   django-timezone-field
     #   pandas
+pyyaml==5.4.1
+    # via transformers
 rcssmin==1.0.6
     # via django-compressor
 redis==3.4.1
     # via celery
+regex==2021.7.6
+    # via
+    #   sacremoses
+    #   transformers
 requests==2.23.0
     # via
     #   -r requirements/requirements-base.in
+    #   huggingface-hub
     #   requests-oauthlib
+    #   spacy
+    #   transformers
 requests-oauthlib==1.3.0
     # via lti
 rjsmin==1.1.0
     # via django-compressor
+sacremoses==0.0.45
+    # via transformers
 saltise-course-flow==0.2.1
     # via -r requirements/requirements-base.in
 saltise-user-feedback==0.1.2
@@ -308,19 +377,43 @@ six==1.15.0
     #   django-lti-tool-provider
     #   elasticsearch-dsl
     #   html5lib
-    #   packaging
     #   pyopenssl
     #   python-dateutil
     #   python-memcached
+    #   sacremoses
     #   stevedore
+smart-open==5.1.0
+    # via pathy
 soupsieve==2.0
     # via beautifulsoup4
+spacy==3.1.0
+    # via contextualspellcheck
+spacy-legacy==3.0.8
+    # via spacy
 sqlparse==0.3.1
     # via
     #   -r requirements/../blink/requirements.txt
     #   django
+srsly==2.4.1
+    # via
+    #   spacy
+    #   thinc
 stevedore==1.32.0
     # via edx-opaque-keys
+thinc==8.0.7
+    # via spacy
+tokenizers==0.10.3
+    # via transformers
+torch==1.9.0
+    # via contextualspellcheck
+tqdm==4.61.2
+    # via
+    #   huggingface-hub
+    #   sacremoses
+    #   spacy
+    #   transformers
+transformers==4.8.2
+    # via contextualspellcheck
 twisted[tls]==20.3.0
     # via
     #   -r requirements/../blink/requirements.txt
@@ -329,6 +422,15 @@ txaio==21.2.1
     # via
     #   -r requirements/../blink/requirements.txt
     #   autobahn
+typer==0.3.2
+    # via
+    #   pathy
+    #   spacy
+typing-extensions==3.10.0.0
+    # via
+    #   huggingface-hub
+    #   pydantic
+    #   torch
 urllib3==1.25.10
     # via
     #   -r requirements/requirements-base.in
@@ -338,6 +440,10 @@ vine==1.3.0
     # via
     #   amqp
     #   celery
+wasabi==0.8.2
+    # via
+    #   spacy
+    #   thinc
 webencodings==0.5.1
     # via
     #   bleach

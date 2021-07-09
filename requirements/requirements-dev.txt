@@ -90,6 +90,19 @@ bleach==3.1.4
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
     #   saltise-user-feedback
+blis==0.7.4
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   spacy
+    #   thinc
+catalogue==2.0.4
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   spacy
+    #   srsly
+    #   thinc
 celery[redis]==4.4.0
     # via
     #   -r requirements/requirements-base.txt
@@ -123,15 +136,23 @@ chardet==3.0.4
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   requests
-click==8.0.1
+click==7.1.2
     # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
     #   black
+    #   sacremoses
     #   safety
+    #   typer
 constantly==15.1.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   twisted
+contextualspellcheck==0.4.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
 coverage==5.0.3
     # via
     #   -r requirements/requirements-test.txt
@@ -148,6 +169,13 @@ cssutils==1.0.2
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   pynliner
+cymem==2.0.5
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   preshed
+    #   spacy
+    #   thinc
 daphne==3.0.1
     # via
     #   -r requirements/requirements-base.txt
@@ -281,6 +309,11 @@ djangorestframework==3.12.2
     #   saltise-user-feedback
 dparse==0.4.1
     # via safety
+editdistance==0.5.3
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   contextualspellcheck
 elasticsearch==7.13.1
     # via
     #   -r requirements/requirements-base.txt
@@ -301,7 +334,12 @@ faker==0.9.1
     #   factory-boy
     #   mixer
 filelock==3.0.12
-    # via virtualenv
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   huggingface-hub
+    #   transformers
+    #   virtualenv
 filetype==1.0.5
     # via
     #   -r requirements/requirements-base.txt
@@ -328,6 +366,11 @@ html5lib==1.0.1
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   django-htmlmin
+huggingface-hub==0.0.12
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   transformers
 hyperlink==21.0.0
     # via
     #   -r requirements/requirements-base.txt
@@ -356,6 +399,16 @@ isort==5.7.0
     # via -r requirements/requirements-dev.in
 jedi==0.16.0
     # via ipython
+jinja2==3.0.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   spacy
+joblib==1.0.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   sacremoses
 jsonfield==3.1.0
     # via
     #   -r requirements/requirements-base.txt
@@ -376,6 +429,11 @@ lxml==4.6.3
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   lti
+markupsafe==2.0.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   jinja2
 mccabe==0.6.1
     # via flake8
 mixer==6.1.3
@@ -391,6 +449,13 @@ msgpack==1.0.0
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   channels-redis
+murmurhash==1.0.5
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   preshed
+    #   spacy
+    #   thinc
 mypy-extensions==0.4.3
     # via black
 mysqlclient==1.4.6
@@ -403,7 +468,11 @@ numpy==1.18.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
+    #   blis
     #   pandas
+    #   spacy
+    #   thinc
+    #   transformers
 oauthlib==3.1.0
     # via
     #   -r requirements/requirements-base.txt
@@ -411,13 +480,16 @@ oauthlib==3.1.0
     #   django-lti-tool-provider
     #   lti
     #   requests-oauthlib
-packaging==20.1
+packaging==21.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   dparse
+    #   huggingface-hub
     #   pytest
     #   safety
+    #   spacy
+    #   transformers
 pandas==1.0.2
     # via
     #   -r requirements/requirements-base.txt
@@ -426,6 +498,11 @@ parso==0.6.2
     # via jedi
 pathspec==0.8.1
     # via black
+pathy==0.6.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   spacy
 pbr==5.4.4
     # via
     #   -r requirements/requirements-base.txt
@@ -445,6 +522,12 @@ pluggy==0.13.1
     #   pytest
 pre-commit==2.13.0
     # via -r requirements/requirements-dev.in
+preshed==3.0.5
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   spacy
+    #   thinc
 prompt-toolkit==3.0.3
     # via ipython
 ptyprocess==0.6.0
@@ -473,6 +556,12 @@ pycparser==2.20
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   cffi
+pydantic==1.8.2
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   spacy
+    #   thinc
 pyflakes==2.1.1
     # via flake8
 pygments==2.5.2
@@ -558,10 +647,12 @@ pytz==2020.1
     #   pandas
 pyyaml==5.4.1
     # via
+    #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   bandit
     #   dparse
     #   pre-commit
+    #   transformers
 rcssmin==1.0.6
     # via
     #   -r requirements/requirements-base.txt
@@ -572,15 +663,23 @@ redis==3.4.1
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   celery
-regex==2020.2.20
-    # via black
+regex==2021.7.6
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   black
+    #   sacremoses
+    #   transformers
 requests==2.23.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   httpobs
+    #   huggingface-hub
     #   requests-oauthlib
     #   safety
+    #   spacy
+    #   transformers
 requests-oauthlib==1.3.0
     # via
     #   -r requirements/requirements-base.txt
@@ -591,6 +690,11 @@ rjsmin==1.1.0
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   django-compressor
+sacremoses==0.0.45
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   transformers
 safety==1.8.5
     # via -r requirements/requirements-dev.in
 saltise-course-flow==0.2.1
@@ -626,13 +730,18 @@ six==1.15.0
     #   elasticsearch-dsl
     #   faker
     #   html5lib
-    #   packaging
     #   pyopenssl
     #   python-dateutil
     #   python-memcached
+    #   sacremoses
     #   stevedore
     #   traitlets
     #   virtualenv
+smart-open==5.1.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   pathy
 smmap==3.0.1
     # via gitdb
 soupsieve==2.0
@@ -640,11 +749,27 @@ soupsieve==2.0
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   beautifulsoup4
+spacy==3.1.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   contextualspellcheck
+spacy-legacy==3.0.8
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   spacy
 sqlparse==0.3.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   django
+srsly==2.4.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   spacy
+    #   thinc
 stevedore==1.32.0
     # via
     #   -r requirements/requirements-base.txt
@@ -655,12 +780,40 @@ text-unidecode==1.2
     # via
     #   -r requirements/requirements-test.txt
     #   faker
+thinc==8.0.7
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   spacy
+tokenizers==0.10.3
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   transformers
 toml==0.10.2
     # via
     #   black
     #   pre-commit
+torch==1.9.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   contextualspellcheck
+tqdm==4.61.2
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   huggingface-hub
+    #   sacremoses
+    #   spacy
+    #   transformers
 traitlets==4.3.3
     # via ipython
+transformers==4.8.2
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   contextualspellcheck
 twisted[tls]==20.3.0
     # via
     #   -r requirements/requirements-base.txt
@@ -671,6 +824,19 @@ txaio==21.2.1
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   autobahn
+typer==0.3.2
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   pathy
+    #   spacy
+typing-extensions==3.10.0.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   huggingface-hub
+    #   pydantic
+    #   torch
 urllib3==1.25.10
     # via
     #   -r requirements/requirements-base.txt
@@ -685,6 +851,12 @@ vine==1.3.0
     #   celery
 virtualenv==20.4.7
     # via pre-commit
+wasabi==0.8.2
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   spacy
+    #   thinc
 wcwidth==0.1.8
     # via
     #   -r requirements/requirements-test.txt
