@@ -13,18 +13,12 @@ from .question import GradingScheme, Question
 
 class AnswerMayShowManager(models.Manager):
     def get_queryset(self):
-        never_show = [
-            a
-            for a in set(
-                AnswerAnnotation.objects.filter(score=0).values_list(
-                    "answer", flat=True
-                )
-            )
-        ]
+
         return (
             super(AnswerMayShowManager, self)
             .get_queryset()
-            .exclude(pk__in=never_show)
+            .prefetch_related("answerannotation_set")
+            .exclude(answerannotation__score=0)
             .exclude(expert=True)
         )
 
