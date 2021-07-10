@@ -85,9 +85,14 @@
   }
 }
 
-.mdc-dialog .mdc-dialog__content {
+.mdc-dialog {
+  & .mdc-dialog__title {
+    text-transform: capitalize;
+  }
+  & .mdc-dialog__content {
   color: var(--mdc-theme-secondary);
   letter-spacing: normal;
+  }
 }
 
 .timestamp {

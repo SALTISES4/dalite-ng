@@ -2,7 +2,7 @@ import { Component, h } from "preact";
 
 import { get, submitData } from "./_ajax/ajax.js";
 
-import { SearchQuestionCard } from "./_components/question.js";
+import { QuestionDialog, SearchQuestionCard } from "./_components/question.js";
 import { Favourites } from "./_components/providers.js";
 
 import { CircularProgress } from "@rmwc/circular-progress";
@@ -35,6 +35,8 @@ export class SearchApp extends Component {
     query: "",
     questions: [],
     categories: [],
+    dialogOpen: false,
+    dialogQuestion: {},
     difficulties: [],
     disciplines: [],
     favourites: [],
@@ -46,6 +48,13 @@ export class SearchApp extends Component {
     selectedImpact: "",
     snackbarIsOpen: false,
     snackbarMessage: "",
+  };
+
+  toggleDialog = (question) => {
+    this.setState({
+      dialogOpen: !this.state.dialogOpen,
+      dialogQuestion: question,
+    });
   };
 
   handleSubmit = async () => {
@@ -444,12 +453,13 @@ export class SearchApp extends Component {
             {this.state.questions.map((question, i) => {
               return (
                 <SearchQuestionCard
-                  question={question}
-                  key={i}
-                  staticURL={this.props.staticURL}
+                  featuredIconURL={this.props.featuredIconURL}
                   gettext={this.props.gettext}
                   handleToggleFavourite={this.handleToggleFavourite}
-                  featuredIconURL={this.props.featuredIconURL}
+                  key={i}
+                  question={question}
+                  staticURL={this.props.staticURL}
+                  toggleDialog={this.toggleDialog}
                 />
               );
             })}
@@ -554,6 +564,12 @@ export class SearchApp extends Component {
         </div>
         {this.chips()}
         {this.results()}
+        <QuestionDialog
+          gettext={this.props.gettext}
+          open={this.state.dialogOpen}
+          onClose={this.toggleDialog}
+          question={this.state.dialogQuestion}
+        />
         <Snackbar
           show={this.state.snackbarIsOpen}
           onHide={(evt) => this.setState({ snackbarIsOpen: false })}

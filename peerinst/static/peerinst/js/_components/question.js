@@ -31,6 +31,78 @@ import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.m
 
 triScale.reverse();
 
+export function QuestionDialog(props) {
+  return (
+    <Dialog open={props.open} onClose={props.onClose}>
+      <DialogTitle>{props.question.title}</DialogTitle>
+      <DialogContent>
+        <div style={{ marginBottom: 16 }}>
+          <Info
+            text={this.props.gettext(
+              `The distribution of first and second choices along with the
+            statistics for each possible outcome are shown in the figure
+            below.  The most convincing rationales submitted by students
+            (i.e. most selected be peers) are also listed for each answer
+            choice.`,
+            )}
+          />
+        </div>
+        <Typography
+          use="body2"
+          tag="p"
+          theme="text-secondary-on-background"
+          style={{ fontWeight: "bold" }}
+        >
+          {props.gettext("Distribution of answer choices")}
+        </Typography>
+        <div style={{ margin: "16px 0px" }}>
+          <PlotConfusionMatrix
+            _matrix={props.question.matrix}
+            freq={props.question.frequency}
+            gettext={props.gettext}
+            plot={props.open}
+          />
+        </div>
+        <MostConvincingRationales
+          gettext={props.gettext}
+          rationales={props.question.most_convincing_rationales}
+        />
+      </DialogContent>
+      <DialogActions>
+        <DialogButton ripple action="accept" isDefaultAction>
+          {props.gettext("Done")}
+        </DialogButton>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+function QuestionCardActionButtons(props) {
+  return (
+    <CardActionButtons>
+      <Typography use="caption" tag="div">
+        {props.gettext("Discipline")}:{" "}
+        <span>
+          {props.question.discipline
+            ? props.question.discipline.title
+            : props.gettext("Unlabelled")}
+        </span>
+      </Typography>
+      <Typography use="caption" tag="div">
+        {props.gettext("Categories")}:{" "}
+        <span>
+          {props.question.category
+            ? props.question.category.map((c) => c.title).join("; ")
+            : props.gettext("Uncategorized")}
+        </span>
+      </Typography>
+      <Typography use="caption" tag="div">
+        {props.gettext("Student answers")}: {props.question.answer_count}
+      </Typography>
+    </CardActionButtons>
+  );
+}
+
 function Info(props) {
   return (
     <div class="info" style={{ display: "flex" }}>
@@ -208,7 +280,7 @@ function FavouriteIcon(props) {
 }
 
 function Image(props) {
-  if (props.image) {
+  if (props.image & props.show) {
     return (
       <Typography use="caption">
         <img alt={props.alt} class="question-image" src={props.image} />
@@ -218,7 +290,7 @@ function Image(props) {
 }
 
 function Video(props) {
-  if (props.url) {
+  if (props.url & props.show) {
     return (
       <object
         class="question-image"
@@ -298,10 +370,11 @@ function QuestionCardBody(props) {
         dangerouslySetInnerHTML={{ __html: props.question.text }}
       />
       <Image
-        image={props.question.image}
         alt={props.question.image_alt_text}
+        image={props.question.image}
+        show={true}
       />
-      <Video url={props.question.video_url} />
+      <Video url={props.question.video_url} show={true} />
       <AnswerChoices question={props.question} show={true} />
     </div>
   );
@@ -333,9 +406,7 @@ function Ratings(props) {
       const colourScale = scaleThreshold(triScale).domain([0.25, 0.5]);
       const color = colourScale(props.question.difficulty.score);
       const opacity = "30";
-      const label = props.dialogOpen
-        ? "close"
-        : props.question.difficulty.label;
+      const label = props.question.difficulty.label;
       return (
         <div
           class="rating"
@@ -344,14 +415,12 @@ function Ratings(props) {
             borderColor: color,
             cursor: "pointer",
           }}
-          onClick={props.toggleDialog}
+          onClick={() => props.toggleDialog(props.question)}
         >
           <div
             class="label"
             style={{
               color,
-              fontFamily: props.dialogOpen ? "Material Icons" : "inherit",
-              fontSize: props.dialogOpen ? 18 : "inherit",
             }}
           >
             {label}
@@ -392,117 +461,39 @@ function Ratings(props) {
   );
 }
 
-export class SearchQuestionCard extends Component {
-  state = {
-    dialogOpen: false,
-  };
-
-  toggleDialog = () => {
-    this.setState({ dialogOpen: !this.state.dialogOpen });
-  };
-
-  render() {
-    return (
-      <div>
-        <Card class="question" style={{ position: "relative" }}>
-          <Ratings
-            dialogOpen={this.state.dialogOpen}
-            question={this.props.question}
-            toggleDialog={this.toggleDialog}
+export function SearchQuestionCard(props) {
+  return (
+    <div>
+      <Card class="question" style={{ position: "relative" }}>
+        <Ratings question={props.question} toggleDialog={props.toggleDialog} />
+        <div style={{ paddingRight: 40 }}>
+          <QuestionCardHeader
+            featuredIconURL={props.featuredIconURL}
+            gettext={props.gettext}
+            question={props.question}
           />
-          <div style={{ paddingRight: 40 }}>
-            <QuestionCardHeader
-              featuredIconURL={this.props.featuredIconURL}
-              gettext={this.props.gettext}
-              question={this.props.question}
+          <QuestionCardBody
+            gettext={this.props.gettext}
+            question={this.props.question}
+          />
+        </div>
+        <CardActions>
+          <QuestionCardActionButtons
+            gettext={props.gettext}
+            question={props.question}
+          />
+          <CardActionIcons>
+            <SearchQuestionCardActionIcons gettext={props.gettext} />
+            <FavouriteIcon
+              gettext={props.gettext}
+              handleToggle={() =>
+                props.handleToggleFavourite(parseInt(props.question.pk))
+              }
+              question={parseInt(props.question.pk)}
             />
-            <QuestionCardBody
-              analyticsOpen={this.state.analyticsOpen}
-              gettext={this.props.gettext}
-              question={this.props.question}
-            />
-          </div>
-          <CardActions>
-            <CardActionButtons>
-              <Typography use="caption" tag="div">
-                {this.props.gettext("Discipline")}:{" "}
-                <span>
-                  {this.props.question.discipline
-                    ? this.props.question.discipline.title
-                    : this.props.gettext("Unlabelled")}
-                </span>
-              </Typography>
-              <Typography use="caption" tag="div">
-                {this.props.gettext("Categories")}:{" "}
-                <span>
-                  {this.props.question.category
-                    ? this.props.question.category
-                        .map((c) => c.title)
-                        .join("; ")
-                    : this.props.gettext("Uncategorized")}
-                </span>
-              </Typography>
-              <Typography use="caption" tag="div">
-                {this.props.gettext("Student answers")}:{" "}
-                {this.props.question.answer_count}
-              </Typography>
-            </CardActionButtons>
-            <CardActionIcons>
-              <SearchQuestionCardActionIcons gettext={this.props.gettext} />
-              <FavouriteIcon
-                gettext={this.props.gettext}
-                handleToggle={() =>
-                  this.props.handleToggleFavourite(
-                    parseInt(this.props.question.pk),
-                  )
-                }
-                question={parseInt(this.props.question.pk)}
-              />
-            </CardActionIcons>
-          </CardActions>
-        </Card>
-        <Dialog open={this.state.dialogOpen} onClose={this.toggleDialog}>
-          <DialogTitle>{this.props.question.title}</DialogTitle>
-          <DialogContent>
-            <div style={{ marginBottom: 16 }}>
-              <Info
-                text={this.props.gettext(
-                  `The distribution of first and second choices along with the
-                statistics for each possible outcome is shown in the figure
-                below.  The most convincing rationales submitted by students
-                (i.e. most selected be peers) are listed below for each answer
-                choice.`,
-                )}
-              />
-            </div>
-            <Typography
-              use="body2"
-              tag="p"
-              theme="text-secondary-on-background"
-              style={{ fontWeight: "bold" }}
-            >
-              {this.props.gettext("Distribution of answer choices")}
-            </Typography>
-            <div style={{ margin: "16px 0px" }}>
-              <PlotConfusionMatrix
-                _matrix={this.props.question.matrix}
-                freq={this.props.question.frequency}
-                gettext={this.props.gettext}
-                plot={this.state.dialogOpen}
-              />
-            </div>
-            <MostConvincingRationales
-              gettext={this.props.gettext}
-              rationales={this.props.question.most_convincing_rationales}
-            />
-          </DialogContent>
-          <DialogActions>
-            <DialogButton ripple action="accept" isDefaultAction>
-              {this.props.gettext("Done")}
-            </DialogButton>
-          </DialogActions>
-        </Dialog>
-      </div>
-    );
-  }
+          </CardActionIcons>
+        </CardActions>
+      </Card>
+    </div>
+  );
 }

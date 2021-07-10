@@ -17,18 +17,18 @@ export class PlotConfusionMatrix extends Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     if (nextProps.plot == true) {
-      const freq = this.props.freq;
-      this.state.matrix["easy"] = this.props._matrix["easy"]
-        ? this.props._matrix["easy"]
+      const freq = nextProps.freq;
+      this.state.matrix["easy"] = nextProps._matrix["easy"]
+        ? nextProps._matrix["easy"]
         : 0;
-      this.state.matrix["hard"] = this.props._matrix["hard"]
-        ? this.props._matrix["hard"]
+      this.state.matrix["hard"] = nextProps._matrix["hard"]
+        ? nextProps._matrix["hard"]
         : 0;
-      this.state.matrix["tricky"] = this.props._matrix["tricky"]
-        ? this.props._matrix["tricky"]
+      this.state.matrix["tricky"] = nextProps._matrix["tricky"]
+        ? nextProps._matrix["tricky"]
         : 0;
-      this.state.matrix["peer"] = this.props._matrix["peer"]
-        ? this.props._matrix["peer"]
+      this.state.matrix["peer"] = nextProps._matrix["peer"]
+        ? nextProps._matrix["peer"]
         : 0;
 
       const matrixSvg = d3.select(this.ref.current).select(".matrix");
