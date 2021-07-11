@@ -1,4 +1,5 @@
 import bleach
+from django.apps import apps
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -13,18 +14,12 @@ from .question import GradingScheme, Question
 
 class AnswerMayShowManager(models.Manager):
     def get_queryset(self):
-        never_show = [
-            a
-            for a in set(
-                AnswerAnnotation.objects.filter(score=0).values_list(
-                    "answer", flat=True
-                )
-            )
-        ]
+
         return (
             super(AnswerMayShowManager, self)
             .get_queryset()
-            .exclude(pk__in=never_show)
+            .prefetch_related("answerannotation_set")
+            .exclude(answerannotation__score=0)
             .exclude(expert=True)
         )
 
@@ -231,6 +226,24 @@ class Answer(models.Model):
             Time taken to answer second part
         """
         return self.datetime_second - self.datetime_first
+
+    @property
+    def global_quality(self):
+        """
+        Use global quality used for validation to provide a real value that
+        can be used for filtering
+        """
+        Quality = apps.get_model(app_label="quality", model_name="quality")
+        try:
+            quality = Quality.objects.get(
+                quality_type__type="global",
+                quality_use_type__type="validation",
+            )
+            quality_score, quality_description = quality.evaluate(self)
+            return quality_score
+
+        except Quality.DoesNotExist:
+            return 1.0
 
 
 class AnswerVote(models.Model):

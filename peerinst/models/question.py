@@ -821,6 +821,12 @@ class Question(models.Model):
 
             df = pd.merge(df_answers, df_votes, left_on="id", right_index=True)
 
+            df["global_quality"] = pd.Series(
+                [a.global_quality for a in answer_qs]
+            )
+
+            df = df[df["global_quality"] >= 0.9]
+
             df_top5 = (
                 df.sort_values(
                     ["first_answer_choice", "times_chosen", "times_shown"],
