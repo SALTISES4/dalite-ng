@@ -2220,8 +2220,10 @@ def question_search_beta(request):
             else:
                 query.append(t)
 
+        # Question flags need to be real time, not from index
+        flagged = list(Question.flagged_objects.values_list("id", flat=True))
         # Search
-        s = qs_ES(" ".join(query), filters)
+        s = qs_ES(" ".join(query), filters, flagged)
         # Serialize
         results = [hit.to_dict() for hit in s[:50]]
         # Add metadata

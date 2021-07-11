@@ -2,7 +2,11 @@ import { Component, h } from "preact";
 
 import { get, submitData } from "./_ajax/ajax.js";
 
-import { QuestionDialog, SearchQuestionCard } from "./_components/question.js";
+import {
+  QuestionDialog,
+  QuestionFlagDialog,
+  SearchQuestionCard,
+} from "./_components/question.js";
 import { Favourites } from "./_components/providers.js";
 
 import { CircularProgress } from "@rmwc/circular-progress";
@@ -40,6 +44,8 @@ export class SearchApp extends Component {
     difficulties: [],
     disciplines: [],
     favourites: [],
+    flagDialogOpen: false,
+    flagDialogQuestion: {},
     impacts: [],
     searching: false,
     selectedCategories: [],
@@ -50,10 +56,24 @@ export class SearchApp extends Component {
     snackbarMessage: "",
   };
 
-  toggleDialog = (question) => {
+  handleToggleDialog = (question) => {
     this.setState({
       dialogOpen: !this.state.dialogOpen,
       dialogQuestion: question,
+    });
+  };
+
+  handleToggleFlagDialog = (question) => {
+    console.debug(
+      `Toggle flag for question: ${
+        question ? question.pk + question.title : ""
+      }`,
+    );
+    this.setState({
+      flagDialogOpen: !this.state.flagDialogOpen,
+      flagDialogQuestion: question
+        ? { title: question.title, pk: question.pk }
+        : {},
     });
   };
 
@@ -459,7 +479,8 @@ export class SearchApp extends Component {
                   key={i}
                   question={question}
                   staticURL={this.props.staticURL}
-                  toggleDialog={this.toggleDialog}
+                  toggleDialog={this.handleToggleDialog}
+                  toggleFlagDialog={this.handleToggleFlagDialog}
                 />
               );
             })}
@@ -567,8 +588,16 @@ export class SearchApp extends Component {
         <QuestionDialog
           gettext={this.props.gettext}
           open={this.state.dialogOpen}
-          onClose={this.toggleDialog}
+          onClose={this.handleToggleDialog}
           question={this.state.dialogQuestion}
+        />
+        <QuestionFlagDialog
+          callback={this.handleSubmit}
+          gettext={this.props.gettext}
+          open={this.state.flagDialogOpen}
+          onClose={this.handleToggleFlagDialog}
+          question={this.state.flagDialogQuestion}
+          urls={this.props.questionFlagURLs}
         />
         <Snackbar
           show={this.state.snackbarIsOpen}

@@ -117,7 +117,6 @@ class QuestionDocument(Document):
         }
     )
     pk = KeywordField()
-    questionflag_set = BooleanField()
     text = TextField(analyzer=html_strip)
     title = TextField(analyzer=html_strip)
     user = ObjectField(
@@ -216,9 +215,6 @@ class QuestionDocument(Document):
 
     def prepare_pk(self, instance):
         return instance.pk
-
-    def prepare_questionflag_set(self, instance):
-        return Question.flagged_objects.filter(pk=instance.pk).exists()
 
     def prepare_text(self, instance):
         return bleach.clean(

@@ -10,7 +10,7 @@ logger = logging.getLogger("performance")
 pp = pprint.PrettyPrinter()
 
 
-def question_search(search_string, filters=[]):
+def question_search(search_string, filters=[], flagged=[]):
 
     start = time.perf_counter()
 
@@ -67,9 +67,9 @@ def question_search(search_string, filters=[]):
                 ],
             },
         )
-        .exclude("term", questionflag_set=True)
         .exclude("term", valid=False)
         .exclude("term", deleted=True)
+        .exclude("terms", pk=flagged)
     )
 
     if filters:

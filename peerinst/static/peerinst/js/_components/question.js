@@ -3,6 +3,7 @@ import { triScale } from "../_theming/colours.js";
 import { scaleThreshold } from "d3";
 import { Favourites } from "./providers.js";
 import { PlotConfusionMatrix } from "../_assignment/analytics.js";
+import { get, submitData } from "../_ajax/ajax.js";
 
 import {
   Card,
@@ -19,6 +20,7 @@ import {
   DialogTitle,
 } from "@rmwc/dialog";
 import { Icon } from "@rmwc/icon";
+import { Select, SelectHelperText } from "@rmwc/select";
 import { Typography } from "@rmwc/typography";
 
 import "@rmwc/button/node_modules/@material/button/dist/mdc.button.min.css";
@@ -26,6 +28,7 @@ import "@rmwc/card/node_modules/@material/card/dist/mdc.card.css";
 import "@rmwc/dialog/node_modules/@material/dialog/dist/mdc.dialog.min.css";
 import "@rmwc/icon/icon.css";
 import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-button.min.css";
+import "@rmwc/select/node_modules/@material/select/dist/mdc.select.min.css";
 import "@rmwc/theme/node_modules/@material/theme/dist/mdc.theme.min.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
@@ -75,6 +78,106 @@ export function QuestionDialog(props) {
       </DialogActions>
     </Dialog>
   );
+}
+
+export class QuestionFlagDialog extends Component {
+  state = {
+    reasons: [],
+    selectedReason: "",
+  };
+
+  handleSubmit = async () => {
+    console.debug("Submit flag");
+
+    try {
+      await submitData(
+        this.props.urls[1],
+        { reason: this.state.selectedReason, id: this.props.question.pk },
+        "POST",
+      );
+      console.info(this.props.callback);
+      this.props.callback();
+    } catch (error) {
+      console.debug(error);
+    }
+  };
+
+  refreshFromDB = async () => {
+    try {
+      const data = await get(this.props.urls[0]);
+      console.debug(data);
+      this.setState({
+        reasons: data.reasons,
+      });
+    } catch (error) {
+      console.debug(error);
+    }
+  };
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.question != nextProps.question) {
+      this.setState({ selectedReason: "" });
+    }
+  }
+
+  componentDidMount() {
+    this.refreshFromDB();
+  }
+
+  render() {
+    return (
+      <Dialog open={this.props.open} onClose={this.props.onClose}>
+        <DialogTitle>{this.props.question.title}</DialogTitle>
+        <DialogContent>
+          <div style={{ marginBottom: 16 }}>
+            <Info
+              text={this.props.gettext(
+                `You can flag this question as problematic using the form below.
+                This will immediately remove it from search results pending
+                review.  It will not remove it from assignments.`,
+              )}
+            />
+          </div>
+          <form
+            id="flag-question-form"
+            method="POST"
+            onKeyDown={(evt) => evt.stopPropagation()}
+            onSubmit={(evt) => evt.preventDefault()}
+          >
+            <Select
+              value={this.state.selectedReason}
+              onChange={(e) => {
+                this.setState({
+                  selectedReason: e.target.value,
+                });
+              }}
+              outlined
+              options={this.state.reasons}
+              style={{ appearance: "none" }}
+            />
+            <SelectHelperText persistent>
+              {this.props.gettext(
+                "Please select the reason for flagging this question.",
+              )}
+            </SelectHelperText>
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <DialogButton ripple action="accept" isDefaultAction>
+            {this.props.gettext("Cancel")}
+          </DialogButton>
+          <DialogButton
+            ripple
+            action="submit"
+            form="flag-question-form"
+            onClick={this.handleSubmit}
+          >
+            {this.props.gettext("Submit")}
+          </DialogButton>
+        </DialogActions>
+      </Dialog>
+    );
+  }
 }
 
 function QuestionCardActionButtons(props) {
@@ -279,6 +382,46 @@ function FavouriteIcon(props) {
   );
 }
 
+function FlagIcon(props) {
+  return (
+    <CardAction
+      icon="outlined_flag"
+      iconOptions={{
+        strategy: "custom",
+        render: ({ content, ...rest }) => (
+          <span class="rmwc-icon material-icons-round mdc-icon-button__icon">
+            {content}
+          </span>
+        ),
+      }}
+      onClick={() => props.handleToggle(props.question)}
+      onIcon="flag"
+      onIconOptions={{
+        strategy: "custom",
+        render: ({ content, ...rest }) => (
+          <span class="rmwc-icon material-icons-round mdc-icon-button__icon mdc-icon-button__icon--on">
+            {content}
+          </span>
+        ),
+      }}
+      theme="primary"
+      title={props.gettext("Flag question for removal")}
+    />
+  );
+}
+
+class AssignmentAddIcon extends Component {
+  render() {
+    return (
+      <CardAction
+        theme="primary"
+        icon="add"
+        title={this.props.gettext("Add question to an assignment")}
+      />
+    );
+  }
+}
+
 function Image(props) {
   if (props.image & props.show) {
     return (
@@ -380,24 +523,6 @@ function QuestionCardBody(props) {
   );
 }
 
-function SearchQuestionCardActionIcons(props) {
-  return (
-    <Fragment>
-      <CardAction
-        theme="primary"
-        onIcon="flag"
-        icon="outlined_flag"
-        title={props.gettext("Flag question for removal")}
-      />
-      <CardAction
-        theme="primary"
-        icon="add"
-        title={props.gettext("Add question to an assignment")}
-      />
-    </Fragment>
-  );
-}
-
 function Ratings(props) {
   const difficulty = () => {
     if (
@@ -473,8 +598,8 @@ export function SearchQuestionCard(props) {
             question={props.question}
           />
           <QuestionCardBody
-            gettext={this.props.gettext}
-            question={this.props.question}
+            gettext={props.gettext}
+            question={props.question}
           />
         </div>
         <CardActions>
@@ -483,7 +608,15 @@ export function SearchQuestionCard(props) {
             question={props.question}
           />
           <CardActionIcons>
-            <SearchQuestionCardActionIcons gettext={props.gettext} />
+            <FlagIcon
+              gettext={props.gettext}
+              handleToggle={props.toggleFlagDialog}
+              question={{
+                pk: props.question.pk,
+                title: props.question.title,
+              }}
+            />
+            <AssignmentAddIcon gettext={props.gettext} />
             <FavouriteIcon
               gettext={props.gettext}
               handleToggle={() =>
