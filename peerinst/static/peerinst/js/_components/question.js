@@ -86,19 +86,19 @@ export class QuestionFlagDialog extends Component {
     selectedReason: "",
   };
 
-  handleSubmit = async () => {
-    console.debug("Submit flag");
-
-    try {
-      await submitData(
-        this.props.urls[1],
-        { reason: this.state.selectedReason, id: this.props.question.pk },
-        "POST",
-      );
-      console.info(this.props.callback);
-      this.props.callback();
-    } catch (error) {
-      console.debug(error);
+  handleSubmit = async (evt) => {
+    if (evt.target.form.checkValidity()) {
+      console.debug("Submit flag");
+      try {
+        await submitData(
+          this.props.urls[1],
+          { reason: this.state.selectedReason, id: this.props.question.pk },
+          "POST",
+        );
+        this.props.callback();
+      } catch (error) {
+        console.debug(error);
+      }
     }
   };
 
@@ -145,15 +145,17 @@ export class QuestionFlagDialog extends Component {
             onSubmit={(evt) => evt.preventDefault()}
           >
             <Select
-              value={this.state.selectedReason}
               onChange={(e) => {
                 this.setState({
                   selectedReason: e.target.value,
                 });
               }}
-              outlined
               options={this.state.reasons}
+              outlined
+              placeholder={this.props.gettext("Select reason")}
+              required
               style={{ appearance: "none" }}
+              value={this.state.selectedReason}
             />
             <SelectHelperText persistent>
               {this.props.gettext(
@@ -168,7 +170,7 @@ export class QuestionFlagDialog extends Component {
           </DialogButton>
           <DialogButton
             ripple
-            action="submit"
+            type="submit"
             form="flag-question-form"
             onClick={this.handleSubmit}
           >
@@ -385,6 +387,7 @@ function FavouriteIcon(props) {
 function FlagIcon(props) {
   return (
     <CardAction
+      checked={this.props.checked}
       icon="outlined_flag"
       iconOptions={{
         strategy: "custom",
@@ -609,6 +612,11 @@ export function SearchQuestionCard(props) {
           />
           <CardActionIcons>
             <FlagIcon
+              checked={
+                this.props.flagged
+                  ? this.props.question.pk == this.props.flagged.pk
+                  : false
+              }
               gettext={props.gettext}
               handleToggle={props.toggleFlagDialog}
               question={{

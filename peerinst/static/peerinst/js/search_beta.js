@@ -57,20 +57,21 @@ export class SearchApp extends Component {
   };
 
   handleToggleDialog = (question) => {
+    console.debug("handleToggleDialog called");
     this.setState({
       dialogOpen: !this.state.dialogOpen,
       dialogQuestion: question,
     });
   };
 
-  handleToggleFlagDialog = (question) => {
+  handleToggleFlagDialog = (question, open = true) => {
     console.debug(
       `Toggle flag for question: ${
         question ? question.pk + question.title : ""
       }`,
     );
     this.setState({
-      flagDialogOpen: !this.state.flagDialogOpen,
+      flagDialogOpen: open,
       flagDialogQuestion: question
         ? { title: question.title, pk: question.pk }
         : {},
@@ -78,6 +79,10 @@ export class SearchApp extends Component {
   };
 
   handleSubmit = async () => {
+    console.debug("handleSubmit called");
+    this.setState({ flagDialogOpen: false, flagDialogQuestion: {} }, () =>
+      console.debug(this.state),
+    );
     const queryString = new URLSearchParams();
     queryString.append("search_string", this.state.query);
     const url = new URL(this.props.url, window.location.origin);
@@ -474,6 +479,7 @@ export class SearchApp extends Component {
               return (
                 <SearchQuestionCard
                   featuredIconURL={this.props.featuredIconURL}
+                  flagged={this.state.flagDialogQuestion}
                   gettext={this.props.gettext}
                   handleToggleFavourite={this.handleToggleFavourite}
                   key={i}
@@ -595,7 +601,7 @@ export class SearchApp extends Component {
           callback={this.handleSubmit}
           gettext={this.props.gettext}
           open={this.state.flagDialogOpen}
-          onClose={this.handleToggleFlagDialog}
+          onClose={(q) => this.handleToggleFlagDialog(q, false)}
           question={this.state.flagDialogQuestion}
           urls={this.props.questionFlagURLs}
         />
