@@ -145,6 +145,7 @@ export class QuestionFlagDialog extends Component {
             onSubmit={(evt) => evt.preventDefault()}
           >
             <Select
+              autofocus
               onChange={(e) => {
                 this.setState({
                   selectedReason: e.target.value,
@@ -152,7 +153,6 @@ export class QuestionFlagDialog extends Component {
               }}
               options={this.state.reasons}
               outlined
-              placeholder={this.props.gettext("Select reason")}
               required
               style={{ appearance: "none" }}
               value={this.state.selectedReason}
@@ -545,6 +545,29 @@ function Ratings(props) {
           }}
           onClick={() => props.toggleDialog(props.question)}
         >
+          <svg
+            width="40"
+            height="40"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ overflow: "visible" }}
+          >
+            <path
+              id={`path-${props.question.pk}`}
+              d="M -3 16 A 19 19 0 0 1 35 16"
+              fill="transparent"
+            />
+            <text text-anchor="middle">
+              <textPath
+                fill={color}
+                startOffset="50%"
+                style={{ fill: color, fontSize: 8 }}
+                xmlnsXlink="http://www.w3.org/1999/xlink"
+                xlinkHref={`#path-${props.question.pk}`}
+              >
+                {this.props.gettext("Click!")}
+              </textPath>
+            </text>
+          </svg>
           <div
             class="label"
             style={{
@@ -593,7 +616,11 @@ export function SearchQuestionCard(props) {
   return (
     <div>
       <Card class="question" style={{ position: "relative" }}>
-        <Ratings question={props.question} toggleDialog={props.toggleDialog} />
+        <Ratings
+          gettext={this.props.gettext}
+          question={props.question}
+          toggleDialog={props.toggleDialog}
+        />
         <div style={{ paddingRight: 40 }}>
           <QuestionCardHeader
             featuredIconURL={props.featuredIconURL}
