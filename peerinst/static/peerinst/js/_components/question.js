@@ -34,6 +34,63 @@ import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.m
 
 triScale.reverse();
 
+export class AssignmentDialog extends Component {
+  state = {
+    assignments: [],
+    create: false,
+  };
+
+  form = () => {
+    if (this.state.create) {
+      return;
+    }
+    return (
+      <form
+        id="assignment-form"
+        method="POST"
+        onKeyDown={(evt) => evt.stopPropagation()}
+        onSubmit={(evt) => evt.preventDefault()}
+      />
+    );
+  };
+
+  handleSubmit = () => {
+    return;
+  };
+
+  render() {
+    return (
+      <Dialog open={this.props.open} onClose={this.props.onClose}>
+        <DialogTitle>{this.props.question.title}</DialogTitle>
+        <DialogContent>
+          <div style={{ marginBottom: 16 }}>
+            <Info
+              text={this.props.gettext(
+                `You can add this question to an existing assignment (if it is
+                editable) or use the question to start a new assignment.`,
+              )}
+            />
+          </div>
+          {this.form()}
+        </DialogContent>
+        <DialogActions>
+          <DialogButton ripple action="accept" isDefaultAction>
+            {this.props.gettext("Cancel")}
+          </DialogButton>
+          <DialogButton
+            ripple
+            type="submit"
+            form="assignment-form"
+            onClick={this.handleSubmit}
+          >
+            {this.props.gettext("Submit")}
+          </DialogButton>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
+
 export function QuestionDialog(props) {
   return (
     <Dialog open={props.open} onClose={props.onClose}>
@@ -413,16 +470,15 @@ function FlagIcon(props) {
   );
 }
 
-class AssignmentAddIcon extends Component {
-  render() {
-    return (
-      <CardAction
-        theme="primary"
-        icon="add"
-        title={this.props.gettext("Add question to an assignment")}
-      />
-    );
-  }
+function AssignmentAddIcon(props) {
+  return (
+    <CardAction
+      icon="add"
+      onClick={() => props.handleToggle(props.question)}
+      theme="primary"
+      title={this.props.gettext("Add question to an assignment")}
+    />
+  );
 }
 
 function Image(props) {
@@ -543,7 +599,7 @@ function Ratings(props) {
             borderColor: color,
             cursor: "pointer",
           }}
-          onClick={() => props.toggleDialog(props.question)}
+          onClick={() => props.handleToggleDialog(props.question)}
         >
           <svg
             width="40"
@@ -619,7 +675,7 @@ export function SearchQuestionCard(props) {
         <Ratings
           gettext={this.props.gettext}
           question={props.question}
-          toggleDialog={props.toggleDialog}
+          handleToggleDialog={props.handleToggleDialog}
         />
         <div style={{ paddingRight: 40 }}>
           <QuestionCardHeader
@@ -645,13 +701,20 @@ export function SearchQuestionCard(props) {
                   : false
               }
               gettext={props.gettext}
-              handleToggle={props.toggleFlagDialog}
+              handleToggle={props.handleToggleFlagDialog}
               question={{
                 pk: props.question.pk,
                 title: props.question.title,
               }}
             />
-            <AssignmentAddIcon gettext={props.gettext} />
+            <AssignmentAddIcon
+              gettext={props.gettext}
+              handleToggle={props.handleToggleAssignmentDialog}
+              question={{
+                pk: props.question.pk,
+                title: props.question.title,
+              }}
+            />
             <FavouriteIcon
               gettext={props.gettext}
               handleToggle={() =>

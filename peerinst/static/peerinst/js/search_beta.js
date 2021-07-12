@@ -3,6 +3,7 @@ import { Component, h } from "preact";
 import { get, submitData } from "./_ajax/ajax.js";
 
 import {
+  AssignmentDialog,
   QuestionDialog,
   QuestionFlagDialog,
   SearchQuestionCard,
@@ -36,6 +37,8 @@ function Chip(props) {
 
 export class SearchApp extends Component {
   state = {
+    assignmentDialogOpen: false,
+    assignmentDialogQuestion: {},
     query: "",
     questions: [],
     categories: [],
@@ -54,6 +57,14 @@ export class SearchApp extends Component {
     selectedImpact: "",
     snackbarIsOpen: false,
     snackbarMessage: "",
+  };
+
+  handleToggleAssignmentDialog = (question) => {
+    console.debug("handleToggleAssignmentDialog called");
+    this.setState({
+      assignmentDialogOpen: !this.state.assignmentDialogOpen,
+      assignmentDialogQuestion: question,
+    });
   };
 
   handleToggleDialog = (question) => {
@@ -481,12 +492,15 @@ export class SearchApp extends Component {
                   featuredIconURL={this.props.featuredIconURL}
                   flagged={this.state.flagDialogQuestion}
                   gettext={this.props.gettext}
+                  handleToggleAssignmentDialog={
+                    this.handleToggleAssignmentDialog
+                  }
+                  handleToggleDialog={this.handleToggleDialog}
                   handleToggleFavourite={this.handleToggleFavourite}
+                  handleToggleFlagDialog={this.handleToggleFlagDialog}
                   key={i}
                   question={question}
                   staticURL={this.props.staticURL}
-                  toggleDialog={this.handleToggleDialog}
-                  toggleFlagDialog={this.handleToggleFlagDialog}
                 />
               );
             })}
@@ -591,6 +605,13 @@ export class SearchApp extends Component {
         </div>
         {this.chips()}
         {this.results()}
+        <AssignmentDialog
+          gettext={this.props.gettext}
+          open={this.state.assignmentDialogOpen}
+          onClose={this.handleToggleAssignmentDialog}
+          question={this.state.assignmentDialogQuestion}
+          urls={[]}
+        />
         <QuestionDialog
           gettext={this.props.gettext}
           open={this.state.dialogOpen}
