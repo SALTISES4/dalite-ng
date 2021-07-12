@@ -163,7 +163,7 @@ class QuestionSearchList(generics.ListAPIView):
                 "image",
                 "image_alt_text",
                 "matrix",
-                "most_convincing_rationales",
+                # "most_convincing_rationales",
                 "peer_impact",
                 "pk",
                 "text",

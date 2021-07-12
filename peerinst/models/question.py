@@ -821,8 +821,10 @@ class Question(models.Model):
 
             df = pd.merge(df_answers, df_votes, left_on="id", right_index=True)
 
+            # TODO: Replace length filter with quality filter
             df_top5 = (
-                df.sort_values(
+                df.loc[df["rationale"].str.len() >= 10, :]
+                .sort_values(
                     ["first_answer_choice", "times_chosen", "times_shown"],
                     ascending=[True, False, False],
                 )
