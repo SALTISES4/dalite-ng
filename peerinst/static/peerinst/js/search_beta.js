@@ -37,6 +37,7 @@ function Chip(props) {
 
 export class SearchApp extends Component {
   state = {
+    assignments: [],
     assignmentDialogOpen: false,
     assignmentDialogQuestion: {},
     query: "",
@@ -59,10 +60,10 @@ export class SearchApp extends Component {
     snackbarMessage: "",
   };
 
-  handleToggleAssignmentDialog = (question) => {
+  handleToggleAssignmentDialog = (question, open = true) => {
     console.debug("handleToggleAssignmentDialog called");
     this.setState({
-      assignmentDialogOpen: !this.state.assignmentDialogOpen,
+      assignmentDialogOpen: open,
       assignmentDialogQuestion: question,
     });
   };
@@ -133,6 +134,35 @@ export class SearchApp extends Component {
         selectedDiscipline: "",
         selectedImpact: "",
       });
+    }
+  };
+
+  handleAssignmentSubmit = async (questionPK, assignments) => {
+    console.debug("handleAssignmentSubmit called");
+    console.debug(questionPK, assignments);
+    for await (const a of assignments) {
+      try {
+        await submitData(
+          this.props.assignmentURL,
+          { assignment: a, question_pk: questionPK },
+          "POST",
+        );
+        this.setState(
+          {
+            assignmentDialogOpen: false,
+            assignmentDialogQuestion: {},
+            snackbarIsOpen: true,
+            snackbarMessage: this.props.gettext(`Added to ${a}`),
+          },
+          this.refreshFromDB,
+        );
+      } catch (error) {
+        console.error(error);
+        this.setState({
+          snackbarIsOpen: true,
+          snackbarMessage: this.props.gettext("An error occurred."),
+        });
+      }
     }
   };
 
@@ -535,12 +565,20 @@ export class SearchApp extends Component {
   };
 
   refreshFromDB = async () => {
-    // Load favourites
+    // Load teacher data
     try {
       const data = await get(this.props.teacherURL);
       console.debug(data);
       this.setState({
-        favourites: data["favourite_questions"],
+        assignments: Object.prototype.hasOwnProperty.call(data, "assignments")
+          ? data["assignments"]
+          : [],
+        favourites: Object.prototype.hasOwnProperty.call(
+          data,
+          "favourite_questions",
+        )
+          ? data["favourite_questions"]
+          : [],
       });
     } catch (error) {
       console.error(error);
@@ -606,11 +644,12 @@ export class SearchApp extends Component {
         {this.chips()}
         {this.results()}
         <AssignmentDialog
+          assignments={this.state.assignments.filter((a) => a.editable)}
+          handleSubmit={this.handleAssignmentSubmit}
           gettext={this.props.gettext}
           open={this.state.assignmentDialogOpen}
-          onClose={this.handleToggleAssignmentDialog}
+          onClose={(q) => this.handleToggleAssignmentDialog(q, false)}
           question={this.state.assignmentDialogQuestion}
-          urls={[]}
         />
         <QuestionDialog
           gettext={this.props.gettext}

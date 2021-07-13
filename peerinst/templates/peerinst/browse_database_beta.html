@@ -49,6 +49,7 @@
     const searchApp = () => {
       return preact.h(
         search_beta.SearchApp, {
+          assignmentURL: "{% url 'REST:assignment_question-list' %}",
           gettext: gettext,
           questionFlagURLs: ["{% url 'question--flag--reasons' %}", "{% url 'question--flag--flag' %}"],
           staticURL: "{{ static_url }}",

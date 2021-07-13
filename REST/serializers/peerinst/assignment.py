@@ -147,8 +147,8 @@ class RankSerializer(serializers.ModelSerializer):
         read_only=True,
         fields=(
             "answer_count",
-            "category",
             "answerchoice_set",
+            "category",
             "collaborators",
             "discipline",
             "frequency",
@@ -204,8 +204,16 @@ class RankSerializer(serializers.ModelSerializer):
         fields = ["assignment", "question", "rank", "pk"]
 
 
-class AssignmentSerializer(serializers.ModelSerializer):
+class AssignmentSerializer(DynamicFieldsModelSerializer):
+    editable = serializers.SerializerMethodField()
     questions = RankSerializer(source="assignmentquestions_set", many=True)
+    question_pks = serializers.SerializerMethodField()
+
+    def get_editable(self, obj):
+        return obj.editable
+
+    def get_question_pks(self, obj):
+        return list(obj.questions.values_list("pk", flat=True))
 
     def validate_questions(self, data):
         assignment_questions = list(
@@ -242,4 +250,4 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Assignment
-        fields = ["title", "questions"]
+        fields = ["editable", "pk", "question_pks", "questions", "title"]

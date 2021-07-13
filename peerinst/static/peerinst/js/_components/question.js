@@ -5,6 +5,7 @@ import { Favourites } from "./providers.js";
 import { PlotConfusionMatrix } from "../_assignment/analytics.js";
 import { get, submitData } from "../_ajax/ajax.js";
 
+import { Button } from "@rmwc/button";
 import {
   Card,
   CardActions,
@@ -12,6 +13,7 @@ import {
   CardActionIcons,
   CardActionButtons,
 } from "@rmwc/card";
+import { Checkbox } from "@rmwc/checkbox";
 import {
   Dialog,
   DialogActions,
@@ -20,15 +22,20 @@ import {
   DialogTitle,
 } from "@rmwc/dialog";
 import { Icon } from "@rmwc/icon";
+import { IconButton } from "@rmwc/icon-button";
 import { Select, SelectHelperText } from "@rmwc/select";
+import { TextField, TextFieldHelperText } from "@rmwc/textfield";
 import { Typography } from "@rmwc/typography";
 
 import "@rmwc/button/node_modules/@material/button/dist/mdc.button.min.css";
 import "@rmwc/card/node_modules/@material/card/dist/mdc.card.css";
+import "@rmwc/checkbox/node_modules/@material/checkbox/dist/mdc.checkbox.min.css";
 import "@rmwc/dialog/node_modules/@material/dialog/dist/mdc.dialog.min.css";
+import "@rmwc/formfield/node_modules/@material/form-field/dist/mdc.form-field.min.css";
 import "@rmwc/icon/icon.css";
 import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-button.min.css";
 import "@rmwc/select/node_modules/@material/select/dist/mdc.select.min.css";
+import "@rmwc/textfield/node_modules/@material/textfield/dist/mdc.textfield.css";
 import "@rmwc/theme/node_modules/@material/theme/dist/mdc.theme.min.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
@@ -36,44 +43,201 @@ triScale.reverse();
 
 export class AssignmentDialog extends Component {
   state = {
-    assignments: [],
+    assignmentsSelected: [],
     create: false,
   };
 
-  form = () => {
+  selectAssignment = (pk) => {
+    const _sa = Array.from(this.state.assignmentsSelected);
+    const index = this.state.assignmentsSelected.indexOf(pk);
+    index < 0 ? _sa.push(pk) : _sa.splice(index, 1);
+    this.setState({ assignmentsSelected: _sa });
+  };
+
+  count = () =>
+    this.props.assignments.filter(
+      (a) => a.question_pks.indexOf(this.props.question.pk) < 0,
+    ).length;
+
+  goBack = () => {
     if (this.state.create) {
-      return;
+      return (
+        <Button ripple onClick={() => this.setState({ create: false })}>
+          {this.props.gettext("Back")}
+        </Button>
+      );
+    }
+  };
+
+  info = () => {
+    if (this.count() == 0) {
+      return (
+        <Info
+          type="alert"
+          text={this.props.gettext(
+            `You have no editable assignments to which this
+             question can be added, but you can create a new one below.  The
+             question will be added to the new assignment automatically.`,
+          )}
+        />
+      );
     }
     return (
-      <form
-        id="assignment-form"
-        method="POST"
-        onKeyDown={(evt) => evt.stopPropagation()}
-        onSubmit={(evt) => evt.preventDefault()}
+      <Info
+        text={this.props.gettext(
+          `You can add this question to an existing assignment (if it is
+           editable) or use this question to start a new assignment.`,
+        )}
       />
     );
   };
 
-  handleSubmit = () => {
-    return;
+  form = () => {
+    if (this.state.create || this.count() == 0) {
+      return (
+        <div style={{ maxWidth: 500 }}>
+          <div style={{ marginBottom: 10 }}>
+            <TextField
+              autofocus
+              class="wide tight"
+              label={this.props.gettext("Assignment title")}
+              name="title"
+              outlined
+            />
+            <TextFieldHelperText persistent>
+              {this.props.gettext(
+                `The assignment title can be anything you'd like, but it is
+                 helpful for indexing if it is a descriptive phrase, 'Mechanics
+                 - Energy Diagrams I'`,
+              )}
+            </TextFieldHelperText>
+          </div>
+          <div style={{ marginBottom: 10 }}>
+            <TextField
+              class="wide tight"
+              label={this.props.gettext("Assignment identifier")}
+              name="identifier"
+              outlined
+            />
+            <TextFieldHelperText persistent>
+              {this.props.gettext(
+                `The assignment identifier is used to access the assignment
+                 through and LMS (e.g. Moodle).  Only use letters, numbers
+                 and/or the underscore for the identifier.`,
+              )}
+            </TextFieldHelperText>
+          </div>
+          <div style={{ marginBottom: 10 }}>
+            <TextField
+              fullwidth
+              textarea
+              label={this.props.gettext("Assignment description (optional)")}
+              name="description"
+              rows="4"
+            />
+            <TextFieldHelperText persistent>
+              {this.props.gettext(
+                `Notes you would like keep for yourself (or other teachers)
+                 regarding this assignment.`,
+              )}
+            </TextFieldHelperText>
+          </div>
+          <div style={{ marginBottom: 10 }}>
+            <TextField
+              textarea
+              fullwidth
+              label={this.props.gettext("Assignment introduction (optional)")}
+              name="intro_page"
+              rows="4"
+            />
+            <TextFieldHelperText persistent>
+              {this.props.gettext(
+                `Any special instructions you would like students to read before
+                 they start the assignment.`,
+              )}
+            </TextFieldHelperText>
+          </div>
+          <div style={{ marginBottom: 10 }}>
+            <TextField
+              textarea
+              fullwidth
+              label={this.props.gettext("Assignment conclusion (optional)")}
+              name="conclusion_page"
+              rows="4"
+            />
+            <TextFieldHelperText persistent>
+              {this.props.gettext(
+                `Any notes you would like to leave for students to read that
+                 will be shown after the last question of the assignment.`,
+              )}
+            </TextFieldHelperText>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div>
+        {this.props.assignments
+          .filter((a) => a.question_pks.indexOf(this.props.question.pk) < 0)
+          .map((a, i) => {
+            return (
+              <div key={i}>
+                <Checkbox
+                  checked={this.state.assignmentsSelected.indexOf(a.pk) >= 0}
+                  onChange={() => this.selectAssignment(a.pk)}
+                  label={a.title}
+                  required={this.state.assignmentsSelected.length == 0}
+                />
+              </div>
+            );
+          })}
+        <IconButton
+          icon="add"
+          onClick={() => {
+            this.setState({ create: true });
+          }}
+          style={{
+            padding: 0,
+            marginLeft: 8,
+            width: 24,
+            height: 24,
+            verticalAlign: "middle",
+          }}
+        />
+        <Typography
+          use="body2"
+          tag="span"
+          style={{ verticalAlign: "middle", marginLeft: 12 }}
+        >
+          {this.props.gettext("Create assignment")}
+        </Typography>
+      </div>
+    );
   };
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.question != nextProps.question) {
+      this.setState({ assignmentsSelected: [], create: false });
+    }
+  }
 
   render() {
     return (
       <Dialog open={this.props.open} onClose={this.props.onClose}>
         <DialogTitle>{this.props.question.title}</DialogTitle>
         <DialogContent>
-          <div style={{ marginBottom: 16 }}>
-            <Info
-              text={this.props.gettext(
-                `You can add this question to an existing assignment (if it is
-                editable) or use the question to start a new assignment.`,
-              )}
-            />
-          </div>
-          {this.form()}
+          <div style={{ marginBottom: 16 }}>{this.info()}</div>
+          <form
+            id="assignment-form"
+            method="POST"
+            onKeyDown={(evt) => evt.stopPropagation()}
+            onSubmit={(evt) => evt.preventDefault()}
+          >
+            {this.form()}
+          </form>
         </DialogContent>
         <DialogActions>
+          {this.goBack()}
           <DialogButton ripple action="accept" isDefaultAction>
             {this.props.gettext("Cancel")}
           </DialogButton>
@@ -81,7 +245,12 @@ export class AssignmentDialog extends Component {
             ripple
             type="submit"
             form="assignment-form"
-            onClick={this.handleSubmit}
+            onClick={() =>
+              this.props.handleSubmit(
+                this.props.question.pk,
+                this.state.assignmentsSelected,
+              )
+            }
           >
             {this.props.gettext("Submit")}
           </DialogButton>
@@ -267,7 +436,7 @@ function QuestionCardActionButtons(props) {
 
 function Info(props) {
   return (
-    <div class="info" style={{ display: "flex" }}>
+    <div class={`${props.type} info`} style={{ display: "flex" }}>
       <Icon
         icon="info"
         iconOptions={{ strategy: "ligature", size: "small" }}
@@ -482,7 +651,7 @@ function AssignmentAddIcon(props) {
 }
 
 function Image(props) {
-  if (props.image & props.show) {
+  if (props.image && props.show) {
     return (
       <Typography use="caption">
         <img alt={props.alt} class="question-image" src={props.image} />
@@ -492,7 +661,7 @@ function Image(props) {
 }
 
 function Video(props) {
-  if (props.url & props.show) {
+  if (props.url && props.show) {
     return (
       <object
         class="question-image"

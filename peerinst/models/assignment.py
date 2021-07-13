@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 import pytz
 from django.contrib.auth.models import User
 from django.core import validators
-from django.urls import reverse
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -48,7 +48,6 @@ class Assignment(models.Model):
             """
         ),
     )
-
     intro_page = models.TextField(
         _("Assignment Cover Page"),
         blank=True,
@@ -59,7 +58,6 @@ class Assignment(models.Model):
             """
         ),
     )
-
     conclusion_page = models.TextField(
         _("Post Assignment Notes"),
         blank=True,
@@ -71,7 +69,6 @@ class Assignment(models.Model):
             """
         ),
     )
-
     questions = models.ManyToManyField(
         Question, verbose_name=_("Questions"), through="AssignmentQuestions"
     )

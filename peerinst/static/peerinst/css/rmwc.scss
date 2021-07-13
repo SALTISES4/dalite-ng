@@ -103,6 +103,9 @@
 /* Customize question cards */
 .info {
   color: $hint;
+  &.alert {
+      color: $error;
+  }
   & p, div {
     font-family: $mdc-typography-font-family;
     font-size: 10px;
@@ -253,6 +256,12 @@
   margin-left: 16px;
   vertical-align: middle;
   width: 34px;
+}
+
+#assignment-form {
+  & .mdc-text-field--textarea .mdc-floating-label {
+    background-color: white;
+  }
 }
 
 .answer-summary-visualization {
