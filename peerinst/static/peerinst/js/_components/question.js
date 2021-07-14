@@ -754,7 +754,7 @@ function Video(props) {
 
 function QuestionCardHeader(props) {
   const byline = () => {
-    if (Object.prototype.hasOwnProperty.call(props.question, "user")) {
+    if (props.question.user.username) {
       return (
         <div style={{ display: "inline" }}>
           <span>
