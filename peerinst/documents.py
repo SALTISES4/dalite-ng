@@ -120,7 +120,11 @@ class QuestionDocument(Document):
     text = TextField(analyzer=html_strip)
     title = TextField(analyzer=html_strip)
     user = ObjectField(
-        properties={"username": TextField(analyzer=autocomplete)}
+        properties={
+            "username": TextField(analyzer=autocomplete),
+            "saltise": BooleanField(index=False),
+            "expert": BooleanField(index=False),
+        }
     )
     valid = BooleanField()
     video_url = TextField(index=False)
@@ -231,6 +235,21 @@ class QuestionDocument(Document):
             styles=[],
             strip=True,
         ).strip()
+
+    def prepare_user(self, instance):
+        username = ""
+        saltise = False
+        expert = False
+        if instance.user:
+            username = instance.user.username
+            if hasattr(instance.user, "saltisemember"):
+                saltise = True
+                expert = instance.user.saltisemember.expert
+        return {
+            "username": username,
+            "saltise": saltise,
+            "expert": expert,
+        }
 
     def prepare_valid(self, instance):
         """

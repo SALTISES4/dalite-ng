@@ -464,7 +464,9 @@ class SaltiseMemberAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "user":
             teachers = Teacher.objects.all().values_list("user", flat=True)
-            kwargs["queryset"] = User.objects.filter(pk__in=teachers)
+            kwargs["queryset"] = User.objects.filter(pk__in=teachers).order_by(
+                "username"
+            )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 

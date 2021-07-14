@@ -760,10 +760,24 @@ function QuestionCardHeader(props) {
           <span>
             {props.gettext("by")} {props.question.user.username}
           </span>{" "}
-          <span class="tag SALTISE">SALTISE</span>{" "}
-          <span class="tag EXPERT">EXPERT</span>{" "}
+          <span
+            class="tag SALTISE"
+            style={{
+              display: props.question.user.saltise ? "inline" : "none",
+            }}
+          >
+            SALTISE
+          </span>{" "}
+          <span
+            class="tag EXPERT"
+            style={{ display: props.question.user.expert ? "inline" : "none" }}
+          >
+            {this.props.gettext("EXPERT")}
+          </span>{" "}
+          {/*
           <span class="tag POWER">POWER USER</span>{" "}
           <span class="tag INFLUENCER">TOP CONTRIBUTOR</span>
+          */}
         </div>
       );
     }

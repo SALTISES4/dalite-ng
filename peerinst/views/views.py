@@ -285,6 +285,7 @@ def access_denied_and_logout(request):
 
 
 @login_required
+@user_passes_test(lambda u: hasattr(u, "teacher"))
 def browse_database(request):
 
     return TemplateResponse(
@@ -293,7 +294,7 @@ def browse_database(request):
 
 
 @login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
+@user_passes_test(lambda u: hasattr(u, "teacher"))
 def browse_database_beta(request):
 
     return TemplateResponse(

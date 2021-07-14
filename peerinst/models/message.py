@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from .admin import UserType
 
@@ -10,6 +11,7 @@ class SaltiseMember(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.SET_NULL, blank=True, null=True
     )
+    expert = models.BooleanField(_("SALTISE fellow"), default=False)
 
     def __str__(self):
         return self.name
