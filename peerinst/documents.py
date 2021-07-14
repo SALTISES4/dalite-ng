@@ -252,14 +252,7 @@ class QuestionDocument(Document):
         }
 
     def prepare_valid(self, instance):
-        """
-        Replicate valid question logic
-
-        TODO:
-            - Refactor to model
-            - Also, need to add a check that there are enough sample answers!
-        """
-        return instance.answerchoice_set.count() > 0 or instance.type == "RO"
+        return instance.is_valid
 
     def get_queryset(self):
         return super().get_queryset().select_related("discipline", "user")

@@ -421,6 +421,13 @@ class Question(models.Model):
         )
         return self.id in Collection.featured_questions()
 
+    @property
+    def is_valid(self):
+        """
+        TODO: Need to add a check that there are enough sample answers!
+        """
+        return self.answerchoice_set.count() > 0 or self.type == "RO"
+
     def get_start_form_class(self):
         from ..forms import FirstAnswerForm
 
