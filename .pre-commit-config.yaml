@@ -12,7 +12,7 @@ repos:
     hooks:
       - id: black
         exclude: "^.*/migrations/.*.py$"
-        args: [--line-length=79]
+        args: [--line-length=79, --safe]
 
   - repo: https://github.com/pycqa/flake8
     rev: 3.9.1

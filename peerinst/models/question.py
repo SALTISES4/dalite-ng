@@ -22,7 +22,6 @@ from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 from reputation.models import Reputation
 
 from .. import rationale_choice
-from ..templatetags.bleach_html import ALLOWED_TAGS
 from .search import MetaSearch
 
 

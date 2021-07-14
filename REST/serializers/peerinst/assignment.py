@@ -206,7 +206,11 @@ class RankSerializer(serializers.ModelSerializer):
 
 class AssignmentSerializer(DynamicFieldsModelSerializer):
     editable = serializers.SerializerMethodField()
-    questions = RankSerializer(source="assignmentquestions_set", many=True)
+    questions = RankSerializer(
+        source="assignmentquestions_set",
+        many=True,
+        required=False,
+    )
     question_pks = serializers.SerializerMethodField()
 
     def get_editable(self, obj):
@@ -226,6 +230,13 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
                 "Question list must contain all questions from this assignment"
             )
 
+    def create(self, validated_data):
+        """Attach user and add to teacher assignments"""
+        assignment = super().create(validated_data)
+        assignment.owner.add(self.context["request"].user)
+        self.context["request"].user.teacher.assignments.add(assignment)
+        return assignment
+
     def update(self, instance, validated_data):
         """
         Only used to reorder questions.
@@ -240,14 +251,29 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         raise PermissionDenied
 
     def to_representation(self, instance):
-        """Bleach HTML-supported fields"""
+        """Bleach fields"""
         ret = super().to_representation(instance)
-        if "title" in ret:
-            ret["title"] = bleach.clean(
-                ret["title"], tags=ALLOWED_TAGS, styles=[], strip=True
-            ).strip()
+        for field in ["conclusion_page", "description", "intro_page"]:
+            if field in ret and ret[field]:
+                ret[field] = bleach.clean(
+                    ret[field], tags=ALLOWED_TAGS, styles=[], strip=True
+                ).strip()
+        for field in ["title"]:
+            if field in ret and ret[field]:
+                ret[field] = bleach.clean(
+                    ret[field], tags=[], styles=[], strip=True
+                ).strip()
         return ret
 
     class Meta:
         model = Assignment
-        fields = ["editable", "pk", "question_pks", "questions", "title"]
+        fields = [
+            "conclusion_page",
+            "description",
+            "editable",
+            "intro_page",
+            "pk",
+            "question_pks",
+            "questions",
+            "title",
+        ]

@@ -104,7 +104,7 @@
 .info {
   color: $hint;
   &.alert {
-      color: $error;
+      color: var(--mdc-theme-error);
   }
   & p, div {
     font-family: $mdc-typography-font-family;

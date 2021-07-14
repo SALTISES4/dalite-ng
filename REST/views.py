@@ -43,11 +43,12 @@ from REST.serializers import (
 
 class AssignmentViewSet(viewsets.ModelViewSet):
     """
-    A simple ViewSet for viewing assignments and editing question order.
+    A simple ViewSet for creating and viewing assignments, and editing question
+    order.
     """
 
-    http_method_names = ["get", "patch"]
-    permission_classes = [IsAuthenticated, InOwnerList]
+    http_method_names = ["get", "patch", "post"]
+    permission_classes = [IsAuthenticated, IsTeacher, InOwnerList]
     renderer_classes = [JSONRenderer]
     serializer_class = AssignmentSerializer
 

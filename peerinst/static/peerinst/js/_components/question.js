@@ -44,7 +44,12 @@ triScale.reverse();
 export class AssignmentDialog extends Component {
   state = {
     assignmentsSelected: [],
+    introduction: "",
+    conclusion: "",
     create: false,
+    description: "",
+    pk: "",
+    title: "",
   };
 
   selectAssignment = (pk) => {
@@ -52,6 +57,34 @@ export class AssignmentDialog extends Component {
     const index = this.state.assignmentsSelected.indexOf(pk);
     index < 0 ? _sa.push(pk) : _sa.splice(index, 1);
     this.setState({ assignmentsSelected: _sa });
+  };
+
+  checkUniqueness = async (evt) => {
+    console.debug("Checking validity");
+
+    // HTML5 validation first
+    if (evt.target.form.checkValidity()) {
+      // Model-level validation
+      const queryString = new URLSearchParams();
+      queryString.append("id", evt.target.value);
+      const url = new URL(this.props.checkIdURL, window.location.origin);
+      url.search = queryString;
+      try {
+        const check = await get(url);
+        console.debug(check);
+        if (!check.valid) {
+          evt.target.setCustomValidity(
+            this.props.gettext("This identifier has already been used."),
+          );
+        } else {
+          evt.target.setCustomValidity("");
+        }
+      } catch (error) {
+        console.debug(error);
+      }
+
+      evt.target.form.checkValidity();
+    }
   };
 
   count = () =>
@@ -101,30 +134,36 @@ export class AssignmentDialog extends Component {
               autofocus
               class="wide tight"
               label={this.props.gettext("Assignment title")}
+              maxlength="200"
               name="title"
+              onInput={(evt) => {
+                this.setState({ title: evt.target.value });
+              }}
               outlined
+              required
+              value={this.state.title}
             />
             <TextFieldHelperText persistent>
-              {this.props.gettext(
-                `The assignment title can be anything you'd like, but it is
-                 helpful for indexing if it is a descriptive phrase, 'Mechanics
-                 - Energy Diagrams I'`,
-              )}
+              {this.props.helpTexts.title}
             </TextFieldHelperText>
           </div>
           <div style={{ marginBottom: 10 }}>
             <TextField
               class="wide tight"
               label={this.props.gettext("Assignment identifier")}
+              maxlength="100"
               name="identifier"
+              onInput={(evt) => {
+                this.setState({ pk: evt.target.value });
+                this.checkUniqueness(evt);
+              }}
               outlined
+              pattern="[\d\w_-]+"
+              required
+              value={this.state.pk}
             />
             <TextFieldHelperText persistent>
-              {this.props.gettext(
-                `The assignment identifier is used to access the assignment
-                 through and LMS (e.g. Moodle).  Only use letters, numbers
-                 and/or the underscore for the identifier.`,
-              )}
+              {this.props.helpTexts.identifier}
             </TextFieldHelperText>
           </div>
           <div style={{ marginBottom: 10 }}>
@@ -133,13 +172,15 @@ export class AssignmentDialog extends Component {
               textarea
               label={this.props.gettext("Assignment description (optional)")}
               name="description"
+              onInput={(evt) => {
+                this.setState({ description: evt.target.value });
+              }}
+              outlined
               rows="4"
+              value={this.state.description}
             />
             <TextFieldHelperText persistent>
-              {this.props.gettext(
-                `Notes you would like keep for yourself (or other teachers)
-                 regarding this assignment.`,
-              )}
+              {this.props.helpTexts.description}
             </TextFieldHelperText>
           </div>
           <div style={{ marginBottom: 10 }}>
@@ -148,13 +189,15 @@ export class AssignmentDialog extends Component {
               fullwidth
               label={this.props.gettext("Assignment introduction (optional)")}
               name="intro_page"
+              onInput={(evt) => {
+                this.setState({ introduction: evt.target.value });
+              }}
+              outlined
               rows="4"
+              value={this.state.introduction}
             />
             <TextFieldHelperText persistent>
-              {this.props.gettext(
-                `Any special instructions you would like students to read before
-                 they start the assignment.`,
-              )}
+              {this.props.helpTexts.intro_page}
             </TextFieldHelperText>
           </div>
           <div style={{ marginBottom: 10 }}>
@@ -163,13 +206,15 @@ export class AssignmentDialog extends Component {
               fullwidth
               label={this.props.gettext("Assignment conclusion (optional)")}
               name="conclusion_page"
+              onInput={(evt) => {
+                this.setState({ conclusion: evt.target.value });
+              }}
+              outlined
               rows="4"
+              value={this.state.conclusion}
             />
             <TextFieldHelperText persistent>
-              {this.props.gettext(
-                `Any notes you would like to leave for students to read that
-                 will be shown after the last question of the assignment.`,
-              )}
+              {this.props.helpTexts.conclusion_page}
             </TextFieldHelperText>
           </div>
         </div>
@@ -177,47 +222,86 @@ export class AssignmentDialog extends Component {
     }
     return (
       <div>
+        <div style={{ marginBottom: 10 }}>
+          <IconButton
+            icon="add"
+            onClick={() => {
+              this.setState({ assignmentsSelected: [], create: true });
+            }}
+            style={{
+              padding: 0,
+              marginLeft: 8,
+              width: 24,
+              height: 24,
+              verticalAlign: "middle",
+            }}
+          />
+          <Typography
+            use="body2"
+            tag="span"
+            style={{ verticalAlign: "middle", marginLeft: 12 }}
+          >
+            {this.props.gettext("Create assignment")}
+          </Typography>
+        </div>
         {this.props.assignments
           .filter((a) => a.question_pks.indexOf(this.props.question.pk) < 0)
+          .sort((x, y) => x.title.localeCompare(y.title))
           .map((a, i) => {
             return (
               <div key={i}>
                 <Checkbox
                   checked={this.state.assignmentsSelected.indexOf(a.pk) >= 0}
                   onChange={() => this.selectAssignment(a.pk)}
-                  label={a.title}
+                  label={`${a.title} (#${a.pk})`}
                   required={this.state.assignmentsSelected.length == 0}
                 />
               </div>
             );
           })}
-        <IconButton
-          icon="add"
-          onClick={() => {
-            this.setState({ create: true });
-          }}
-          style={{
-            padding: 0,
-            marginLeft: 8,
-            width: 24,
-            height: 24,
-            verticalAlign: "middle",
-          }}
-        />
-        <Typography
-          use="body2"
-          tag="span"
-          style={{ verticalAlign: "middle", marginLeft: 12 }}
-        >
-          {this.props.gettext("Create assignment")}
-        </Typography>
       </div>
     );
   };
 
+  handleSubmit = async (evt) => {
+    if (evt.target.form.checkValidity()) {
+      if (this.state.create) {
+        this.props.handleSubmit(this.props.question.pk, [], {
+          intro_page: this.state.introduction,
+          conclusion_page: this.state.conclusion,
+          description: this.state.description,
+          pk: this.state.pk,
+          title: this.state.title,
+        });
+        this.setState({
+          intro_page: "",
+          conclusion_page: "",
+          description: "",
+          pk: "",
+          title: "",
+        });
+      } else {
+        this.props.handleSubmit(
+          this.props.question.pk,
+          this.state.assignmentsSelected,
+          {},
+        );
+        this.setState({ assignmentsSelected: [] });
+      }
+    }
+  };
+
   shouldComponentUpdate(nextProps, nextState) {
     if (this.props.question != nextProps.question) {
-      this.setState({ assignmentsSelected: [], create: false });
+      this.setState({
+        assignmentsSelected: [],
+        create: false,
+        intro_page: "",
+        conclusion_page: "",
+        description: "",
+        pk: "",
+        title: "",
+      });
     }
   }
 
@@ -245,12 +329,7 @@ export class AssignmentDialog extends Component {
             ripple
             type="submit"
             form="assignment-form"
-            onClick={() =>
-              this.props.handleSubmit(
-                this.props.question.pk,
-                this.state.assignmentsSelected,
-              )
-            }
+            onClick={this.handleSubmit}
           >
             {this.props.gettext("Submit")}
           </DialogButton>

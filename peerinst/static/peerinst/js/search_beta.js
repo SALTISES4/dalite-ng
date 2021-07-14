@@ -40,6 +40,7 @@ export class SearchApp extends Component {
     assignments: [],
     assignmentDialogOpen: false,
     assignmentDialogQuestion: {},
+    assignmentFormMetaData: {},
     query: "",
     questions: [],
     categories: [],
@@ -137,9 +138,29 @@ export class SearchApp extends Component {
     }
   };
 
-  handleAssignmentSubmit = async (questionPK, assignments) => {
+  handleAssignmentSubmit = async (
+    questionPK,
+    assignments = [],
+    newAssignmentData = {},
+  ) => {
     console.debug("handleAssignmentSubmit called");
-    console.debug(questionPK, assignments);
+    console.debug(questionPK, assignments, newAssignmentData);
+    if (Object.keys(newAssignmentData).length > 0) {
+      try {
+        const _assignment = await submitData(
+          this.props.assignmentListURL,
+          newAssignmentData,
+          "POST",
+        );
+        assignments = [_assignment.pk];
+      } catch (error) {
+        console.error(error);
+        this.setState({
+          snackbarIsOpen: true,
+          snackbarMessage: this.props.gettext("An error occurred."),
+        });
+      }
+    }
     for await (const a of assignments) {
       try {
         await submitData(
@@ -589,6 +610,22 @@ export class SearchApp extends Component {
         ),
       });
     }
+    // Load assignment form data
+    try {
+      const data = await get(this.props.assignmentFormMetaDataURL);
+      console.debug(data);
+      this.setState({
+        assignmentFormMetaData: data,
+      });
+    } catch (error) {
+      console.error(error);
+      this.setState({
+        snackbarIsOpen: true,
+        snackbarMessage: this.props.gettext(
+          "Error.  Try refreshing this page.",
+        ),
+      });
+    }
   };
 
   componentDidMount() {
@@ -645,6 +682,8 @@ export class SearchApp extends Component {
         {this.results()}
         <AssignmentDialog
           assignments={this.state.assignments.filter((a) => a.editable)}
+          checkIdURL={this.props.assignmentFormCheckIdURL}
+          helpTexts={this.state.assignmentFormMetaData}
           handleSubmit={this.handleAssignmentSubmit}
           gettext={this.props.gettext}
           open={this.state.assignmentDialogOpen}
