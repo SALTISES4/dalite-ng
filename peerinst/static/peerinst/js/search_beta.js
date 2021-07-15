@@ -96,6 +96,7 @@ export class SearchApp extends Component {
   handleSubmit = async () => {
     /* Prevent searches from being submitted faster than once per DT ms */
     const DT = 500;
+    const startTime = performance.now();
     console.debug("handleSubmit called");
     const timeElapsed = performance.now() - this.state.lastKeyStroke;
     if (timeElapsed > DT || this.state.questions.length == 0) {
@@ -123,14 +124,23 @@ export class SearchApp extends Component {
           this.setState({ searching: true });
           const data = await get(url);
           console.debug(data);
-          this.setState({
-            categories: data.meta.categories,
-            difficulties: data.meta.difficulties,
-            disciplines: data.meta.disciplines,
-            impacts: data.meta.impacts,
-            questions: data.results,
-            searching: false,
-          });
+          this.setState(
+            {
+              categories: data.meta.categories,
+              difficulties: data.meta.difficulties,
+              disciplines: data.meta.disciplines,
+              impacts: data.meta.impacts,
+              questions: data.results,
+              searching: false,
+            },
+            () =>
+              console.debug(
+                `Search time: ${(
+                  (performance.now() - startTime) /
+                  1000
+                ).toExponential(3)}s`,
+              ),
+          );
         } catch (error) {
           console.debug(error);
           this.setState({
