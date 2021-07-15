@@ -46,7 +46,8 @@ def update_question_meta_search_difficulty():
 @app.task
 def elasticsearch_reindex():
     call_command("search_index", "--rebuild", "-f")
-    return "success"
+    logger.info("rebuilt elasticsearch index")
+    return
 
 
 @try_async
