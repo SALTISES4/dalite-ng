@@ -97,6 +97,7 @@ from .decorators import ajax_login_required, ajax_user_passes_test
 LOGGER = logging.getLogger(__name__)
 LOGGER_teacher_activity = logging.getLogger("teacher_activity")
 performance_logger = logging.getLogger("performance")
+search_logger = logging.getLogger("search")
 
 
 # Views related to Auth
@@ -2208,6 +2209,7 @@ def question_search_beta(request):
     search_string = request.GET.get("search_string", default="")
 
     if search_string:
+        start = time.perf_counter()
         # Parse to remove filter terms from search string
         filters = []
         terms = search_string.split()
@@ -2261,6 +2263,10 @@ def question_search_beta(request):
                 "disciplines": [],
                 "impacts": [],
             }
+
+        search_logger.info(
+            f"{time.perf_counter() - start:.2e}s - {search_string}"
+        )
 
         return JsonResponse({"results": results, "meta": meta}, safe=False)
 

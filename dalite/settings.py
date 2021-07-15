@@ -454,6 +454,12 @@ LOGGING = {
             "formatter": "complete",
             "stream": "ext://sys.stdout",
         },
+        "search_file_log": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "complete",
+            "filename": os.path.join(BASE_DIR, "log", "search.log"),
+        },
         "performance_console_log": {
             "level": "DEBUG" if DEBUG else "INFO",
             "class": "logging.StreamHandler",
@@ -540,6 +546,11 @@ LOGGING = {
         "nlp": {
             "handlers": ["performance_console_log"],
             "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "search": {
+            "handlers": ["search_file_log"],
+            "level": "INFO",
             "propagate": True,
         },
     },

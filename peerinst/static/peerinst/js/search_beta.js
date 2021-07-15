@@ -52,6 +52,7 @@ export class SearchApp extends Component {
     flagDialogOpen: false,
     flagDialogQuestion: {},
     impacts: [],
+    lastKeyStroke: undefined,
     searching: false,
     selectedCategories: [],
     selectedDifficulty: "",
@@ -59,6 +60,7 @@ export class SearchApp extends Component {
     selectedImpact: "",
     snackbarIsOpen: false,
     snackbarMessage: "",
+    timeoutID: "",
   };
 
   handleToggleAssignmentDialog = (question, open = true) => {
@@ -92,48 +94,70 @@ export class SearchApp extends Component {
   };
 
   handleSubmit = async () => {
+    /* Prevent searches from being submitted faster than once per DT ms */
+    const DT = 500;
     console.debug("handleSubmit called");
-    this.setState({ flagDialogOpen: false, flagDialogQuestion: {} }, () =>
-      console.debug(this.state),
-    );
-    const queryString = new URLSearchParams();
-    queryString.append("search_string", this.state.query);
-    const url = new URL(this.props.url, window.location.origin);
-    url.search = queryString;
+    const timeElapsed = performance.now() - this.state.lastKeyStroke;
+    if (timeElapsed > DT || this.state.questions.length == 0) {
+      console.info("Submitting...");
+      window.clearTimeout(this.state.timeoutID);
+      this.setState(
+        {
+          assignmentDialogOpen: false,
+          assignmentDialogQuestion: {},
+          dialogOpen: false,
+          dialogQuestion: {},
+          flagDialogOpen: false,
+          flagDialogQuestion: {},
+          lastKeyStroke: performance.now(),
+        },
+        () => console.debug(this.state),
+      );
+      const queryString = new URLSearchParams();
+      queryString.append("search_string", this.state.query);
+      const url = new URL(this.props.url, window.location.origin);
+      url.search = queryString;
 
-    if (this.state.query.length > 2) {
-      try {
-        this.setState({ searching: true });
-        const data = await get(url);
-        console.debug(data);
+      if (this.state.query.length > 2) {
+        try {
+          this.setState({ searching: true });
+          const data = await get(url);
+          console.debug(data);
+          this.setState({
+            categories: data.meta.categories,
+            difficulties: data.meta.difficulties,
+            disciplines: data.meta.disciplines,
+            impacts: data.meta.impacts,
+            questions: data.results,
+            searching: false,
+          });
+        } catch (error) {
+          console.debug(error);
+          this.setState({
+            snackbarIsOpen: true,
+            snackbarMessage: this.props.gettext(
+              "An error occurred.  Try refreshing this page.",
+            ),
+          });
+        }
+      } else {
         this.setState({
-          categories: data.meta.categories,
-          difficulties: data.meta.difficulties,
-          disciplines: data.meta.disciplines,
-          impacts: data.meta.impacts,
-          questions: data.results,
-          searching: false,
-        });
-      } catch (error) {
-        console.debug(error);
-        this.setState({
-          snackbarIsOpen: true,
-          snackbarMessage: this.props.gettext(
-            "An error occurred.  Try refreshing this page.",
-          ),
+          questions: [],
+          categories: [],
+          difficulties: [],
+          disciplines: [],
+          impacts: [],
+          selectedCategories: [],
+          selectedDifficulty: "",
+          selectedDiscipline: "",
+          selectedImpact: "",
         });
       }
     } else {
+      window.clearTimeout(this.state.timeoutID);
       this.setState({
-        questions: [],
-        categories: [],
-        difficulties: [],
-        disciplines: [],
-        impacts: [],
-        selectedCategories: [],
-        selectedDifficulty: "",
-        selectedDiscipline: "",
-        selectedImpact: "",
+        lastKeyStroke: performance.now(),
+        timeoutID: window.setTimeout(this.handleSubmit, DT),
       });
     }
   };
