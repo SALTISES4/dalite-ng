@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from quality.models import Quality
 
+from .institution import Institution
 from .question import Discipline
 
 
@@ -58,6 +59,9 @@ class StudentGroup(models.Model):
 
     discipline = models.ForeignKey(
         Discipline, blank=True, null=True, on_delete=models.SET_NULL
+    )
+    institution = models.ForeignKey(
+        Institution, blank=True, null=True, on_delete=models.SET_NULL
     )
 
     def __str__(self):
