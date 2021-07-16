@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import logging
 
 from django.http import HttpResponse, JsonResponse
@@ -11,12 +8,13 @@ from dalite.views.errors import response_400
 from dalite.views.utils import get_json_params
 
 from ..models import Question, QuestionFlag, QuestionFlagReason
-from .decorators import teacher_required
+from .decorators import ajax_login_required, teacher_required
 
 logger = logging.getLogger("peerinst-views")
 
 
 @require_GET
+@ajax_login_required
 @teacher_required
 def get_flag_question_reasons(req, teacher):
     data = {"reasons": [q.title for q in QuestionFlagReason.objects.all()]}
@@ -24,6 +22,7 @@ def get_flag_question_reasons(req, teacher):
 
 
 @require_POST
+@ajax_login_required
 @teacher_required
 def flag_question(req, teacher):
     args = get_json_params(req, args=["id", "reason"])
@@ -64,4 +63,4 @@ def flag_question(req, teacher):
     flag.flag_reason.add(flag_reason)
     logger.info("Question flagged!")
 
-    return HttpResponse("")
+    return JsonResponse({})

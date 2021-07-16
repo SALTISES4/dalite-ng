@@ -1,10 +1,8 @@
 import bleach
-
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
-from django.template.defaultfilters import title
 from rest_framework import serializers
 from rest_framework.exceptions import bad_request
 
@@ -26,12 +24,11 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ["title"]
 
     def to_representation(self, instance):
-        """Bleach and ensure title case"""
+        """Bleach"""
         ret = super().to_representation(instance)
         ret["title"] = bleach.clean(
             ret["title"], tags=[], styles=[], strip=True
-        )
-        ret["title"] = title(ret["title"])
+        ).strip()
         return ret
 
 
@@ -41,12 +38,11 @@ class DisciplineSerializer(serializers.ModelSerializer):
         fields = ["title", "pk"]
 
     def to_representation(self, instance):
-        """Bleach and ensure title case"""
+        """Bleach"""
         ret = super().to_representation(instance)
         ret["title"] = bleach.clean(
             ret["title"], tags=[], styles=[], strip=True
-        )
-        ret["title"] = title(ret["title"])
+        ).strip()
         return ret
 
 
@@ -57,48 +53,79 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(DynamicFieldsModelSerializer):
-    answer_count = serializers.SerializerMethodField()
+    answer_count = serializers.ReadOnlyField()
+    answerchoice_set = serializers.SerializerMethodField()
+    assignment_count = serializers.ReadOnlyField()
     category = CategorySerializer(many=True, read_only=True)
-    choices = serializers.SerializerMethodField()
-    discipline = DisciplineSerializer(read_only=True)
-    user = UserSerializer(read_only=True)
-    most_convincing_rationales = serializers.SerializerMethodField()
-    matrix = serializers.SerializerMethodField()
-    freq = serializers.SerializerMethodField()
     collaborators = UserSerializer(many=True, read_only=True)
+    difficulty = serializers.SerializerMethodField()
+    discipline = DisciplineSerializer(read_only=True)
+    frequency = serializers.SerializerMethodField()
+    matrix = serializers.SerializerMethodField()
+    most_convincing_rationales = serializers.SerializerMethodField()
+    peer_impact = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True)
 
     def get_answer_count(self, obj):
-        return obj.answer_set.count()
+        return obj.answer_count
 
-    def get_choices(self, obj):
-        return obj.get_choices()
+    def get_assignment_count(self, obj):
+        return obj.assignment_count
 
-    def get_most_convincing_rationales(self, obj):
-        return obj.get_most_convincing_rationales()
+    def get_answerchoice_set(self, obj):
+        return [
+            {
+                "correct": obj.is_correct(i),
+                "text": bleach.clean(
+                    ac[1],
+                    tags=ALLOWED_TAGS,
+                    styles=[],
+                    strip=True,
+                ).strip(),
+            }
+            for i, ac in enumerate(obj.get_choices(), 1)
+        ]
+
+    def get_difficulty(self, obj):
+        d = obj.get_difficulty()
+        return {"score": d[0], "label": str(d[1])}
+
+    def get_frequency(self, obj):
+        return obj.get_frequency()
 
     def get_matrix(self, obj):
         return obj.get_matrix()
 
-    def get_freq(self, obj):
-        return obj.get_frequency()
+    def get_most_convincing_rationales(self, obj):
+        return obj.get_most_convincing_rationales()
+
+    def get_peer_impact(self, obj):
+        pi = obj.get_peer_impact()
+        return {"score": pi[0], "label": str(pi[1])}
 
     class Meta:
         model = Question
         fields = [
-            "pk",
-            "title",
-            "text",
-            "user",
-            "discipline",
             "answer_count",
+            "answerchoice_set",
+            "answer_style",
+            "assignment_count",
             "category",
+            "collaborators",
+            "difficulty",
+            "discipline",
+            "frequency",
             "image",
             "image_alt_text",
-            "choices",
-            "most_convincing_rationales",
             "matrix",
-            "freq",
-            "collaborators",
+            "most_convincing_rationales",
+            "peer_impact",
+            "pk",
+            "text",
+            "title",
+            "type",
+            "user",
+            "video_url",
         ]
 
     def to_representation(self, instance):
@@ -107,22 +134,11 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         if "title" in ret:
             ret["title"] = bleach.clean(
                 ret["title"], tags=ALLOWED_TAGS, styles=[], strip=True
-            )
+            ).strip()
         if "text" in ret:
             ret["text"] = bleach.clean(
                 ret["text"], tags=ALLOWED_TAGS, styles=[], strip=True
             ).strip()
-        if "choices" in ret:
-            ret["choices"] = [
-                (
-                    choice[0],
-                    bleach.clean(
-                        choice[1], tags=ALLOWED_TAGS, styles=[], strip=True
-                    ).strip(),
-                    instance.is_correct(i),
-                )
-                for (i, choice) in enumerate(ret["choices"], 1)
-            ]
         return ret
 
 
@@ -130,27 +146,27 @@ class RankSerializer(serializers.ModelSerializer):
     question = QuestionSerializer(
         read_only=True,
         fields=(
-            "pk",
-            "title",
-            "text",
-            "user",
-            "discipline",
             "answer_count",
+            "answerchoice_set",
             "category",
+            "collaborators",
+            "discipline",
+            "frequency",
             "image",
             "image_alt_text",
-            "choices",
             "matrix",
-            "freq",
-            "collaborators",
+            "pk",
+            "text",
+            "title",
+            "user",
         ),
     )
 
     def create(self, validated_data):
-        """ Custom create method to add questions to an assignment based on pk
-            Required POST data:
-                - assignment (validated normally)
-                - question_pk (validated here)
+        """Custom create method to add questions to an assignment based on pk
+        Required POST data:
+            - assignment (validated normally)
+            - question_pk (validated here)
         """
 
         assignment = validated_data["assignment"]
@@ -188,8 +204,20 @@ class RankSerializer(serializers.ModelSerializer):
         fields = ["assignment", "question", "rank", "pk"]
 
 
-class AssignmentSerializer(serializers.ModelSerializer):
-    questions = RankSerializer(source="assignmentquestions_set", many=True)
+class AssignmentSerializer(DynamicFieldsModelSerializer):
+    editable = serializers.SerializerMethodField()
+    questions = RankSerializer(
+        source="assignmentquestions_set",
+        many=True,
+        required=False,
+    )
+    question_pks = serializers.SerializerMethodField()
+
+    def get_editable(self, obj):
+        return obj.editable
+
+    def get_question_pks(self, obj):
+        return list(obj.questions.values_list("pk", flat=True))
 
     def validate_questions(self, data):
         assignment_questions = list(
@@ -201,6 +229,13 @@ class AssignmentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Question list must contain all questions from this assignment"
             )
+
+    def create(self, validated_data):
+        """Attach user and add to teacher assignments"""
+        assignment = super().create(validated_data)
+        assignment.owner.add(self.context["request"].user)
+        self.context["request"].user.teacher.assignments.add(assignment)
+        return assignment
 
     def update(self, instance, validated_data):
         """
@@ -216,14 +251,29 @@ class AssignmentSerializer(serializers.ModelSerializer):
         raise PermissionDenied
 
     def to_representation(self, instance):
-        """Bleach HTML-supported fields"""
+        """Bleach fields"""
         ret = super().to_representation(instance)
-        if "title" in ret:
-            ret["title"] = bleach.clean(
-                ret["title"], tags=ALLOWED_TAGS, styles=[], strip=True
-            )
+        for field in ["conclusion_page", "description", "intro_page"]:
+            if field in ret and ret[field]:
+                ret[field] = bleach.clean(
+                    ret[field], tags=ALLOWED_TAGS, styles=[], strip=True
+                ).strip()
+        for field in ["title"]:
+            if field in ret and ret[field]:
+                ret[field] = bleach.clean(
+                    ret[field], tags=[], styles=[], strip=True
+                ).strip()
         return ret
 
     class Meta:
         model = Assignment
-        fields = ["title", "questions"]
+        fields = [
+            "conclusion_page",
+            "description",
+            "editable",
+            "intro_page",
+            "pk",
+            "question_pks",
+            "questions",
+            "title",
+        ]

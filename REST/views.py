@@ -1,16 +1,16 @@
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, generics
+from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from peerinst.models import (
-    Assignment,
-    AssignmentQuestions,
     Answer,
     AnswerAnnotation,
+    Assignment,
+    AssignmentQuestions,
     Discipline,
     Question,
     StudentGroup,
@@ -19,35 +19,36 @@ from peerinst.models import (
 )
 from peerinst.util import question_search_function
 from REST.pagination import SearchPagination
-from REST.serializers import (
-    AssignmentSerializer,
-    AnswerSerializer,
-    DisciplineSerializer,
-    FeedbackWriteSerialzer,
-    FeedbackReadSerialzer,
-    QuestionSerializer,
-    RankSerializer,
-    StudentGroupSerializer,
-    StudentGroupAssignmentAnswerSerializer,
-    TeacherSerializer,
-)
 from REST.permissions import (
     InAssignmentOwnerList,
     InOwnerList,
+    InTeacherList,
     IsAdminUserOrReadOnly,
     IsNotStudent,
     IsTeacher,
-    InTeacherList,
+)
+from REST.serializers import (
+    AnswerSerializer,
+    AssignmentSerializer,
+    DisciplineSerializer,
+    FeedbackReadSerialzer,
+    FeedbackWriteSerialzer,
+    QuestionSerializer,
+    RankSerializer,
+    StudentGroupAssignmentAnswerSerializer,
+    StudentGroupSerializer,
+    TeacherSerializer,
 )
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
     """
-    A simple ViewSet for viewing assignments and editing question order.
+    A simple ViewSet for creating and viewing assignments, and editing question
+    order.
     """
 
-    http_method_names = ["get", "patch"]
-    permission_classes = [IsAuthenticated, InOwnerList]
+    http_method_names = ["get", "patch", "post"]
+    permission_classes = [IsAuthenticated, IsTeacher, InOwnerList]
     renderer_classes = [JSONRenderer]
     serializer_class = AssignmentSerializer
 
@@ -79,7 +80,7 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_serializer(self, *args, **kwargs):
         return QuestionSerializer(
-            fields=["choices", "pk", "text", "title"], *args, **kwargs
+            fields=["answerchoice_set", "pk", "text", "title"], *args, **kwargs
         )
 
 
@@ -107,7 +108,7 @@ class QuestionListViewSet(viewsets.ModelViewSet):
 
 
 class QuestionSearchList(generics.ListAPIView):
-    """ A simple ListView to return search results in JSON format"""
+    """A simple ListView to return search results in JSON format"""
 
     pagination_class = SearchPagination
     renderer_classes = [JSONRenderer]
@@ -135,13 +136,13 @@ class QuestionSearchList(generics.ListAPIView):
             )
             return queryset
 
+        if discipline:
+            queryset = queryset.filter(discipline=discipline)
+
         # Call search function
         queryset = question_search_function(
             search_string, pre_filtered_list=queryset, is_old_query=True
         )
-
-        if discipline:
-            queryset = queryset.filter(discipline=discipline)
 
         return queryset
 
@@ -150,22 +151,30 @@ class QuestionSearchList(generics.ListAPIView):
         return QuestionSerializer(
             read_only=True,
             fields=(
-                "pk",
-                "title",
-                "text",
-                "user",
-                "discipline",
                 "answer_count",
+                "answer_style",
+                "answerchoice_set",
+                "assignment_count",
                 "category",
+                "choices",
+                "collaborators",
+                "difficulty",
+                "discipline",
+                "frequency",
                 "image",
                 "image_alt_text",
-                "choices",
                 "matrix",
-                "freq",
-                "collaborators",
+                # "most_convincing_rationales",
+                "peer_impact",
+                "pk",
+                "text",
+                "title",
+                "type",
+                "user",
+                "video_url",
             ),
             *args,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -223,14 +232,10 @@ class TeacherView(generics.RetrieveUpdateAPIView):
 
         if len(current_favorites) - len(new_favorites) > 0:
             q_pk = list(set(current_favorites) - set(new_favorites))[0]
-            message = "{} removed from favourites".format(
-                Question.objects.get(id=q_pk).title
-            )
+            message = f"#{q_pk} removed from favourites"
         else:
             q_pk = list(set(new_favorites) - set(current_favorites))[0]
-            message = "{} added to favourites".format(
-                Question.objects.get(id=q_pk).title
-            )
+            message = f"#{q_pk} added to favourites"
 
         snackbar_message = {"snackbar_message": message}
 
@@ -251,7 +256,9 @@ class TeacherFeedbackList(generics.ListCreateAPIView):
     serializer_class = FeedbackWriteSerialzer
 
     def get_queryset(self):
-        return AnswerAnnotation.objects.filter(annotator=self.request.user,)
+        return AnswerAnnotation.objects.filter(
+            annotator=self.request.user,
+        )
 
     def perform_create(self, serializer):
         serializer.save(annotator=self.request.user)
@@ -266,7 +273,9 @@ class TeacherFeedbackDetail(generics.RetrieveUpdateAPIView):
     serializer_class = FeedbackWriteSerialzer
 
     def get_queryset(self):
-        return AnswerAnnotation.objects.filter(annotator=self.request.user,)
+        return AnswerAnnotation.objects.filter(
+            annotator=self.request.user,
+        )
 
 
 class TeacherFeedbackThroughAnswerDetail(TeacherFeedbackDetail):

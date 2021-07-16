@@ -138,9 +138,8 @@ class TeacherReputationHeader extends ReputationHeader {
         });
       } else if (model.reputation !== null && model.reputation !== undefined) {
         // $FlowFixMe
-        shadow.getElementById(
-          "icon__reputation",
-        ).textContent = model.reputation.toString();
+        shadow.getElementById("icon__reputation").textContent =
+          model.reputation.toString();
       }
 
       return icon;

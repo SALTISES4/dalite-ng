@@ -1,5 +1,4 @@
 import pytest
-
 from django.urls import reverse
 from rest_framework import status
 
@@ -58,9 +57,13 @@ def test_in_teacher_list_permission(
         rf, None, student_group_assignment
     )
 
+    assert InTeacherList().has_object_permission(
+        rf, None, student_group_assignment.group
+    )
+
     with pytest.raises(AttributeError):
         assert InTeacherList().has_object_permission(
-            rf, None, student_group_assignment.group
+            rf, None, student_group_assignment.group.group
         )
 
 

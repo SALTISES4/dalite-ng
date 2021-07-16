@@ -86,6 +86,7 @@ class Feedback extends Component {
           {this.scores.slice(1).map((score, i) => {
             return (
               <Icon
+                key={i}
                 icon={
                   this.props.feedback.score >= score ? "star" : "star_border"
                 }
@@ -121,7 +122,7 @@ class Feedback extends Component {
         </Typography>
         <Choices
           show={true}
-          choices={this.props.feedback.answer.question.choices}
+          choices={this.props.feedback.answer.question.answerchoice_set}
         />
 
         <div style={{ marginTop: "16px" }}>
@@ -219,8 +220,8 @@ export class FeedbackApp extends Component {
             }}
           >
             <div style={{ maxWidth: "775px" }}>
-              {feedbackList.map((el) => (
-                <Feedback feedback={el} gettext={this.props.gettext} />
+              {feedbackList.map((el, i) => (
+                <Feedback feedback={el} gettext={this.props.gettext} key={i} />
               ))}
             </div>
           </DialogContent>

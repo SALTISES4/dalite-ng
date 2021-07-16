@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-
-
-from dalite.views.errors import response_400
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
+
+from dalite.views.errors import response_400
 
 from ..mixins import student_check
 from ..models import Category, Discipline, Subject, Teacher, User
@@ -48,6 +46,7 @@ def search_categories(request):
     else:
         return response_400(request, msg="")
 
+
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
 @require_GET
@@ -56,7 +55,7 @@ def search_usernames(request):
     if request.is_ajax():
         users = User.objects.filter(
             groups__name__in=[settings.TEACHER_GROUP],
-            username__icontains=request.GET.get("term")
+            username__icontains=request.GET.get("term"),
         ).values_list("username", "id")
 
         return JsonResponse(
@@ -64,6 +63,7 @@ def search_usernames(request):
         )
     else:
         return response_400(request, msg="")
+
 
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
@@ -80,6 +80,7 @@ def search_subjects(request):
         )
     else:
         return response_400(request, msg="")
+
 
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")

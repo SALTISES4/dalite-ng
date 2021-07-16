@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.models import DELETION, LogEntry
+from django.contrib.auth.models import User
 from django.core import exceptions
 from django.urls import reverse
 from django.utils.html import escape, format_html
@@ -457,5 +458,17 @@ class MessageAdmin(admin.ModelAdmin):
 admin.site.register(LogEntry, LogEntryAdmin)
 admin.site.register(models.Message, MessageAdmin)
 admin.site.register(models.MessageType)
-admin.site.register(models.SaltiseMember)
+
+
+class SaltiseMemberAdmin(admin.ModelAdmin):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "user":
+            teachers = Teacher.objects.all().values_list("user", flat=True)
+            kwargs["queryset"] = User.objects.filter(pk__in=teachers).order_by(
+                "username"
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+admin.site.register(models.SaltiseMember, SaltiseMemberAdmin)
 admin.site.register(models.UserType)

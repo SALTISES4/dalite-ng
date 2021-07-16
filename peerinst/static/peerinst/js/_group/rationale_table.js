@@ -83,7 +83,10 @@ class Question extends Component {
               dangerouslySetInnerHTML={{ __html: this.state.question.text }}
             />
           </Typography>
-          <Choices show={true} choices={this.state.question.choices} />
+          <Choices
+            show={true}
+            choices={this.state.question.answerchoice_set}
+          />
         </div>
       </div>
     );
@@ -256,6 +259,7 @@ class AnswerFeedback extends Component {
           {this.scores.map((score, i) => {
             return (
               <IconButton
+                key={i}
                 icon="star_border"
                 checked={
                   (this.state.score >= score &&

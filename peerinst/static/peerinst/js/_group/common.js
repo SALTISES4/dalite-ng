@@ -43,9 +43,8 @@ function saveField(event, type, save, className) {
   const container = event.currentTarget.parentNode.previousElementSibling;
   const field =
     event.currentTarget.parentNode.previousElementSibling.firstElementChild;
-  const url = container.parentNode.parentNode.parentNode.getAttribute(
-    "data-update-url",
-  );
+  const url =
+    container.parentNode.parentNode.parentNode.getAttribute("data-update-url");
   if (type == "text") {
     saveTextField(field, save, className, url).then(function (newField) {
       container.replaceChild(newField, field);

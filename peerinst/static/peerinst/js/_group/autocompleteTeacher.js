@@ -89,7 +89,7 @@ export class TeacherInputWithAutocomplete extends Component {
         <TextField
           dense
           outlined
-          placeholder="Add teachers to group"
+          placeholder={this.props.gettext("Add teachers to group")}
           onInput={(evt) => {
             this.setState({ searchTerm: evt.target.value }, () =>
               this.search(),
@@ -106,7 +106,7 @@ export class TeacherInputWithAutocomplete extends Component {
               evt.preventDefault();
             }
           }}
-          style={{ position: "relative " }}
+          style={{ position: "relative" }}
           withTrailingIcon={
             <TextFieldIcon
               tabIndex="0"
@@ -115,7 +115,7 @@ export class TeacherInputWithAutocomplete extends Component {
                   ? this.state.searchTerm == this.state.searchResult.user
                     ? "check"
                     : "close"
-                  : {}
+                  : ""
               }
               onClick={() => {
                 this.save();
@@ -147,7 +147,12 @@ export class TeacherInputWithAutocomplete extends Component {
           <Typography use="body2">
             {this.state.teachers.map((teacher, i) => {
               return (
-                <Chip id={`chip-${i}`} text={teacher.user} theme="secondary" />
+                <Chip
+                  id={`chip-${i}`}
+                  key={i}
+                  text={teacher.user}
+                  theme="secondary"
+                />
               );
             })}
           </Typography>

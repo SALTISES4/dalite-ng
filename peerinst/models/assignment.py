@@ -2,14 +2,16 @@ import base64
 import logging
 from datetime import datetime, timedelta
 
+import bleach
 import pytz
 from django.contrib.auth.models import User
 from django.core import validators
-from django.urls import reverse
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 from quality.models import Quality
 from reputation.models import Reputation
 
@@ -31,64 +33,98 @@ class Assignment(models.Model):
         primary_key=True,
         max_length=100,
         help_text=_(
-            "A unique identifier for this assignment used for inclusion in a "
-            "course.  Only use letters, numbers and/or the underscore for the "
-            "identifier."
+            "The assignment identifier is used to access the assignment "
+            "through an LMS (e.g. Moodle).  Only use letters, numbers and the "
+            "underscore for the identifier.  Max length is 100 characters."
         ),
-        validators=[validators.validate_slug],
+        validators=[
+            validators.validate_slug,
+            validators.MinLengthValidator(2),
+        ],
     )
-    title = models.CharField(_("Title"), max_length=200)
+    title = models.CharField(
+        _("Title"),
+        max_length=200,
+        help_text=_(
+            "The assignment title can be anything you'd like, but it is "
+            "helpful for indexing if it is a descriptive phrase, e.g. "
+            "'Mechanics - Energy Diagrams 1'.  Max length is 200 characters."
+        ),
+    )
     description = models.TextField(
         _("Description"),
         blank=True,
         null=True,
         help_text=_(
-            """Notes you would like keep for yourself
-            (or other teachers) regarding this assignment
-            """
+            "Notes you would like keep for yourself (or other teachers) "
+            "regarding this assignment."
         ),
     )
-
     intro_page = models.TextField(
         _("Assignment Cover Page"),
         blank=True,
         null=True,
         help_text=_(
-            """Any special instructions you would like
-            students to read before they start the assignment.
-            """
+            "Any special instructions you would like students to read before "
+            "they start the assignment."
         ),
     )
-
     conclusion_page = models.TextField(
         _("Post Assignment Notes"),
         blank=True,
         null=True,
         help_text=_(
-            """Any notes you would like to leave for students
-            to read that will be shown after the last
-            question of the assignment.
-            """
+            "Any notes you would like to leave for students to read that will "
+            "be shown after the last question of the assignment."
         ),
     )
-
     questions = models.ManyToManyField(
         Question, verbose_name=_("Questions"), through="AssignmentQuestions"
     )
     owner = models.ManyToManyField(User, blank=True)
     parent = models.ForeignKey(
-        "Assignment", null=True, on_delete=models.SET_NULL
+        "Assignment", blank=True, null=True, on_delete=models.SET_NULL
     )
-
     reputation = models.OneToOneField(
         Reputation, blank=True, null=True, on_delete=models.SET_NULL
     )
-
     created_on = models.DateTimeField(auto_now_add=True, null=True)
     last_modified = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return self.identifier
+
+    def save(self, *args, **kwargs):
+        html_fields = ["conclusion_page", "description", "intro_page"]
+        text_fields = ["title"]
+
+        for field in html_fields:
+            if getattr(self, field):
+                """Bleach"""
+                setattr(
+                    self,
+                    field,
+                    bleach.clean(
+                        getattr(self, field),
+                        tags=ALLOWED_TAGS,
+                        styles=[],
+                        strip=True,
+                    ).strip(),
+                )
+        for field in text_fields:
+            if getattr(self, field):
+                """Bleach"""
+                setattr(
+                    self,
+                    field,
+                    bleach.clean(
+                        getattr(self, field),
+                        tags=[],
+                        styles=[],
+                        strip=True,
+                    ).strip(),
+                )
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse(
