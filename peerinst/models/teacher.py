@@ -14,21 +14,9 @@ from reputation.models import Reputation
 from .answer import Answer
 from .assignment import Assignment
 from .group import StudentGroup
+from .institution import Institution
 from .question import Discipline, Question
 from .student import Student, StudentGroupAssignment
-
-
-class Institution(models.Model):
-    name = models.CharField(
-        max_length=100, unique=True, help_text=_("Name of school.")
-    )
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = _("institution")
-        verbose_name_plural = _("institutions")
 
 
 class Teacher(models.Model):
