@@ -75,7 +75,7 @@ function initTables() {
         '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"Bf>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"ip>', // eslint-disable-line
       buttons: [],
     });
-    table.order(2, "desc");
+    table.order(0, "desc");
   });
 }
 
@@ -83,7 +83,15 @@ function updateTableData() {
   const table = $("#discipline-activity__groups").DataTable(); // eslint-disable-line
   table.rows().remove();
   table.rows
-    .add(model.state.activity.map((d) => [d.name, d.teacher, d.n_students]))
+    .add(
+      model.state.activity.map((d) => [
+        d.year,
+        d.semester,
+        d.name,
+        d.teacher,
+        d.n_students,
+      ]),
+    )
     .draw();
 }
 
