@@ -17,7 +17,8 @@ const { terser } = require("rollup-plugin-terser"); // minifier
 const embedCSS = require("rollup-plugin-postcss");
 const alias = require("@rollup/plugin-alias");
 const replace = require("@rollup/plugin-replace");
-const typescript = require("@rollup/plugin-typescript"); // typescript
+const ts = require("gulp-typescript"); // typescript
+const tsProject = ts.createProject("tsconfig.json");
 
 /* Build modules for styles */
 const scssLint = require("stylelint"); // linter
@@ -160,6 +161,15 @@ function watchStyle(app, module) {
   );
 }
 
+function typescript() {
+  const build = gulp
+    .src(["peerinst/**/*.{js,tsx}", "!peerinst/**/*.min.js"])
+    .pipe(tsProject())
+    .pipe(gulp.dest("test/ts"));
+
+  return build;
+}
+
 function buildScript(app, module) {
   const name = module === "index" ? "bundle" : module;
   // While migrating to typescript, we need to check for both file extensions
@@ -203,7 +213,6 @@ function buildScript(app, module) {
       eslint({
         fix: true,
       }),
-      typescript(),
       // https://github.com/rollup/plugins/tree/master/packages/babel#using-with-rollupplugin-commonjs
       babel({
         babelHelpers: "bundled",
@@ -330,6 +339,8 @@ const scripts = gulp.parallel(
   ),
 );
 
+const typecheck = gulp.series(typescript, scripts);
+
 const build = gulp.parallel(styles, scripts, icons);
 const dev = gulp.series(build, watch);
 
@@ -338,4 +349,5 @@ exports.watch = watch;
 exports.dev = dev;
 exports.styles = styles;
 exports.scripts = scripts;
+exports.typecheck = typecheck;
 exports.icons = icons;

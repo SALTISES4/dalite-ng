@@ -29,6 +29,7 @@
     "@babel/plugin-transform-runtime": "^7.14.5",
     "@babel/preset-env": "^7.14.7",
     "@babel/preset-typescript": "^7.14.5",
+    "@khanacademy/flow-to-ts": "^0.5.2",
     "@rollup/plugin-alias": "^3.1.4",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^19.0.1",
@@ -36,7 +37,7 @@
     "@rollup/plugin-node-resolve": "^13.0.2",
     "@rollup/plugin-replace": "^2.4.2",
     "@rollup/plugin-strip": "^2.0.1",
-    "@rollup/plugin-typescript": "^8.2.3",
+    "@types/jquery": "^3.5.6",
     "@typescript-eslint/eslint-plugin": "^4.28.3",
     "@typescript-eslint/parser": "^4.28.3",
     "cssnano": "^5.0.6",
@@ -56,6 +57,7 @@
     "gulp-replace": "^1.1.3",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-svg-sprite": "^1.5.0",
+    "gulp-typescript": "^6.0.0-alpha.1",
     "material-components-web": "^0.34.1",
     "moment": "^2.29.1",
     "postcss": "^8.3.4",
@@ -130,22 +132,24 @@
       "bundle": "readonly",
       "gettext": "readonly"
     },
-    "overrides" : [
-      {"extends": [
-        "eslint:recommended",
-        "preact",
-        "google",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:prettier/recommended"
-      ],
-      "files": [
-        "**/*.{ts,tsx}"
-      ],
-      "parser": "@typescript-eslint/parser",
-      "plugins": [
-        "@typescript-eslint",
-        "prettier"
-      ]}
+    "overrides": [
+      {
+        "extends": [
+          "eslint:recommended",
+          "preact",
+          "google",
+          "plugin:@typescript-eslint/recommended",
+          "plugin:prettier/recommended"
+        ],
+        "files": [
+          "**/*.{ts,tsx}"
+        ],
+        "parser": "@typescript-eslint/parser",
+        "plugins": [
+          "@typescript-eslint",
+          "prettier"
+        ]
+      }
     ],
     "parser": "@babel/eslint-parser",
     "plugins": [
