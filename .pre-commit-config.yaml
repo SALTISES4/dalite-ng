@@ -26,13 +26,14 @@ repos:
       - id: eslint
         args: [--fix]
         additional_dependencies:
-          - "@babel/eslint-parser@7.14.7"
           - eslint@7.30.0
           - eslint-config-developit@1.2.0
           - eslint-config-google@0.14.0
           - eslint-config-preact@1.1.4
           - eslint-config-prettier@8.3.0
           - eslint-plugin-prettier@3.4.0
+          - "@typescript-eslint/parser"
+          - "@typescript-eslint/eslint-plugin"
         exclude: "^.*\\.min\\..*$"
 
   - repo: https://github.com/pre-commit/mirrors-prettier

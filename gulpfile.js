@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/no-var-requires: "off" */
+
 /* Build tools */
 const gulp = require("gulp");
 const concat = require("gulp-concat");
@@ -15,6 +17,7 @@ const { terser } = require("rollup-plugin-terser"); // minifier
 const embedCSS = require("rollup-plugin-postcss");
 const alias = require("@rollup/plugin-alias");
 const replace = require("@rollup/plugin-replace");
+const typescript = require("@rollup/plugin-typescript"); // typescript
 
 /* Build modules for styles */
 const scssLint = require("stylelint"); // linter
@@ -193,6 +196,7 @@ function buildScript(app, module) {
       eslint({
         fix: true,
       }),
+      typescript(),
       // https://github.com/rollup/plugins/tree/master/packages/babel#using-with-rollupplugin-commonjs
       babel({
         babelHelpers: "bundled",
