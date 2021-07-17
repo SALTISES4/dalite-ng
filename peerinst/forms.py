@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, date
+from datetime import date, datetime
 
 import pytz
 from django import forms
@@ -388,7 +388,14 @@ class StudentGroupCreateForm(forms.ModelForm):
 
     class Meta:
         model = StudentGroup
-        fields = ["title", "name", "year", "semester", "discipline"]
+        fields = [
+            "title",
+            "name",
+            "year",
+            "semester",
+            "discipline",
+            "institution",
+        ]
 
 
 class StudentGroupUpdateForm(forms.ModelForm):
