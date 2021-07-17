@@ -1,5 +1,3 @@
-"use strict";
-
 function getCsrfToken() {
   return document.querySelectorAll("input[name=csrfmiddlewaretoken]")[0].value;
 }

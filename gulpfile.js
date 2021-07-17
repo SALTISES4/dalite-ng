@@ -32,6 +32,8 @@ const sourcemaps = require("gulp-sourcemaps"); // sourcemaps
 /* Build for icons */
 const svgSprite = require("gulp-svg-sprite");
 
+const { existsSync } = require("fs");
+
 const templateModules = ["peerinst", "quality", "reputation", "tos"];
 
 const styleBuilds = [
@@ -79,6 +81,7 @@ const scriptBuilds = [
   {
     app: "peerinst",
     modules: [
+      "account",
       "group",
       "student",
       "search",
@@ -159,8 +162,12 @@ function watchStyle(app, module) {
 
 function buildScript(app, module) {
   const name = module === "index" ? "bundle" : module;
+  // While migrating to typescript, we need to check for both file extensions
+  const file = existsSync(`./${app}/static/${app}/js/${module}.js`)
+    ? `./${app}/static/${app}/js/${module}.js`
+    : `./${app}/static/${app}/js/${module}.tsx`;
   const inputOptions = {
-    input: `./${app}/static/${app}/js/${module}.js`,
+    input: file,
     external: [
       "jquery",
       "flatpickr",

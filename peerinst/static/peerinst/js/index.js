@@ -830,8 +830,6 @@ export function wrap(text, width) {
  *  @function
  */
 function underlines() {
-  "use strict";
-
   // Decorate h1 headers
   const lines = d3.selectAll(".underline");
   lines.selectAll("g").remove();

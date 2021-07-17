@@ -20,6 +20,7 @@
   "devDependencies": {
     "@babel/cli": "^7.14.5",
     "@babel/core": "^7.14.6",
+    "@babel/eslint-parser": "^7.14.7",
     "@babel/plugin-external-helpers": "^7.14.5",
     "@babel/plugin-proposal-class-properties": "^7.14.5",
     "@babel/plugin-proposal-optional-chaining": "^7.14.5",
@@ -92,7 +93,7 @@
         }
       ],
       [
-        "@babel/typescript",
+        "@babel/preset-typescript",
         {
           "jsxPragma": "h"
         }
@@ -122,7 +123,6 @@
       "eslint:recommended",
       "preact",
       "google",
-      "plugin:@typescript-eslint/recommended",
       "plugin:prettier/recommended"
     ],
     "globals": {
@@ -130,13 +130,28 @@
       "bundle": "readonly",
       "gettext": "readonly"
     },
-    "parser": "@typescript-eslint/parser",
+    "overrides" : [
+      {"extends": [
+        "eslint:recommended",
+        "preact",
+        "google",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended"
+      ],
+      "files": [
+        "**/*.{ts,tsx}"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "plugins": [
+        "@typescript-eslint",
+        "prettier"
+      ]}
+    ],
+    "parser": "@babel/eslint-parser",
     "plugins": [
-      "@typescript-eslint",
       "prettier"
     ],
     "rules": {
-      "strict": 0,
       "no-invalid-this": "off",
       "arrow-parens": "off",
       "indent": [
@@ -150,7 +165,6 @@
         "double"
       ],
       "radix": "off",
-      "react/prefer-stateless-function": "off",
       "spaced-comment": "off",
       "object-curly-spacing": [
         "error",
