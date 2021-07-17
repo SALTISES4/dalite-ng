@@ -5,13 +5,13 @@ const rename = require("gulp-rename");
 
 /* Build modules for scripts */
 const commonjs = require("@rollup/plugin-commonjs"); // loader
-const { eslint } = require("rollup-plugin-eslint"); // linter
+const eslint = require("@rollup/plugin-eslint"); // linter
 const { babel } = require("@rollup/plugin-babel"); // transpiler + polyfills
 const resolve = require("@rollup/plugin-node-resolve"); // loader
-const strip = require("@rollup/plugin-strip"); // remove console.log statements
+const nodeResolve = resolve.default;
+const strip = require("@rollup/plugin-strip"); // remove console statements
 const rollup = require("rollup"); // bundler
 const { terser } = require("rollup-plugin-terser"); // minifier
-const nodeResolve = resolve.default;
 const embedCSS = require("rollup-plugin-postcss");
 const alias = require("@rollup/plugin-alias");
 const replace = require("@rollup/plugin-replace");
@@ -111,27 +111,6 @@ const scriptBuilds = [
   },
 ];
 
-const babelConfig = {
-  babelHelpers: "bundled",
-  presets: [
-    "@babel/preset-flow",
-    [
-      "@babel/preset-env",
-      {
-        useBuiltIns: "usage",
-        corejs: 3,
-      },
-    ],
-  ],
-  plugins: [
-    "@babel/plugin-proposal-class-properties",
-    "@babel/plugin-proposal-optional-chaining",
-    ["@babel/plugin-transform-react-jsx", { pragma: "h" }],
-  ],
-  exclude: "node_modules/**",
-  babelrc: false,
-};
-
 function buildStyle(app, module) {
   const cb = (file) => {
     // https://github.com/postcss/gulp-postcss#advanced-usage
@@ -208,12 +187,17 @@ function buildScript(app, module) {
         ],
       }),
       replace({
+        preventAssignment: true,
         "process.env.NODE_ENV": JSON.stringify("production"),
       }),
       eslint({
         fix: true,
       }),
-      babel(babelConfig),
+      // https://github.com/rollup/plugins/tree/master/packages/babel#using-with-rollupplugin-commonjs
+      babel({
+        babelHelpers: "bundled",
+        exclude: "node_modules/**",
+      }),
       // https://github.com/rollup/plugins/tree/master/packages/commonjs#using-with-rollupplugin-node-resolve
       nodeResolve({
         mainFields: ["module", "main", "browser"],
