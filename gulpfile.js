@@ -162,8 +162,9 @@ function watchStyle(app, module) {
 }
 
 function typescript() {
+  // Add js,jsx to src
   const build = gulp
-    .src(["peerinst/**/*.{js,tsx}", "!peerinst/**/*.min.js"])
+    .src(["peerinst/**/*.{ts,tsx}", "!peerinst/**/*.min.js"])
     .pipe(tsProject())
     .pipe(gulp.dest("test/ts"));
 

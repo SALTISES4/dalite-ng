@@ -1,61 +1,59 @@
-// @flow
-import { buildReq } from "../../ajax.js";
-import { clear } from "../../utils.js";
+import { buildReq } from "../../ajax";
+import { clear } from "../../utils";
 
 /*********/
+
 /* model */
+
 /*********/
-
 type Thread = {
-  id: number,
-  title: string,
+  id: number;
+  title: string;
   lastReply: {
-    author: string,
-    content: string,
-  },
-  nNew: number,
-  link: string,
+    author: string;
+    content: string;
+  };
+  nNew: number;
+  link: string;
 };
-
 type Message = Thread;
-
 let model: {
-  open: boolean,
-  messages: Array<Message>,
+  open: boolean;
+  messages: Array<Message>;
   urls: {
-    markReadUrl: string,
-    messagesUrl: string,
-  },
+    markReadUrl: string;
+    messagesUrl: string;
+  };
 };
 
-function initModel(urls: { markReadUrl: string, messagesUrl: string }): void {
+function initModel(urls: {
+  markReadUrl: string;
+  messagesUrl: string;
+}): void {
   model = {
     open: false,
     messages: [],
-    urls,
+    urls
   };
 }
 
 /**********/
-/* update */
-/**********/
 
+/* update */
+
+/**********/
 function update(): void {
   getMessages();
 }
 
 function toggleMessages(): void {
   const header = document.querySelector(".messages");
-  document.querySelectorAll(".header--togglable > *").forEach((header_) => {
+  document.querySelectorAll(".header--togglable > *").forEach(header_ => {
     if (header_ != header && header_.hasAttribute("open")) {
       if (header_.shadowRoot) {
-        header_.shadowRoot
-          .querySelector(".header__icon")
-          .dispatchEvent(new Event("click"));
+        header_.shadowRoot.querySelector(".header__icon").dispatchEvent(new Event("click"));
       } else {
-        header_
-          .querySelector(".header__icon")
-          .dispatchEvent(new Event("click"));
+        header_.querySelector(".header__icon").dispatchEvent(new Event("click"));
       }
     }
   });
@@ -66,55 +64,55 @@ function toggleMessages(): void {
 function getMessages(): void {
   const url = model.urls.messagesUrl;
   const req = buildReq({}, "get");
-
-  fetch(url, req)
-    .then((resp) => resp.json())
-    .then((data) => {
-      model.messages = data.threads.map((message) => ({
-        id: message.id,
-        title: message.title,
-        lastReply: {
-          author: message.last_reply.author,
-          content: message.last_reply.content,
-          date: message.last_reply.date,
-        },
-        nNew: message.n_new,
-        link: message.link,
-      }));
-      messagesView();
-    });
+  fetch(url, req).then(resp => resp.json()).then(data => {
+    model.messages = data.threads.map(message => ({
+      id: message.id,
+      title: message.title,
+      lastReply: {
+        author: message.last_reply.author,
+        content: message.last_reply.content,
+        date: message.last_reply.date
+      },
+      nNew: message.n_new,
+      link: message.link
+    }));
+    messagesView();
+  });
 }
 
 async function markAllRead(): Promise<void> {
   const req = buildReq({}, "post");
   const resp = await fetch(model.urls.markReadUrl, req);
+
   if (resp.ok) {
-    model.messages.forEach((message) => {
+    model.messages.forEach(message => {
       message.nNew = 0;
     });
   }
+
   messagesView();
 }
 
-async function markRead(
-  event: MouseEvent,
-  message: Message,
-  div: HTMLDivElement,
-): Promise<void> {
+async function markRead(event: MouseEvent, message: Message, div: HTMLDivElement): Promise<void> {
   event.stopPropagation();
-  const req = buildReq({ id: message.id }, "post");
+  const req = buildReq({
+    id: message.id
+  }, "post");
   const resp = await fetch(model.urls.markReadUrl, req);
+
   if (resp.ok) {
     message.nNew = 0;
   }
+
   messageView(message, div);
   badgeView();
 }
 
 /********/
-/* view */
-/********/
 
+/* view */
+
+/********/
 function view(): void {
   messagesView();
 }
@@ -129,16 +127,12 @@ function messagesView(): void {
   }
 
   badgeView();
-
   clear(messagesList);
-
   document.querySelector(".messages__read-all-btn").classList.add("hidden");
+  const nNew = model.messages.filter(message => message.nNew > 0).length;
 
-  const nNew = model.messages.filter((message) => message.nNew > 0).length;
   if (nNew) {
-    document
-      .querySelector(".messages__read-all-btn")
-      .classList.remove("hidden");
+    document.querySelector(".messages__read-all-btn").classList.remove("hidden");
   }
 
   if (model.messages.length) {
@@ -160,8 +154,8 @@ function messagesView(): void {
 
 function badgeView(): void {
   const badge = document.querySelector(".messages__icon__badge");
+  const nNew = model.messages.filter(message => message.nNew > 0).length;
 
-  const nNew = model.messages.filter((message) => message.nNew > 0).length;
   if (nNew) {
     badge.textContent = nNew.toString();
     badge.style.display = "flex";
@@ -171,10 +165,7 @@ function badgeView(): void {
   }
 }
 
-function messageView(
-  message: Message,
-  div: ?HTMLDivElement = null,
-): HTMLDivElement {
+function messageView(message: Message, div: HTMLDivElement | null | undefined = null): HTMLDivElement {
   if (div) {
     clear(div);
   } else {
@@ -207,12 +198,10 @@ function messageView(
     const lastReply = document.createElement("div");
     lastReply.classList.add("message__last-reply");
     div.appendChild(lastReply);
-
     const content = document.createElement("span");
     content.classList.add("message__last-reply__content");
     content.textContent = message.lastReply.content;
     lastReply.appendChild(content);
-
     const author = document.createElement("div");
     author.classList.add("message__last-reply__author");
     author.innerHTML = `${message.lastReply.author} &middot; ${message.lastReply.date}`;
@@ -222,9 +211,7 @@ function messageView(
       markReadBtn.classList.add("message__mark-read");
       markReadBtn.textContent = "clear";
       markReadBtn.title = "Mark read";
-      markReadBtn.addEventListener("click", (event: MouseEvent) =>
-        markRead(event, message, div),
-      );
+      markReadBtn.addEventListener("click", (event: MouseEvent) => markRead(event, message, div));
       author.appendChild(markReadBtn);
     }
 
@@ -241,25 +228,22 @@ function noMessageView(): HTMLDivElement {
 }
 
 /*************/
-/* listeners */
-/*************/
 
+/* listeners */
+
+/*************/
 function initEventListeners(): void {
   addMessagesOpenListener();
   addMarkAllReadListener();
 }
 
 function addMessagesOpenListener(): void {
-  document
-    .querySelector(".messages")
-    ?.addEventListener("click", function (event: MouseEvent) {
-      event.stopPropagation();
-    });
-  document
-    .querySelector(".messages__icon")
-    ?.addEventListener("click", function (event: MouseEvent) {
-      toggleMessages();
-    });
+  document.querySelector(".messages")?.addEventListener("click", function (event: MouseEvent) {
+    event.stopPropagation();
+  });
+  document.querySelector(".messages__icon")?.addEventListener("click", function (event: MouseEvent) {
+    toggleMessages();
+  });
   document.body?.addEventListener("click", function (event: MouseEvent) {
     if (model.open) {
       event.stopPropagation();
@@ -269,18 +253,17 @@ function addMessagesOpenListener(): void {
 }
 
 function addMarkAllReadListener(): void {
-  document
-    .querySelector(".messages__read-all-btn")
-    ?.addEventListener("click", () => markAllRead());
+  document.querySelector(".messages__read-all-btn")?.addEventListener("click", () => markAllRead());
 }
 
 /********/
-/* init */
-/********/
 
+/* init */
+
+/********/
 export function init(urls: {
-  markReadUrl: string,
-  messagesUrl: string,
+  markReadUrl: string;
+  messagesUrl: string;
 }): void {
   initModel(urls);
   update();

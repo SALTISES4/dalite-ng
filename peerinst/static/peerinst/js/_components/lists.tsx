@@ -1,7 +1,7 @@
-import { Component, h } from "preact";
+import { h, Component } from "preact";
 
-export class QuestionList extends Component {
+export default class QuestionList extends Component {
   render() {
-    return;
+    return <div />;
   }
 }
