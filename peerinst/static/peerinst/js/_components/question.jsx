@@ -2,7 +2,7 @@ import { Component, Fragment, h } from "preact";
 import { triScale } from "../_theming/colours.js";
 import { scaleThreshold } from "d3";
 import { Favourites } from "./providers.js";
-import { PlotConfusionMatrix } from "../_assignment/analytics.js";
+import { PlotConfusionMatrix } from "../_assignment/analytics.jsx";
 import { get, submitData } from "../_ajax/ajax.js";
 
 import { Button } from "@rmwc/button";
@@ -21,7 +21,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@rmwc/dialog";
-import { Icon } from "@rmwc/icon";
+import Icon from "@rmwc/icon";
 import { IconButton } from "@rmwc/icon-button";
 import { Select, SelectHelperText } from "@rmwc/select";
 import { TextField, TextFieldHelperText } from "@rmwc/textfield";

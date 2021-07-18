@@ -1,0 +1,44 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "preact",
+    "google",
+    "plugin:prettier/recommended"
+  ],
+  "globals": {
+    "$": "readonly",
+    "bundle": "readonly",
+    "gettext": "readonly"
+  },
+  "overrides": [
+    {
+      "extends": [
+        "eslint:recommended",
+        "preact",
+        "google",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended"
+      ],
+      "files": ["**/*.{ts,tsx}"],
+      "parser": "@typescript-eslint/parser",
+      "plugins": ["@typescript-eslint", "prettier"]
+    }
+  ],
+  "parser": "@babel/eslint-parser",
+  "plugins": ["prettier"],
+  "rules": {
+    "no-invalid-this": "off",
+    "arrow-parens": "off",
+    "require-jsdoc": "off",
+    "guard-for-in": "off",
+    "quotes": ["error", "double"],
+    "radix": "off",
+    "spaced-comment": "off",
+    "object-curly-spacing": ["error", "always"],
+    "prettier/prettier": "error"
+  }
+}

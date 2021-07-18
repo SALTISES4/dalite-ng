@@ -17,7 +17,7 @@ import {
 import { Icon } from "@rmwc/icon";
 import { Typography } from "@rmwc/typography";
 
-import { colours, PlotConfusionMatrix } from "./analytics.js";
+import { colours, PlotConfusionMatrix } from "./analytics.jsx";
 
 import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-button.min.css";
 import "@rmwc/card/node_modules/@material/card/dist/mdc.card.min.css";

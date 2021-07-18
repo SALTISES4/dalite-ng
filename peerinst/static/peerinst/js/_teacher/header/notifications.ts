@@ -1,10 +1,10 @@
 import { clear, createSvg } from "../../utils";
 
-/*********/
+/** *******/
 
 /* model */
 
-/*********/
+/** *******/
 export type Notification = {
   text: string;
   inProgress: boolean;
@@ -20,23 +20,27 @@ let model: {
 function initModel(): void {
   model = {
     notificationsOpen: false,
-    notifications: []
+    notifications: [],
   };
 }
 
-/**********/
+/** ********/
 
 /* update */
 
-/**********/
+/** ********/
 function toggleNotifications(): void {
   const header = document.querySelector(".notifications");
-  document.querySelectorAll(".header--togglable > *").forEach(header_ => {
+  document.querySelectorAll(".header--togglable > *").forEach((header_) => {
     if (header_ != header && header_.hasAttribute("open")) {
       if (header_.shadowRoot) {
-        header_.shadowRoot.querySelector(".header__icon").dispatchEvent(new Event("click"));
+        header_.shadowRoot
+          .querySelector(".header__icon")
+          .dispatchEvent(new Event("click"));
       } else {
-        header_.querySelector(".header__icon").dispatchEvent(new Event("click"));
+        header_
+          .querySelector(".header__icon")
+          .dispatchEvent(new Event("click"));
       }
     }
   });
@@ -50,16 +54,16 @@ export function updateNotifications(notifications: Array<Notification>): void {
 }
 
 function clearAll(): void {
-  model.notifications.forEach(notification => {
+  model.notifications.forEach((notification) => {
     notification.onCloseClick();
   });
 }
 
-/********/
+/** ******/
 
 /* view */
 
-/********/
+/** ******/
 function view(): void {
   notificationsView();
 }
@@ -67,13 +71,17 @@ function view(): void {
 function notificationsView(): void {
   const notifications = document.querySelector(".notifications");
   const badge = notifications?.querySelector(".notifications__icon__badge");
-  const notificationsList = notifications?.querySelector(".notifications__notifications");
+  const notificationsList = notifications?.querySelector(
+    ".notifications__notifications",
+  );
 
   if (!notifications || !badge || !notificationsList) {
     return;
   }
 
-  const completedNotifications = model.notifications.filter(notification => !notification.inProgress);
+  const completedNotifications = model.notifications.filter(
+    (notification) => !notification.inProgress,
+  );
 
   if (completedNotifications.length > 0) {
     badge.textContent = completedNotifications.length.toString();
@@ -89,16 +97,24 @@ function notificationsView(): void {
     model.notifications.map(function (notification) {
       notificationsList.appendChild(notificationView(notification));
     });
-    document.querySelector(".notifications__clear-all-btn").removeAttribute("hidden");
+    document
+      .querySelector(".notifications__clear-all-btn")
+      .removeAttribute("hidden");
   } else {
     notificationsList.appendChild(noNotificationView());
-    document.querySelector(".notifications__clear-all-btn").setAttribute("hidden", "");
+    document
+      .querySelector(".notifications__clear-all-btn")
+      .setAttribute("hidden", "");
   }
 
-  if (model.notifications.some(notification => notification.inProgress)) {
-    document.querySelector(".notifications__spinner")?.classList.add("notifications__spinner--loading");
+  if (model.notifications.some((notification) => notification.inProgress)) {
+    document
+      .querySelector(".notifications__spinner")
+      ?.classList.add("notifications__spinner--loading");
   } else {
-    document.querySelector(".notifications__spinner")?.classList.remove("notifications__spinner--loading");
+    document
+      .querySelector(".notifications__spinner")
+      ?.classList.remove("notifications__spinner--loading");
   }
 
   if (model.notificationsOpen) {
@@ -151,23 +167,27 @@ function noNotificationView(): HTMLDivElement {
   return div;
 }
 
-/*************/
+/** ***********/
 
 /* listeners */
 
-/*************/
+/** ***********/
 function initEventListeners(): void {
   addNotificationsOpenListener();
   addClearAllListener();
 }
 
 function addNotificationsOpenListener(): void {
-  document.querySelector(".notifications")?.addEventListener("click", function (event: MouseEvent) {
-    event.stopPropagation();
-  });
-  document.querySelector(".notifications__icon")?.addEventListener("click", function (event: MouseEvent) {
-    toggleNotifications();
-  });
+  document
+    .querySelector(".notifications")
+    ?.addEventListener("click", function (event: MouseEvent) {
+      event.stopPropagation();
+    });
+  document
+    .querySelector(".notifications__icon")
+    ?.addEventListener("click", function (event: MouseEvent) {
+      toggleNotifications();
+    });
   document.body?.addEventListener("click", function (event: MouseEvent) {
     if (model.notificationsOpen) {
       event.stopPropagation();
@@ -177,14 +197,16 @@ function addNotificationsOpenListener(): void {
 }
 
 function addClearAllListener(): void {
-  document.querySelector(".notifications__clear-all-btn")?.addEventListener("click", () => clearAll());
+  document
+    .querySelector(".notifications__clear-all-btn")
+    ?.addEventListener("click", () => clearAll());
 }
 
-/********/
+/** ******/
 
 /* init */
 
-/********/
+/** ******/
 export function init(): void {
   initModel();
   view();

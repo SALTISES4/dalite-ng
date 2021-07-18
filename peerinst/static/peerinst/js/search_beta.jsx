@@ -7,7 +7,7 @@ import {
   QuestionDialog,
   QuestionFlagDialog,
   SearchQuestionCard,
-} from "./_components/question.js";
+} from "./_components/question.jsx";
 import { Favourites } from "./_components/providers.js";
 
 import { CircularProgress } from "@rmwc/circular-progress";

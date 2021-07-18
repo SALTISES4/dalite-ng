@@ -35,7 +35,7 @@ import "@rmwc/theme/node_modules/@material/theme/dist/mdc.theme.min.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
 import { get, submitData } from "../_ajax/ajax.js";
-import { Choices } from "../_assignment/question.js";
+import { Choices } from "../_assignment/question.jsx";
 
 class Question extends Component {
   state = {

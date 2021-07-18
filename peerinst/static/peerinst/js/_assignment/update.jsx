@@ -13,7 +13,7 @@ import "@rmwc/linear-progress/node_modules/@material/linear-progress/dist/mdc.li
 import "@rmwc/snackbar/node_modules/@material/snackbar/dist/mdc.snackbar.min.css";
 
 import { get, submitData } from "../_ajax/ajax.js";
-import { QuestionCard, Favourites, User } from "./question.js";
+import { QuestionCard, Favourites, User } from "./question.jsx";
 
 class ToggleVisibleItems extends Component {
   toggleOrdering = () => {

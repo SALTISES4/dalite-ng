@@ -19,7 +19,7 @@ import "@rmwc/snackbar/node_modules/@material/snackbar/dist/mdc.snackbar.min.css
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
 import { get } from "../_ajax/ajax.js";
-import { Choices } from "../_assignment/question.js";
+import { Choices } from "../_assignment/question.jsx";
 
 class Feedback extends Component {
   scores = Array.from([0, 1, 2, 3]);

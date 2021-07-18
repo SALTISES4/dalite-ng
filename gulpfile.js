@@ -162,9 +162,8 @@ function watchStyle(app, module) {
 }
 
 function typescript() {
-  // Add js,jsx to src
   const build = gulp
-    .src(["peerinst/**/*.{ts,tsx}", "!peerinst/**/*.min.js"])
+    .src(["peerinst/**/*.{ts,tsx,js,jsx}", "!peerinst/**/*.min.js"])
     .pipe(tsProject())
     .pipe(gulp.dest("test/ts"));
 
@@ -173,10 +172,14 @@ function typescript() {
 
 function buildScript(app, module) {
   const name = module === "index" ? "bundle" : module;
-  // While migrating to typescript, we need to check for both file extensions
+  // While migrating to typescript, we need to check for all file extensions
   const file = existsSync(`./${app}/static/${app}/js/${module}.js`)
     ? `./${app}/static/${app}/js/${module}.js`
-    : `./${app}/static/${app}/js/${module}.tsx`;
+    : existsSync(`./${app}/static/${app}/js/${module}.ts`)
+    ? `./${app}/static/${app}/js/${module}.ts`
+    : existsSync(`./${app}/static/${app}/js/${module}.tsx`)
+    ? `./${app}/static/${app}/js/${module}.tsx`
+    : `./${app}/static/${app}/js/${module}.jsx`;
   const inputOptions = {
     input: file,
     external: [
@@ -195,9 +198,7 @@ function buildScript(app, module) {
       "material/snackbar",
     ],
     onwarn(warning, warn) {
-      if (warning.code == "CIRCULAR_DEPENDENCY") {
-        return;
-      }
+      if (warning.code === "CIRCULAR_DEPENDENCY") return;
       warn(warning);
     },
     plugins: [
@@ -214,18 +215,20 @@ function buildScript(app, module) {
       eslint({
         fix: true,
       }),
+      embedCSS({ extract: true }),
+      strip(),
+      // https://github.com/rollup/plugins/tree/master/packages/commonjs#using-with-rollupplugin-node-resolve
+      nodeResolve({
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+        mainFields: ["module", "main", "browser"],
+      }),
+      commonjs(),
       // https://github.com/rollup/plugins/tree/master/packages/babel#using-with-rollupplugin-commonjs
       babel({
         babelHelpers: "bundled",
         exclude: "node_modules/**",
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
       }),
-      // https://github.com/rollup/plugins/tree/master/packages/commonjs#using-with-rollupplugin-node-resolve
-      nodeResolve({
-        mainFields: ["module", "main", "browser"],
-      }),
-      commonjs(),
-      embedCSS({ extract: true }),
-      strip(),
     ],
   };
   const outputOptions = {
@@ -260,8 +263,8 @@ function buildScript(app, module) {
 function watchScript(app, module) {
   gulp.watch(
     [
-      `./${app}/static/${app}/js/_${module}/**/*.js`,
-      `./${app}/static/${app}/js/${module}.js`,
+      `./${app}/static/${app}/js/_${module}/**/*.{js,jsx,ts,tsx}`,
+      `./${app}/static/${app}/js/${module}.{js,jsx,ts,tsx}`,
     ],
     () => buildScript(app, module),
   );

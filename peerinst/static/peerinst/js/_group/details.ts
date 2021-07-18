@@ -8,31 +8,31 @@ import { buildReq } from "../ajax";
 /** *******/
 type InitialData = {
   assignments: Array<{
-    url: string,
-  }>,
-  students: Array<number>,
+    url: string;
+  }>;
+  students: Array<number>;
   urls: {
-    update_url: string,
-    get_student_information_url: string,
-  },
+    update_url: string;
+    get_student_information_url: string;
+  };
 };
 type Assignment = {
-  url: string,
+  url: string;
 };
 type Student = {
-  id: number,
-  email: string | null | undefined,
-  lastLogin: Date | null | undefined,
-  popularity: number | null | undefined,
+  id: number;
+  email: string | null | undefined;
+  lastLogin: Date | null | undefined;
+  popularity: number | null | undefined;
 };
 let model: {
-  language: string,
-  assignments: Array<Assignment>,
-  students: Array<Student>,
+  language: string;
+  assignments: Array<Assignment>;
+  students: Array<Student>;
   urls: {
-    updateUrl: string,
-    getStudentInformationUrl: string,
-  },
+    updateUrl: string;
+    getStudentInformationUrl: string;
+  };
 };
 
 function initModel(data: InitialData): void {

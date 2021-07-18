@@ -18,7 +18,7 @@ import "@rmwc/textfield/node_modules/@material/line-ripple/dist/mdc.line-ripple.
 import "@rmwc/select/node_modules/@material/select/dist/mdc.select.min.css";
 
 import { get, submitData } from "../_ajax/ajax.js";
-import { QuestionCard, Favourites, User } from "./question.js";
+import { QuestionCard, Favourites, User } from "./question.jsx";
 
 export class SearchBar extends Component {
   state = {
