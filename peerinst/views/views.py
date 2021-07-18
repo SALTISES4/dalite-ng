@@ -1046,6 +1046,7 @@ class QuestionFormView(QuestionMixin, FormView):
                     group = StudentGroup(name=course_id)
                 group.semester = current_semester()
                 group.year = current_year()
+                group.mode_created = StudentGroup.LTI
 
                 # since teachers do not necessarily set discipline for
                 # themselves, take discipline of first question seen
