@@ -12,8 +12,8 @@ type InitialData = {
   }>;
   students: Array<number>;
   urls: {
-    update_url: string;
-    get_student_information_url: string;
+    update_url: string; // eslint-disable-line camelcase
+    get_student_information_url: string; // eslint-disable-line camelcase
   };
 };
 type Assignment = {
@@ -115,7 +115,7 @@ function toggleStudentIdNeeded(event: MouseEvent, url: string): void {
 }
 */
 export async function createCollection(
-  groupPk: BigInteger,
+  groupPk: number,
   addAssignmentUrl: string,
   collectionUpdateUrl: string,
 ) {

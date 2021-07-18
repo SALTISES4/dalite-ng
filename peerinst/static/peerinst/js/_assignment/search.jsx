@@ -276,6 +276,7 @@ export class SearchDbApp extends Component {
                 handleQuestionDelete={null}
                 handleQuestionAdd={this.add}
                 handleToggleFavourite={this.handleToggleFavourite}
+                key={i}
                 question={q.question}
                 rank={i}
                 gettext={this.props.gettext}

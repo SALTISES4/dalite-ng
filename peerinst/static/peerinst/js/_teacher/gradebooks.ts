@@ -1,6 +1,6 @@
 import { buildReq } from "../ajax";
-import { updateNotifications } from "./header/notifications";
-import type { Notification } from "./header/notifications";
+import { updateNotifications } from "./header/notifications"; // eslint-disable-line no-duplicate-imports
+import type { Notification } from "./header/notifications"; // eslint-disable-line no-duplicate-imports
 
 /** *******/
 

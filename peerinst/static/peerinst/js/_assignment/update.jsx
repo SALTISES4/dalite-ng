@@ -352,12 +352,13 @@ export class AssignmentUpdateApp extends Component {
           <User.Provider value={this.props.user}>
             {this.toggles()}
             <div style={{ marginBottom: "28px" }}>
-              {this.state.questions.map((q) => (
+              {this.state.questions.map((q, i) => (
                 <QuestionCard
                   cloneURL={this.props.questionCloneBaseURL}
                   editURL={this.props.questionEditBaseURL}
                   handleQuestionDelete={this.delete}
                   handleToggleFavourite={this.handleToggleFavourite}
+                  key={i}
                   question={q.question}
                   rank={q.pk}
                   gettext={this.props.gettext}

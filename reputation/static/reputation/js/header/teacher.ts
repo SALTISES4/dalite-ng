@@ -18,6 +18,7 @@ class TeacherReputationHeader extends ReputationHeader {
       id: number;
       element: TeacherReputationHeader;
       reputation: number | null | undefined;
+      reputationStyleUrl: string;
       reputationType: string;
       reputationUrl: string;
       reputations: Array<Reputation>;

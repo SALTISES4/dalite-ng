@@ -56,16 +56,16 @@ export class ReputationHeader extends HTMLElement {
     return this.hasAttribute("hidden");
   }
 
-  get open() {
-    return this.hasAttribute("open");
-  }
-
   set hidden(val: boolean) {
     if (val) {
       this.setAttribute("hidden", "");
     } else {
       this.removeAttribute("hidden");
     }
+  }
+
+  get open() {
+    return this.hasAttribute("open");
   }
 
   set open(val: boolean) {
