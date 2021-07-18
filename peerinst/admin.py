@@ -16,6 +16,7 @@ from .models import (
     Collection,
     Discipline,
     Institution,
+    InstitutionalLMS,
     LastLogout,
     LtiEvent,
     Question,
@@ -220,6 +221,11 @@ class SubjectAdmin(admin.ModelAdmin):
 
 @admin.register(Institution)
 class InstitutionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(InstitutionalLMS)
+class InstitutionalLMSAdmin(admin.ModelAdmin):
     pass
 
 
