@@ -41,6 +41,11 @@ class StudentGroup(models.Model):
         (WINTER, "Winter"),
     )
 
+    LTI = "LTI"
+    STANDALONE = "STANDALONE"
+
+    MODE_CREATED_CHOICES = ((LTI, "LTI"), (STANDALONE, "STANDALONE"))
+
     name = models.CharField(max_length=100, unique=True)
     title = models.CharField(max_length=100, null=True, blank=True)
     creation_date = models.DateField(blank=True, null=True, auto_now=True)
@@ -62,6 +67,11 @@ class StudentGroup(models.Model):
     )
     institution = models.ForeignKey(
         Institution, blank=True, null=True, on_delete=models.SET_NULL
+    )
+    mode_created = models.CharField(
+        max_length=10,
+        choices=MODE_CREATED_CHOICES,
+        default=STANDALONE,
     )
 
     def __str__(self):
