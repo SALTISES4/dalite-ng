@@ -3,7 +3,7 @@ import { triScale } from "../_theming/colours.js";
 import { scaleThreshold } from "d3";
 import { Favourites } from "./providers.js";
 import { PlotConfusionMatrix } from "../_assignment/analytics.jsx";
-import { get, submitData } from "../_ajax/ajax.js";
+import { get, submitData } from "../_ajax/ajax";
 
 import { Button } from "@rmwc/button";
 import {
@@ -39,9 +39,50 @@ import "@rmwc/textfield/node_modules/@material/textfield/dist/mdc.textfield.css"
 import "@rmwc/theme/node_modules/@material/theme/dist/mdc.theme.min.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
+import {
+  Assignment,
+  AssignmentCreate,
+  AssignmentForm,
+  Question,
+} from "./types";
+
 triScale.reverse();
 
-export class AssignmentDialog extends Component {
+type AssigmentDialogProps = {
+  assignments: Assignment[];
+  checkIdURL: string;
+  helpTexts: AssignmentForm;
+  handleSubmit: (
+    a: number,
+    b: string[],
+    c: {
+      conclusion_page: string; // eslint-disable-line camelcase
+      description: string;
+      intro_page: string; // eslint-disable-line camelcase
+      pk: string;
+      title: string;
+    },
+  ) => Promise<void>;
+  gettext: (a: string) => string;
+  open: boolean;
+  onClose: () => void;
+  question: Question;
+};
+
+type AssignmentDialogState = {
+  assignmentsSelected: string[];
+  introduction: string;
+  conclusion: string;
+  create: boolean;
+  description: string;
+  pk: string;
+  title: string;
+};
+
+export class AssignmentDialog extends Component<
+  AssigmentDialogProps,
+  AssignmentDialogState
+> {
   state = {
     assignmentsSelected: [],
     introduction: "",
@@ -52,47 +93,45 @@ export class AssignmentDialog extends Component {
     title: "",
   };
 
-  selectAssignment = (pk) => {
-    const _sa = Array.from(this.state.assignmentsSelected);
-    const index = this.state.assignmentsSelected.indexOf(pk);
+  selectAssignment = (pk: string): void => {
+    const _sa: string[] = Array.from(this.state.assignmentsSelected);
+    const index = _sa.indexOf(pk);
     index < 0 ? _sa.push(pk) : _sa.splice(index, 1);
     this.setState({ assignmentsSelected: _sa });
   };
 
-  checkUniqueness = async (evt) => {
+  checkUniqueness = async (evt: InputEvent): Promise<void> => {
     console.debug("Checking validity");
 
-    // HTML5 validation first
-    if (evt.target.form.checkValidity()) {
-      // Model-level validation
-      const queryString = new URLSearchParams();
-      queryString.append("id", evt.target.value);
-      const url = new URL(this.props.checkIdURL, window.location.origin);
-      url.search = queryString;
-      try {
-        const check = await get(url);
-        console.debug(check);
-        if (!check.valid) {
-          evt.target.setCustomValidity(
-            this.props.gettext("This identifier has already been used."),
-          );
-        } else {
-          evt.target.setCustomValidity("");
-        }
-      } catch (error) {
-        console.debug(error);
+    // Model-level validation
+    const target = evt.target as HTMLInputElement;
+    const queryString = new URLSearchParams();
+    queryString.append("id", target.value);
+    const url = new URL(this.props.checkIdURL, window.location.origin);
+    url.search = queryString.toString();
+    try {
+      const check = await get(url.toString());
+      console.debug(check);
+      if (!check.valid) {
+        target.setCustomValidity(
+          this.props.gettext("This identifier has already been used."),
+        );
+      } else {
+        target.setCustomValidity("");
       }
-
-      evt.target.form.checkValidity();
+    } catch (error) {
+      console.debug(error);
     }
+
+    target.form?.checkValidity();
   };
 
-  count = () =>
+  count = (): number =>
     this.props.assignments.filter(
       (a) => a.question_pks.indexOf(this.props.question.pk) < 0,
     ).length;
 
-  goBack = () => {
+  goBack = (): JSX.Element => {
     if (this.state.create) {
       return (
         <Button ripple onClick={() => this.setState({ create: false })}>
@@ -100,9 +139,10 @@ export class AssignmentDialog extends Component {
         </Button>
       );
     }
+    return <Fragment />;
   };
 
-  info = () => {
+  info = (): JSX.Element => {
     if (this.count() == 0) {
       return (
         <Info
@@ -125,16 +165,16 @@ export class AssignmentDialog extends Component {
     );
   };
 
-  form = () => {
+  form = (): JSX.Element => {
     if (this.state.create || this.count() == 0) {
       return (
         <div style={{ maxWidth: 500 }}>
           <div style={{ marginBottom: 10 }}>
             <TextField
-              autofocus
-              class="wide tight"
+              autoFocus
+              className="wide tight"
               label={this.props.gettext("Assignment title")}
-              maxlength="200"
+              maxLength={200}
               name="title"
               onInput={(evt) => {
                 this.setState({ title: evt.target.value });
@@ -149,9 +189,9 @@ export class AssignmentDialog extends Component {
           </div>
           <div style={{ marginBottom: 10 }}>
             <TextField
-              class="wide tight"
+              className="wide tight"
               label={this.props.gettext("Assignment identifier")}
-              maxlength="100"
+              maxLength={100}
               name="identifier"
               onInput={(evt) => {
                 this.setState({ pk: evt.target.value });
@@ -176,7 +216,7 @@ export class AssignmentDialog extends Component {
                 this.setState({ description: evt.target.value });
               }}
               outlined
-              rows="4"
+              rows={4}
               value={this.state.description}
             />
             <TextFieldHelperText persistent>
@@ -193,7 +233,7 @@ export class AssignmentDialog extends Component {
                 this.setState({ introduction: evt.target.value });
               }}
               outlined
-              rows="4"
+              rows={4}
               value={this.state.introduction}
             />
             <TextFieldHelperText persistent>
@@ -210,7 +250,7 @@ export class AssignmentDialog extends Component {
                 this.setState({ conclusion: evt.target.value });
               }}
               outlined
-              rows="4"
+              rows={4}
               value={this.state.conclusion}
             />
             <TextFieldHelperText persistent>
@@ -251,7 +291,11 @@ export class AssignmentDialog extends Component {
             return (
               <div key={i}>
                 <Checkbox
-                  checked={this.state.assignmentsSelected.indexOf(a.pk) >= 0}
+                  checked={
+                    (
+                      Array.from(this.state.assignmentsSelected) as string[]
+                    ).indexOf(a.pk) >= 0
+                  }
                   onChange={() => this.selectAssignment(a.pk)}
                   label={`${a.title} (#${a.pk})`}
                   required={this.state.assignmentsSelected.length == 0}
@@ -263,8 +307,9 @@ export class AssignmentDialog extends Component {
     );
   };
 
-  handleSubmit = async (evt) => {
-    if (evt.target.form.checkValidity()) {
+  handleSubmit = async (evt: React.MouseEvent): Promise<void> => {
+    const target = evt.target as HTMLInputElement;
+    if (target.form?.checkValidity()) {
       if (this.state.create) {
         this.props.handleSubmit(this.props.question.pk, [], {
           intro_page: this.state.introduction,
@@ -274,8 +319,8 @@ export class AssignmentDialog extends Component {
           title: this.state.title,
         });
         this.setState({
-          intro_page: "",
-          conclusion_page: "",
+          introduction: "",
+          conclusion: "",
           description: "",
           pk: "",
           title: "",
@@ -284,20 +329,20 @@ export class AssignmentDialog extends Component {
         this.props.handleSubmit(
           this.props.question.pk,
           this.state.assignmentsSelected,
-          {},
+          {} as AssignmentCreate,
         );
         this.setState({ assignmentsSelected: [] });
       }
     }
   };
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps: AssigmentDialogProps): boolean {
     if (this.props.question != nextProps.question) {
       this.setState({
         assignmentsSelected: [],
         create: false,
-        intro_page: "",
-        conclusion_page: "",
+        introduction: "",
+        conclusion: "",
         description: "",
         pk: "",
         title: "",
@@ -306,7 +351,7 @@ export class AssignmentDialog extends Component {
     return true;
   }
 
-  render() {
+  render(): JSX.Element {
     return (
       <Dialog open={this.props.open} onClose={this.props.onClose}>
         <DialogTitle>{this.props.question.title}</DialogTitle>
@@ -340,14 +385,26 @@ export class AssignmentDialog extends Component {
   }
 }
 
-export function QuestionDialog(props) {
+type QuestionDialogProps = {
+  gettext: (a: string) => string;
+  open: boolean;
+  onClose: () => void;
+  question: Question;
+};
+
+export function QuestionDialog({
+  gettext,
+  open,
+  onClose,
+  question,
+}: QuestionDialogProps): JSX.Element {
   return (
-    <Dialog open={props.open} onClose={props.onClose}>
-      <DialogTitle>{props.question.title}</DialogTitle>
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>{question.title}</DialogTitle>
       <DialogContent>
         <div style={{ marginBottom: 16 }}>
           <Info
-            text={this.props.gettext(
+            text={gettext(
               `The distribution of first and second choices along with the
             statistics for each possible outcome are shown in the figure
             below.  The most convincing rationales submitted by students
@@ -362,38 +419,56 @@ export function QuestionDialog(props) {
           theme="text-secondary-on-background"
           style={{ fontWeight: "bold" }}
         >
-          {props.gettext("Distribution of answer choices")}
+          {gettext("Distribution of answer choices")}
         </Typography>
         <div style={{ margin: "16px 0px" }}>
           <PlotConfusionMatrix
-            _matrix={props.question.matrix}
-            freq={props.question.frequency}
-            gettext={props.gettext}
-            plot={props.open}
+            _matrix={question.matrix}
+            freq={question.frequency}
+            gettext={gettext}
+            plot={open}
           />
         </div>
         <MostConvincingRationales
-          gettext={props.gettext}
-          rationales={props.question.most_convincing_rationales}
+          gettext={gettext}
+          rationales={question.most_convincing_rationales}
         />
       </DialogContent>
       <DialogActions>
         <DialogButton ripple action="accept" isDefaultAction>
-          {props.gettext("Done")}
+          {gettext("Done")}
         </DialogButton>
       </DialogActions>
     </Dialog>
   );
 }
 
-export class QuestionFlagDialog extends Component {
+type QuestionFlagDialogProps = {
+  callback: () => Promise<void>;
+  gettext: (a: string) => string;
+  open: boolean;
+  onClose: () => void;
+  question: { title: string; pk: number };
+  urls: string[];
+};
+
+type QuestionFlagDialogState = {
+  reasons: string[];
+  selectedReason: string;
+};
+
+export class QuestionFlagDialog extends Component<
+  QuestionFlagDialogProps,
+  QuestionFlagDialogState
+> {
   state = {
     reasons: [],
     selectedReason: "",
   };
 
-  handleSubmit = async (evt) => {
-    if (evt.target.form.checkValidity()) {
+  handleSubmit = async (evt: React.MouseEvent): Promise<void> => {
+    const target = evt.target as HTMLInputElement;
+    if (target.form?.checkValidity()) {
       console.debug("Submit flag");
       try {
         await submitData(
@@ -408,7 +483,7 @@ export class QuestionFlagDialog extends Component {
     }
   };
 
-  refreshFromDB = async () => {
+  refreshFromDB = async (): Promise<void> => {
     try {
       const data = await get(this.props.urls[0]);
       console.debug(data);
@@ -420,18 +495,18 @@ export class QuestionFlagDialog extends Component {
     }
   };
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps: QuestionFlagDialogProps): boolean {
     if (this.props.question != nextProps.question) {
       this.setState({ selectedReason: "" });
     }
     return true;
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.refreshFromDB();
   }
 
-  render() {
+  render(): JSX.Element {
     return (
       <Dialog open={this.props.open} onClose={this.props.onClose}>
         <DialogTitle>{this.props.question.title}</DialogTitle>
@@ -452,7 +527,7 @@ export class QuestionFlagDialog extends Component {
             onSubmit={(evt) => evt.preventDefault()}
           >
             <Select
-              autofocus
+              autoFocus
               onChange={(e) => {
                 this.setState({
                   selectedReason: e.target.value,
@@ -562,7 +637,7 @@ function MostConvincingRationales(props) {
                         {a.rationale}
                       </Typography>
                       <Typography
-                        class="meta"
+                        className="meta"
                         use="caption"
                         tag="div"
                         dangerouslySetInnerHTML={{
@@ -586,6 +661,7 @@ function MostConvincingRationales(props) {
       </div>
     );
   }
+  return <Fragment />;
 }
 
 function AnswerChoices(props) {
@@ -636,9 +712,20 @@ function AnswerChoices(props) {
       );
     }
   }
+  return <Fragment />;
 }
 
-class Featured extends Component {
+type FeaturedProps = {
+  collection: { title: string; url: string };
+  gettext: (a: string) => string;
+  url: string[];
+};
+
+type FeaturedState = {
+  hovered: boolean;
+};
+
+class Featured extends Component<FeaturedProps, FeaturedState> {
   state = {
     hovered: false,
   };
@@ -670,18 +757,28 @@ class Featured extends Component {
   }
 }
 
-function FavouriteIcon(props) {
+type FavouriteIconProps = {
+  gettext: (a: string) => string;
+  handleToggle: () => void;
+  question: number;
+};
+
+function FavouriteIcon({
+  gettext,
+  handleToggle,
+  question,
+}: FavouriteIconProps) {
   return (
     <Favourites.Consumer>
-      {(favourites) => {
+      {(favourites: number[]) => {
         return (
           <CardAction
-            checked={favourites.includes(props.question)}
-            onClick={props.handleToggle}
+            checked={favourites.includes(question)}
+            onClick={handleToggle}
             onIcon="favorite"
             icon="favorite_border"
             theme="primary"
-            title={props.gettext(
+            title={gettext(
               "Select or remove this question as one of your favourites",
             )}
           />
@@ -691,42 +788,66 @@ function FavouriteIcon(props) {
   );
 }
 
-function FlagIcon(props) {
+type FlagIconProps = {
+  checked: boolean;
+  gettext: (a: string) => string;
+  handleToggle: (a: { title: string; pk: number }, d?: boolean) => void;
+  question: { title: string; pk: number };
+};
+
+function FlagIcon({
+  checked,
+  gettext,
+  handleToggle,
+  question,
+}: FlagIconProps) {
   return (
     <CardAction
-      checked={this.props.checked}
+      checked={checked}
       icon="outlined_flag"
       iconOptions={{
         strategy: "custom",
-        render: ({ content, ...rest }) => (
+        // eslint-disable-next-line react/display-name
+        render: ({ content }) => (
           <span class="rmwc-icon material-icons-round mdc-icon-button__icon">
             {content}
           </span>
         ),
       }}
-      onClick={() => props.handleToggle(props.question)}
+      onClick={() => handleToggle(question)}
       onIcon="flag"
       onIconOptions={{
         strategy: "custom",
-        render: ({ content, ...rest }) => (
+        // eslint-disable-next-line react/display-name
+        render: ({ content }) => (
           <span class="rmwc-icon material-icons-round mdc-icon-button__icon mdc-icon-button__icon--on">
             {content}
           </span>
         ),
       }}
       theme="primary"
-      title={props.gettext("Flag question for removal")}
+      title={gettext("Flag question for removal")}
     />
   );
 }
 
-function AssignmentAddIcon(props) {
+type AssignmentAddIconProps = {
+  gettext: (a: string) => string;
+  handleToggle: (a: Question) => void;
+  question: Question;
+};
+
+function AssignmentAddIcon({
+  gettext,
+  handleToggle,
+  question,
+}: AssignmentAddIconProps) {
   return (
     <CardAction
       icon="add"
-      onClick={() => props.handleToggle(props.question)}
+      onClick={() => handleToggle(question)}
       theme="primary"
-      title={this.props.gettext("Add question to an assignment")}
+      title={gettext("Add question to an assignment")}
     />
   );
 }
@@ -739,6 +860,7 @@ function Image(props) {
       </Typography>
     );
   }
+  return <Fragment />;
 }
 
 function Video(props) {
@@ -752,29 +874,40 @@ function Video(props) {
       />
     );
   }
+  return <Fragment />;
 }
 
-function QuestionCardHeader(props) {
+type QuestionCardHeaderProps = {
+  featuredIconURL: string[];
+  gettext: (a: string) => string;
+  question: Question;
+};
+
+function QuestionCardHeader({
+  featuredIconURL,
+  gettext,
+  question,
+}: QuestionCardHeaderProps) {
   const byline = () => {
-    if (props.question.user.username) {
+    if (question.user.username) {
       return (
         <div style={{ display: "inline" }}>
           <span>
-            {props.gettext("by")} {props.question.user.username}
+            {gettext("by")} {question.user.username}
           </span>{" "}
           <span
             class="tag SALTISE"
             style={{
-              display: props.question.user.saltise ? "inline" : "none",
+              display: question.user.saltise ? "inline" : "none",
             }}
           >
             SALTISE
           </span>{" "}
           <span
             class="tag EXPERT"
-            style={{ display: props.question.user.expert ? "inline" : "none" }}
+            style={{ display: question.user.expert ? "inline" : "none" }}
           >
-            {this.props.gettext("EXPERT")}
+            {gettext("EXPERT")}
           </span>{" "}
           {/*
           <span class="tag POWER">POWER USER</span>{" "}
@@ -786,12 +919,12 @@ function QuestionCardHeader(props) {
   };
 
   const featured = () => {
-    if (props.question.featured) {
+    if (question.featured && question.collections) {
       return (
         <Featured
-          collection={this.props.question.collections[0]}
-          gettext={this.props.gettext}
-          url={this.props.featuredIconURL}
+          collection={question.collections[0]}
+          gettext={gettext}
+          url={featuredIconURL}
         />
       );
     }
@@ -801,13 +934,13 @@ function QuestionCardHeader(props) {
     <Fragment>
       <div>
         <Typography
-          class="title"
+          className="title"
           use="headline5"
           tag="h2"
           // This field is bleached and safe
           // eslint-disable-next-line
           dangerouslySetInnerHTML={{
-            __html: props.question.title,
+            __html: question.title,
           }}
         />
         {featured()}
@@ -818,7 +951,7 @@ function QuestionCardHeader(props) {
         theme="text-secondary-on-background"
         style={{ marginBottom: 10 }}
       >
-        #{props.question.pk} {byline()}
+        #{question.pk} {byline()}
       </Typography>
     </Fragment>
   );
@@ -846,15 +979,19 @@ function QuestionCardBody(props) {
   );
 }
 
-function Ratings(props) {
+type RatingsProps = {
+  gettext: (a: string) => string;
+  handleToggleDialog: (a: Question) => void;
+  question: Question;
+};
+
+function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
   const difficulty = () => {
-    if (
-      Object.prototype.hasOwnProperty.call(props.question.difficulty, "score")
-    ) {
+    if (Object.prototype.hasOwnProperty.call(question.difficulty, "score")) {
       const colourScale = scaleThreshold(triScale).domain([0.25, 0.5]);
-      const color = colourScale(props.question.difficulty.score);
+      const color = colourScale(question.difficulty.score);
       const opacity = "30";
-      const label = props.question.difficulty.label;
+      const label = question.difficulty.label;
       return (
         <div
           class="rating"
@@ -863,7 +1000,7 @@ function Ratings(props) {
             borderColor: color,
             cursor: "pointer",
           }}
-          onClick={() => props.handleToggleDialog(props.question)}
+          onClick={() => handleToggleDialog(question)}
         >
           <svg
             width="40"
@@ -872,19 +1009,21 @@ function Ratings(props) {
             style={{ overflow: "visible" }}
           >
             <path
-              id={`path-${props.question.pk}`}
+              id={`path-${question.pk}`}
               d="M -3 16 A 19 19 0 0 1 35 16"
               fill="transparent"
             />
             <text text-anchor="middle">
+              {/* @ts-ignore: TS doesn't recognize textPath */}
               <textPath
                 fill={color}
                 startOffset="50%"
                 style={{ fill: color, fontSize: 8 }}
                 xmlnsXlink="http://www.w3.org/1999/xlink"
-                xlinkHref={`#path-${props.question.pk}`}
+                xlinkHref={`#path-${question.pk}`}
               >
-                {this.props.gettext("Click!")}
+                {gettext("Click!")}
+                {/* @ts-ignore: TS doesn't recognize textPath  */}
               </textPath>
             </text>
           </svg>
@@ -902,11 +1041,9 @@ function Ratings(props) {
   };
 
   const impact = () => {
-    if (
-      Object.prototype.hasOwnProperty.call(props.question.peer_impact, "score")
-    ) {
+    if (Object.prototype.hasOwnProperty.call(question.peer_impact, "score")) {
       const colourScale = scaleThreshold(triScale).domain([0.05, 0.25]);
-      const color = colourScale(props.question.peer_impact.score);
+      const color = colourScale(question.peer_impact.score);
       const opacity = "30";
       return (
         <div
@@ -917,7 +1054,7 @@ function Ratings(props) {
           }}
         >
           <div class="label" style={{ color }}>
-            {props.question.peer_impact.label}
+            {question.peer_impact.label}
           </div>
         </div>
       );
@@ -932,59 +1069,67 @@ function Ratings(props) {
   );
 }
 
-export function SearchQuestionCard(props) {
+type SearchQuestionCardProps = {
+  featuredIconURL: string[];
+  flagged: { title: string; pk: number };
+  gettext: (a: string) => string;
+  handleToggleAssignmentDialog: (a: Question, b?: boolean) => void;
+  handleToggleDialog: (a: Question) => void;
+  handleToggleFavourite: (a: number) => Promise<void>;
+  handleToggleFlagDialog: (
+    a: { title: string; pk: number },
+    b?: boolean,
+  ) => void;
+  question: Question;
+};
+
+export function SearchQuestionCard({
+  featuredIconURL,
+  flagged,
+  gettext,
+  handleToggleAssignmentDialog,
+  handleToggleDialog,
+  handleToggleFavourite,
+  handleToggleFlagDialog,
+  question,
+}: SearchQuestionCardProps): JSX.Element {
   return (
     <div>
-      <Card class="question" style={{ position: "relative" }}>
+      <Card className="question" style={{ position: "relative" }}>
         <Ratings
-          gettext={this.props.gettext}
-          question={props.question}
-          handleToggleDialog={props.handleToggleDialog}
+          gettext={gettext}
+          question={question}
+          handleToggleDialog={handleToggleDialog}
         />
         <div style={{ paddingRight: 40 }}>
           <QuestionCardHeader
-            featuredIconURL={props.featuredIconURL}
-            gettext={props.gettext}
-            question={props.question}
+            featuredIconURL={featuredIconURL}
+            gettext={gettext}
+            question={question}
           />
-          <QuestionCardBody
-            gettext={props.gettext}
-            question={props.question}
-          />
+          <QuestionCardBody gettext={gettext} question={question} />
         </div>
         <CardActions>
-          <QuestionCardActionButtons
-            gettext={props.gettext}
-            question={props.question}
-          />
+          <QuestionCardActionButtons gettext={gettext} question={question} />
           <CardActionIcons>
             <FlagIcon
-              checked={
-                this.props.flagged
-                  ? this.props.question.pk == this.props.flagged.pk
-                  : false
-              }
-              gettext={props.gettext}
-              handleToggle={props.handleToggleFlagDialog}
+              checked={flagged ? question.pk == flagged.pk : false}
+              gettext={gettext}
+              handleToggle={handleToggleFlagDialog}
               question={{
-                pk: props.question.pk,
-                title: props.question.title,
+                pk: question.pk,
+                title: question.title,
               }}
             />
             <AssignmentAddIcon
-              gettext={props.gettext}
-              handleToggle={props.handleToggleAssignmentDialog}
-              question={{
-                pk: props.question.pk,
-                title: props.question.title,
-              }}
+              gettext={gettext}
+              handleToggle={handleToggleAssignmentDialog}
+              question={question}
             />
             <FavouriteIcon
-              gettext={props.gettext}
-              handleToggle={() =>
-                props.handleToggleFavourite(parseInt(props.question.pk))
-              }
-              question={parseInt(props.question.pk)}
+              gettext={gettext}
+              handleToggle={() => handleToggleFavourite(question.pk)}
+              question={question.pk}
             />
           </CardActionIcons>
         </CardActions>

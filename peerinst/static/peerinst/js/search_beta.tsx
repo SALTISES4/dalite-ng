@@ -1,13 +1,13 @@
 import { Component, Fragment, h } from "preact";
 
-import { get, submitData } from "./_ajax/ajax.js";
+import { get, submitData } from "./_ajax/ajax";
 
 import {
   AssignmentDialog,
   QuestionDialog,
   QuestionFlagDialog,
   SearchQuestionCard,
-} from "./_components/question.jsx";
+} from "./_components/question";
 import { Favourites } from "./_components/providers.js";
 
 import { CircularProgress } from "@rmwc/circular-progress";
@@ -24,8 +24,15 @@ import "@rmwc/snackbar/node_modules/@material/snackbar/dist/mdc.snackbar.min.css
 import "@rmwc/textfield/node_modules/@material/textfield/dist/mdc.textfield.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
+import {
+  Assignment,
+  AssignmentCreate,
+  AssignmentForm,
+  Question,
+} from "./_components/types";
+
 type ChipProps = {
-  onClick: (MouseEvent) => void;
+  onClick: (a: string) => void;
   selected: boolean;
   text: string;
 };
@@ -46,66 +53,12 @@ type SearchAppProps = {
   assignmentFormCheckIdURL: string;
   assignmentFormMetaDataURL: string;
   assignmentListURL: string;
-  gettext: (str: string) => string;
+  gettext: (a: string) => string;
   questionFlagURLs: string[];
   staticURL: string;
   url: string;
   teacherURL: string;
   featuredIconURL: string[];
-};
-
-type Assignment = {
-  editable: boolean;
-  pk: string;
-  question_pks: number[]; // eslint-disable-line camelcase
-  title: string;
-};
-
-type AssignmentForm = {
-  conclusion_page: string; // eslint-disable-line camelcase
-  description: string;
-  identifier: string;
-  intro_page: string; // eslint-disable-line camelcase
-  title: string;
-};
-
-type Question = {
-  answer_count: number; // eslint-disable-line camelcase
-  answer_style: number; // eslint-disable-line camelcase
-  answerchoice_set: { correct: boolean; text: string }[]; // eslint-disable-line camelcase
-  assignment_count: number; // eslint-disable-line camelcase
-  category: { title: string }[];
-  deleted: boolean;
-  difficulty: { score: number; label: string };
-  discipline: { title: string };
-  featured: boolean;
-  frequency: {
-    first_choice: Record<string, number>; // eslint-disable-line camelcase
-    second_choice: Record<string, number>; // eslint-disable-line camelcase
-  };
-  image_alt_text: string; // eslint-disable-line camelcase
-  matrix: { easy: number; hard: number; tricky: number; peer: number };
-  // eslint-disable-next-line camelcase
-  most_convincing_rationales: {
-    correct: boolean;
-    label: string;
-    // eslint-disable-next-line camelcase
-    most_convincing: {
-      id: number;
-      times_chosen: number; // eslint-disable-line camelcase
-      times_shown: number; // eslint-disable-line camelcase
-      rationale: string;
-    }[];
-    text: string;
-  };
-  peer_impact: { score: number; label: string }; // eslint-disable-line camelcase
-  pk: number;
-  text: string;
-  title: string;
-  type: string;
-  user: { username: string; saltise: boolean; expert: boolean };
-  valid: boolean;
-  video_url: string; // eslint-disable-line camelcase
 };
 
 type SearchAppState = {
@@ -181,7 +134,10 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
     return;
   };
 
-  handleToggleFlagDialog = (question: Question, open = true): void => {
+  handleToggleFlagDialog = (
+    question: { title: string; pk: number },
+    open = true,
+  ): void => {
     console.debug(
       `Toggle flag for question: ${
         question ? question.pk + question.title : ""
@@ -225,7 +181,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
       if (this.state.query.length > 2) {
         try {
           this.setState({ searching: true });
-          const data = await get(url);
+          const data = await get(url.toString());
           console.debug(data);
           this.setState(
             {
@@ -279,7 +235,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
   handleAssignmentSubmit = async (
     questionPK: number,
     assignments: string[] = [],
-    newAssignmentData: AssignmentForm = {} as AssignmentForm,
+    newAssignmentData: AssignmentCreate = {} as AssignmentCreate,
   ): Promise<void> => {
     console.debug("handleAssignmentSubmit called");
     console.debug(questionPK, assignments, newAssignmentData);
@@ -695,7 +651,6 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
                   handleToggleFlagDialog={this.handleToggleFlagDialog}
                   key={i}
                   question={question}
-                  staticURL={this.props.staticURL}
                 />
               );
             })}
@@ -834,20 +789,27 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
           handleSubmit={this.handleAssignmentSubmit}
           gettext={this.props.gettext}
           open={this.state.assignmentDialogOpen}
-          onClose={(q) => this.handleToggleAssignmentDialog(q, false)}
+          onClose={() =>
+            this.handleToggleAssignmentDialog({} as Question, false)
+          }
           question={this.state.assignmentDialogQuestion}
         />
         <QuestionDialog
           gettext={this.props.gettext}
           open={this.state.dialogOpen}
-          onClose={this.handleToggleDialog}
+          onClose={() => this.handleToggleDialog({} as Question)}
           question={this.state.dialogQuestion}
         />
         <QuestionFlagDialog
           callback={this.handleSubmit}
           gettext={this.props.gettext}
           open={this.state.flagDialogOpen}
-          onClose={(q) => this.handleToggleFlagDialog(q, false)}
+          onClose={() =>
+            this.handleToggleFlagDialog(
+              {} as { title: string; pk: number },
+              false,
+            )
+          }
           question={this.state.flagDialogQuestion}
           urls={this.props.questionFlagURLs}
         />

@@ -12,7 +12,7 @@ import "@rmwc/formfield/node_modules/@material/form-field/dist/mdc.form-field.mi
 import "@rmwc/linear-progress/node_modules/@material/linear-progress/dist/mdc.linear-progress.min.css";
 import "@rmwc/snackbar/node_modules/@material/snackbar/dist/mdc.snackbar.min.css";
 
-import { get, submitData } from "../_ajax/ajax.js";
+import { get, submitData } from "../_ajax/ajax";
 import { QuestionCard, Favourites, User } from "./question.jsx";
 
 class ToggleVisibleItems extends Component {

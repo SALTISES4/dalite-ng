@@ -18,7 +18,7 @@ import "@rmwc/linear-progress/node_modules/@material/linear-progress/dist/mdc.li
 import "@rmwc/snackbar/node_modules/@material/snackbar/dist/mdc.snackbar.min.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
-import { get } from "../_ajax/ajax.js";
+import { get } from "../_ajax/ajax";
 import { Choices } from "../_assignment/question.jsx";
 
 class Feedback extends Component {

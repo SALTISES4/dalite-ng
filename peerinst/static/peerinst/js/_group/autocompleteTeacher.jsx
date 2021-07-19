@@ -10,7 +10,7 @@ import { Typography } from "@rmwc/typography";
 
 // Rely on mdc default styles from global use
 
-import { get, submitData } from "../_ajax/ajax.js";
+import { get, submitData } from "../_ajax/ajax";
 
 export class TeacherInputWithAutocomplete extends Component {
   state = {

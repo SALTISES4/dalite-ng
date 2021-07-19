@@ -17,7 +17,7 @@ import "@rmwc/textfield/node_modules/@material/notched-outline/dist/mdc.notched-
 import "@rmwc/textfield/node_modules/@material/line-ripple/dist/mdc.line-ripple.min.css";
 import "@rmwc/select/node_modules/@material/select/dist/mdc.select.min.css";
 
-import { get, submitData } from "../_ajax/ajax.js";
+import { get, submitData } from "../_ajax/ajax";
 import { QuestionCard, Favourites, User } from "./question.jsx";
 
 export class SearchBar extends Component {

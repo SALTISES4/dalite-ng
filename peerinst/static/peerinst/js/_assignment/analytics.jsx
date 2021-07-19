@@ -68,7 +68,7 @@ export class PlotConfusionMatrix extends Component {
         .attr("dy", 10)
         .attr("class", "annotation")
         .style("text-anchor", "middle")
-        .text(`${parseInt(100 * this.state.matrix["easy"])}%`);
+        .text(`${Math.floor(100 * this.state.matrix["easy"])}%`);
 
       g.append("text")
         .attr("x", size / 4)
@@ -103,7 +103,7 @@ export class PlotConfusionMatrix extends Component {
         .attr("dy", 10)
         .attr("class", "annotation")
         .style("text-anchor", "middle")
-        .text(`${parseInt(100 * this.state.matrix["hard"])}%`);
+        .text(`${Math.floor(100 * this.state.matrix["hard"])}%`);
 
       g.append("text")
         .attr("x", (3 * size) / 4)
@@ -138,7 +138,7 @@ export class PlotConfusionMatrix extends Component {
         .attr("dy", 10)
         .attr("class", "annotation")
         .style("text-anchor", "middle")
-        .text(`${parseInt(100 * this.state.matrix["peer"])}%`);
+        .text(`${Math.floor(100 * this.state.matrix["peer"])}%`);
 
       g.append("text")
         .attr("x", size / 4)
@@ -173,7 +173,7 @@ export class PlotConfusionMatrix extends Component {
         .attr("dy", 10)
         .attr("class", "annotation")
         .style("text-anchor", "middle")
-        .text(`${parseInt(100 * this.state.matrix["tricky"])}%`);
+        .text(`${Math.floor(100 * this.state.matrix["tricky"])}%`);
 
       g.append("text")
         .attr("x", (3 * size) / 4)
@@ -307,7 +307,7 @@ export class PlotConfusionMatrix extends Component {
         .attr("class", "annotation-dark")
         .style("text-anchor", "end")
         .text(function (d) {
-          return `${parseInt(100 * d.value)}%`;
+          return `${Math.floor(100 * d.value)}%`;
         });
 
       ggg
@@ -325,7 +325,7 @@ export class PlotConfusionMatrix extends Component {
         .attr("class", "annotation-dark")
         .style("text-anchor", "start")
         .text(function (d) {
-          return `${parseInt(100 * d.value)}%`;
+          return `${Math.floor(100 * d.value)}%`;
         });
 
       gg.append("g")
@@ -344,6 +344,7 @@ export class PlotConfusionMatrix extends Component {
           return d.key.length < 30 ? d.key : `${d.key.substring(0, 30)}...`;
         });
     }
+    return false;
   }
 
   render() {

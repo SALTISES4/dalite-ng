@@ -36,7 +36,8 @@
         "radix": "off",
         "spaced-comment": "off",
         "object-curly-spacing": ["error", "always"],
-        "prettier/prettier": "error"
+        "prettier/prettier": "error",
+        "@typescript-eslint/ban-ts-comment": "warn"
       }
     }
   ],

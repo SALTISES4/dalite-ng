@@ -34,7 +34,7 @@ import "@rmwc/textfield/node_modules/@material/textfield/dist/mdc.textfield.css"
 import "@rmwc/theme/node_modules/@material/theme/dist/mdc.theme.min.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
-import { get, submitData } from "../_ajax/ajax.js";
+import { get, submitData } from "../_ajax/ajax";
 import { Choices } from "../_assignment/question.jsx";
 
 class Question extends Component {

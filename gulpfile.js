@@ -220,7 +220,6 @@ function buildScript(app, module) {
         fix: true,
       }),
       embedCSS({ extract: true }),
-      strip(),
       // https://github.com/rollup/plugins/tree/master/packages/commonjs#using-with-rollupplugin-node-resolve
       nodeResolve({
         extensions: [".js", ".jsx", ".ts", ".tsx"],
@@ -233,6 +232,7 @@ function buildScript(app, module) {
         exclude: "node_modules/**",
         extensions: [".js", ".jsx", ".ts", ".tsx"],
       }),
+      strip({ include: ["**/*.(js|jsx|ts|tsx)"] }),
     ],
   };
   const outputOptions = {
@@ -348,7 +348,6 @@ const scripts = gulp.parallel(
 );
 
 const typecheck = gulp.series(typescript, scripts);
-
 const build = gulp.parallel(styles, scripts, icons);
 const dev = gulp.series(build, watch);
 
