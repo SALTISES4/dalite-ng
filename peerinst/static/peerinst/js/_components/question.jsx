@@ -303,6 +303,7 @@ export class AssignmentDialog extends Component {
         title: "",
       });
     }
+    return true;
   }
 
   render() {
@@ -423,6 +424,7 @@ export class QuestionFlagDialog extends Component {
     if (this.props.question != nextProps.question) {
       this.setState({ selectedReason: "" });
     }
+    return true;
   }
 
   componentDidMount() {

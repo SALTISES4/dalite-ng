@@ -56,6 +56,7 @@ const Checkmark = (props) => {
       />
     );
   }
+  return <Fragment />;
 };
 
 export const Choices = (props) => {
@@ -74,6 +75,7 @@ export const Choices = (props) => {
       </ol>
     );
   }
+  return <Fragment />;
 };
 
 export class QuestionCard extends Component {

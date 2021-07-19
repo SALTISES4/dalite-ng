@@ -1,5 +1,5 @@
 import { buildReq } from "../../../../../peerinst/static/peerinst/js/ajax.js";
-import { formatDatetime } from "../../../../../peerinst/static/peerinst/js/utils.ts"; // eslint-disable-line
+import { formatDatetime } from "../../../../../peerinst/static/peerinst/js/utils"; // eslint-disable-line
 
 /*********/
 /* model */

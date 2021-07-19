@@ -163,9 +163,13 @@ function watchStyle(app, module) {
 
 function typescript() {
   const build = gulp
-    .src(["peerinst/**/*.{ts,tsx,js,jsx}", "!peerinst/**/*.min.js"])
-    .pipe(tsProject())
-    .pipe(gulp.dest("test/ts"));
+    .src("**/*.tsx")
+    // .src([
+    //   "{analytics,peerinst,reputation,quality,tos}/**/*.{ts,tsx,js,jsx}",
+    //   "!**/*.min.js",
+    //   "!**/tinymce/**/*.js",
+    // ])
+    .pipe(tsProject());
 
   return build;
 }
@@ -353,5 +357,6 @@ exports.watch = watch;
 exports.dev = dev;
 exports.styles = styles;
 exports.scripts = scripts;
+exports.typescript = typescript;
 exports.typecheck = typecheck;
 exports.icons = icons;
