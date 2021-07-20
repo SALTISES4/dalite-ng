@@ -1,5 +1,5 @@
 import { buildReq } from "../../../../../peerinst/static/peerinst/js/ajax.js";
-import { clear } from "../../../../../peerinst/static/peerinst/js/utils.js";
+import { clear } from "../../../../../peerinst/static/peerinst/js/utils.ts";
 
 /*********/
 /* model */

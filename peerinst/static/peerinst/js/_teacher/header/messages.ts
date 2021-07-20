@@ -1,34 +1,32 @@
-// @flow
-import { buildReq } from "../../ajax.js";
-import { clear } from "../../utils.js";
+import { buildReq } from "../../ajax";
+import { clear } from "../../utils";
 
-/*********/
+/** *******/
+
 /* model */
-/*********/
 
+/** *******/
 type Thread = {
-  id: number,
-  title: string,
+  id: number;
+  title: string;
   lastReply: {
-    author: string,
-    content: string,
-  },
-  nNew: number,
-  link: string,
+    author: string;
+    content: string;
+  };
+  nNew: number;
+  link: string;
 };
-
 type Message = Thread;
-
 let model: {
-  open: boolean,
-  messages: Array<Message>,
+  open: boolean;
+  messages: Array<Message>;
   urls: {
-    markReadUrl: string,
-    messagesUrl: string,
-  },
+    markReadUrl: string;
+    messagesUrl: string;
+  };
 };
 
-function initModel(urls: { markReadUrl: string, messagesUrl: string }): void {
+function initModel(urls: { markReadUrl: string; messagesUrl: string }): void {
   model = {
     open: false,
     messages: [],
@@ -36,10 +34,11 @@ function initModel(urls: { markReadUrl: string, messagesUrl: string }): void {
   };
 }
 
-/**********/
-/* update */
-/**********/
+/** ********/
 
+/* update */
+
+/** ********/
 function update(): void {
   getMessages();
 }
@@ -66,7 +65,6 @@ function toggleMessages(): void {
 function getMessages(): void {
   const url = model.urls.messagesUrl;
   const req = buildReq({}, "get");
-
   fetch(url, req)
     .then((resp) => resp.json())
     .then((data) => {
@@ -88,11 +86,13 @@ function getMessages(): void {
 async function markAllRead(): Promise<void> {
   const req = buildReq({}, "post");
   const resp = await fetch(model.urls.markReadUrl, req);
+
   if (resp.ok) {
     model.messages.forEach((message) => {
       message.nNew = 0;
     });
   }
+
   messagesView();
 }
 
@@ -102,19 +102,27 @@ async function markRead(
   div: HTMLDivElement,
 ): Promise<void> {
   event.stopPropagation();
-  const req = buildReq({ id: message.id }, "post");
+  const req = buildReq(
+    {
+      id: message.id,
+    },
+    "post",
+  );
   const resp = await fetch(model.urls.markReadUrl, req);
+
   if (resp.ok) {
     message.nNew = 0;
   }
+
   messageView(message, div);
   badgeView();
 }
 
-/********/
-/* view */
-/********/
+/** ******/
 
+/* view */
+
+/** ******/
 function view(): void {
   messagesView();
 }
@@ -129,12 +137,10 @@ function messagesView(): void {
   }
 
   badgeView();
-
   clear(messagesList);
-
   document.querySelector(".messages__read-all-btn").classList.add("hidden");
-
   const nNew = model.messages.filter((message) => message.nNew > 0).length;
+
   if (nNew) {
     document
       .querySelector(".messages__read-all-btn")
@@ -160,8 +166,8 @@ function messagesView(): void {
 
 function badgeView(): void {
   const badge = document.querySelector(".messages__icon__badge");
-
   const nNew = model.messages.filter((message) => message.nNew > 0).length;
+
   if (nNew) {
     badge.textContent = nNew.toString();
     badge.style.display = "flex";
@@ -173,7 +179,7 @@ function badgeView(): void {
 
 function messageView(
   message: Message,
-  div: ?HTMLDivElement = null,
+  div: HTMLDivElement | null | undefined = null,
 ): HTMLDivElement {
   if (div) {
     clear(div);
@@ -207,12 +213,10 @@ function messageView(
     const lastReply = document.createElement("div");
     lastReply.classList.add("message__last-reply");
     div.appendChild(lastReply);
-
     const content = document.createElement("span");
     content.classList.add("message__last-reply__content");
     content.textContent = message.lastReply.content;
     lastReply.appendChild(content);
-
     const author = document.createElement("div");
     author.classList.add("message__last-reply__author");
     author.innerHTML = `${message.lastReply.author} &middot; ${message.lastReply.date}`;
@@ -240,10 +244,11 @@ function noMessageView(): HTMLDivElement {
   return div;
 }
 
-/*************/
-/* listeners */
-/*************/
+/** ***********/
 
+/* listeners */
+
+/** ***********/
 function initEventListeners(): void {
   addMessagesOpenListener();
   addMarkAllReadListener();
@@ -274,13 +279,14 @@ function addMarkAllReadListener(): void {
     ?.addEventListener("click", () => markAllRead());
 }
 
-/********/
-/* init */
-/********/
+/** ******/
 
+/* init */
+
+/** ******/
 export function init(urls: {
-  markReadUrl: string,
-  messagesUrl: string,
+  markReadUrl: string;
+  messagesUrl: string;
 }): void {
   initModel(urls);
   update();

@@ -1,4 +1,3 @@
-"use strict";
 import flatpickr from "flatpickr";
 import { MDCSnackbar } from "@material/snackbar";
 

@@ -1,5 +1,3 @@
-"use strict";
-
 function toggleButton(event) {
   const container = event.currentTarget;
   if (!container.classList.contains("btn-toggle--disabled")) {

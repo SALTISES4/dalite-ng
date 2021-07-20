@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/no-var-requires: "off" */
+
 /* Build tools */
 const gulp = require("gulp");
 const concat = require("gulp-concat");
@@ -5,16 +7,18 @@ const rename = require("gulp-rename");
 
 /* Build modules for scripts */
 const commonjs = require("@rollup/plugin-commonjs"); // loader
-const { eslint } = require("rollup-plugin-eslint"); // linter
+const eslint = require("@rollup/plugin-eslint"); // linter
 const { babel } = require("@rollup/plugin-babel"); // transpiler + polyfills
 const resolve = require("@rollup/plugin-node-resolve"); // loader
-const strip = require("@rollup/plugin-strip"); // remove console.log statements
+const nodeResolve = resolve.default;
+const strip = require("@rollup/plugin-strip"); // remove console statements
 const rollup = require("rollup"); // bundler
 const { terser } = require("rollup-plugin-terser"); // minifier
-const nodeResolve = resolve.default;
 const embedCSS = require("rollup-plugin-postcss");
 const alias = require("@rollup/plugin-alias");
 const replace = require("@rollup/plugin-replace");
+const ts = require("gulp-typescript"); // typescript
+const tsProject = ts.createProject("tsconfig.json");
 
 /* Build modules for styles */
 const scssLint = require("stylelint"); // linter
@@ -28,6 +32,8 @@ const sourcemaps = require("gulp-sourcemaps"); // sourcemaps
 
 /* Build for icons */
 const svgSprite = require("gulp-svg-sprite");
+
+const { existsSync } = require("fs");
 
 const templateModules = ["peerinst", "quality", "reputation", "tos"];
 
@@ -76,6 +82,7 @@ const scriptBuilds = [
   {
     app: "peerinst",
     modules: [
+      "account",
       "group",
       "student",
       "search",
@@ -110,27 +117,6 @@ const scriptBuilds = [
     modules: ["teachers"],
   },
 ];
-
-const babelConfig = {
-  babelHelpers: "bundled",
-  presets: [
-    "@babel/preset-flow",
-    [
-      "@babel/preset-env",
-      {
-        useBuiltIns: "usage",
-        corejs: 3,
-      },
-    ],
-  ],
-  plugins: [
-    "@babel/plugin-proposal-class-properties",
-    "@babel/plugin-proposal-optional-chaining",
-    ["@babel/plugin-transform-react-jsx", { pragma: "h" }],
-  ],
-  exclude: "node_modules/**",
-  babelrc: false,
-};
 
 function buildStyle(app, module) {
   const cb = (file) => {
@@ -175,10 +161,31 @@ function watchStyle(app, module) {
   );
 }
 
+function typescript() {
+  const build = gulp
+    .src("**/*.tsx")
+    // .src([
+    //   "{analytics,peerinst,reputation,quality,tos}/**/*.{ts,tsx,js,jsx}",
+    //   "!**/*.min.js",
+    //   "!**/tinymce/**/*.js",
+    // ])
+    .pipe(tsProject());
+
+  return build;
+}
+
 function buildScript(app, module) {
   const name = module === "index" ? "bundle" : module;
+  // While migrating to typescript, we need to check for all file extensions
+  const file = existsSync(`./${app}/static/${app}/js/${module}.js`)
+    ? `./${app}/static/${app}/js/${module}.js`
+    : existsSync(`./${app}/static/${app}/js/${module}.ts`)
+    ? `./${app}/static/${app}/js/${module}.ts`
+    : existsSync(`./${app}/static/${app}/js/${module}.tsx`)
+    ? `./${app}/static/${app}/js/${module}.tsx`
+    : `./${app}/static/${app}/js/${module}.jsx`;
   const inputOptions = {
-    input: `./${app}/static/${app}/js/${module}.js`,
+    input: file,
     external: [
       "jquery",
       "flatpickr",
@@ -195,9 +202,7 @@ function buildScript(app, module) {
       "material/snackbar",
     ],
     onwarn(warning, warn) {
-      if (warning.code == "CIRCULAR_DEPENDENCY") {
-        return;
-      }
+      if (warning.code === "CIRCULAR_DEPENDENCY") return;
       warn(warning);
     },
     plugins: [
@@ -208,19 +213,26 @@ function buildScript(app, module) {
         ],
       }),
       replace({
+        preventAssignment: true,
         "process.env.NODE_ENV": JSON.stringify("production"),
       }),
       eslint({
         fix: true,
       }),
-      babel(babelConfig),
+      embedCSS({ extract: true }),
       // https://github.com/rollup/plugins/tree/master/packages/commonjs#using-with-rollupplugin-node-resolve
       nodeResolve({
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
         mainFields: ["module", "main", "browser"],
       }),
       commonjs(),
-      embedCSS({ extract: true }),
-      strip(),
+      // https://github.com/rollup/plugins/tree/master/packages/babel#using-with-rollupplugin-commonjs
+      babel({
+        babelHelpers: "bundled",
+        exclude: "node_modules/**",
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+      }),
+      strip({ include: ["**/*.(js|jsx|ts|tsx)"] }),
     ],
   };
   const outputOptions = {
@@ -255,8 +267,8 @@ function buildScript(app, module) {
 function watchScript(app, module) {
   gulp.watch(
     [
-      `./${app}/static/${app}/js/_${module}/**/*.js`,
-      `./${app}/static/${app}/js/${module}.js`,
+      `./${app}/static/${app}/js/_${module}/**/*.{js,jsx,ts,tsx}`,
+      `./${app}/static/${app}/js/${module}.{js,jsx,ts,tsx}`,
     ],
     () => buildScript(app, module),
   );
@@ -335,6 +347,7 @@ const scripts = gulp.parallel(
   ),
 );
 
+const typecheck = gulp.series(typescript, scripts);
 const build = gulp.parallel(styles, scripts, icons);
 const dev = gulp.series(build, watch);
 
@@ -343,4 +356,6 @@ exports.watch = watch;
 exports.dev = dev;
 exports.styles = styles;
 exports.scripts = scripts;
+exports.typescript = typescript;
+exports.typecheck = typecheck;
 exports.icons = icons;

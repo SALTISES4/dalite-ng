@@ -1,13 +1,13 @@
-import { Component, h } from "preact";
+import { Component, Fragment, h } from "preact";
 
-import { get, submitData } from "./_ajax/ajax.js";
+import { get, submitData } from "./_ajax/ajax";
 
 import {
   AssignmentDialog,
   QuestionDialog,
   QuestionFlagDialog,
   SearchQuestionCard,
-} from "./_components/question.js";
+} from "./_components/question";
 import { Favourites } from "./_components/providers.js";
 
 import { CircularProgress } from "@rmwc/circular-progress";
@@ -24,35 +24,98 @@ import "@rmwc/snackbar/node_modules/@material/snackbar/dist/mdc.snackbar.min.css
 import "@rmwc/textfield/node_modules/@material/textfield/dist/mdc.textfield.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
-function Chip(props) {
+import {
+  Assignment,
+  AssignmentCreate,
+  AssignmentForm,
+  Question,
+} from "./_components/types";
+
+type ChipProps = {
+  onClick: (a: string) => void;
+  selected: boolean;
+  text: string;
+};
+
+function Chip({ onClick, selected, text }: ChipProps) {
   return (
     <div
-      class={this.props.selected ? "selected chips" : "chips"}
-      onClick={() => props.onClick(props.text)}
+      class={selected ? "selected chips" : "chips"}
+      onClick={() => onClick(text)}
     >
-      {props.text}
+      {text}
     </div>
   );
 }
 
-export class SearchApp extends Component {
+type SearchData = {
+  meta: {
+    categories: string[];
+    difficulties: string[];
+    disciplines: string[];
+    impacts: string[];
+  };
+  results: Question[];
+};
+
+type SearchAppProps = {
+  assignmentURL: string;
+  assignmentFormCheckIdURL: string;
+  assignmentFormMetaDataURL: string;
+  assignmentListURL: string;
+  gettext: (a: string) => string;
+  questionFlagURLs: string[];
+  staticURL: string;
+  url: string;
+  teacherURL: string;
+  featuredIconURL: string[];
+};
+
+type SearchAppState = {
+  assignments: Assignment[];
+  assignmentDialogOpen: boolean;
+  assignmentDialogQuestion: Question;
+  assignmentFormMetaData: AssignmentForm;
+  query: string;
+  questions: Question[];
+  categories: string[];
+  dialogOpen: boolean;
+  dialogQuestion: Question;
+  difficulties: string[];
+  disciplines: string[];
+  favourites: number[];
+  flagDialogOpen: boolean;
+  flagDialogQuestion: { title: string; pk: number };
+  impacts: string[];
+  lastKeyStroke: number;
+  searching: boolean;
+  selectedCategories: string[];
+  selectedDifficulty: string;
+  selectedDiscipline: string;
+  selectedImpact: string;
+  snackbarIsOpen: boolean;
+  snackbarMessage: string;
+  timeoutID: number;
+};
+
+export class SearchApp extends Component<SearchAppProps, SearchAppState> {
   state = {
     assignments: [],
     assignmentDialogOpen: false,
-    assignmentDialogQuestion: {},
-    assignmentFormMetaData: {},
+    assignmentDialogQuestion: {} as Question,
+    assignmentFormMetaData: {} as AssignmentForm,
     query: "",
     questions: [],
     categories: [],
     dialogOpen: false,
-    dialogQuestion: {},
+    dialogQuestion: {} as Question,
     difficulties: [],
     disciplines: [],
     favourites: [],
     flagDialogOpen: false,
-    flagDialogQuestion: {},
+    flagDialogQuestion: {} as { title: string; pk: number },
     impacts: [],
-    lastKeyStroke: undefined,
+    lastKeyStroke: 0,
     searching: false,
     selectedCategories: [],
     selectedDifficulty: "",
@@ -60,26 +123,31 @@ export class SearchApp extends Component {
     selectedImpact: "",
     snackbarIsOpen: false,
     snackbarMessage: "",
-    timeoutID: "",
+    timeoutID: 0,
   };
 
-  handleToggleAssignmentDialog = (question, open = true) => {
+  handleToggleAssignmentDialog = (question: Question, open = true): void => {
     console.debug("handleToggleAssignmentDialog called");
     this.setState({
       assignmentDialogOpen: open,
       assignmentDialogQuestion: question,
     });
+    return;
   };
 
-  handleToggleDialog = (question) => {
+  handleToggleDialog = (question: Question): void => {
     console.debug("handleToggleDialog called");
     this.setState({
       dialogOpen: !this.state.dialogOpen,
       dialogQuestion: question,
     });
+    return;
   };
 
-  handleToggleFlagDialog = (question, open = true) => {
+  handleToggleFlagDialog = (
+    question: { title: string; pk: number },
+    open = true,
+  ): void => {
     console.debug(
       `Toggle flag for question: ${
         question ? question.pk + question.title : ""
@@ -89,11 +157,12 @@ export class SearchApp extends Component {
       flagDialogOpen: open,
       flagDialogQuestion: question
         ? { title: question.title, pk: question.pk }
-        : {},
+        : ({} as { title: string; pk: number }),
     });
+    return;
   };
 
-  handleSubmit = async () => {
+  handleSubmit = async (): Promise<void> => {
     /* Prevent searches from being submitted faster than once per DT ms */
     const DT = 500;
     const startTime = performance.now();
@@ -105,11 +174,11 @@ export class SearchApp extends Component {
       this.setState(
         {
           assignmentDialogOpen: false,
-          assignmentDialogQuestion: {},
+          assignmentDialogQuestion: {} as Question,
           dialogOpen: false,
-          dialogQuestion: {},
+          dialogQuestion: {} as Question,
           flagDialogOpen: false,
-          flagDialogQuestion: {},
+          flagDialogQuestion: {} as { title: string; pk: number },
           lastKeyStroke: performance.now(),
         },
         () => console.debug(this.state),
@@ -117,12 +186,12 @@ export class SearchApp extends Component {
       const queryString = new URLSearchParams();
       queryString.append("search_string", this.state.query);
       const url = new URL(this.props.url, window.location.origin);
-      url.search = queryString;
+      url.search = queryString.toString();
 
       if (this.state.query.length > 2) {
         try {
           this.setState({ searching: true });
-          const data = await get(url);
+          const data = (await get(url.toString())) as SearchData;
           console.debug(data);
           this.setState(
             {
@@ -170,13 +239,14 @@ export class SearchApp extends Component {
         timeoutID: window.setTimeout(this.handleSubmit, DT),
       });
     }
+    return;
   };
 
   handleAssignmentSubmit = async (
-    questionPK,
-    assignments = [],
-    newAssignmentData = {},
-  ) => {
+    questionPK: number,
+    assignments: string[] = [],
+    newAssignmentData: AssignmentCreate = {} as AssignmentCreate,
+  ): Promise<void> => {
     console.debug("handleAssignmentSubmit called");
     console.debug(questionPK, assignments, newAssignmentData);
     if (Object.keys(newAssignmentData).length > 0) {
@@ -186,7 +256,8 @@ export class SearchApp extends Component {
           newAssignmentData,
           "POST",
         );
-        assignments = [_assignment.pk];
+        console.debug(_assignment);
+        assignments = [(_assignment as AssignmentCreate).pk];
       } catch (error) {
         console.error(error);
         this.setState({
@@ -195,6 +266,7 @@ export class SearchApp extends Component {
         });
       }
     }
+    const added: string[] = [];
     for await (const a of assignments) {
       try {
         await submitData(
@@ -202,15 +274,11 @@ export class SearchApp extends Component {
           { assignment: a, question_pk: questionPK },
           "POST",
         );
-        this.setState(
-          {
-            assignmentDialogOpen: false,
-            assignmentDialogQuestion: {},
-            snackbarIsOpen: true,
-            snackbarMessage: this.props.gettext(`Added to ${a}`),
-          },
-          this.refreshFromDB,
-        );
+        added.push(a);
+        this.setState({
+          assignmentDialogOpen: false,
+          assignmentDialogQuestion: {} as Question,
+        });
       } catch (error) {
         console.error(error);
         this.setState({
@@ -219,11 +287,27 @@ export class SearchApp extends Component {
         });
       }
     }
+
+    let message = this.props.gettext("Added to ");
+    if (added.length == 1) {
+      message += added[0];
+    } else {
+      message += `${added.length} ${this.props.gettext("assignments")}`;
+    }
+    console.debug(message);
+    this.setState(
+      {
+        snackbarIsOpen: true,
+        snackbarMessage: message,
+      },
+      this.refreshFromDB,
+    );
+    return;
   };
 
-  handleToggleFavourite = async (questionPK) => {
-    const currentFavourites = Array.from(this.state.favourites);
-    const _favourites = Array.from(this.state.favourites);
+  handleToggleFavourite = async (questionPK: number): Promise<void> => {
+    const currentFavourites: number[] = Array.from(this.state.favourites);
+    const _favourites: number[] = Array.from(this.state.favourites);
 
     if (_favourites.includes(questionPK)) {
       _favourites.splice(_favourites.indexOf(questionPK), 1);
@@ -249,9 +333,10 @@ export class SearchApp extends Component {
         snackbarMessage: this.props.gettext("An error occurred."),
       });
     }
+    return;
   };
 
-  categoryChips = () => {
+  categoryChips = (): JSX.Element => {
     if (this.state.categories.length > 0) {
       return (
         <div class="chip-container">
@@ -262,15 +347,15 @@ export class SearchApp extends Component {
           >
             {this.props.gettext("Categories")}
           </Typography>
-          {this.state.categories.map((c, i) => {
+          {this.state.categories.map((c: string, i) => {
             if (c.length > 0) {
+              const sc: string[] = [...this.state.selectedCategories];
               return (
                 <Chip
-                  selected={this.state.selectedCategories.indexOf(c) >= 0}
+                  selected={sc.indexOf(c) >= 0}
                   text={c}
                   key={i}
                   onClick={() => {
-                    const sc = [...this.state.selectedCategories];
                     const index = sc.indexOf(c);
                     if (index >= 0) {
                       sc.splice(index, 1);
@@ -286,7 +371,7 @@ export class SearchApp extends Component {
                         selectedCategories: sc,
                         query: `${sc
                           .map(
-                            (_c) =>
+                            (_c: string) =>
                               `category__title::${_c.replaceAll(" ", "_")}`,
                           )
                           .join(" ")} ${_query}`,
@@ -303,7 +388,7 @@ export class SearchApp extends Component {
             onClick={() => {
               this.setState(
                 {
-                  selectedCategories: "",
+                  selectedCategories: [],
                   query: this.state.query
                     .replace(/category__title::\S+/gi, "")
                     .replace(/\s+/g, " ")
@@ -325,9 +410,10 @@ export class SearchApp extends Component {
         </div>
       );
     }
+    return <Fragment />;
   };
 
-  difficultyChips = () => {
+  difficultyChips = (): JSX.Element => {
     if (this.state.difficulties.length > 0) {
       return (
         <div class="chip-container">
@@ -338,7 +424,7 @@ export class SearchApp extends Component {
           >
             {this.props.gettext("Difficulty levels")}
           </Typography>
-          {this.state.difficulties.map((d, i) => {
+          {this.state.difficulties.map((d: string, i) => {
             if (d.length > 0) {
               return (
                 <Chip
@@ -400,9 +486,10 @@ export class SearchApp extends Component {
         </div>
       );
     }
+    return <Fragment />;
   };
 
-  disciplineChips = () => {
+  disciplineChips = (): JSX.Element => {
     if (this.state.disciplines.length > 0) {
       return (
         <div class="chip-container">
@@ -413,7 +500,7 @@ export class SearchApp extends Component {
           >
             {this.props.gettext("Disciplines")}
           </Typography>
-          {this.state.disciplines.map((d, i) => {
+          {this.state.disciplines.map((d: string, i) => {
             if (d.length > 0) {
               return (
                 <Chip
@@ -475,9 +562,10 @@ export class SearchApp extends Component {
         </div>
       );
     }
+    return <Fragment />;
   };
 
-  impactChips = () => {
+  impactChips = (): JSX.Element => {
     if (this.state.impacts.length > 0) {
       return (
         <div class="chip-container">
@@ -488,7 +576,7 @@ export class SearchApp extends Component {
           >
             {this.props.gettext("Peer impact levels")}
           </Typography>
-          {this.state.impacts.map((d, i) => {
+          {this.state.impacts.map((d: string, i) => {
             if (d.length > 0) {
               return (
                 <Chip
@@ -550,9 +638,10 @@ export class SearchApp extends Component {
         </div>
       );
     }
+    return <Fragment />;
   };
 
-  chips = () => {
+  chips = (): JSX.Element => {
     return (
       <div>
         {this.disciplineChips()}
@@ -563,9 +652,9 @@ export class SearchApp extends Component {
     );
   };
 
-  results = () => {
+  results = (): JSX.Element => {
     if (this.state.searching) {
-      return <CircularProgress class="spinner" size="xlarge" />;
+      return <CircularProgress className="spinner" size="xlarge" />;
     }
     if (this.state.questions.length > 0) {
       return (
@@ -585,7 +674,6 @@ export class SearchApp extends Component {
                   handleToggleFlagDialog={this.handleToggleFlagDialog}
                   key={i}
                   question={question}
-                  staticURL={this.props.staticURL}
                 />
               );
             })}
@@ -617,9 +705,10 @@ export class SearchApp extends Component {
         </div>
       );
     }
+    return <Fragment />;
   };
 
-  refreshFromDB = async () => {
+  refreshFromDB = async (): Promise<void> => {
     // Load teacher data
     try {
       const data = await get(this.props.teacherURL);
@@ -649,7 +738,7 @@ export class SearchApp extends Component {
       const data = await get(this.props.assignmentFormMetaDataURL);
       console.debug(data);
       this.setState({
-        assignmentFormMetaData: data,
+        assignmentFormMetaData: data as AssignmentForm,
       });
     } catch (error) {
       console.error(error);
@@ -660,19 +749,20 @@ export class SearchApp extends Component {
         ),
       });
     }
+    return;
   };
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.refreshFromDB();
   }
 
-  render() {
+  render(): JSX.Element {
     return (
       <div>
         <div id="search-form" style={{ width: 500 }}>
           <TextField
-            autofocus
-            class="wide tight"
+            autoFocus
+            className="wide tight"
             outlined
             label={this.props.gettext("Type something...")}
             withLeadingIcon={<TextFieldIcon icon="search" theme="primary" />}
@@ -681,7 +771,7 @@ export class SearchApp extends Component {
                 style={
                   this.state.query ? { display: "block" } : { display: "none" }
                 }
-                tabIndex="0"
+                tabIndex={0}
                 icon="close"
                 theme="primary"
                 onClick={() =>
@@ -704,7 +794,6 @@ export class SearchApp extends Component {
               this.setState({ query: evt.target.value }, this.handleSubmit);
             }}
             value={this.state.query}
-            theme="secondary"
           />
           <TextFieldHelperText persistent>
             {this.props.gettext(
@@ -715,35 +804,44 @@ export class SearchApp extends Component {
         {this.chips()}
         {this.results()}
         <AssignmentDialog
-          assignments={this.state.assignments.filter((a) => a.editable)}
+          assignments={this.state.assignments.filter(
+            (a: Assignment) => a.editable,
+          )}
           checkIdURL={this.props.assignmentFormCheckIdURL}
           helpTexts={this.state.assignmentFormMetaData}
           handleSubmit={this.handleAssignmentSubmit}
           gettext={this.props.gettext}
           open={this.state.assignmentDialogOpen}
-          onClose={(q) => this.handleToggleAssignmentDialog(q, false)}
+          onClose={() =>
+            this.handleToggleAssignmentDialog({} as Question, false)
+          }
           question={this.state.assignmentDialogQuestion}
         />
         <QuestionDialog
           gettext={this.props.gettext}
           open={this.state.dialogOpen}
-          onClose={this.handleToggleDialog}
+          onClose={() => this.handleToggleDialog({} as Question)}
           question={this.state.dialogQuestion}
         />
         <QuestionFlagDialog
           callback={this.handleSubmit}
           gettext={this.props.gettext}
           open={this.state.flagDialogOpen}
-          onClose={(q) => this.handleToggleFlagDialog(q, false)}
+          onClose={() =>
+            this.handleToggleFlagDialog(
+              {} as { title: string; pk: number },
+              false,
+            )
+          }
           question={this.state.flagDialogQuestion}
           urls={this.props.questionFlagURLs}
         />
         <Snackbar
           show={this.state.snackbarIsOpen}
-          onHide={(evt) => this.setState({ snackbarIsOpen: false })}
+          onHide={() => this.setState({ snackbarIsOpen: false })}
           message={this.state.snackbarMessage}
           timeout={5000}
-          actionHandler={() => {}}
+          actionHandler={() => {}} // eslint-disable-line @typescript-eslint/no-empty-function
           actionText="OK"
           dismissesOnAction={true}
         />

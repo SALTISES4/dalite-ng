@@ -1,4 +1,5 @@
 /* global pageNav */
+declare let bundle: any; // bundle will be available globally at runtime
 
 import { updateAssignmentQuestionList } from "./ajax.js";
 

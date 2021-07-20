@@ -1,11 +1,10 @@
-// @flow
+/** *******/
 
-/*********/
 /* model */
-/*********/
 
+/** *******/
 let model: {
-  submitAllowed: boolean,
+  submitAllowed: boolean;
 };
 
 function initModel() {
@@ -14,19 +13,21 @@ function initModel() {
   };
 }
 
-/**********/
-/* update */
-/**********/
+/** ********/
 
+/* update */
+
+/** ********/
 function allowSubmit() {
   model.submitAllowed = true;
   submitButtonView();
 }
 
-/********/
-/* view */
-/********/
+/** ******/
 
+/* view */
+
+/** ******/
 function view() {
   submitButtonView();
   showMeMore();
@@ -54,14 +55,17 @@ function showMeMore() {
           `show-counter-${el.getAttribute("data-rationale-iterator")}`,
         );
         let shownCounter = 0;
+
         for (let i = 0; i < els.length; i++) {
           if (els[i].hidden == true && shownCounter < 2) {
             els[i].hidden = false;
             shownCounter++;
+
             if (i == els.length - 1) {
               el.hidden = true;
               break;
             }
+
             showCounter.setAttribute(
               "value",
               +showCounter.getAttribute("value") + 1,
@@ -73,10 +77,11 @@ function showMeMore() {
   );
 }
 
-/*************/
-/* listeners */
-/*************/
+/** ***********/
 
+/* listeners */
+
+/** ***********/
 function listeners() {
   [].forEach.call(
     document.querySelectorAll("#submit-answer-form input[type=radio]"),
@@ -84,10 +89,11 @@ function listeners() {
   );
 }
 
-/********/
-/* init */
-/********/
+/** ******/
 
+/* init */
+
+/** ******/
 export function init() {
   initModel();
   view();

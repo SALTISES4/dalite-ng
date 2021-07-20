@@ -1,9 +1,9 @@
 import { buildReq } from "../ajax.js";
-import { clear } from "../utils.js";
+import { clear } from "../utils";
 
-/*********/
+/** *******/
 /* model */
-/*********/
+/** *******/
 
 let model;
 
@@ -82,9 +82,9 @@ function initModel(data) {
   };
 }
 
-/**********/
+/** ********/
 /* update */
-/**********/
+/** ********/
 
 function handleStudentIdKeyDown(key, group, node) {
   if (key === "Enter") {
@@ -165,7 +165,7 @@ function copyStudentIdToClipboard(group, node) {
 }
 
 export function goToAssignment(
-  group: { studentId: string, studentIdNeeded: boolean, name: string },
+  group: { studentId: string; studentIdNeeded: boolean; name: string },
   assignment: { link: string },
 ) {
   if (!group.studentIdNeeded || group.studentId !== "") {
@@ -254,9 +254,9 @@ export function joinGroup() {
     });
 }
 
-/********/
+/** ******/
 /* view */
-/********/
+/** ******/
 
 function view(groupStudentId, callback) {
   identityView();
@@ -365,7 +365,7 @@ function verifyJoinGroupDisabledStatus() {
   }
 }
 
-function groupsView(groupStudentId: string = "") {
+function groupsView(groupStudentId = "") {
   const groups = document.getElementById("student-groups");
   clear(groups);
   model.groups
@@ -758,9 +758,9 @@ function showCopyBubble(node) {
   setTimeout(() => node.removeChild(bubble), 600);
 }
 
-/*************/
+/** ***********/
 /* listeners */
-/*************/
+/** ***********/
 
 function initListeners() {
   addLinkListeners();
@@ -772,7 +772,7 @@ function addLinkListeners() {
     .getElementById("edit-user-btn")
     .addEventListener("click", function () {
       // TODO: Allow student info editing
-      //edit_user();
+      // edit_user();
     });
   document
     .getElementById("modify-tos-btn")
@@ -814,9 +814,9 @@ function addJoinGroupListeners() {
     });
 }
 
-/*********/
+/** *******/
 /* utils */
-/*********/
+/** *******/
 
 function timeuntil(date1, date2) {
   let diff = date1 - date2;
@@ -844,9 +844,9 @@ function timeuntil(date1, date2) {
   return diff_;
 }
 
-/********/
+/** ******/
 /* init */
-/********/
+/** ******/
 
 export function initStudentPage(data, groupStudentId = "", callback) {
   initModel(data);

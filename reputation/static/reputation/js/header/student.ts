@@ -1,33 +1,30 @@
-// @flow
-"use strict";
 import { buildReq } from "../../../../../peerinst/static/peerinst/js/ajax.js";
-import { clear } from "../../../../../peerinst/static/peerinst/js/utils.js";
+import { clear } from "../../../../../peerinst/static/peerinst/js/utils";
 import * as d3 from "d3";
-import { ReputationHeader } from "./header.js";
+import { ReputationHeader } from "./header";
 
 class StudentReputationHeader extends ReputationHeader {
   async init(shadow: ShadowRoot) {
-    /*********/
+    /** *******/
+
     /* model */
-    /*********/
 
+    /** *******/
     type Reputation = {
-      name: string,
-      description: string,
-      reputation: number,
-      badgeThresholds: Array<number>,
-      badgeColour: string,
+      name: string;
+      description: string;
+      reputation: number;
+      badgeThresholds: Array<number>;
+      badgeColour: string;
     };
-
     type Model = {
-      id: number,
-      element: StudentReputationHeader,
-      reputationType: string,
-      reputationUrl: string,
-      reputations: Array<Reputation>,
-      shadow: ShadowRoot,
+      id: number;
+      element: StudentReputationHeader;
+      reputationType: string;
+      reputationUrl: string;
+      reputations: Array<Reputation>;
+      shadow: ShadowRoot;
     };
-
     const model: Model = {
       id: parseInt(this.reputationId),
       element: this,
@@ -38,12 +35,14 @@ class StudentReputationHeader extends ReputationHeader {
       shadow,
     };
 
-    /**********/
-    /* update */
-    /**********/
+    /** ********/
 
+    /* update */
+
+    /** ********/
     async function update() {
       await getReputation();
+
       if (model.reputations.length) {
         model.element.hidden = false;
       }
@@ -74,6 +73,7 @@ class StudentReputationHeader extends ReputationHeader {
         .querySelectorAll(".header--togglable > *")
         .forEach((header_) => {
           console.log(header_);
+
           if (header_ != header && header_.hasAttribute("open")) {
             if (header_.shadowRoot) {
               header_.shadowRoot
@@ -93,17 +93,16 @@ class StudentReputationHeader extends ReputationHeader {
       toggleReputationView();
     }
 
-    /********/
-    /* view */
-    /********/
+    /** ******/
 
+    /* view */
+
+    /** ******/
     function view() {
       model.shadow.appendChild(styleView());
-
       const container = document.createElement("div");
       container.id = "container";
       model.shadow.appendChild(container);
-
       container.appendChild(iconView());
       container.appendChild(listView());
     }
@@ -120,12 +119,10 @@ class StudentReputationHeader extends ReputationHeader {
           event.stopPropagation();
           toggleReputationList();
         });
-
         const star = document.createElement("i");
         star.id = "icon__icon";
         star.textContent = "star";
         icon.appendChild(star);
-
         // $FlowFixMe
         document.body?.addEventListener("click", (event: MouseEvent) => {
           if (model.element.open) {
@@ -139,6 +136,7 @@ class StudentReputationHeader extends ReputationHeader {
 
     function listView() {
       let list = model.shadow.querySelector("#list");
+
       if (!list) {
         list = document.createElement("div");
         list.id = "list";
@@ -148,12 +146,10 @@ class StudentReputationHeader extends ReputationHeader {
       }
 
       clear(list);
-
       model.reputations.forEach((reputation) => {
         // $FlowFixMe
         reputationView(list, reputation);
       });
-
       return list;
     }
 
@@ -163,7 +159,6 @@ class StudentReputationHeader extends ReputationHeader {
       name.textContent = `${reputation.name}`;
       name.title = reputation.description;
       list.appendChild(name);
-
       list.appendChild(progressView(reputation));
     }
 
@@ -171,21 +166,19 @@ class StudentReputationHeader extends ReputationHeader {
       if (window.innerWidth <= 500) {
         return mobileProgressView(reputation);
       }
+
       return desktopProgressView(reputation);
     }
 
     function desktopProgressView(reputation: Reputation): HTMLElement {
       const container = document.createElement("div");
       container.classList.add("badge");
-
       const width = Math.max(...reputation.badgeThresholds);
-
       const svg = d3
         .select(container)
         .append("svg")
         .attr("viewBox", "0 0 200 40")
         .append("g");
-
       svg
         .append("text")
         .attr("data-val", reputation.reputation)
@@ -195,7 +188,6 @@ class StudentReputationHeader extends ReputationHeader {
         .attr("class", "fill-primary badge__reputation")
         .attr("font-size", 16)
         .text(0);
-
       svg
         .append("rect")
         .attr("x", 40)
@@ -207,7 +199,6 @@ class StudentReputationHeader extends ReputationHeader {
         .attr("stroke", "var(--reputation-colour)")
         .attr("stroke-width", 1)
         .attr("fill", "none");
-
       svg
         .append("rect")
         .attr("class", "badge__bar")
@@ -232,7 +223,6 @@ class StudentReputationHeader extends ReputationHeader {
         .attr("stroke", "var(--reputation-colour)")
         .attr("stroke-width", 1)
         .attr("fill", "var(--reputation-colour)");
-
       reputation.badgeThresholds.forEach((threshold) => {
         const badge = svg.append("g");
         badge
@@ -267,20 +257,17 @@ class StudentReputationHeader extends ReputationHeader {
           badge.append("title").text(`Obtained at ${threshold}`);
         }
       });
-
       return container;
     }
 
     function mobileProgressView(reputation: Reputation): HTMLElement {
       const container = document.createElement("div");
       container.classList.add("badge");
-
       const svg = d3
         .select(container)
         .append("svg")
         .attr("viewBox", "0 0 200 40")
         .append("g");
-
       svg
         .append("text")
         .attr("data-val", reputation.reputation)
@@ -318,7 +305,6 @@ class StudentReputationHeader extends ReputationHeader {
               ")" +
               ` scale(${19.5 / 25})`,
           );
-
         badge
           .append("title")
           .text(`Obtained at ${reputation.badgeThresholds[0]}`);
@@ -329,6 +315,7 @@ class StudentReputationHeader extends ReputationHeader {
           .map(([t, i]) => i)[0];
         let width;
         const thresholds = [];
+
         if (idx == 0) {
           width = reputation.badgeThresholds[0];
         } else {
@@ -337,8 +324,8 @@ class StudentReputationHeader extends ReputationHeader {
             reputation.badgeThresholds[idx - 1];
           thresholds.push(reputation.badgeThresholds[idx - 1]);
         }
-        thresholds.push(reputation.badgeThresholds[idx]);
 
+        thresholds.push(reputation.badgeThresholds[idx]);
         svg
           .append("rect")
           .attr("x", 40)
@@ -350,7 +337,6 @@ class StudentReputationHeader extends ReputationHeader {
           .attr("stroke", "var(--reputation-colour)")
           .attr("stroke-width", 1)
           .attr("fill", "none");
-
         svg
           .append("rect")
           .attr("class", "badge__bar")
@@ -395,7 +381,6 @@ class StudentReputationHeader extends ReputationHeader {
           .attr("stroke", "var(--reputation-colour)")
           .attr("stroke-width", 2)
           .attr("fill", "var(--reputation-colour)");
-
         thresholds.forEach((threshold, i) => {
           const badge = svg.append("g");
           badge
@@ -449,12 +434,12 @@ class StudentReputationHeader extends ReputationHeader {
       if (window.innerWidth <= 500) {
         return toggleMobileReputationView();
       }
+
       return toggleDesktopReputationView();
     }
 
     function toggleDesktopReputationView() {
       const duration = 500;
-
       const counts = model.shadow.querySelectorAll(".badge__reputation");
       const bars = model.shadow.querySelectorAll(".badge__bar");
 
@@ -463,6 +448,7 @@ class StudentReputationHeader extends ReputationHeader {
         const count = d3.select(counts[i]);
         const bar = d3.select(bars[i]);
         const width = Math.max(...reputation.badgeThresholds);
+
         if (model.element.open) {
           count
             .transition()
@@ -492,6 +478,7 @@ class StudentReputationHeader extends ReputationHeader {
             .ease(d3.easeCubicInOut)
             .tween("text", function () {
               const interpolate = d3.interpolate(this.textContent, 0); // eslint-disable-line
+
               return function (t) {
                 this.textContent = Math.round(interpolate(t)); // eslint-disable-line
               };
@@ -507,7 +494,6 @@ class StudentReputationHeader extends ReputationHeader {
 
     function toggleMobileReputationView() {
       const duration = 500;
-
       const counts = model.shadow.querySelectorAll(".badge__reputation");
       const bars = model.shadow.querySelectorAll(".badge__bar");
 
@@ -521,6 +507,7 @@ class StudentReputationHeader extends ReputationHeader {
           .map(([t, i]) => i)[0];
         let width: number;
         const thresholds: Array<number> = [];
+
         if (idx == 0) {
           width = reputation.badgeThresholds[0];
         } else {
@@ -529,7 +516,9 @@ class StudentReputationHeader extends ReputationHeader {
             reputation.badgeThresholds[idx - 1];
           thresholds.push(reputation.badgeThresholds[idx - 1]);
         }
+
         thresholds.push(reputation.badgeThresholds[idx]);
+
         if (model.element.open) {
           count
             .transition()
@@ -568,6 +557,7 @@ class StudentReputationHeader extends ReputationHeader {
             .ease(d3.easeCubicInOut)
             .tween("text", function () {
               const interpolate = d3.interpolate(this.textContent, 0); // eslint-disable-line
+
               return function (t) {
                 this.textContent = Math.round(interpolate(t)); // eslint-disable-line
               };
@@ -589,10 +579,11 @@ class StudentReputationHeader extends ReputationHeader {
       return style;
     }
 
-    /********/
-    /* init */
-    /********/
+    /** ******/
 
+    /* init */
+
+    /** ******/
     view();
     await update();
   }

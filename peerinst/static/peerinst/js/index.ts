@@ -1,4 +1,6 @@
 /* global deletedQuestionsHidden:writable */
+declare let bundle: any; // bundle will be available globally at runtime
+declare let deletedQuestionsHidden: any; // deletedQuestionsHidden will be available globally at runtime
 
 // MDC
 import autoInit from "@material/auto-init/index";
@@ -830,8 +832,6 @@ export function wrap(text, width) {
  *  @function
  */
 function underlines() {
-  "use strict";
-
   // Decorate h1 headers
   const lines = d3.selectAll(".underline");
   lines.selectAll("g").remove();
