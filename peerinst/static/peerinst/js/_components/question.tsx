@@ -310,7 +310,7 @@ export class AssignmentDialog extends Component<
   handleSubmit = async (evt: React.MouseEvent): Promise<void> => {
     const target = evt.target as HTMLInputElement;
     if (target.form?.checkValidity()) {
-      if (this.state.create) {
+      if (this.state.create || this.count() == 0) {
         this.props.handleSubmit(this.props.question.pk, [], {
           intro_page: this.state.introduction,
           conclusion_page: this.state.conclusion,
