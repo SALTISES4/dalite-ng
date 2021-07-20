@@ -110,7 +110,7 @@ export class AssignmentDialog extends Component<
     const url = new URL(this.props.checkIdURL, window.location.origin);
     url.search = queryString.toString();
     try {
-      const check = await get(url.toString());
+      const check = (await get(url.toString())) as { valid: boolean };
       console.debug(check);
       if (!check.valid) {
         target.setCustomValidity(
@@ -485,7 +485,7 @@ export class QuestionFlagDialog extends Component<
 
   refreshFromDB = async (): Promise<void> => {
     try {
-      const data = await get(this.props.urls[0]);
+      const data = (await get(this.props.urls[0])) as { reasons: string[] };
       console.debug(data);
       this.setState({
         reasons: data.reasons,

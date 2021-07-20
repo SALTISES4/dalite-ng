@@ -48,6 +48,16 @@ function Chip({ onClick, selected, text }: ChipProps) {
   );
 }
 
+type SearchData = {
+  meta: {
+    categories: string[];
+    difficulties: string[];
+    disciplines: string[];
+    impacts: string[];
+  };
+  results: Question[];
+};
+
 type SearchAppProps = {
   assignmentURL: string;
   assignmentFormCheckIdURL: string;
@@ -181,7 +191,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
       if (this.state.query.length > 2) {
         try {
           this.setState({ searching: true });
-          const data = await get(url.toString());
+          const data = (await get(url.toString())) as SearchData;
           console.debug(data);
           this.setState(
             {
@@ -246,7 +256,8 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
           newAssignmentData,
           "POST",
         );
-        assignments = [_assignment.pk];
+        console.debug(_assignment);
+        assignments = [(_assignment as AssignmentCreate).pk];
       } catch (error) {
         console.error(error);
         this.setState({
@@ -255,6 +266,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
         });
       }
     }
+    const added: string[] = [];
     for await (const a of assignments) {
       try {
         await submitData(
@@ -262,15 +274,11 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
           { assignment: a, question_pk: questionPK },
           "POST",
         );
-        this.setState(
-          {
-            assignmentDialogOpen: false,
-            assignmentDialogQuestion: {} as Question,
-            snackbarIsOpen: true,
-            snackbarMessage: this.props.gettext(`Added to ${a}`),
-          },
-          this.refreshFromDB,
-        );
+        added.push(a);
+        this.setState({
+          assignmentDialogOpen: false,
+          assignmentDialogQuestion: {} as Question,
+        });
       } catch (error) {
         console.error(error);
         this.setState({
@@ -279,6 +287,21 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
         });
       }
     }
+
+    let message = this.props.gettext("Added to ");
+    if (added.length == 1) {
+      message += added[0];
+    } else {
+      message += `${added.length} ${this.props.gettext("assignments")}`;
+    }
+    console.debug(message);
+    this.setState(
+      {
+        snackbarIsOpen: true,
+        snackbarMessage: message,
+      },
+      this.refreshFromDB,
+    );
     return;
   };
 
@@ -715,7 +738,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
       const data = await get(this.props.assignmentFormMetaDataURL);
       console.debug(data);
       this.setState({
-        assignmentFormMetaData: data,
+        assignmentFormMetaData: data as AssignmentForm,
       });
     } catch (error) {
       console.error(error);
