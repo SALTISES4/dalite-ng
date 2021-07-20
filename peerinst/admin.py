@@ -314,8 +314,27 @@ class StudentAdmin(admin.ModelAdmin):
 
 @admin.register(StudentGroup)
 class StudentGroupAdmin(admin.ModelAdmin):
-    list_display = ["id", "name"]
-    search_fields = ["name"]
+    def num_students(self):
+        return self.studentgroupmembership_set.all().count()
+
+    list_display = [
+        "id",
+        "year",
+        "semester",
+        "name",
+        "title",
+        num_students,
+        "discipline",
+        "institution",
+    ]
+    search_fields = ["name", "institution"]
+    list_filter = [
+        "year",
+        "semester",
+        "mode_created",
+        "institution",
+        "discipline",
+    ]
 
 
 @admin.register(StudentNotification)
