@@ -528,9 +528,9 @@ export class QuestionFlagDialog extends Component<
           >
             <Select
               autoFocus
-              onChange={(e) => {
+              onChange={(e: React.FormEvent<HTMLInputElement>) => {
                 this.setState({
-                  selectedReason: e.target.value,
+                  selectedReason: (e.target as HTMLInputElement).value,
                 });
               }}
               options={this.state.reasons}
@@ -579,7 +579,9 @@ function QuestionCardActionButtons(props) {
         {props.gettext("Categories")}:{" "}
         <span>
           {props.question.category
-            ? props.question.category.map((c) => c.title).join("; ")
+            ? props.question.category
+                .map((c: { title: string }) => c.title)
+                .join("; ")
             : props.gettext("Uncategorized")}
         </span>
       </Typography>
@@ -852,26 +854,32 @@ function AssignmentAddIcon({
   );
 }
 
-function Image(props) {
-  if (props.image && props.show) {
+type ImageProps = {
+  alt?: string;
+  image: string;
+  show?: boolean;
+};
+
+function Image({ alt = "", image, show = true }: ImageProps) {
+  if (image && show) {
     return (
       <Typography use="caption">
-        <img alt={props.alt} class="question-image" src={props.image} />
+        <img alt={alt} class="question-image" src={image} />
       </Typography>
     );
   }
   return <Fragment />;
 }
 
-function Video(props) {
-  if (props.url && props.show) {
+type VideoProps = {
+  show?: boolean;
+  url: string;
+};
+
+function Video({ show = true, url }: VideoProps) {
+  if (url && show) {
     return (
-      <object
-        class="question-image"
-        width="640"
-        height="390"
-        data={props.url}
-      />
+      <object class="question-image" width="640" height="390" data={url} />
     );
   }
   return <Fragment />;
