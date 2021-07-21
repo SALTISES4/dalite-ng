@@ -133,7 +133,7 @@ def test_send_email__no_email(student):
 def test_join_group(student, group):
     student.join_group(group)
 
-    assert group in student.student_groups.all()
+    assert group in student.groups.all()
     assert group in student.current_groups
     assert group not in student.old_groups
     assert not mail.outbox

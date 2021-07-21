@@ -106,9 +106,5 @@ class StudentGroup(models.Model):
         return base64.urlsafe_b64encode(str(self.id).encode()).decode()
 
     @property
-    def students(self):
-        return self.student_set.all()
-
-    @property
     def has_emails(self):
         return all(s.student.email for s in self.students)

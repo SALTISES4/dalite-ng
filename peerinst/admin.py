@@ -310,6 +310,8 @@ class StudentAdmin(admin.ModelAdmin):
 
     list_display = [student_username, student_email]
     search_fields = ["student__email", "student__username"]
+    readonly_fields = ["student"]
+    exclude = ["reputation"]
 
 
 @admin.register(StudentGroup)
