@@ -144,14 +144,6 @@ def get_flagged_rationales(req: HttpRequest) -> HttpResponse:
 
 
 @require_safe
-def activity_page(req: HttpRequest) -> HttpResponse:
-    context = {
-        "disciplines": list(Discipline.objects.values_list("title", flat=True))
-    }
-    return render(req, "peerinst/saltise_admin/activity.html", context)
-
-
-@require_safe
 @with_query_string_params(args=["discipline"])
 def get_groups_activity(req: HttpRequest, discipline: str) -> HttpResponse:
     try:

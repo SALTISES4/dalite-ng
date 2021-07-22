@@ -1,9 +1,11 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.core import mail
 from django.urls import reverse
 
 from peerinst.models import NewUserRequest
 from quality.tests.fixtures import *  # noqa
+
+from .. import factories
 
 
 def test_index__superuser(client, superuser):
@@ -79,13 +81,18 @@ def test_verify_user__refuse(client, staff, new_user_requests):
     ).exists()
 
 
-def test_activity_page(client, staff, disciplines):
-    assert client.login(username=staff.username, password="test")
-    resp = client.get(reverse("saltise-admin:activity"))
+def test_activity_page(client):
+    saltise_staff = factories.UserFactory()
+    saltise_staff.is_staff = True
+    saltise_staff.user_permissions.add(
+        Permission.objects.get(
+            content_type__app_label="peerinst",
+            content_type__model="studentgroup",
+            codename="view_studentgroup",
+        )
+    )
+    saltise_staff.save()
+    assert client.login(username=saltise_staff.username, password="test")
+    resp = client.get(reverse("admin:peerinst_studentgroup_changelist"))
 
     assert resp.status_code == 200
-    assert "peerinst/saltise_admin/activity.html" in [
-        t.name for t in resp.templates
-    ]
-    assert len(disciplines) == len(resp.context["disciplines"])
-    assert all(d.title in resp.context["disciplines"] for d in disciplines)
