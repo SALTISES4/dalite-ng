@@ -434,14 +434,14 @@
 {{ block.super }}
 <script nonce="{{ request.csp_nonce }}">
   window.addEventListener('load', function() {
-    const AccountApp = () => {
+    const QuestionApp = () => {
       return preact.h(
-        account.TeacherAccountApp, {
+        account.TeacherAccountQuestionApp, {
           gettext: gettext,
           urls: {questionCreate: "{% url 'question-create' %}", questionEdit: "{% url 'question-update-path' %}", questionList: "{% url 'REST:teacher' teacher.pk %}"},
         });
     }
-    preact.render(AccountApp(), document.getElementById("questions-app"));
+    preact.render(QuestionApp(), document.getElementById("questions-app"));
   });
 </script>
 

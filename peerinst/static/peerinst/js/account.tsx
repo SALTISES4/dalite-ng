@@ -28,12 +28,12 @@ function Breadcrumb({ onClick, text }: BreadcrumbProps): JSX.Element {
   );
 }
 
-type TeacherAccountAppProps = {
+type TeacherAccountQuestionAppProps = {
   gettext: (a: string) => string;
   urls: { questionCreate: string; questionEdit: string; questionList: string };
 };
 
-type TeacherAccountAppState = {
+type TeacherAccountQuestionAppState = {
   archived: number[];
   deleted: number[];
   open: boolean;
@@ -52,9 +52,9 @@ type TeacherAccountAppState = {
   view: string;
 };
 
-export class TeacherAccountApp extends Component<
-  TeacherAccountAppProps,
-  TeacherAccountAppState
+export class TeacherAccountQuestionApp extends Component<
+  TeacherAccountQuestionAppProps,
+  TeacherAccountQuestionAppState
 > {
   state = {
     archived: [],
@@ -205,7 +205,9 @@ export class TeacherAccountApp extends Component<
     if (this.state.open) {
       return (
         <Fragment>
-          <div style={{ marginLeft: 48 }}>{this.breadcrumbs()}</div>
+          <div style={{ marginLeft: 48, marginTop: -6, marginBottom: 16 }}>
+            {this.breadcrumbs()}
+          </div>
           <QuestionList
             archived={this.state.archived}
             deleted={this.state.deleted}
