@@ -316,6 +316,12 @@ class StudentAdmin(admin.ModelAdmin):
 
 @admin.register(StudentGroup)
 class StudentGroupAdmin(admin.ModelAdmin):
+    def teacher(self):
+        if self.teacher.first():
+            return self.teacher.first().user.email
+        else:
+            return ""
+
     def num_students(self):
         return self.studentgroupmembership_set.all().count()
 
@@ -325,6 +331,7 @@ class StudentGroupAdmin(admin.ModelAdmin):
         "semester",
         "name",
         "title",
+        teacher,
         num_students,
         "discipline",
         "institution",
@@ -336,6 +343,10 @@ class StudentGroupAdmin(admin.ModelAdmin):
         "mode_created",
         "institution",
         "discipline",
+    ]
+    readonly_fields = ["name", "title", "student_id_needed", num_students]
+    exclude = [
+        "quality",
     ]
 
 
