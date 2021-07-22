@@ -59,7 +59,7 @@ export class TeacherAccountApp extends Component<
   state = {
     archived: [],
     deleted: [],
-    open: false,
+    open: localStorage.getItem("teacher-account-question-section") === "true",
     questions: [],
     shared: [],
     view: "",
@@ -243,7 +243,18 @@ export class TeacherAccountApp extends Component<
             }
           />
           <Typography
-            onClick={() => this.setState({ open: !this.state.open })}
+            onClick={() =>
+              this.setState({ open: !this.state.open }, () => {
+                try {
+                  localStorage.setItem(
+                    "teacher-account-question-section",
+                    `${this.state.open}`,
+                  );
+                } catch (error) {
+                  console.error(error);
+                }
+              })
+            }
             use="headline4"
             tag="h2"
             style={{ cursor: "pointer", marginBottom: 0 }}

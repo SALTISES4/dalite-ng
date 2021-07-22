@@ -74,7 +74,8 @@ export function QuestionList({
   return (
     <List twoLine>
       {questions
-        .concat(shared)
+        .reverse()
+        .concat(shared.reverse())
         .filter((q) => {
           return view == "deleted"
             ? deleted.includes(q.pk)
