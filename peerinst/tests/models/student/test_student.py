@@ -142,7 +142,7 @@ def test_join_group(student, group):
 def test_join_group_mail_new_group(student, group):
     student.join_group(group, mail_type="new_group")
 
-    assert group in student.student_groups.all()
+    assert group in student.groups.all()
     assert group in student.current_groups
     assert group not in student.old_groups
     assert len(mail.outbox) == 1
@@ -151,7 +151,7 @@ def test_join_group_mail_new_group(student, group):
 def test_join_group_mail_confirmation(student, group):
     student.join_group(group, mail_type="confirmation")
 
-    assert group in student.student_groups.all()
+    assert group in student.groups.all()
     assert group in student.current_groups
     assert group not in student.old_groups
     assert len(mail.outbox) == 1
@@ -165,7 +165,7 @@ def test_join_group_existing_assignments(student, group_assignment):
 
     student.join_group(group_assignment.group)
 
-    assert group_assignment.group in student.student_groups.all()
+    assert group_assignment.group in student.groups.all()
     assert group_assignment.group in student.current_groups
     assert group_assignment.group not in student.old_groups
 
@@ -177,13 +177,12 @@ def test_join_group_existing_assignments(student, group_assignment):
 
 def test_leave_group(student, group):
     student.groups.add(group)
-    StudentGroupMembership.objects.create(student=student, group=group)
+    StudentGroupMembership.objects.get_or_create(student=student, group=group)
     assert group in student.groups.all()
-    assert group in student.student_groups.all()
 
     student.leave_group(group)
 
-    assert group in student.student_groups.all()
+    assert group in student.groups.all()
     assert group not in student.current_groups
     assert group in student.old_groups
 
@@ -191,7 +190,7 @@ def test_leave_group(student, group):
 def test_leave_group__doesnt_exist(student, group):
     student.leave_group(group)
 
-    assert group not in student.student_groups.all()
+    assert group not in student.groups.all()
     assert group not in student.current_groups
     assert group not in student.old_groups
 
