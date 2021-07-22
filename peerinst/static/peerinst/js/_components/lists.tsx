@@ -31,6 +31,12 @@ type QuestionListProps = {
     title: string;
     type: string;
   }[];
+  shared: {
+    answer_count: number; // eslint-disable-line camelcase
+    pk: number;
+    title: string;
+    type: string;
+  }[];
   view: string;
 };
 
@@ -42,6 +48,7 @@ export function QuestionList({
   handleToggleArchived,
   handleToggleDeleted,
   questions,
+  shared,
   view,
 }: QuestionListProps): JSX.Element {
   if (
@@ -67,6 +74,7 @@ export function QuestionList({
   return (
     <List twoLine>
       {questions
+        .concat(shared)
         .filter((q) => {
           return view == "deleted"
             ? deleted.includes(q.pk)
@@ -94,6 +102,7 @@ export function QuestionList({
                   handleToggleArchived={handleToggleArchived}
                   handleToggleDeleted={handleToggleDeleted}
                   question={q}
+                  shared={shared.map((sq) => sq.pk).includes(q.pk)}
                 />
               </Fragment>
             );
@@ -117,6 +126,7 @@ type QuestionListItemProps = {
     title: string;
     type: string;
   };
+  shared: boolean;
 };
 
 function QuestionListItem({
@@ -127,22 +137,25 @@ function QuestionListItem({
   handleToggleArchived,
   handleToggleDeleted,
   question,
+  shared,
 }: QuestionListItemProps): JSX.Element {
   const deleteIcon = (): JSX.Element | undefined => {
-    return (
-      <IconButton
-        icon={deleted ? "restore_from_trash" : "delete"}
-        onClick={() => handleToggleDeleted(question.pk)}
-        style={{ color: "#757575" }}
-        title={
-          deleted
-            ? gettext("Undelete this question.")
-            : gettext(
-                "Delete this question.  If there are no student answers associated  with it, deleting removes it from search results but won't prevent other teachers from using it if they have already included it in their assignments.",
-              )
-        }
-      />
-    );
+    if (!shared) {
+      return (
+        <IconButton
+          icon={deleted ? "restore_from_trash" : "delete"}
+          onClick={() => handleToggleDeleted(question.pk)}
+          style={{ color: "#757575" }}
+          title={
+            deleted
+              ? gettext("Undelete this question.")
+              : gettext(
+                  "Delete this question.  If there are no student answers associated  with it, deleting removes it from search results but won't prevent other teachers from using it if they have already included it in their assignments.",
+                )
+          }
+        />
+      );
+    }
   };
 
   const archiveIcon = (): JSX.Element | undefined => {

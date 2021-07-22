@@ -332,8 +332,9 @@ def test_teacher_questions(client, questions, teachers):
     2. Only current teacher endpoint is accessible via GET
     3. Can update favourites through PUT
     4. Can update deleted and archived through PUT
-    5. Cannot delete or archive a question we don't own
-    6. No other http methods
+    5. Cannot delete a question we don't own
+    6. Can only archive questions we own or share
+    7. No other http methods
     """
 
     # Setup
@@ -399,18 +400,8 @@ def test_teacher_questions(client, questions, teachers):
     assert questions[0] in teachers[1].archived_questions.all()
     assert response.status_code == status.HTTP_200_OK
 
-    # 5. Cannot delete or archive a question not owned
+    # 5. Cannot delete a question we don't own
     assert questions[1].user != teachers[1].user
-    assert questions[2].user != teachers[1].user
-
-    response = client.put(
-        url,
-        {
-            "archived_questions": [questions[1].pk],
-        },
-        content_type="application/json",
-    )
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     response = client.put(
         url,
@@ -421,7 +412,30 @@ def test_teacher_questions(client, questions, teachers):
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    # 6. No other http methods
+    # 6. Can only archive questions we own or share
+    assert questions[2].user != teachers[1].user
+    assert teachers[1].user not in questions[2].collaborators.all()
+
+    response = client.put(
+        url,
+        {
+            "archived_questions": [questions[1].pk],
+        },
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    questions[3].collaborators.add(teachers[1].user)
+    response = client.put(
+        url,
+        {
+            "archived_questions": [questions[3].pk],
+        },
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    # 7. No other http methods
     disallowed = ["post", "patch", "delete", "head", "options", "trace"]
 
     for method in disallowed:

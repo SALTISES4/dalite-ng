@@ -43,6 +43,12 @@ type TeacherAccountAppState = {
     title: string;
     type: string;
   }[];
+  shared: {
+    answer_count: number; // eslint-disable-line camelcase
+    pk: number;
+    title: string;
+    type: string;
+  }[];
   view: string;
 };
 
@@ -55,6 +61,7 @@ export class TeacherAccountApp extends Component<
     deleted: [],
     open: false,
     questions: [],
+    shared: [],
     view: "",
   };
 
@@ -130,11 +137,15 @@ export class TeacherAccountApp extends Component<
     try {
       const data = await get(this.props.urls.questionList);
       console.debug(data);
-      this.setState({
-        archived: data["archived_questions"],
-        deleted: data["deleted_questions"],
-        questions: data["questions"],
-      });
+      this.setState(
+        {
+          archived: data["archived_questions"],
+          deleted: data["deleted_questions"],
+          questions: data["questions"],
+          shared: data["shared_questions"],
+        },
+        () => console.debug(this.state),
+      );
     } catch (error) {
       console.error(error);
     }
@@ -203,6 +214,7 @@ export class TeacherAccountApp extends Component<
             handleToggleArchived={this.handleToggleArchived}
             handleToggleDeleted={this.handleToggleDeleted}
             questions={this.state.questions}
+            shared={this.state.shared}
             view={this.state.view}
           />
         </Fragment>

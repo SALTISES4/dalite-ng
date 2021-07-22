@@ -37,24 +37,44 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
         read_only=True,
         source="user.question_set",
     )
+    shared_questions = QuestionSerializer(
+        fields=[
+            "answer_count",
+            "pk",
+            "title",
+            "type",
+        ],
+        many=True,
+        read_only=True,
+        source="user.collaborators",
+    )
     user = UserSerializer(read_only=True)
 
     def validate(self, data):
-        """
-        Limit archived and deleted questions to questions where user is owner
-        """
+        # Limit deleted questions to questions where user is owner
         questions = self.context["request"].user.question_set.all()
 
-        if "archived_questions" in data:
-            if any([q not in questions for q in data["archived_questions"]]):
-                raise serializers.ValidationError(
-                    "Cannot archive this question"
-                )
         if "deleted_questions" in data:
             if any([q not in questions for q in data["deleted_questions"]]):
                 raise serializers.ValidationError(
                     "Cannot delete this question"
                 )
+
+        # Limit archived questions to questions where user is owner or
+        # collaborator
+        shared = self.context["request"].user.collaborators.all()
+
+        if "archived_questions" in data:
+            if any(
+                [
+                    q not in questions | shared
+                    for q in data["archived_questions"]
+                ]
+            ):
+                raise serializers.ValidationError(
+                    "Cannot archive this question"
+                )
+
         return data
 
     class Meta:
@@ -64,7 +84,8 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
             "assignments",
             "deleted_questions",
             "favourite_questions",
-            "questions",
             "pk",
+            "questions",
+            "shared_questions",
             "user",
         ]
