@@ -125,7 +125,6 @@ def test_leave_group_is_member_of_group(client, student, group):
     StudentGroupMembership.objects.get_or_create(student=student, group=group)
 
     assert group in student.groups.all()
-    assert group in student.student_groups.all()
     assert StudentGroupMembership.objects.get(
         student=student, group=group
     ).current_member
