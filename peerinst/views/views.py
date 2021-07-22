@@ -22,7 +22,12 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count, Q
 from django.db.models.expressions import Func
 from django.forms import Textarea, inlineformset_factory
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import (
+    Http404,
+    HttpResponse,
+    HttpResponseRedirect,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.template.response import TemplateResponse
@@ -237,6 +242,10 @@ def sign_up(request):
         context["form"] = forms.SignUpForm()
 
     return render(request, template, context)
+
+
+def page_not_found(request):
+    raise Http404("")
 
 
 def admin_check(user):

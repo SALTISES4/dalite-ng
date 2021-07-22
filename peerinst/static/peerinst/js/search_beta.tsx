@@ -40,7 +40,7 @@ type ChipProps = {
 function Chip({ onClick, selected, text }: ChipProps) {
   return (
     <div
-      class={selected ? "selected chips" : "chips"}
+      className={selected ? "selected chips" : "chips"}
       onClick={() => onClick(text)}
     >
       {text}
@@ -339,7 +339,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
   categoryChips = (): JSX.Element => {
     if (this.state.categories.length > 0) {
       return (
-        <div class="chip-container">
+        <div className="chip-container">
           <Typography
             use="caption"
             tag="div"

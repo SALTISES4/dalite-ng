@@ -163,7 +163,7 @@ function watchStyle(app, module) {
 
 function typescript() {
   const build = gulp
-    .src("**/*.tsx")
+    .src(["**/*.tsx"])
     // .src([
     //   "{analytics,peerinst,reputation,quality,tos}/**/*.{ts,tsx,js,jsx}",
     //   "!**/*.min.js",

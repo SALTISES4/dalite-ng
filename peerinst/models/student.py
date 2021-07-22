@@ -455,7 +455,10 @@ class StudentAssignment(models.Model):
                     host = _url.hostname
 
                 signin_link = "{}://{}{}?token={}".format(
-                    protocol, host, reverse("student-page"), token,
+                    protocol,
+                    host,
+                    reverse("student-page"),
+                    token,
                 )
 
                 assignment_link = "{}://{}{}".format(

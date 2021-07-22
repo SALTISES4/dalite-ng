@@ -592,15 +592,22 @@ function QuestionCardActionButtons(props) {
   );
 }
 
-function Info(props) {
+type InfoProps = {
+  size?: number;
+  text: string;
+  type?: string;
+};
+
+export function Info({ size = 10, text, type = "" }: InfoProps): JSX.Element {
   return (
-    <div class={`${props.type} info`} style={{ display: "flex" }}>
+    <div className="info" style={{ display: "flex" }}>
       <Icon
+        className={type}
         icon="info"
         iconOptions={{ strategy: "ligature", size: "small" }}
       />
-      <Typography use="caption" tag="p">
-        {props.text}
+      <Typography use="caption" tag="p" style={{ fontSize: size }}>
+        {text}
       </Typography>
     </div>
   );
@@ -690,8 +697,8 @@ function AnswerChoices(props) {
       Object.prototype.hasOwnProperty.call(props.question, "answerchoice_set")
     ) {
       return (
-        <div class="question-answers">
-          <ol type={props.question.answer_style == 0 ? "A" : "l"}>
+        <div className="question-answers">
+          <ol type={props.question.answer_style == 0 ? "A" : "1"}>
             {props.question.answerchoice_set.map((ac, i) => {
               return (
                 <Typography
@@ -1070,7 +1077,7 @@ function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
   };
 
   return (
-    <div class="ratings">
+    <div className="ratings">
       {difficulty()}
       {impact()}
     </div>
