@@ -53,7 +53,6 @@ def old_patterns():
             views.QuestionUpdateView.as_view(),
             name="question-update",
         ),
-        path("question/delete", views.question_delete, name="question-delete"),
         path(
             "discipline/create",
             views.DisciplineCreateView.as_view(),

@@ -1,12 +1,13 @@
 import json
-import pytz
 from datetime import datetime
-import pytest
 
+import pytest
+import pytz
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group, Permission, User
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
+from rest_framework import status
 
 from peerinst.models import (
     Assignment,
@@ -17,8 +18,6 @@ from peerinst.models import (
 )
 from quality.models import UsesCriterion
 from tos.models import Consent, Role, Tos
-
-from rest_framework import status
 
 
 def ready_user(pk):
@@ -228,7 +227,8 @@ class TeacherTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertCountEqual(
-            response.context["object_list"], assignment.questions.all(),
+            response.context["object_list"],
+            assignment.questions.all(),
         )
         questions = [
             rank.question for rank in assignment.assignmentquestions_set.all()
@@ -927,31 +927,6 @@ class TeacherTest(TestCase):
         )
         self.assertEqual(response.status_code, 403)
         self.assertTemplateUsed(response, "tos/tos_required.html")
-
-    def test_question_delete(self):
-        logged_in = self.client.login(
-            username=self.validated_teacher.username,
-            password=self.validated_teacher.text_pwd,
-        )
-        self.assertTrue(logged_in)
-
-        # 'Delete', i.e. hide, question for teacher (ajax only)
-        response = self.client.post(
-            reverse("question-delete"),
-            {"pk": 32},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        self.assertEqual(response.status_code, 200)
-        q = Question.objects.get(pk=32)
-        self.assertIn(
-            q, self.validated_teacher.teacher.deleted_questions.all()
-        )
-
-        # Check this question is not searchable
-        # response =
-        # self.client.get(reverse('question-search')+"?search_string=Question&type=assignment&id=Assignment1")
-        # print(response.context['search_results'])
-        # self.assertNotIn(q, response.context['search_results'])
 
     def test_collection_private(self):
 

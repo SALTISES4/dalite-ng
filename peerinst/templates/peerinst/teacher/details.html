@@ -182,82 +182,6 @@
     <div id="questions-app"></div>
 
     <div class="foldable">
-      <h2 id="question-section" class="foldable--title mdc-typography--display1 mdc-theme--secondary">
-        {% trans 'Questions' %}
-      </h2>
-      <div class="foldable--body">
-        <div class="admin-link">
-          <a href="{% url 'question-create' %}">{% trans 'Create new' %}</a>
-          <span class="links-divider">|</span><span id='show-deleted-questions' class='toggle-deleted-questions fake-link clickable'>{% trans 'Show deleted' %}</span><span id='hide-deleted-questions' class='toggle-deleted-questions fake-link clickable'>{% trans 'Hide deleted' %}</span>
-        </div>
-
-        <h3>{% trans 'My questions' %}</h3>
-        {% if not object.user.question_set.all %}
-        <p class='mdc-typography--body1'>{% blocktrans %}You do not have any questions.  Create one using the link above!{% endblocktrans %}</p>
-        {% else %}
-        <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-          {% for q in object.user.question_set.all|dictsortreversed:'created_on' %}
-            <li role="separator" class="mdc-list-divider list-item-question-{{ q.pk }}"></li>
-            <li class="mdc-list-item list-item-question-{{ q.pk }}">
-              <span class="mdc-list-item__graphic">
-              {% if q.type == "RO" %}
-                <i class="mdc-theme--primary material-icons md-48">chat</i>
-              {% else %}
-                  <i class="mdc-theme--primary material-icons md-48">question_answer</i>
-              {% endif %}
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {{ q.pk }}: {{q.title|safe|striptags}}
-                <span class="mdc-list-item__secondary-text">
-                  {% trans 'Last modified: ' %}{{q.last_modified}}
-                </span>
-              </span>
-              <span class="mdc-list-item__meta">
-                <i question="{{ q.pk }}" class="undelete-question-{{ q.pk }} material-icons md-24 mdc-ripple-surface icon-list">restore_from_trash</i>
-                <i question="{{ q.pk }}" class="delete-question-{{ q.pk }} material-icons md-24 mdc-ripple-surface icon-list">delete</i>
-                <a id="edit-question-{{ q.pk }}" href="{% url 'question-update' q.pk %}">
-                  <i class="material-icons md-24 mdc-ripple-surface icon-list">mode_edit</i>
-                </a>
-              </span>
-            </li>
-          {% endfor %}
-          <li role="separator" class="mdc-list-divider"></li>
-        </ul>
-        {% endif %}
-
-        {% if object.user.collaborators.all %}
-        <h3>{% trans 'Collaborations' %}</h3>
-        <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-          {% for q in object.user.collaborators.all %}
-            <li role="separator" class="mdc-list-divider list-item-question-{{ q.pk }}"></li>
-            <li class="mdc-list-item list-item-question-{{ q.pk }}">
-              <span class="mdc-list-item__graphic">
-                <div class="iconify">
-                  <span class="text-on-div-icon bold">{{q.pk}}</span>
-                </div>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {{q.title|safe|striptags}}
-                <span class="mdc-list-item__secondary-text">
-                  {% trans 'Last modified: ' %}{{q.last_modified}}
-                </span>
-              </span>
-              <span class="mdc-list-item__meta">
-                <i question="{{ q.pk }}" class="undelete-question-{{ q.pk }} material-icons md-24 mdc-ripple-surface icon-list">restore_from_trash</i>
-                <i question="{{ q.pk }}" class="delete-question-{{ q.pk }} material-icons md-24 mdc-ripple-surface icon-list">delete</i>
-                <a id="edit-question-{{ q.pk }}" href="{% url 'question-update' q.pk %}">
-                  <i class="material-icons md-24 mdc-ripple-surface icon-list">mode_edit</i>
-                </a>
-              </span>
-            </li>
-          {% endfor %}
-          <li role="separator" class="mdc-list-divider"></li>
-        </ul>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="foldable">
       <h2 id="blink-section" class="foldable--title mdc-typography--display1 mdc-theme--secondary">
         {% trans 'Blink scripts' %}
       </h2>
@@ -270,7 +194,6 @@
         {% if not object.blinkassignment_set.all %}
         <p class='mdc-typography--body1'>{% blocktrans %}A blink script is a series of blink questions strung together into one activity.  You do not have any blink scripts.{% endblocktrans %}</p>
         {% endif %}
-
 
         <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive" >
           {% for a in object.blinkassignment_set.all %}
@@ -511,32 +434,19 @@
 {{ block.super }}
 <script nonce="{{ request.csp_nonce }}">
   window.addEventListener('load', function() {
-    const QuestionsApp = () => {
+    const AccountApp = () => {
       return preact.h(
         account.TeacherAccountApp, {
           gettext: gettext,
           urls: {questionCreate: "{% url 'question-create' %}", questionEdit: "{% url 'question-update-path' %}", questionList: "{% url 'REST:teacher' teacher.pk %}"},
         });
     }
-    preact.render(QuestionsApp(), document.getElementById("questions-app"));
+    preact.render(AccountApp(), document.getElementById("questions-app"));
   });
 </script>
 
 <script nonce="{{ request.csp_nonce }}">
   bundle.addDialog();
-
-  // Hide all deleted questions and set global scope state variable
-  var deletedQuestionsHidden = true;
-  $('#hide-deleted-questions').hide();
-  $('[class*=undelete-question]').hide();
-  {% for q in object.deleted_questions.all %}
-  $('.list-item-question-{{ q.pk }}').hide();
-  $('.list-item-question-{{ q.pk }}').addClass('deleted');
-  $('.undelete-question-{{ q.pk }}').show();
-  $('.delete-question-{{ q.pk }}').hide();
-  {% endfor %}
-
-  bundle.handleQuestionDelete("{% url 'question-delete' %}");
 
   $.ajaxSetup({
       beforeSend: function(xhr, settings) {

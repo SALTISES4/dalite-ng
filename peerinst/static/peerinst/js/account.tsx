@@ -205,7 +205,7 @@ export class TeacherAccountApp extends Component<
     if (this.state.open) {
       return (
         <Fragment>
-          {this.breadcrumbs()}
+          <div style={{ marginLeft: 48 }}>{this.breadcrumbs()}</div>
           <QuestionList
             archived={this.state.archived}
             deleted={this.state.deleted}
@@ -234,8 +234,7 @@ export class TeacherAccountApp extends Component<
             checked={this.state.open}
             icon={"chevron_right"}
             onClick={() => this.setState({ open: !this.state.open })}
-            onIcon={"expand_less"}
-            style={{ marginLeft: -48 }}
+            onIcon={"expand_more"}
             theme="secondary"
             title={
               this.state.open

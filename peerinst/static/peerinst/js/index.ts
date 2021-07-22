@@ -1,6 +1,4 @@
-/* global deletedQuestionsHidden:writable */
 declare let bundle: any; // bundle will be available globally at runtime
-declare let deletedQuestionsHidden: any; // deletedQuestionsHidden will be available globally at runtime
 
 // MDC
 import autoInit from "@material/auto-init/index";
@@ -1274,39 +1272,6 @@ export function addDialog() {
     document.querySelector(`#activate-${el.id}`).onclick = () => {
       dialog.show();
     };
-  });
-}
-
-/** Handle question delete/undelete for teacher account view
- *  @function
- *  @param {String} url
- */
-export function handleQuestionDelete(url) {
-  // Toggle questions
-  $(".toggle-deleted-questions").on("click", () => {
-    $(".deleted").slideToggle();
-    $("#hide-deleted-questions").toggle();
-    $("#show-deleted-questions").toggle();
-    deletedQuestionsHidden = !deletedQuestionsHidden;
-  });
-
-  // Delete/undelete
-  $("[class*=delete-question]").on("click", (event) => {
-    const el = event.target;
-    const pk = $(el).attr("question");
-    const posting = $.post(url, { pk });
-    posting.done((data) => {
-      if (data["action"] == "restore") {
-        $(`.list-item-question-${pk}`).removeClass("deleted");
-      } else {
-        $(`.list-item-question-${pk}`).addClass("deleted");
-      }
-      $(`.undelete-question-${pk}`).toggle();
-      $(`.delete-question-${pk}`).toggle();
-      if (deletedQuestionsHidden == true) {
-        $(`.list-item-question-${pk}`).slideToggle("deleted");
-      }
-    });
   });
 }
 

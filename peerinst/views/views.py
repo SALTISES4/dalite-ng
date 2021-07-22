@@ -37,7 +37,7 @@ from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language
 from django.utils.translation import ugettext_lazy as _
-from django.views.decorators.http import require_POST, require_safe
+from django.views.decorators.http import require_safe
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, FormView, UpdateView
@@ -657,25 +657,6 @@ class QuestionUpdateView(
             return reverse(
                 "answer-choice-form", kwargs={"question_id": self.object.pk}
             )
-
-
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
-@require_POST
-def question_delete(request):
-    """Hide questions that a teacher deletes."""
-    if request.is_ajax():
-        # Ajax only
-        question = get_object_or_404(Question, pk=request.POST.get("pk"))
-        teacher = get_object_or_404(Teacher, user=request.user)
-        if question not in teacher.deleted_questions.all():
-            teacher.deleted_questions.add(question)
-            return JsonResponse({"action": "delete"})
-        else:
-            teacher.deleted_questions.remove(question)
-            return JsonResponse({"action": "restore"})
-    else:
-        return response_400(request)
 
 
 @login_required
