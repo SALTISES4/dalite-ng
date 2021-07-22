@@ -49,7 +49,7 @@
           <li role="separator" class="mdc-list-divider"></li>
           <li class="mdc-list-item pointer group-link">
             <span class="mdc-list-item__graphic mdc-theme--primary">
-              <i class="clickable mdc-theme--primary material-icons md-48">group</i>
+              <i class="clickable mdc-theme--primary material-icons md-36">group</i>
             </span>
             <span class="clickable mdc-list-item__text mdc-theme--secondary bold">
               {% if not g.title %} {{ g.name }} {% else %} {{ g.title }} {% endif %}
@@ -99,7 +99,7 @@
           <li role="separator" class="mdc-list-divider"></li>
           <li class="mdc-list-item">
             <span class="mdc-list-item__graphic mdc-theme--primary">
-              <i class="clickable mdc-theme--primary material-icons md-48 pointer assignment-link">assignment</i>
+              <i class="clickable mdc-theme--primary material-icons md-36 pointer assignment-link">assignment</i>
             </span>
             <span class="mdc-list-item__text mdc-theme--secondary bold">
               <a class="mdc-theme--secondary" href="{% url 'question-list' a.pk %}">{{ a.identifier }}</a>
@@ -204,7 +204,7 @@
           <li class="mdc-list-item blink" id="edit-blink-{{a.pk}}">
           {% endif %}
             <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">play_circle_filled</i>
+                <i class="mdc-theme--primary material-icons md-36">play_circle_filled</i>
             </span>
             <span class="mdc-list-item__text mdc-theme--secondary bold">
               {{a.title|safe|striptags}}
@@ -245,7 +245,7 @@
           <li role="separator" class="mdc-list-divider"></li>
           <li class="mdc-list-item">
             <span class="mdc-list-item__graphic mdc-theme--primary">
-              <i class="clickable mdc-theme--primary material-icons md-48 collection-icon" id="{{ a.pk }}">book</i>
+              <i class="clickable mdc-theme--primary material-icons md-36 collection-icon" id="{{ a.pk }}">book</i>
             </span>
             <span class="mdc-list-item__text mdc-theme--secondary bold">
               <a class="mdc-theme--secondary" href="{% url 'collection-detail' a.pk %}">{{ a.title }}</a>
@@ -326,7 +326,7 @@
               {% comment %} title="{% trans 'Quality evaluation for allowing rationale submission' %}" {% endcomment %}
               {% comment %} id="quality-eval-edit"> {% endcomment %}
             {% comment %} <span class="mdc-list-item__graphic mdc-theme--primary"> {% endcomment %}
-              {% comment %} <i class="mdc-theme--primary material-icons md-48"> {% endcomment %}
+              {% comment %} <i class="mdc-theme--primary material-icons md-36"> {% endcomment %}
                 {% comment %} assistant {% endcomment %}
               {% comment %} </i> {% endcomment %}
             {% comment %} </span> {% endcomment %}
@@ -355,7 +355,7 @@
         <ul class="mdc-list mdc-list--two-line">
           <li role="separator" class="mdc-list-divider"></li>
           <li class="mdc-list-item pointer" id="edit-user-btn">
-            <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-48">account_circle</i></span>
+            <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-36">account_circle</i></span>
             <span class="mdc-list-item__text mdc-theme--secondary bold">
               {{ object.user.username }}
               <span class="mdc-list-item__secondary-text">
@@ -369,7 +369,7 @@
           </li>
           <li role="separator" class="mdc-list-divider"></li>
           <li class="mdc-list-item pointer edit-identity-btn">
-            <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-48">book</i></span>
+            <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-36">book</i></span>
             <span class="mdc-list-item__text mdc-theme--secondary bold">
               {% for d in object.disciplines.all %}
                 {{ d.title }}{% if not forloop.last %}, {% endif %}
@@ -382,7 +382,7 @@
           </li>
           <li role="separator" class="mdc-list-divider"></li>
           <li class="mdc-list-item pointer edit-identity-btn">
-            <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-48">school</i></span>
+            <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-36">school</i></span>
             <span class="mdc-list-item__text mdc-theme--secondary bold">
               {% for i in object.institutions.all %}
                 {{ i.name }}{% if not forloop.last %}, {% endif %}
@@ -396,11 +396,11 @@
           <li role="separator" class="mdc-list-divider"></li>
           <li class="mdc-list-item pointer" id="tos-modify-btn">
             {% if tos_accepted %}
-              <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-48">check</i></span>
+              <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-36">check</i></span>
               <span class="mdc-list-item__text mdc-theme--secondary bold">
               {% trans 'Terms of service: Sharing' %}
             {% else %}
-              <span class="mdc-list-item__graphic mdc-theme--primary red"><i class="material-icons md-48">clear</i></span>
+              <span class="mdc-list-item__graphic mdc-theme--primary red"><i class="material-icons md-36">clear</i></span>
               <span class="mdc-list-item__text mdc-theme--secondary bold">
               {% trans 'Terms of service: Not sharing' %}
               {% endif %}
@@ -412,7 +412,7 @@
           </li>
           <li role="separator" class="mdc-list-divider"></li>
           <li class="mdc-list-item pointer" id="email-modify-btn">
-            <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-48">email</i></span>
+            <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-36">email</i></span>
             <span class="mdc-list-item__text mdc-theme--secondary bold">
               {% trans "Email settings" %}
               <span class="mdc-list-item__secondary-text">
