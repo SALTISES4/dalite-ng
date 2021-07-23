@@ -12,7 +12,7 @@ import {
 } from "@rmwc/list";
 import { Typography } from "@rmwc/typography";
 
-import { Info } from "./question";
+import { Info } from "../question";
 
 import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-button.min.css";
 import "@rmwc/list/node_modules/@material/list/dist/mdc.list.css";
@@ -51,6 +51,8 @@ export function QuestionList({
   shared,
   view,
 }: QuestionListProps): JSX.Element {
+  const byPk = (a, b) => b.pk - a.pk;
+
   if (
     questions.filter(
       (q) => !deleted.includes(q.pk) && !archived.includes(q.pk),
@@ -74,8 +76,8 @@ export function QuestionList({
   return (
     <List twoLine>
       {questions
-        .reverse()
-        .concat(shared.reverse())
+        .sort(byPk)
+        .concat(shared.sort(byPk))
         .filter((q) => {
           return view == "deleted"
             ? deleted.includes(q.pk)
@@ -94,7 +96,7 @@ export function QuestionList({
             i: number,
           ) => {
             return (
-              <Fragment key={i}>
+              <div key={i}>
                 <QuestionListItem
                   archived={archived.includes(q.pk)}
                   deleted={deleted.includes(q.pk)}
@@ -105,7 +107,7 @@ export function QuestionList({
                   question={q}
                   shared={shared.map((sq) => sq.pk).includes(q.pk)}
                 />
-              </Fragment>
+              </div>
             );
           },
         )}

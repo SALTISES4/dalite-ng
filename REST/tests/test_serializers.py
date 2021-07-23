@@ -12,6 +12,47 @@ from peerinst.tests.fixtures.teacher import login_teacher
 
 
 @pytest.mark.django_db
+def test_dynamic_serializer_querystring(client, assignments, teacher):
+    """
+    Requirements:
+    1. Return subset of specified fields in querystring
+    """
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher", args=(teacher.pk,))
+    response = client.get(url)
+
+    data = json.loads(response.content)
+
+    # Check all fields present
+    fields = [
+        "archived_questions",
+        "assignments",
+        "deleted_questions",
+        "favourite_questions",
+        "pk",
+        "questions",
+        "shared_questions",
+        "user",
+    ]
+    for field in fields:
+        assert field in data
+
+    assert len(data.keys()) == len(fields)
+
+    requested_fields = ["assignments", "pk", "fake"]
+    url = f"{reverse('REST:teacher', args=(teacher.pk,))}?field={'&field='.join(requested_fields)}"  # noqa E501
+
+    response = client.get(url)
+
+    data = json.loads(response.content)
+    for field in requested_fields:
+        assert field in data
+
+    assert len(data.keys()) == 2
+
+
+@pytest.mark.django_db
 def test_assignment_list(client, assignments, student, teacher):
     """
     Requirements:

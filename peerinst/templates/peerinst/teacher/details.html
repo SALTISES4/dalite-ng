@@ -179,6 +179,8 @@
       </div>
     </div>
 
+    <div id="assignments-app"></div>
+
     <div id="questions-app"></div>
 
     <div class="foldable">
@@ -438,10 +440,29 @@
       return preact.h(
         account.TeacherAccountQuestionApp, {
           gettext: gettext,
-          urls: {questionCreate: "{% url 'question-create' %}", questionEdit: "{% url 'question-update-path' %}", questionList: "{% url 'REST:teacher' teacher.pk %}"},
+          urls: {
+            questionCreate: "{% url 'question-create' %}",
+            questionEdit: "{% url 'question-update-path' %}",
+            questionList: "{% url 'REST:teacher' teacher.pk %}"
+          },
         });
     }
     preact.render(QuestionApp(), document.getElementById("questions-app"));
+
+    const AssignmentApp = () => {
+      return preact.h(
+        account.TeacherAccountAssignmentApp, {
+          gettext: gettext,
+          urls: {
+            assignmentCreate: "{% url 'assignment-create' %}",
+            assignmentDistribute: "{% url 'student-group-assignment-create-path' %}",
+            assignmentList: "{% url 'REST:teacher' teacher.pk %}?field=assignments",
+            assignmentSearch: "{% url 'teacher-assignments' teacher.id %}",
+            generateReport: "{% url 'report_selector' %}",
+          }
+        });
+    }
+    preact.render(AssignmentApp(), document.getElementById("assignments-app"));
   });
 </script>
 

@@ -14,6 +14,22 @@ def not_authenticated(user):
     return not user.is_authenticated
 
 
+def dummy_paths():
+    # Dummy paths used to generate base urls without pk
+    return [
+        path(
+            "question/update/",
+            views.page_not_found,
+            name="question-update-path",
+        ),
+        path(
+            "live/studentgroupassignment/create/",
+            views.page_not_found,
+            name="student-group-assignment-create-path",
+        ),
+    ]
+
+
 def old_patterns():
     return [
         # DALITE
@@ -42,11 +58,6 @@ def old_patterns():
             "question/clone/<int:pk>",
             views.QuestionCloneView.as_view(),
             name="question-clone",
-        ),
-        path(
-            "question/update/",
-            views.page_not_found,
-            name="question-update-path",
         ),
         path(
             "question/update/<int:pk>",
@@ -818,6 +829,7 @@ urlpatterns = sum(
         teacher_patterns(),
         dev_admin_patterns(),
         saltise_admin_patterns(),
+        dummy_paths(),
     ],
     [],
 )
