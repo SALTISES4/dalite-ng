@@ -24,6 +24,9 @@ class Teacher(models.Model):
     institutions = models.ManyToManyField(Institution, blank=True)
     disciplines = models.ManyToManyField(Discipline, blank=True)
     assignments = models.ManyToManyField(Assignment, blank=True)
+    archived_assignments = models.ManyToManyField(
+        Assignment, blank=True, related_name="archived_assignments"
+    )
     archived_questions = models.ManyToManyField(
         Question, blank=True, related_name="archived_questions"
     )
