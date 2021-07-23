@@ -24,12 +24,11 @@ logger = logging.getLogger("peerinst-models")
 
 class Student(models.Model):
     student = models.OneToOneField(User, on_delete=models.CASCADE)
-    groups = models.ManyToManyField(StudentGroup, blank=True)
-    student_groups = models.ManyToManyField(
+    groups = models.ManyToManyField(
         StudentGroup,
         blank=True,
         through="StudentGroupMembership",
-        related_name="groups_new",
+        related_name="students",
     )
     send_reminder_email_every_day = models.BooleanField(default=False)
     send_reminder_email_day_before = models.BooleanField(default=True)

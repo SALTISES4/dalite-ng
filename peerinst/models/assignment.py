@@ -357,7 +357,7 @@ class StudentGroupAssignment(models.Model):
     def update_students(self):
         logger.info(
             "Updating %d students for student group assignment %d",
-            self.group.student_set.count(),
+            self.group.students.all().count(),
             self.pk,
         )
         distribute_assignment_to_students_async(self.pk)

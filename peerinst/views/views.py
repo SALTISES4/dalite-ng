@@ -71,6 +71,8 @@ from ..models import (
     Category,
     Collection,
     Discipline,
+    Institution,
+    InstitutionalLMS,
     NewUserRequest,
     Question,
     RationaleOnlyQuestion,
@@ -1036,6 +1038,23 @@ class QuestionFormView(QuestionMixin, FormView):
                     group = StudentGroup(name=course_id)
                 group.semester = current_semester()
                 group.year = current_year()
+                group.mode_created = StudentGroup.LTI
+
+                lms_url = self.lti_data.edx_lti_parameters.get(
+                    "tool_consumer_instance_guid"
+                )
+                if lms_url:
+                    (
+                        institutional_lms,
+                        created,
+                    ) = InstitutionalLMS.objects.get_or_create(url=lms_url)
+                    if created:
+                        institution = Institution.objects.create(
+                            name=institutional_lms.url
+                        )
+                        institutional_lms.institution = institution
+
+                    group.institution = institutional_lms.institution
 
                 # since teachers do not necessarily set discipline for
                 # themselves, take discipline of first question seen

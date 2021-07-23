@@ -16,6 +16,7 @@ from .models import (
     Collection,
     Discipline,
     Institution,
+    InstitutionalLMS,
     LastLogout,
     LtiEvent,
     Question,
@@ -223,6 +224,11 @@ class InstitutionAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(InstitutionalLMS)
+class InstitutionalLMSAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(Assignment)
 class AssignmentAdmin(admin.ModelAdmin):
     filter_horizontal = ["questions"]
@@ -304,12 +310,44 @@ class StudentAdmin(admin.ModelAdmin):
 
     list_display = [student_username, student_email]
     search_fields = ["student__email", "student__username"]
+    readonly_fields = ["student"]
+    exclude = ["reputation"]
 
 
 @admin.register(StudentGroup)
 class StudentGroupAdmin(admin.ModelAdmin):
-    list_display = ["id", "name"]
-    search_fields = ["name"]
+    def teacher(self):
+        if self.teacher.first():
+            return self.teacher.first().user.email
+        else:
+            return ""
+
+    def num_students(self):
+        return self.studentgroupmembership_set.all().count()
+
+    list_display = [
+        "id",
+        "year",
+        "semester",
+        "name",
+        "title",
+        teacher,
+        num_students,
+        "discipline",
+        "institution",
+    ]
+    search_fields = ["name", "institution"]
+    list_filter = [
+        "year",
+        "semester",
+        "mode_created",
+        "institution",
+        "discipline",
+    ]
+    readonly_fields = ["name", "title", "student_id_needed", num_students]
+    exclude = [
+        "quality",
+    ]
 
 
 @admin.register(StudentNotification)

@@ -797,11 +797,6 @@ def saltise_admin_patterns():
                             name="get-flagged-rationales",
                         ),
                         path(
-                            "activity",
-                            staff_member_required(views.admin_.activity_page),
-                            name="activity",
-                        ),
-                        path(
                             "get-groups-activity",
                             staff_member_required(
                                 views.admin_.get_groups_activity

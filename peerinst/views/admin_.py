@@ -135,18 +135,12 @@ def get_flagged_rationales(req: HttpRequest) -> HttpResponse:
                 "note": a.note,
                 "answer_pk": a.answer.pk,
             }
-            for a in AnswerAnnotation.objects.filter(score=0, answer__show_to_others=True)
+            for a in AnswerAnnotation.objects.filter(
+                score=0, answer__show_to_others=True
+            )
         ]
     }
     return JsonResponse(data)
-
-
-@require_safe
-def activity_page(req: HttpRequest) -> HttpResponse:
-    context = {
-        "disciplines": list(Discipline.objects.values_list("title", flat=True))
-    }
-    return render(req, "peerinst/saltise_admin/activity.html", context)
 
 
 @require_safe
@@ -177,6 +171,8 @@ def get_groups_activity(req: HttpRequest, discipline: str) -> HttpResponse:
                 "name": group.title,
                 "teacher": group.teacher.last().user.username,
                 "n_students": group.studentgroupmembership_set.count(),
+                "semester": group.semester,
+                "year": group.year,
             }
             for group in groups
         ]

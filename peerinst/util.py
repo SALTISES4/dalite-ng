@@ -336,7 +336,7 @@ def student_list_from_student_groups(group_list):
         student_ids.extend(
             [
                 s.student.username
-                for s in group.student_set.all()
+                for s in group.students.all()
                 if s.student.username not in ["student"]
             ]
         )
@@ -1391,7 +1391,7 @@ def get_student_activity_data(teacher):
     all_answers_by_group = {}
     for g in current_groups:
         all_answers_by_group[g] = {}
-        student_list = g.student_set.all().values_list(
+        student_list = g.students.all().values_list(
             "student__username", flat=True
         )
         if len(student_list) > 0:
@@ -1532,7 +1532,7 @@ def get_student_activity_data(teacher):
                     datetime.utcnow().replace(tzinfo=pytz.utc)
                 )
                 json_data[group_key.name][id]["total"] = (
-                    group_key.student_set.count()
+                    group_key.students.all().count()
                     * assignment.questions.count()
                 )
                 json_data[group_key.name][id]["answers"] = []
