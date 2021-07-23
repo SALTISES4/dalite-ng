@@ -1,39 +1,37 @@
-// @flow
-import { buildReq } from "../ajax.js";
-import { updateNotifications } from "./header/notifications.js";
-import type { Notification } from "./header/notifications.js";
+import { buildReq } from "../ajax";
+import { updateNotifications } from "./header/notifications"; // eslint-disable-line no-duplicate-imports
+import type { Notification } from "./header/notifications"; // eslint-disable-line no-duplicate-imports
 
-/*********/
+/** *******/
+
 /* model */
-/*********/
 
+/** *******/
 const CHECK_EVERY = 1;
-
 type Task = {
-  id: string,
-  description: string,
-  completed: boolean,
-  datetime: Date,
-  error: boolean,
+  id: string;
+  description: string;
+  completed: boolean;
+  datetime: Date;
+  error: boolean;
 };
-
 let model: {
   urls: {
-    requestGradebook: string,
-    gradebookResult: string,
-    removeFailedGradebook: string,
-    downloadGradebook: string,
-    tasks: string,
-  },
-  tasks: Array<Task>,
+    requestGradebook: string;
+    gradebookResult: string;
+    removeFailedGradebook: string;
+    downloadGradebook: string;
+    tasks: string;
+  };
+  tasks: Array<Task>;
 };
 
 function initModel(urls: {
-  requestGradebook: string,
-  gradebookResult: string,
-  removeFailedGradebook: string,
-  downloadGradebook: string,
-  tasks: string,
+  requestGradebook: string;
+  gradebookResult: string;
+  removeFailedGradebook: string;
+  downloadGradebook: string;
+  tasks: string;
 }): void {
   model = {
     tasks: [],
@@ -47,10 +45,11 @@ function initModel(urls: {
   };
 }
 
-/**********/
-/* update */
-/**********/
+/** ********/
 
+/* update */
+
+/** ********/
 function update(): void {
   getTasks();
 }
@@ -58,7 +57,6 @@ function update(): void {
 function getTasks(): void {
   const url = model.urls.tasks;
   const req = buildReq({}, "get");
-
   fetch(url, req)
     .then((resp) => resp.json())
     .then((data) => {
@@ -68,10 +66,10 @@ function getTasks(): void {
 
 async function initTasks(
   data: Array<{
-    id: string,
-    description: string,
-    completed: boolean,
-    datetime: string,
+    id: string;
+    description: string;
+    completed: boolean;
+    datetime: string;
   }>,
 ): Promise<void> {
   model.tasks = data
@@ -98,12 +96,10 @@ async function requestGradebook(event: MouseEvent): Promise<void> {
   const button = event.currentTarget;
   const groupId = button.getAttribute("data-group");
   const assignmentId = button.getAttribute("data-assignment");
-
   const data = {
     group_id: groupId,
     assignment_id: assignmentId,
   };
-
   const url = model.urls.requestGradebook;
   const req = buildReq(data, "post");
   const resp = await fetch(url, req);
@@ -112,6 +108,7 @@ async function requestGradebook(event: MouseEvent): Promise<void> {
     const data = await resp.text();
     const title = data.split("\n")[0];
     const csv = data.split("\n").slice(1).join("\n");
+
     _downloadGradebook(title, csv);
   } else if (resp.status === 201) {
     const data = await resp.json();
@@ -132,8 +129,12 @@ async function requestGradebook(event: MouseEvent): Promise<void> {
 
 async function getGradebookResult(task: Task): Promise<void> {
   const url = model.urls.gradebookResult;
-  const req = buildReq({ task_id: task.id }, "post");
-
+  const req = buildReq(
+    {
+      task_id: task.id,
+    },
+    "post",
+  );
   const resp = await fetch(url, req);
 
   if (resp.status == 200) {
@@ -152,12 +153,18 @@ async function getGradebookResult(task: Task): Promise<void> {
 
 async function removeGradebookError(task: Task): Promise<void> {
   const url = model.urls.removeFailedGradebook;
-  const req = buildReq({ task_id: task.id }, "post");
-
+  const req = buildReq(
+    {
+      task_id: task.id,
+    },
+    "post",
+  );
   const resp = await fetch(url, req);
+
   if (resp.ok) {
     model.tasks = model.tasks.filter((t) => t.id !== task.id);
   }
+
   updateNotifications(getNotifications());
 }
 
@@ -173,7 +180,9 @@ async function downloadGradebook(task: Task): Promise<void> {
     const data = await resp.text();
     const title = data.split("\n")[0];
     const csv = data.split("\n").slice(1).join("\n");
+
     _downloadGradebook(title, csv);
+
     model.tasks = model.tasks.filter((t) => t.id != task.id);
     updateNotifications(getNotifications());
   } else {
@@ -208,14 +217,17 @@ function getNotifications(): Array<Notification> {
   }));
 }
 
-/********/
+/** ******/
+
 /* view */
-/********/
 
-/*************/
+/** ******/
+
+/** ***********/
+
 /* listeners */
-/*************/
 
+/** ***********/
 function initListeners(): void {
   addGradebookListeners();
 }
@@ -231,16 +243,17 @@ function addGradebookListeners(): void {
   );
 }
 
-/********/
-/* init */
-/********/
+/** ******/
 
+/* init */
+
+/** ******/
 export function init(urls: {
-  requestGradebook: string,
-  gradebookResult: string,
-  removeFailedGradebook: string,
-  downloadGradebook: string,
-  tasks: string,
+  requestGradebook: string;
+  gradebookResult: string;
+  removeFailedGradebook: string;
+  downloadGradebook: string;
+  tasks: string;
 }): void {
   initModel(urls);
   update();

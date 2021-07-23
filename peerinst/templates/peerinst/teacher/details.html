@@ -4,6 +4,20 @@
 
 {% block stylesheets %}
 {{ block.super }}
+{% compress js file preact %}
+<script src="{% static 'peerinst/js/preact.min.js' %}" defer="true"></script>
+{% endcompress %}
+{% compress js file account %}
+<script src="{% static 'peerinst/js/account.min.js' %}" defer></script>
+{% endcompress %}
+
+{% compress css file account %}
+<link href="{% static 'peerinst/js/account.min.css' %}" rel="stylesheet">
+{% endcompress %}
+{% compress css file rmwc %}
+<link href="{% static 'peerinst/css/rmwc.min.css' %}" rel="stylesheet">
+{% endcompress %}
+
 <style nonce="{{ request.csp_nonce }}">
 .deleted {
   background-color: lightgray;
@@ -164,6 +178,8 @@
         </ul>
       </div>
     </div>
+
+    <div id="questions-app"></div>
 
     <div class="foldable">
       <h2 id="question-section" class="foldable--title mdc-typography--display1 mdc-theme--secondary">
@@ -493,6 +509,19 @@
 
 {% block scripts %}
 {{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
+  window.addEventListener('load', function() {
+    const QuestionsApp = () => {
+      return preact.h(
+        account.TeacherAccountApp, {
+          gettext: gettext,
+          urls: {questionCreate: "{% url 'question-create' %}", questionEdit: "{% url 'question-update-path' %}", questionList: "{% url 'REST:teacher' teacher.pk %}"},
+        });
+    }
+    preact.render(QuestionsApp(), document.getElementById("questions-app"));
+  });
+</script>
+
 <script nonce="{{ request.csp_nonce }}">
   bundle.addDialog();
 

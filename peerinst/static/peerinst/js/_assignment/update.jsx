@@ -12,8 +12,8 @@ import "@rmwc/formfield/node_modules/@material/form-field/dist/mdc.form-field.mi
 import "@rmwc/linear-progress/node_modules/@material/linear-progress/dist/mdc.linear-progress.min.css";
 import "@rmwc/snackbar/node_modules/@material/snackbar/dist/mdc.snackbar.min.css";
 
-import { get, submitData } from "../_ajax/ajax.js";
-import { QuestionCard, Favourites, User } from "./question.js";
+import { get, submitData } from "../_ajax/ajax";
+import { QuestionCard, Favourites, User } from "./question.jsx";
 
 class ToggleVisibleItems extends Component {
   toggleOrdering = () => {
@@ -352,12 +352,13 @@ export class AssignmentUpdateApp extends Component {
           <User.Provider value={this.props.user}>
             {this.toggles()}
             <div style={{ marginBottom: "28px" }}>
-              {this.state.questions.map((q) => (
+              {this.state.questions.map((q, i) => (
                 <QuestionCard
                   cloneURL={this.props.questionCloneBaseURL}
                   editURL={this.props.questionEditBaseURL}
                   handleQuestionDelete={this.delete}
                   handleToggleFavourite={this.handleToggleFavourite}
+                  key={i}
                   question={q.question}
                   rank={q.pk}
                   gettext={this.props.gettext}

@@ -1,22 +1,20 @@
-// @flow
+import { clear, createSvg } from "../../utils";
 
-import { clear, createSvg } from "../../utils.js";
+/** *******/
 
-/*********/
 /* model */
-/*********/
 
+/** *******/
 export type Notification = {
-  text: string,
-  inProgress: boolean,
-  error: boolean,
-  onClick: () => Promise<void>,
-  onCloseClick: () => Promise<void>,
+  text: string;
+  inProgress: boolean;
+  error: boolean;
+  onClick: () => Promise<void>;
+  onCloseClick: () => Promise<void>;
 };
-
 let model: {
-  notificationsOpen: boolean,
-  notifications: Array<Notification>,
+  notificationsOpen: boolean;
+  notifications: Array<Notification>;
 };
 
 function initModel(): void {
@@ -26,10 +24,11 @@ function initModel(): void {
   };
 }
 
-/**********/
-/* update */
-/**********/
+/** ********/
 
+/* update */
+
+/** ********/
 function toggleNotifications(): void {
   const header = document.querySelector(".notifications");
   document.querySelectorAll(".header--togglable > *").forEach((header_) => {
@@ -60,10 +59,11 @@ function clearAll(): void {
   });
 }
 
-/********/
-/* view */
-/********/
+/** ******/
 
+/* view */
+
+/** ******/
 function view(): void {
   notificationsView();
 }
@@ -82,6 +82,7 @@ function notificationsView(): void {
   const completedNotifications = model.notifications.filter(
     (notification) => !notification.inProgress,
   );
+
   if (completedNotifications.length > 0) {
     badge.textContent = completedNotifications.length.toString();
     badge.style.display = "flex";
@@ -136,6 +137,7 @@ function notificationView(notification: Notification): HTMLDivElement {
     div.appendChild(spinner);
   } else {
     let icon;
+
     if (notification.error) {
       icon = createSvg("error");
       icon.classList.add("notification__icon--error");
@@ -143,6 +145,7 @@ function notificationView(notification: Notification): HTMLDivElement {
       div.classList.add("notification--completed");
       icon = createSvg("cloud_download");
     }
+
     icon.classList.add("notification__icon");
     div.appendChild(icon);
   }
@@ -155,7 +158,6 @@ function notificationView(notification: Notification): HTMLDivElement {
   remove.classList.add("notification__close");
   remove.addEventListener("click", notification.onCloseClick);
   div.appendChild(remove);
-
   return div;
 }
 
@@ -165,10 +167,11 @@ function noNotificationView(): HTMLDivElement {
   return div;
 }
 
-/*************/
-/* listeners */
-/*************/
+/** ***********/
 
+/* listeners */
+
+/** ***********/
 function initEventListeners(): void {
   addNotificationsOpenListener();
   addClearAllListener();
@@ -199,10 +202,11 @@ function addClearAllListener(): void {
     ?.addEventListener("click", () => clearAll());
 }
 
-/********/
-/* init */
-/********/
+/** ******/
 
+/* init */
+
+/** ******/
 export function init(): void {
   initModel();
   view();

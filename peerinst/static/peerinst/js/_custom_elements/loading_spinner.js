@@ -1,4 +1,3 @@
-// @flow
 export class LoadingSpinner extends HTMLElement {
   constructor() {
     super();

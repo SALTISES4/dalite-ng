@@ -1,36 +1,38 @@
-// @flow
-import { buildReq } from "../ajax.js";
-//import { editField } from "./common.js";
+import { buildReq } from "../ajax";
+// import { editField } from "./common.js";
 
-/*********/
+/** *******/
+
 /* model */
-/*********/
 
+/** *******/
 type InitialData = {
-  assignments: Array<{ url: string }>,
-  students: Array<number>,
-  urls: { update_url: string, get_student_information_url: string },
-};
-
-type Assignment = {
-  url: string,
-};
-
-type Student = {
-  id: number,
-  email: ?string,
-  lastLogin: ?Date,
-  popularity: ?number,
-};
-
-let model: {
-  language: string,
-  assignments: Array<Assignment>,
-  students: Array<Student>,
+  assignments: Array<{
+    url: string;
+  }>;
+  students: Array<number>;
   urls: {
-    updateUrl: string,
-    getStudentInformationUrl: string,
-  },
+    update_url: string; // eslint-disable-line camelcase
+    get_student_information_url: string; // eslint-disable-line camelcase
+  };
+};
+type Assignment = {
+  url: string;
+};
+type Student = {
+  id: number;
+  email: string | null | undefined;
+  lastLogin: Date | null | undefined;
+  popularity: number | null | undefined;
+};
+let model: {
+  language: string;
+  assignments: Array<Assignment>;
+  students: Array<Student>;
+  urls: {
+    updateUrl: string;
+    getStudentInformationUrl: string;
+  };
 };
 
 function initModel(data: InitialData): void {
@@ -56,33 +58,41 @@ function initModel(data: InitialData): void {
   };
 }
 
-/**********/
-/* update */
-/**********/
+/** ********/
 
+/* update */
+
+/** ********/
 async function update(): Promise<void> {
-  model.students.forEach((student) => {
-    // getStudentInformation(student);
-  });
+  // model.students.forEach((student) => {
+  //   getStudentInformation(student);
+  // });
 }
 
 function removeAssignment(event: MouseEvent, url: string): void {
   event.stopPropagation();
-  const li = event.currentTarget.parentNode.parentNode;
-  const container = li.parentNode;
-
-  const req = buildReq({}, "post");
-  url = `${url}remove/`;
-
-  fetch(url, req).then(function (resp) {
-    if (resp.ok) {
-      container.removeChild(li.nextSibling);
-      container.removeChild(li);
-      if (container.children.length == 1) {
-        location.reload();
+  if (event.currentTarget) {
+    const target = event.currentTarget as Element;
+    if (target.parentNode) {
+      const li = target.parentNode.parentNode;
+      if (li) {
+        const container = li.parentNode;
+        const req = buildReq({}, "post");
+        url = `${url}remove/`;
+        fetch(url, req).then(function (resp) {
+          if (resp.ok && container) {
+            if (li.nextSibling) {
+              container.removeChild(li.nextSibling);
+            }
+            container.removeChild(li);
+            if (container.children.length == 1) {
+              location.reload();
+            }
+          }
+        });
       }
     }
-  });
+  }
 }
 
 /*
@@ -104,13 +114,17 @@ function toggleStudentIdNeeded(event: MouseEvent, url: string): void {
     });
 }
 */
-
 export async function createCollection(
-  groupPk,
-  addAssignmentUrl,
-  collectionUpdateUrl,
+  groupPk: number,
+  addAssignmentUrl: string,
+  collectionUpdateUrl: string,
 ) {
-  const req = buildReq({ group_pk: groupPk }, "post");
+  const req = buildReq(
+    {
+      group_pk: groupPk,
+    },
+    "post",
+  );
   const resp = await fetch(addAssignmentUrl, req);
   const data = await resp.json();
   window.location.assign(collectionUpdateUrl.replace("0", `${data.pk}`));
@@ -133,17 +147,18 @@ export async function createCollection(
 //   studentListTableView(student);
 // }
 
-/********/
-/* view */
-/********/
+/** ******/
 
+/* view */
+
+/** ******/
 // function studentListTableView(student: Student): void {
 //   const criteria = [
 //     ...document.querySelectorAll("#student-reputation-table th"),
 //   ]
 //     .slice(2)
 //     .map((header) => header.getAttribute("name"));
-//   // $FlowFixMe
+//   // @ts-expect-error
 //   const table = $("#student-reputation-table").DataTable(); // eslint-disable-line
 //   table.row
 //     .add([
@@ -164,15 +179,15 @@ export async function createCollection(
 //     .draw();
 // }
 
-/*************/
-/* listeners */
-/*************/
+/** ***********/
 
+/* listeners */
+
+/** ***********/
 function initListeners(): void {
   addLinkListeners();
-  addRemoveAssignmentListeners();
-  //addEditListeners();
-  //addToggleIdListener();
+  addRemoveAssignmentListeners(); // addEditListeners();
+  // addToggleIdListener();
 }
 
 function addLinkListeners(): void {
@@ -213,10 +228,11 @@ function addToggleIdListener(): void {
 }
 */
 
-/********/
-/* init */
-/********/
+/** ******/
 
+/* init */
+
+/** ******/
 export function init(data: InitialData): void {
   initModel(data);
   initListeners();

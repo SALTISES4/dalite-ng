@@ -44,6 +44,11 @@ def old_patterns():
             name="question-clone",
         ),
         path(
+            "question/update/",
+            views.page_not_found,
+            name="question-update-path",
+        ),
+        path(
             "question/update/<int:pk>",
             views.QuestionUpdateView.as_view(),
             name="question-update",

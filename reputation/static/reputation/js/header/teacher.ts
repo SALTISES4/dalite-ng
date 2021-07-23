@@ -1,31 +1,29 @@
-// @flow
-"use strict";
-import { buildReq } from "../../../../../peerinst/static/peerinst/js/ajax.js";
-import { clear } from "../../../../../peerinst/static/peerinst/js/utils.js";
-import { ReputationHeader } from "./header.js";
+import { buildReq } from "../../../../../peerinst/static/peerinst/js/ajax";
+import { clear } from "../../../../../peerinst/static/peerinst/js/utils";
+import { ReputationHeader } from "./header";
 
 class TeacherReputationHeader extends ReputationHeader {
   async init(shadow: ShadowRoot) {
-    /*********/
+    /** *******/
+
     /* model */
-    /*********/
 
+    /** *******/
     type Reputation = {
-      name: string,
-      description: string,
-      reputation: number,
+      name: string;
+      description: string;
+      reputation: number;
     };
-
     type Model = {
-      id: number,
-      element: TeacherReputationHeader,
-      reputation: ?number,
-      reputationType: string,
-      reputationUrl: string,
-      reputations: Array<Reputation>,
-      shadow: ShadowRoot,
+      id: number;
+      element: TeacherReputationHeader;
+      reputation: number | null | undefined;
+      reputationStyleUrl: string;
+      reputationType: string;
+      reputationUrl: string;
+      reputations: Array<Reputation>;
+      shadow: ShadowRoot;
     };
-
     const model: Model = {
       id: parseInt(this.reputationId),
       element: this,
@@ -37,13 +35,16 @@ class TeacherReputationHeader extends ReputationHeader {
       shadow,
     };
 
-    /**********/
+    /** ********/
+
     /* update */
-    /**********/
+
+    /** ********/
     this.update = update;
 
     async function update() {
       await getReputation();
+
       if (model.reputation !== null) {
         model.element.hidden = false;
       }
@@ -89,17 +90,16 @@ class TeacherReputationHeader extends ReputationHeader {
       listView();
     }
 
-    /********/
-    /* view */
-    /********/
+    /** ******/
 
+    /* view */
+
+    /** ******/
     function view() {
       shadow.appendChild(styleView());
-
       const container = document.createElement("div");
       container.id = "container";
       shadow.appendChild(container);
-
       container.appendChild(iconView());
       container.appendChild(listView());
     }
@@ -117,19 +117,18 @@ class TeacherReputationHeader extends ReputationHeader {
           event.stopPropagation();
           toggleReputationList();
         });
-
         const star = document.createElement("i");
         star.id = "icon__icon";
         star.textContent = "star";
         icon.appendChild(star);
-
         const span = document.createElement("span");
         span.id = "icon__reputation";
+
         if (model.reputation !== null && model.reputation !== undefined) {
           span.textContent = model.reputation.toString();
         }
-        icon.appendChild(span);
 
+        icon.appendChild(span);
         // $FlowFixMe
         document.body?.addEventListener("click", (event: MouseEvent) => {
           if (model.element.open) {
@@ -148,6 +147,7 @@ class TeacherReputationHeader extends ReputationHeader {
     function listView() {
       // $FlowFixMe
       let list = shadow.getElementById("list");
+
       if (!list) {
         list = document.createElement("div");
         list.id = "list";
@@ -157,13 +157,10 @@ class TeacherReputationHeader extends ReputationHeader {
       }
 
       clear(list);
-
       headerView(list);
-
       model.reputations.forEach((reputation) => {
         reputationView(list, reputation);
       });
-
       return list;
     }
 
@@ -172,7 +169,6 @@ class TeacherReputationHeader extends ReputationHeader {
       name.classList.add("list__header");
       name.textContent = "Name";
       list.appendChild(name);
-
       const rep = document.createElement("div");
       rep.classList.add("list__header");
       rep.textContent = "Reputation";
@@ -185,7 +181,6 @@ class TeacherReputationHeader extends ReputationHeader {
       name.textContent = `${reputation.name}`;
       name.title = reputation.description;
       list.appendChild(name);
-
       const rep = document.createElement("div");
       rep.classList.add("list__reputation");
       rep.textContent = (
@@ -202,10 +197,11 @@ class TeacherReputationHeader extends ReputationHeader {
       return style;
     }
 
-    /********/
-    /* init */
-    /********/
+    /** ******/
 
+    /* init */
+
+    /** ******/
     view();
     await update();
   }

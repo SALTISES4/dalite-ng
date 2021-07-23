@@ -103,8 +103,11 @@
 /* Customize question cards */
 .info {
   color: $hint;
-  &.alert {
+  & i.alert {
       color: var(--mdc-theme-error);
+  }
+  & i.tip {
+      color: $mdc-theme-primary;
   }
   & p, div {
     font-family: $mdc-typography-font-family;
@@ -296,4 +299,30 @@
   & svg {
     vertical-align: middle;
   }
+}
+
+/* Account page */
+.breadcrumb {
+  color: $hint;
+  cursor: pointer;
+  font-family: $mdc-typography-font-family;
+  -webkit-font-smoothing: auto;
+  letter-spacing: normal;
+
+  &:not(:first-of-type)::before {
+    color: $mdc-theme-secondary;
+    content: "\FF5C";
+    padding-left: 4px;
+    padding-right: 3px;
+  }
+}
+
+.question-list-item.hatched {
+  background: repeating-linear-gradient(
+  -45deg,
+  transparentize($hint, 0.85),
+  transparentize($hint, 0.85) 5px,
+  transparentize($hint, 0.95) 5px,
+  transparentize($hint, 0.95) 10px
+);
 }

@@ -15,6 +15,7 @@
 .coverage
 .data/
 .pytest_cache/
+.rollup.cache/
 .tern-port
 .venv
 /CACHE
