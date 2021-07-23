@@ -46,7 +46,7 @@ def test_dynamic_serializer_querystring(client, assignments, teacher):
     response = client.get(url)
 
     data = json.loads(response.content)
-    for field in requested_fields:
+    for field in ["assignments", "pk"]:
         assert field in data
 
     assert len(data.keys()) == 2
