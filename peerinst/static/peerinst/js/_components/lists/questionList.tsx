@@ -49,6 +49,42 @@ export function QuestionList({
   const sharedPks = shared.map((sq) => sq.pk);
   const byPk = (a: ListedQuestion, b: ListedQuestion) => b.pk - a.pk;
 
+  const info = (): JSX.Element | undefined => {
+    if (view == "") {
+      return (
+        <Info
+          className="large"
+          text={gettext(
+            "This is the list of questions for which you are the primary author or a co-author.",
+          )}
+          type="tip"
+        />
+      );
+    }
+    if (view == "archived") {
+      return (
+        <Info
+          className="large"
+          text={gettext(
+            "This is the list of questions for which you are the primary author or a co-author and that you have archived.",
+          )}
+          type="tip"
+        />
+      );
+    }
+    if (view == "deleted") {
+      return (
+        <Info
+          className="large"
+          text={gettext(
+            "This is the list of questions for which you are the primary author and that you have marked for deletion.  From time to time, questions marked for deletion that are not part of any assignment and that have no associated student answers will be removed from the database.  Questions that have been included in any assignment or have student answers cannot be deleted, only archived.",
+          )}
+          type="tip"
+        />
+      );
+    }
+  };
+
   if (
     questions.filter(
       (q) => !deleted.includes(q.pk) && !archived.includes(q.pk),
@@ -66,35 +102,38 @@ export function QuestionList({
     );
   }
   return (
-    <List twoLine>
-      {questions
-        .sort(byPk)
-        .concat(shared.sort(byPk))
-        .filter((q) => {
-          return view == "deleted"
-            ? deleted.includes(q.pk)
-            : view == "archived"
-            ? archived.includes(q.pk) && !deleted.includes(q.pk)
-            : !deleted.includes(q.pk) && !archived.includes(q.pk);
-        })
-        .map((q: ListedQuestion, i: number) => {
-          return (
-            <div key={i}>
-              <QuestionListItem
-                archived={archived.includes(q.pk)}
-                deleted={deleted.includes(q.pk)}
-                editURL={editURL}
-                gettext={gettext}
-                handleToggleArchived={handleToggleArchived}
-                handleToggleDeleted={handleToggleDeleted}
-                question={q}
-                shared={sharedPks.includes(q.pk)}
-              />
-            </div>
-          );
-        })}
-      <ListDivider />
-    </List>
+    <Fragment>
+      <div style={{ marginBottom: 8, maxWidth: 600 }}>{info()}</div>
+      <List twoLine>
+        {questions
+          .sort(byPk)
+          .concat(shared.sort(byPk))
+          .filter((q) => {
+            return view == "deleted"
+              ? deleted.includes(q.pk)
+              : view == "archived"
+              ? archived.includes(q.pk) && !deleted.includes(q.pk)
+              : !deleted.includes(q.pk) && !archived.includes(q.pk);
+          })
+          .map((q: ListedQuestion, i: number) => {
+            return (
+              <div key={i}>
+                <QuestionListItem
+                  archived={archived.includes(q.pk)}
+                  deleted={deleted.includes(q.pk)}
+                  editURL={editURL}
+                  gettext={gettext}
+                  handleToggleArchived={handleToggleArchived}
+                  handleToggleDeleted={handleToggleDeleted}
+                  question={q}
+                  shared={sharedPks.includes(q.pk)}
+                />
+              </div>
+            );
+          })}
+        <ListDivider />
+      </List>
+    </Fragment>
   );
 }
 
