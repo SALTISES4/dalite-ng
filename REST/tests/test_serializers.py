@@ -27,9 +27,11 @@ def test_dynamic_serializer_querystring(client, assignments, teacher):
     # Check all fields present
     fields = [
         "archived_questions",
+        "assignment_pks",
         "assignments",
         "deleted_questions",
         "favourite_questions",
+        "owned_assignments",
         "pk",
         "questions",
         "shared_questions",
