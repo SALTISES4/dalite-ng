@@ -22,6 +22,7 @@ export type Assignment = {
   question_pks: number[]; // eslint-disable-line camelcase
   title: string;
   urls: {
+    copy: string;
     distribute: string;
     preview: string;
     update: string;
@@ -169,25 +170,36 @@ function AssignmentListItem({
   };
 
   const editIcon = (): JSX.Element | undefined => {
-    if (owned && !archived && assignment.editable) {
+    const edit = owned && assignment.editable;
+    if (!archived) {
       return (
         <IconButton
-          icon="edit"
-          onClick={() => (window.location.href = assignment.urls.update)}
-          title={gettext("Edit or clone this assignment to make changes.")}
+          icon={edit ? "edit" : "file_copy"}
+          onClick={() =>
+            (window.location.href = edit
+              ? assignment.urls.update
+              : assignment.urls.copy)
+          }
+          title={
+            edit
+              ? gettext("Edit this assignment to make changes.")
+              : gettext("Copy this assignment to make changes.")
+          }
         />
       );
     }
   };
 
   const distributeIcon = (): JSX.Element | undefined => {
-    return (
-      <IconButton
-        icon="share"
-        onClick={() => (window.location.href = assignment.urls.distribute)}
-        title={gettext("Distribute this assignment to one of your groups.")}
-      />
-    );
+    if (!archived) {
+      return (
+        <IconButton
+          icon="share"
+          onClick={() => (window.location.href = assignment.urls.distribute)}
+          title={gettext("Distribute this assignment to one of your groups.")}
+        />
+      );
+    }
   };
 
   const icons = () => {
