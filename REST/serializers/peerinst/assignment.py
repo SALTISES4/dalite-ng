@@ -223,6 +223,9 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
 
     def get_urls(self, obj):
         return {
+            "distribute": reverse(
+                "student-group-assignment-create", args=(obj.pk,)
+            ),
             "preview": obj.get_absolute_url(),
             "update": reverse("assignment-update", args=(obj.pk,)),
         }

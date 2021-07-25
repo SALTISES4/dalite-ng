@@ -22,11 +22,6 @@ def dummy_paths():
             views.page_not_found,
             name="question-update-path",
         ),
-        path(
-            "live/studentgroupassignment/create/",
-            views.page_not_found,
-            name="student-group-assignment-create-path",
-        ),
     ]
 
 

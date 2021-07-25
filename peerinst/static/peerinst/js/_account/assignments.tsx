@@ -13,7 +13,6 @@ type TeacherAccountAssignmentAppProps = {
   gettext: (a: string) => string;
   urls: {
     assignmentCreate: string;
-    assignmentDistribute: string;
     assignmentList: string;
     assignmentSearch: string;
     assignmentUpdate: string;

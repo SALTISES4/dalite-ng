@@ -22,6 +22,7 @@ export type Assignment = {
   question_pks: number[]; // eslint-disable-line camelcase
   title: string;
   urls: {
+    distribute: string;
     preview: string;
     update: string;
   };
@@ -179,11 +180,22 @@ function AssignmentListItem({
     }
   };
 
+  const distributeIcon = (): JSX.Element | undefined => {
+    return (
+      <IconButton
+        icon="share"
+        onClick={() => (window.location.href = assignment.urls.distribute)}
+        title={gettext("Distribute this assignment to one of your groups.")}
+      />
+    );
+  };
+
   const icons = () => {
     return (
       <div style={{ marginLeft: "auto" }}>
         {editIcon()}
         {archiveIcon()}
+        {distributeIcon()}
       </div>
     );
   };
@@ -195,16 +207,17 @@ function AssignmentListItem({
         className={
           archived ? "question-list-item hatched" : "question-list-item"
         }
-        onClick={() => (window.location.href = assignment.urls.preview)}
       >
         <ListItemGraphic
           icon={"assignment"}
-          style={{ fontSize: 36 }}
+          onClick={() => (window.location.href = assignment.urls.preview)}
+          style={{ cursor: "pointer", fontSize: 36 }}
           theme="primary"
         />
         <ListItemText>
           <ListItemPrimaryText
-            style={{ fontWeight: "bold" }}
+            onClick={() => (window.location.href = assignment.urls.preview)}
+            style={{ cursor: "pointer", fontWeight: "bold" }}
             theme="secondary"
           >
             {assignment.title}
