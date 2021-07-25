@@ -1,19 +1,13 @@
 import { Component, Fragment, h } from "preact";
 
-import { get } from "../_ajax/ajax";
+import { get, submitData } from "../_ajax/ajax";
 
 import { Breadcrumb, Heading } from "./heading";
 
-type Assignment = {
-  editable: boolean;
-  pk: string;
-  question_pks: number[]; // eslint-disable-line camelcase
-  title: string;
-  urls: {
-    preview: string;
-    update: string;
-  };
-};
+import {
+  Assignment,
+  AssignmentList,
+} from "../_components/lists/assignmentList";
 
 type TeacherAccountAssignmentAppProps = {
   gettext: (a: string) => string;
@@ -22,12 +16,14 @@ type TeacherAccountAssignmentAppProps = {
     assignmentDistribute: string;
     assignmentList: string;
     assignmentSearch: string;
+    assignmentUpdate: string;
     generateReport: string;
   };
 };
 
 type TeacherAccountAssignmentAppState = {
-  archived: number[];
+  archived: Assignment[];
+  ownedAssignments: Assignment[];
   assignments: Assignment[];
   open: boolean;
   view: string;
@@ -42,17 +38,76 @@ export class TeacherAccountAssignmentApp extends Component<
     assignments: [],
     open:
       localStorage.getItem("teacher-account-assignment-section") === "true",
+    ownedAssignments: [],
     view: "",
+  };
+
+  archived = (
+    assignments: Assignment[],
+    owned: Assignment[],
+  ): Assignment[] => {
+    console.debug("Inferring archived assignments");
+    const assignmentSet = new Set<string>(assignments.map((a) => a.pk));
+    const archived = owned.filter((x) => !assignmentSet.has(x.pk));
+    console.debug(assignmentSet, owned, archived);
+
+    return archived;
+  };
+
+  updateView = (): void => {
+    console.debug("Updating view");
+    if (this.state.view == "archived" && this.state.archived.length == 0) {
+      this.setState({ view: "" });
+      return;
+    }
+  };
+
+  handleToggleArchived = async (a: Assignment): Promise<void> => {
+    console.debug("Toggle archived");
+    console.debug(a);
+
+    const _assignments: Assignment[] = Array.from(this.state.assignments);
+    const _archived: Assignment[] = Array.from(this.state.archived);
+    if (_archived.map((_a) => _a.pk).includes(a.pk)) {
+      _assignments.push(a);
+    } else {
+      _assignments.splice(_assignments.indexOf(a), 1);
+    }
+    try {
+      const data = await submitData(
+        this.props.urls.assignmentList,
+        { assignment_pks: _assignments.map((a) => a.pk) },
+        "PUT",
+      );
+      console.debug(data);
+      this.setState(
+        {
+          archived: this.archived(
+            data["assignments"],
+            data["owned_assignments"],
+          ),
+          assignments: data["assignments"],
+        },
+        this.updateView,
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   refreshFromDB = async (): Promise<void> => {
     try {
       const data = await get(this.props.urls.assignmentList);
       console.debug(data);
+
       this.setState(
         {
-          //archived: data["archived_assignments"],
+          archived: this.archived(
+            data["assignments"],
+            data["owned_assignments"],
+          ),
           assignments: data["assignments"],
+          ownedAssignments: data["owned_assignments"],
         },
         () => console.debug(this.state, this.props),
       );
@@ -126,11 +181,20 @@ export class TeacherAccountAssignmentApp extends Component<
           <div style={{ marginLeft: 48, marginTop: -6, marginBottom: 16 }}>
             {this.breadcrumbs()}
           </div>
+          <AssignmentList
+            archived={this.state.archived}
+            assignments={this.state.assignments}
+            gettext={this.props.gettext}
+            handleToggleArchived={this.handleToggleArchived}
+            ownedAssignments={this.state.ownedAssignments}
+            view={this.state.view}
+          />
         </Fragment>
       );
     }
+    return;
   };
-  //<AssignmentList assignments={this.state.assignments} />
+
   componentDidMount(): void {
     this.refreshFromDB();
   }

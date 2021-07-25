@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from peerinst.models import Question, Teacher
+from peerinst.models import Assignment, Question, Teacher
 
 from .assignment import (
     AssignmentSerializer,
@@ -15,16 +15,25 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
         many=True, queryset=Question.objects.all()
     )
     assignments = AssignmentSerializer(
-        fields=["editable", "pk", "question_pks", "title"],
+        fields=["editable", "pk", "question_pks", "title", "urls"],
         many=True,
         read_only=True,
-        source="user.assignment_set",
+    )
+    # For updating
+    assignment_pks = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Assignment.objects.all(), source="assignments"
     )
     deleted_questions = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Question.objects.all()
     )
     favourite_questions = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Question.objects.all()
+    )
+    owned_assignments = AssignmentSerializer(
+        fields=["editable", "pk", "question_pks", "title", "urls"],
+        many=True,
+        read_only=True,
+        source="user.assignment_set",
     )
     questions = QuestionSerializer(
         fields=[
@@ -81,9 +90,11 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
         model = Teacher
         fields = [
             "archived_questions",
+            "assignment_pks",
             "assignments",
             "deleted_questions",
             "favourite_questions",
+            "owned_assignments",
             "pk",
             "questions",
             "shared_questions",

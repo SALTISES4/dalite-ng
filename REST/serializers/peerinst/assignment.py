@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from rest_framework import serializers
 from rest_framework.exceptions import bad_request
 
@@ -212,12 +213,19 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         required=False,
     )
     question_pks = serializers.SerializerMethodField()
+    urls = serializers.SerializerMethodField()
 
     def get_editable(self, obj):
         return obj.editable
 
     def get_question_pks(self, obj):
         return list(obj.questions.values_list("pk", flat=True))
+
+    def get_urls(self, obj):
+        return {
+            "preview": obj.get_absolute_url(),
+            "update": reverse("assignment-update", args=(obj.pk,)),
+        }
 
     def validate_questions(self, data):
         assignment_questions = list(
@@ -276,4 +284,5 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
             "question_pks",
             "questions",
             "title",
+            "urls",
         ]

@@ -3,7 +3,10 @@ import { Component, Fragment, h } from "preact";
 import { get, submitData } from "../_ajax/ajax";
 
 import { Breadcrumb, Heading } from "./heading";
-import { QuestionList } from "../_components/lists/questionList";
+import {
+  ListedQuestion,
+  QuestionList,
+} from "../_components/lists/questionList";
 
 type TeacherAccountQuestionAppProps = {
   gettext: (a: string) => string;
@@ -14,18 +17,8 @@ type TeacherAccountQuestionAppState = {
   archived: number[];
   deleted: number[];
   open: boolean;
-  questions: {
-    answer_count: number; // eslint-disable-line camelcase
-    pk: number;
-    title: string;
-    type: string;
-  }[];
-  shared: {
-    answer_count: number; // eslint-disable-line camelcase
-    pk: number;
-    title: string;
-    type: string;
-  }[];
+  questions: ListedQuestion[];
+  shared: ListedQuestion[];
   view: string;
 };
 

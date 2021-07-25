@@ -114,10 +114,15 @@
     font-family: $mdc-typography-font-family;
     font-size: 10px;
     -webkit-font-smoothing: auto;
-    letter-spacing: -0.01em;
+    letter-spacing: normal;
     line-height: 12px;
     margin-top: 1px;
     padding-left: 6px;
+
+    &.large {
+      font-size: 12px;
+      line-height: 14px;
+    }
   }
 }
 
@@ -313,7 +318,7 @@
   &:not(:first-of-type)::before {
     color: $mdc-theme-secondary;
     content: "\FF5C";
-    padding-left: 4px;
+    padding-left: 3px;
     padding-right: 3px;
   }
 }
@@ -326,4 +331,13 @@
   transparentize($hint, 0.95) 5px,
   transparentize($hint, 0.95) 10px
 );
+}
+
+.assignment-list-item, .question-list-item {
+  & .mdc-icon-button {
+    color: $hint;
+    &:last-of-type {
+      margin-right: -12px;
+    }
+  }
 }

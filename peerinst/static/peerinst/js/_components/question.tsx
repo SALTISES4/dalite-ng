@@ -593,12 +593,16 @@ function QuestionCardActionButtons(props) {
 }
 
 type InfoProps = {
-  size?: number;
+  className?: string;
   text: string;
   type?: string;
 };
 
-export function Info({ size = 10, text, type = "" }: InfoProps): JSX.Element {
+export function Info({
+  className = "",
+  text,
+  type = "",
+}: InfoProps): JSX.Element {
   return (
     <div className="info" style={{ display: "flex" }}>
       <Icon
@@ -606,7 +610,7 @@ export function Info({ size = 10, text, type = "" }: InfoProps): JSX.Element {
         icon="info"
         iconOptions={{ strategy: "ligature", size: "small" }}
       />
-      <Typography use="caption" tag="p" style={{ fontSize: size }}>
+      <Typography use="caption" tag="p" className={className}>
         {text}
       </Typography>
     </div>

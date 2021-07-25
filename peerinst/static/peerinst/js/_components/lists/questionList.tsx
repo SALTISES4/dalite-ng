@@ -10,13 +10,18 @@ import {
   ListItemPrimaryText,
   ListItemSecondaryText,
 } from "@rmwc/list";
-import { Typography } from "@rmwc/typography";
 
 import { Info } from "../question";
 
 import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-button.min.css";
 import "@rmwc/list/node_modules/@material/list/dist/mdc.list.css";
-import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
+
+export type ListedQuestion = {
+  answer_count: number; // eslint-disable-line camelcase
+  pk: number;
+  title: string;
+  type: string;
+};
 
 type QuestionListProps = {
   archived: number[];
@@ -25,18 +30,8 @@ type QuestionListProps = {
   gettext: (a: string) => string;
   handleToggleArchived: (a: number) => Promise<void>;
   handleToggleDeleted: (a: number) => Promise<void>;
-  questions: {
-    answer_count: number; // eslint-disable-line camelcase
-    pk: number;
-    title: string;
-    type: string;
-  }[];
-  shared: {
-    answer_count: number; // eslint-disable-line camelcase
-    pk: number;
-    title: string;
-    type: string;
-  }[];
+  questions: ListedQuestion[];
+  shared: ListedQuestion[];
   view: string;
 };
 
@@ -51,7 +46,8 @@ export function QuestionList({
   shared,
   view,
 }: QuestionListProps): JSX.Element {
-  const byPk = (a, b) => b.pk - a.pk;
+  const sharedPks = shared.map((sq) => sq.pk);
+  const byPk = (a: ListedQuestion, b: ListedQuestion) => b.pk - a.pk;
 
   if (
     questions.filter(
@@ -60,17 +56,13 @@ export function QuestionList({
     view == ""
   ) {
     return (
-      <div style={{ margin: "10px 0px" }}>
-        <Typography use="body1" tag="p">
-          <Info
-            size={12}
-            text={gettext(
-              "You do not have any questions (or they are all archived/deleted).  You can create one using the link above.",
-            )}
-            type="tip"
-          />
-        </Typography>
-      </div>
+      <Info
+        className="large"
+        text={gettext(
+          "You do not have any questions (or they are all archived/deleted).  You can create one using the link above.",
+        )}
+        type="alert"
+      />
     );
   }
   return (
@@ -85,32 +77,22 @@ export function QuestionList({
             ? archived.includes(q.pk) && !deleted.includes(q.pk)
             : !deleted.includes(q.pk) && !archived.includes(q.pk);
         })
-        .map(
-          (
-            q: {
-              answer_count: number; // eslint-disable-line camelcase
-              pk: number;
-              title: string;
-              type: string;
-            },
-            i: number,
-          ) => {
-            return (
-              <div key={i}>
-                <QuestionListItem
-                  archived={archived.includes(q.pk)}
-                  deleted={deleted.includes(q.pk)}
-                  editURL={editURL}
-                  gettext={gettext}
-                  handleToggleArchived={handleToggleArchived}
-                  handleToggleDeleted={handleToggleDeleted}
-                  question={q}
-                  shared={shared.map((sq) => sq.pk).includes(q.pk)}
-                />
-              </div>
-            );
-          },
-        )}
+        .map((q: ListedQuestion, i: number) => {
+          return (
+            <div key={i}>
+              <QuestionListItem
+                archived={archived.includes(q.pk)}
+                deleted={deleted.includes(q.pk)}
+                editURL={editURL}
+                gettext={gettext}
+                handleToggleArchived={handleToggleArchived}
+                handleToggleDeleted={handleToggleDeleted}
+                question={q}
+                shared={sharedPks.includes(q.pk)}
+              />
+            </div>
+          );
+        })}
       <ListDivider />
     </List>
   );
@@ -123,12 +105,7 @@ type QuestionListItemProps = {
   gettext: (a: string) => string;
   handleToggleArchived: (a: number) => Promise<void>;
   handleToggleDeleted: (a: number) => Promise<void>;
-  question: {
-    answer_count: number; // eslint-disable-line camelcase
-    pk: number;
-    title: string;
-    type: string;
-  };
+  question: ListedQuestion;
   shared: boolean;
 };
 
@@ -148,7 +125,6 @@ function QuestionListItem({
         <IconButton
           icon={deleted ? "restore_from_trash" : "delete"}
           onClick={() => handleToggleDeleted(question.pk)}
-          style={{ color: "#757575" }}
           title={
             deleted
               ? gettext("Undelete this question.")
@@ -167,7 +143,6 @@ function QuestionListItem({
         <IconButton
           icon={archived ? "unarchive" : "archive"}
           onClick={() => handleToggleArchived(question.pk)}
-          style={{ color: "#757575" }}
           title={
             archived
               ? gettext("Unarchive this question.")
@@ -184,7 +159,6 @@ function QuestionListItem({
         <IconButton
           icon="edit"
           onClick={() => (window.location.href = editURL + question.pk)}
-          style={{ color: "#757575", marginRight: -12 }}
           title={gettext("Edit or clone this question to make changes.")}
         />
       );
