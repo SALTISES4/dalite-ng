@@ -2,11 +2,15 @@ import { Component, Fragment, h } from "preact";
 
 import { get, submitData } from "../_ajax/ajax";
 
+import { CircularProgress } from "@rmwc/circular-progress";
+
 import { Breadcrumb, Heading } from "./heading";
 import {
   ListedQuestion,
   QuestionList,
 } from "../_components/lists/questionList";
+
+import "@rmwc/circular-progress/circular-progress.css";
 
 type TeacherAccountQuestionAppProps = {
   gettext: (a: string) => string;
@@ -16,6 +20,7 @@ type TeacherAccountQuestionAppProps = {
 type TeacherAccountQuestionAppState = {
   archived: number[];
   deleted: number[];
+  loaded: boolean;
   open: boolean;
   questions: ListedQuestion[];
   shared: ListedQuestion[];
@@ -29,6 +34,7 @@ export class TeacherAccountQuestionApp extends Component<
   state = {
     archived: [],
     deleted: [],
+    loaded: false,
     open: localStorage.getItem("teacher-account-question-section") === "true",
     questions: [],
     shared: [],
@@ -111,6 +117,7 @@ export class TeacherAccountQuestionApp extends Component<
         {
           archived: data["archived_questions"],
           deleted: data["deleted_questions"],
+          loaded: true,
           questions: data["questions"],
           shared: data["shared_questions"],
         },
@@ -172,6 +179,9 @@ export class TeacherAccountQuestionApp extends Component<
   };
 
   content = (): JSX.Element | undefined => {
+    if (this.state.open && !this.state.loaded) {
+      return <CircularProgress className="spinner" size="xlarge" />;
+    }
     if (this.state.open) {
       return (
         <Fragment>

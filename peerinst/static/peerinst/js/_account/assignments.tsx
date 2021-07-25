@@ -2,12 +2,16 @@ import { Component, Fragment, h } from "preact";
 
 import { get, submitData } from "../_ajax/ajax";
 
+import { CircularProgress } from "@rmwc/circular-progress";
+
 import { Breadcrumb, Heading } from "./heading";
 
 import {
   Assignment,
   AssignmentList,
 } from "../_components/lists/assignmentList";
+
+import "@rmwc/circular-progress/circular-progress.css";
 
 type TeacherAccountAssignmentAppProps = {
   gettext: (a: string) => string;
@@ -22,9 +26,10 @@ type TeacherAccountAssignmentAppProps = {
 
 type TeacherAccountAssignmentAppState = {
   archived: Assignment[];
-  ownedAssignments: Assignment[];
   assignments: Assignment[];
+  loaded: boolean;
   open: boolean;
+  ownedAssignments: Assignment[];
   view: string;
 };
 
@@ -35,6 +40,7 @@ export class TeacherAccountAssignmentApp extends Component<
   state = {
     archived: [],
     assignments: [],
+    loaded: false,
     open:
       localStorage.getItem("teacher-account-assignment-section") === "true",
     ownedAssignments: [],
@@ -106,6 +112,7 @@ export class TeacherAccountAssignmentApp extends Component<
             data["owned_assignments"],
           ),
           assignments: data["assignments"],
+          loaded: true,
           ownedAssignments: data["owned_assignments"],
         },
         () => console.debug(this.state, this.props),
@@ -174,6 +181,9 @@ export class TeacherAccountAssignmentApp extends Component<
   };
 
   content = (): JSX.Element | undefined => {
+    if (this.state.open && !this.state.loaded) {
+      return <CircularProgress className="spinner" size="xlarge" />;
+    }
     if (this.state.open) {
       return (
         <Fragment>
@@ -191,7 +201,6 @@ export class TeacherAccountAssignmentApp extends Component<
         </Fragment>
       );
     }
-    return;
   };
 
   componentDidMount(): void {
