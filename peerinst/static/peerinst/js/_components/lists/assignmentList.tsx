@@ -18,12 +18,14 @@ import "@rmwc/list/node_modules/@material/list/dist/mdc.list.css";
 
 export type Assignment = {
   editable: boolean;
+  is_valid: boolean; // eslint-disable-line camelcase
   pk: string;
   question_pks: number[]; // eslint-disable-line camelcase
   title: string;
   urls: {
     copy: string;
     distribute: string;
+    fix: string;
     preview: string;
     update: string;
   };
@@ -191,7 +193,7 @@ function AssignmentListItem({
   };
 
   const distributeIcon = (): JSX.Element | undefined => {
-    if (!archived) {
+    if (!archived && assignment.is_valid) {
       return (
         <IconButton
           icon="share"
@@ -205,10 +207,26 @@ function AssignmentListItem({
   const icons = () => {
     return (
       <div style={{ marginLeft: "auto" }}>
+        {distributeIcon()}
         {editIcon()}
         {archiveIcon()}
-        {distributeIcon()}
       </div>
+    );
+  };
+
+  const caption = (): JSX.Element => {
+    console.debug(assignment);
+    if (assignment.is_valid) {
+      return (
+        <span>
+          {assignment.question_pks.length} {gettext("questions")}
+        </span>
+      );
+    }
+    return (
+      <span style={{ color: "var(--mdc-theme-error)" }}>
+        {gettext("There is a problem with this assignment.")}
+      </span>
     );
   };
 
@@ -221,21 +239,29 @@ function AssignmentListItem({
         }
       >
         <ListItemGraphic
-          icon={"assignment"}
-          onClick={() => (window.location.href = assignment.urls.preview)}
+          icon={assignment.is_valid ? "assignment" : "report"}
+          onClick={() =>
+            (window.location.href = assignment.is_valid
+              ? assignment.urls.preview
+              : assignment.urls.fix)
+          }
           style={{ cursor: "pointer", fontSize: 36 }}
-          theme="primary"
+          theme={assignment.is_valid ? "primary" : "error"}
         />
         <ListItemText>
           <ListItemPrimaryText
-            onClick={() => (window.location.href = assignment.urls.preview)}
+            onClick={() =>
+              (window.location.href = assignment.is_valid
+                ? assignment.urls.preview
+                : assignment.urls.fix)
+            }
             style={{ cursor: "pointer", fontWeight: "bold" }}
-            theme="secondary"
+            theme={assignment.is_valid ? "secondary" : "error"}
           >
             {assignment.title}
           </ListItemPrimaryText>
           <ListItemSecondaryText theme="textHintOnBackground">
-            {assignment.question_pks.length} {gettext("questions")}
+            {caption()}
           </ListItemSecondaryText>
         </ListItemText>
         {icons()}

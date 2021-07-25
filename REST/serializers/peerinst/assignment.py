@@ -207,6 +207,7 @@ class RankSerializer(serializers.ModelSerializer):
 
 class AssignmentSerializer(DynamicFieldsModelSerializer):
     editable = serializers.SerializerMethodField()
+    is_valid = serializers.SerializerMethodField()
     questions = RankSerializer(
         source="assignmentquestions_set",
         many=True,
@@ -227,9 +228,16 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
             "distribute": reverse(
                 "student-group-assignment-create", args=(obj.pk,)
             ),
+            "fix": reverse(
+                "research-assignment-question-index-by-assignment",
+                args=(obj.pk,),
+            ),
             "preview": obj.get_absolute_url(),
             "update": reverse("assignment-update", args=(obj.pk,)),
         }
+
+    def get_is_valid(self, obj):
+        return not obj.includes_flagged_question
 
     def validate_questions(self, data):
         assignment_questions = list(
@@ -284,6 +292,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
             "description",
             "editable",
             "intro_page",
+            "is_valid",
             "pk",
             "question_pks",
             "questions",
