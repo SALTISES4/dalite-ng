@@ -195,6 +195,7 @@ function AssignmentListItem({
         className={
           archived ? "question-list-item hatched" : "question-list-item"
         }
+        onClick={() => (window.location.href = assignment.urls.preview)}
       >
         <ListItemGraphic
           icon={"assignment"}

@@ -334,6 +334,7 @@
 }
 
 .assignment-list-item, .question-list-item {
+  cursor: pointer;
   & .mdc-icon-button {
     color: $hint;
     &:last-of-type {
