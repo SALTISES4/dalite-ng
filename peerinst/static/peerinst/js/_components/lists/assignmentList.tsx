@@ -268,7 +268,8 @@ class AssignmentListItem extends Component<
     if (
       !this.props.archived &&
       this.props.assignment.is_valid &&
-      this.props.assignment.questions
+      this.props.assignment?.questions &&
+      this.props.assignment.questions.length > 0
     ) {
       return (
         <IconButton
@@ -309,7 +310,10 @@ class AssignmentListItem extends Component<
   };
 
   ltiDialog = (): JSX.Element | undefined => {
-    if (this.props.assignment.questions) {
+    if (
+      this.props.assignment?.questions &&
+      this.props.assignment.questions.length > 0
+    ) {
       return (
         <Dialog
           open={this.state.dialogIsOpen}
