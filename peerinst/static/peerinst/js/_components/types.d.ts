@@ -36,6 +36,7 @@ export type Question = {
     first_choice: Record<string, number>; // eslint-disable-line camelcase
     second_choice: Record<string, number>; // eslint-disable-line camelcase
   };
+  image: string;
   image_alt_text: string; // eslint-disable-line camelcase
   matrix: { easy: number; hard: number; tricky: number; peer: number };
   // eslint-disable-next-line camelcase

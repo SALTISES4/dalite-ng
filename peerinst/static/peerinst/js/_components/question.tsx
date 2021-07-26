@@ -976,7 +976,11 @@ function QuestionCardHeader({
   );
 }
 
-function QuestionCardBody(props) {
+type QuestionCardBodyProps = {
+  question: Question;
+};
+
+function QuestionCardBody({ question }: QuestionCardBodyProps) {
   return (
     <div>
       <Typography
@@ -985,15 +989,15 @@ function QuestionCardBody(props) {
         theme="text-secondary-on-background"
         // This field is bleached and safe
         // eslint-disable-next-line
-        dangerouslySetInnerHTML={{ __html: props.question.text }}
+        dangerouslySetInnerHTML={{ __html: question.text }}
       />
       <Image
-        alt={props.question.image_alt_text}
-        image={props.question.image}
+        alt={question.image_alt_text}
+        image={question.image}
         show={true}
       />
-      <Video url={props.question.video_url} show={true} />
-      <AnswerChoices question={props.question} show={true} />
+      <Video url={question.video_url} show={true} />
+      <AnswerChoices question={question} show={true} />
     </div>
   );
 }
@@ -1126,7 +1130,7 @@ export function SearchQuestionCard({
             gettext={gettext}
             question={question}
           />
-          <QuestionCardBody gettext={gettext} question={question} />
+          <QuestionCardBody question={question} />
         </div>
         <CardActions>
           <QuestionCardActionButtons gettext={gettext} question={question} />

@@ -453,6 +453,12 @@
       return preact.h(
         account.TeacherAccountAssignmentApp, {
           gettext: gettext,
+          lti: {
+            launchURL: "{{ LTI_launch_url }}",
+            consumerKey: "{{ LTI_key }}",
+            sharedSecret: "{{ LTI_secret }}",
+            teacherHash: "{{ teacher.hash }}",
+          },
           urls: {
             assignmentCreate: "{% url 'assignment-create' %}",
             assignmentList: "{% url 'REST:teacher' teacher.pk %}?field=assignments&field=owned_assignments",

@@ -15,6 +15,12 @@ import "@rmwc/circular-progress/circular-progress.css";
 
 type TeacherAccountAssignmentAppProps = {
   gettext: (a: string) => string;
+  lti: {
+    launchURL: string;
+    consumerKey: string;
+    sharedSecret: string;
+    teacherHash: string;
+  };
   urls: {
     assignmentCreate: string;
     assignmentList: string;
@@ -194,6 +200,7 @@ export class TeacherAccountAssignmentApp extends Component<
             archived={this.state.archived}
             assignments={this.state.assignments}
             gettext={this.props.gettext}
+            lti={this.props.lti}
             handleToggleArchived={this.handleToggleArchived}
             ownedAssignments={this.state.ownedAssignments}
             view={this.state.view}

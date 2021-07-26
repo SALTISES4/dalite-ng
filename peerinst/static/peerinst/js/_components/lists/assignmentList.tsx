@@ -18,6 +18,7 @@ import {
   ListItemSecondaryText,
 } from "@rmwc/list";
 import { Menu, MenuItem, MenuSurfaceAnchor } from "@rmwc/menu";
+import { Typography } from "@rmwc/typography";
 
 import { Info } from "../question";
 
@@ -27,11 +28,38 @@ import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-butto
 import "@rmwc/list/node_modules/@material/list/dist/mdc.list.css";
 import "@rmwc/menu/node_modules/@material/menu/dist/mdc.menu.css";
 import "@rmwc/menu/node_modules/@material/menu-surface/dist/mdc.menu-surface.css";
+import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
+
+type BasicQuestion = {
+  answer_count: number; // eslint-disable-line camelcase
+  answerchoice_set: { correct: boolean; text: string }[]; // eslint-disable-line camelcase
+
+  category: { title: string }[];
+  collaborators?: string[];
+  discipline: { title: string };
+  frequency: {
+    first_choice: Record<string, number>; // eslint-disable-line camelcase
+    second_choice: Record<string, number>; // eslint-disable-line camelcase
+  };
+  image: string;
+  image_alt_text: string; // eslint-disable-line camelcase
+  matrix: { easy: number; hard: number; tricky: number; peer: number };
+  pk: number;
+  text: string;
+  title: string;
+  user: { username: string } | null;
+};
 
 export type Assignment = {
   editable: boolean;
   is_valid: boolean; // eslint-disable-line camelcase
   pk: string;
+  questions?: {
+    assignment: string;
+    pk: number;
+    question: BasicQuestion;
+    rank: number;
+  }[];
   question_pks: number[]; // eslint-disable-line camelcase
   title: string;
   urls: {
@@ -48,6 +76,12 @@ type AssignmentListProps = {
   assignments: Assignment[];
   gettext: (a: string) => string;
   handleToggleArchived: (a: Assignment) => Promise<void>;
+  lti: {
+    launchURL: string;
+    consumerKey: string;
+    sharedSecret: string;
+    teacherHash: string;
+  };
   ownedAssignments: Assignment[];
   view: string;
 };
@@ -57,6 +91,7 @@ export function AssignmentList({
   assignments,
   gettext,
   handleToggleArchived,
+  lti,
   ownedAssignments,
   view,
 }: AssignmentListProps): JSX.Element {
@@ -65,6 +100,7 @@ export function AssignmentList({
     assignments,
     gettext,
     handleToggleArchived,
+    lti,
     ownedAssignments,
     view,
   );
@@ -143,6 +179,7 @@ export function AssignmentList({
                   assignment={a}
                   gettext={gettext}
                   handleToggleArchived={handleToggleArchived}
+                  lti={lti}
                   owned={ownedPks.includes(a.pk)}
                 />
               </div>
@@ -159,6 +196,12 @@ type AssignmentListItemProps = {
   assignment: Assignment;
   gettext: (a: string) => string;
   handleToggleArchived: (a: Assignment) => Promise<void>;
+  lti: {
+    launchURL: string;
+    consumerKey: string;
+    sharedSecret: string;
+    teacherHash: string;
+  };
   owned: boolean;
 };
 
@@ -222,7 +265,11 @@ class AssignmentListItem extends Component<
   };
 
   distributeIcon = (): JSX.Element | undefined => {
-    if (!this.props.archived && this.props.assignment.is_valid) {
+    if (
+      !this.props.archived &&
+      this.props.assignment.is_valid &&
+      this.props.assignment.questions
+    ) {
       return (
         <IconButton
           icon="share"
@@ -261,34 +308,62 @@ class AssignmentListItem extends Component<
     );
   };
 
-  render() {
-    return (
-      <Fragment>
-        <ListDivider />
+  ltiDialog = (): JSX.Element | undefined => {
+    if (this.props.assignment.questions) {
+      return (
         <Dialog
           open={this.state.dialogIsOpen}
           onClose={() => this.setState({ dialogIsOpen: false })}
         >
           <DialogTitle>{this.props.assignment.title}</DialogTitle>
           <DialogContent>
-            <div style={{ marginBottom: 16 }}>
-              <Info
-                type="tip"
-                text={this.props.gettext(
-                  `Use the following information to configure the LTI tool in
-                 your Learning Management System (e.g. Moodle, OpenEdx):`,
-                )}
-              />
-            </div>
-
             <Info
-              type="tip"
+              className="large"
               text={this.props.gettext(
-                `To import any of the questions below, copy and paste the text
-                 below the question title into the Custom Paramaters box of your
+                `Use the following information to configure the LTI tool in
+             your Learning Management System (e.g. Moodle, OpenEdx):`,
+              )}
+              type="tip"
+            />
+            <blockquote>
+              <ul>
+                <li>
+                  {this.props.gettext("LTI Launch URL")}:{" "}
+                  {this.props.lti.launchURL}
+                </li>
+                <li>
+                  {this.props.gettext("LTI Consumer Key")}:{" "}
+                  {this.props.lti.consumerKey}
+                </li>
+                <li>
+                  {this.props.gettext("LTI Shared Secret")}:{" "}
+                  {this.props.lti.sharedSecret}
+                </li>
+              </ul>
+            </blockquote>
+            <Info
+              className="large"
+              text={this.props.gettext(
+                `To import assignment questions, copy and paste the text
+                 below the question title into the Custom Parameters box of your
                  LTI tool:`,
               )}
+              type="tip"
             />
+            <Typography use="body1" tag="ul">
+              {this.props.assignment.questions.map((q, i): JSX.Element => {
+                return (
+                  <li key={i}>
+                    {q.question.title}:
+                    <ul>
+                      <li>assignment_id={this.props.assignment.pk}</li>
+                      <li>question_id={q.question.pk}</li>
+                      <li>teacher_id={this.props.lti.teacherHash}</li>
+                    </ul>
+                  </li>
+                );
+              })}
+            </Typography>
           </DialogContent>
           <DialogActions>
             <DialogButton
@@ -301,6 +376,15 @@ class AssignmentListItem extends Component<
             </DialogButton>
           </DialogActions>
         </Dialog>
+      );
+    }
+  };
+
+  render() {
+    return (
+      <Fragment>
+        <ListDivider />
+        {this.ltiDialog()}
         <MenuSurfaceAnchor
           style={{
             position: "absolute",

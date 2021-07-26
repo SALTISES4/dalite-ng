@@ -15,7 +15,15 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
         many=True, queryset=Question.objects.all()
     )
     assignments = AssignmentSerializer(
-        fields=["editable", "is_valid", "pk", "question_pks", "title", "urls"],
+        fields=[
+            "editable",
+            "is_valid",
+            "pk",
+            "questions",
+            "question_pks",
+            "title",
+            "urls",
+        ],
         many=True,
         read_only=True,
     )
