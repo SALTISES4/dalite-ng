@@ -55,7 +55,7 @@ export class CopyBox extends Component<CopyBoxProps, CopyBoxState> {
             show={this.state.snackbarIsOpen}
             onHide={() => this.setState({ snackbarIsOpen: false })}
             message={this.state.snackbarMessage}
-            timeout={5000}
+            timeout={1000}
             actionHandler={() => {}} // eslint-disable-line @typescript-eslint/no-empty-function
             actionText="OK"
             dismissesOnAction={true}
