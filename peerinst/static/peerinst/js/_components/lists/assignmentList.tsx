@@ -20,6 +20,7 @@ import {
 import { Menu, MenuItem, MenuSurfaceAnchor } from "@rmwc/menu";
 import { Typography } from "@rmwc/typography";
 
+import { CopyBox } from "../clipboard";
 import { Info } from "../question";
 
 import "@rmwc/button/node_modules/@material/button/dist/mdc.button.min.css";
@@ -329,22 +330,56 @@ class AssignmentListItem extends Component<
               )}
               type="tip"
             />
-            <blockquote>
-              <ul>
-                <li>
-                  {this.props.gettext("LTI Launch URL")}:{" "}
-                  {this.props.lti.launchURL}
-                </li>
-                <li>
-                  {this.props.gettext("LTI Consumer Key")}:{" "}
-                  {this.props.lti.consumerKey}
-                </li>
-                <li>
-                  {this.props.gettext("LTI Shared Secret")}:{" "}
-                  {this.props.lti.sharedSecret}
-                </li>
-              </ul>
-            </blockquote>
+
+            <div style={{ marginLeft: 26, marginTop: 10 }}>
+              <Typography
+                use="body2"
+                tag="div"
+                style={{ fontWeight: "bold", marginBottom: 4 }}
+              >
+                {this.props.gettext("LTI Launch URL")}
+              </Typography>
+              <Typography use="body2" tag="div">
+                <CopyBox gettext={this.props.gettext}>
+                  <ul style={{ paddingLeft: 8 }}>
+                    <li>{this.props.lti.launchURL}</li>
+                  </ul>
+                </CopyBox>
+              </Typography>
+            </div>
+            <div style={{ marginLeft: 26, marginTop: 10 }}>
+              <Typography
+                use="body2"
+                tag="div"
+                style={{ fontWeight: "bold", marginBottom: 4 }}
+              >
+                {this.props.gettext("LTI Consumer Key")}
+              </Typography>
+              <Typography use="body2" tag="div">
+                <CopyBox gettext={this.props.gettext}>
+                  <ul style={{ paddingLeft: 8 }}>
+                    <li>{this.props.lti.consumerKey}</li>
+                  </ul>
+                </CopyBox>
+              </Typography>
+            </div>
+            <div style={{ marginBottom: 24, marginLeft: 26, marginTop: 10 }}>
+              <Typography
+                use="body2"
+                tag="div"
+                style={{ fontWeight: "bold", marginBottom: 4 }}
+              >
+                {this.props.gettext("LTI Shared Secret")}
+              </Typography>
+              <Typography use="body2" tag="div">
+                <CopyBox gettext={this.props.gettext}>
+                  <ul style={{ paddingLeft: 8 }}>
+                    <li>{this.props.lti.sharedSecret}</li>
+                  </ul>
+                </CopyBox>
+              </Typography>
+            </div>
+
             <Info
               className="large"
               text={this.props.gettext(
@@ -354,20 +389,29 @@ class AssignmentListItem extends Component<
               )}
               type="tip"
             />
-            <Typography use="body1" tag="ul">
-              {this.props.assignment.questions.map((q, i): JSX.Element => {
-                return (
-                  <li key={i}>
-                    {q.question.title}:
-                    <ul>
-                      <li>assignment_id={this.props.assignment.pk}</li>
-                      <li>question_id={q.question.pk}</li>
-                      <li>teacher_id={this.props.lti.teacherHash}</li>
-                    </ul>
-                  </li>
-                );
-              })}
-            </Typography>
+            {this.props.assignment.questions.map((q, i): JSX.Element => {
+              return (
+                <div key={i} style={{ marginLeft: 26, marginTop: 10 }}>
+                  <Typography
+                    key={i}
+                    use="body2"
+                    tag="div"
+                    style={{ fontWeight: "bold", marginBottom: 4 }}
+                  >
+                    Q{i + 1}. {q.question.title}
+                  </Typography>
+                  <Typography use="body2" tag="div">
+                    <CopyBox gettext={this.props.gettext}>
+                      <ul style={{ paddingLeft: 8 }}>
+                        <li>assignment_id={this.props.assignment.pk}</li>
+                        <li>question_id={q.question.pk}</li>
+                        <li>teacher_id={this.props.lti.teacherHash}</li>
+                      </ul>
+                    </CopyBox>
+                  </Typography>
+                </div>
+              );
+            })}
           </DialogContent>
           <DialogActions>
             <DialogButton
