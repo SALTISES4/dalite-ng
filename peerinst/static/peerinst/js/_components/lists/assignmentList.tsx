@@ -1,5 +1,12 @@
-import { Fragment, h } from "preact";
+import { Component, createRef, Fragment, h } from "preact";
 
+import {
+  Dialog,
+  DialogActions,
+  DialogButton,
+  DialogContent,
+  DialogTitle,
+} from "@rmwc/dialog";
 import { IconButton } from "@rmwc/icon-button";
 import {
   List,
@@ -10,11 +17,16 @@ import {
   ListItemPrimaryText,
   ListItemSecondaryText,
 } from "@rmwc/list";
+import { Menu, MenuItem, MenuSurfaceAnchor } from "@rmwc/menu";
 
 import { Info } from "../question";
 
+import "@rmwc/button/node_modules/@material/button/dist/mdc.button.min.css";
+import "@rmwc/dialog/node_modules/@material/dialog/dist/mdc.dialog.min.css";
 import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-button.min.css";
 import "@rmwc/list/node_modules/@material/list/dist/mdc.list.css";
+import "@rmwc/menu/node_modules/@material/menu/dist/mdc.menu.css";
+import "@rmwc/menu/node_modules/@material/menu-surface/dist/mdc.menu-surface.css";
 
 export type Assignment = {
   editable: boolean;
@@ -108,9 +120,13 @@ export function AssignmentList({
   };
 
   return (
-    <Fragment>
+    <div>
       <div style={{ marginBottom: 8, maxWidth: 600 }}>{info()}</div>
-      <List twoLine>
+      <List
+        className="assignment-list"
+        twoLine
+        style={{ position: "relative" }}
+      >
         {assignments
           .concat(archived)
           .sort(sort)
@@ -134,7 +150,7 @@ export function AssignmentList({
           })}
         <ListDivider />
       </List>
-    </Fragment>
+    </div>
   );
 }
 
@@ -146,126 +162,203 @@ type AssignmentListItemProps = {
   owned: boolean;
 };
 
-function AssignmentListItem({
-  archived,
-  assignment,
-  gettext,
-  handleToggleArchived,
-  owned,
-}: AssignmentListItemProps): JSX.Element {
-  const archiveIcon = (): JSX.Element | undefined => {
+type AssingmentListItemState = {
+  dialogIsOpen: boolean;
+  menuIsOpen: boolean;
+};
+
+class AssignmentListItem extends Component<
+  AssignmentListItemProps,
+  AssingmentListItemState
+> {
+  state = {
+    dialogIsOpen: false,
+    menuIsOpen: false,
+  };
+
+  menuRef = createRef();
+
+  archiveIcon = (): JSX.Element | undefined => {
     return (
       <IconButton
         icon={
-          owned && archived ? "unarchive" : owned ? "archive" : "remove_circle"
+          this.props.owned && this.props.archived
+            ? "unarchive"
+            : this.props.owned
+            ? "archive"
+            : "remove_circle"
         }
-        onClick={() => handleToggleArchived(assignment)}
+        onClick={() => this.props.handleToggleArchived(this.props.assignment)}
         title={
-          archived
-            ? gettext("Unarchive this assignment.")
-            : owned
-            ? gettext("Archive this assignment to hide it.")
-            : gettext("Unfollow this assignment.")
+          this.props.archived
+            ? this.props.gettext("Unarchive this assignment.")
+            : this.props.owned
+            ? this.props.gettext("Archive this assignment to hide it.")
+            : this.props.gettext("Unfollow this assignment.")
         }
       />
     );
   };
 
-  const editIcon = (): JSX.Element | undefined => {
-    const edit = owned && assignment.editable;
-    if (!archived) {
+  editIcon = (): JSX.Element | undefined => {
+    const edit = this.props.owned && this.props.assignment.editable;
+    if (!this.props.archived) {
       return (
         <IconButton
           icon={edit ? "edit" : "file_copy"}
           onClick={() =>
             (window.location.href = edit
-              ? assignment.urls.update
-              : assignment.urls.copy)
+              ? this.props.assignment.urls.update
+              : this.props.assignment.urls.copy)
           }
           title={
             edit
-              ? gettext("Edit this assignment to make changes.")
-              : gettext("Copy this assignment to make changes.")
+              ? this.props.gettext("Edit this assignment to make changes.")
+              : this.props.gettext("Copy this assignment to make changes.")
           }
         />
       );
     }
   };
 
-  const distributeIcon = (): JSX.Element | undefined => {
-    if (!archived && assignment.is_valid) {
+  distributeIcon = (): JSX.Element | undefined => {
+    if (!this.props.archived && this.props.assignment.is_valid) {
       return (
         <IconButton
           icon="share"
-          onClick={() => (window.location.href = assignment.urls.distribute)}
-          title={gettext("Distribute this assignment to one of your groups.")}
+          onClick={() => this.setState({ menuIsOpen: true })}
+          title={this.props.gettext(
+            "Distribute this assignment to one of your groups.",
+          )}
         />
       );
     }
   };
 
-  const icons = () => {
+  icons = () => {
     return (
       <div style={{ marginLeft: "auto" }}>
-        {distributeIcon()}
-        {editIcon()}
-        {archiveIcon()}
+        {this.distributeIcon()}
+        {this.editIcon()}
+        {this.archiveIcon()}
       </div>
     );
   };
 
-  const caption = (): JSX.Element => {
-    console.debug(assignment);
-    if (assignment.is_valid) {
+  caption = (): JSX.Element => {
+    if (this.props.assignment.is_valid) {
       return (
         <span>
-          {assignment.question_pks.length} {gettext("questions")}
+          {this.props.assignment.question_pks.length}{" "}
+          {this.props.gettext("questions")}
         </span>
       );
     }
     return (
       <span style={{ color: "var(--mdc-theme-error)" }}>
-        {gettext("There is a problem with this assignment.")}
+        {this.props.gettext("There is a problem with this assignment.")}
       </span>
     );
   };
 
-  return (
-    <Fragment>
-      <ListDivider />
-      <ListItem
-        className={
-          archived ? "question-list-item hatched" : "question-list-item"
-        }
-      >
-        <ListItemGraphic
-          icon={assignment.is_valid ? "assignment" : "report"}
-          onClick={() =>
-            (window.location.href = assignment.is_valid
-              ? assignment.urls.preview
-              : assignment.urls.fix)
-          }
-          style={{ cursor: "pointer", fontSize: 36 }}
-          theme={assignment.is_valid ? "primary" : "error"}
-        />
-        <ListItemText>
-          <ListItemPrimaryText
-            onClick={() =>
-              (window.location.href = assignment.is_valid
-                ? assignment.urls.preview
-                : assignment.urls.fix)
-            }
-            style={{ cursor: "pointer", fontWeight: "bold" }}
-            theme={assignment.is_valid ? "secondary" : "error"}
+  render() {
+    return (
+      <Fragment>
+        <ListDivider />
+        <Dialog
+          open={this.state.dialogIsOpen}
+          onClose={() => this.setState({ dialogIsOpen: false })}
+        >
+          <DialogTitle>{this.props.assignment.title}</DialogTitle>
+          <DialogContent>
+            <div style={{ marginBottom: 16 }}>
+              <Info
+                type="tip"
+                text={this.props.gettext(
+                  `Use the following information to configure the LTI tool in
+                 your Learning Management System (e.g. Moodle, OpenEdx):`,
+                )}
+              />
+            </div>
+
+            <Info
+              type="tip"
+              text={this.props.gettext(
+                `To import any of the questions below, copy and paste the text
+                 below the question title into the Custom Paramaters box of your
+                 LTI tool:`,
+              )}
+            />
+          </DialogContent>
+          <DialogActions>
+            <DialogButton
+              ripple
+              action="accept"
+              isDefaultAction
+              theme="primary"
+            >
+              {this.props.gettext("OK")}
+            </DialogButton>
+          </DialogActions>
+        </Dialog>
+        <MenuSurfaceAnchor
+          style={{
+            position: "absolute",
+            right: 0,
+          }}
+        >
+          <Menu
+            open={this.state.menuIsOpen}
+            onClose={() => this.setState({ menuIsOpen: false })}
           >
-            {assignment.title}
-          </ListItemPrimaryText>
-          <ListItemSecondaryText theme="textHintOnBackground">
-            {caption()}
-          </ListItemSecondaryText>
-        </ListItemText>
-        {icons()}
-      </ListItem>
-    </Fragment>
-  );
+            <MenuItem onClick={() => this.setState({ dialogIsOpen: true })}>
+              {this.props.gettext("Distribute via LMS (e.g. Moodle)")}
+            </MenuItem>
+            <MenuItem
+              onClick={() =>
+                (window.location.href = this.props.assignment.urls.distribute)
+              }
+            >
+              {this.props.gettext("Distribute via myDALITE")}
+            </MenuItem>
+          </Menu>
+        </MenuSurfaceAnchor>
+        <ListItem
+          className={
+            this.props.archived
+              ? "assignment-list-item hatched"
+              : "assignment-list-item"
+          }
+        >
+          <ListItemGraphic
+            icon={this.props.assignment.is_valid ? "assignment" : "report"}
+            onClick={() =>
+              (window.location.href = this.props.assignment.is_valid
+                ? this.props.assignment.urls.preview
+                : this.props.assignment.urls.fix)
+            }
+            style={{ cursor: "pointer", fontSize: 36 }}
+            theme={this.props.assignment.is_valid ? "primary" : "error"}
+          />
+          <ListItemText>
+            <ListItemPrimaryText
+              onClick={() =>
+                (window.location.href = this.props.assignment.is_valid
+                  ? this.props.assignment.urls.preview
+                  : this.props.assignment.urls.fix)
+              }
+              style={{ cursor: "pointer", fontWeight: "bold" }}
+              theme={this.props.assignment.is_valid ? "secondary" : "error"}
+            >
+              {this.props.assignment.title}
+            </ListItemPrimaryText>
+            <ListItemSecondaryText theme="textHintOnBackground">
+              {this.caption()}
+            </ListItemSecondaryText>
+          </ListItemText>
+          {this.icons()}
+        </ListItem>
+      </Fragment>
+    );
+  }
 }

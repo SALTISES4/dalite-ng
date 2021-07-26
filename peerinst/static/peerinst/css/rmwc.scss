@@ -323,17 +323,16 @@
   }
 }
 
-.question-list-item.hatched {
-  background: repeating-linear-gradient(
-  -45deg,
-  transparentize($hint, 0.85),
-  transparentize($hint, 0.85) 5px,
-  transparentize($hint, 0.95) 5px,
-  transparentize($hint, 0.95) 10px
-);
-}
-
 .assignment-list-item, .question-list-item {
+  &.hatched {
+    background: repeating-linear-gradient(
+      -45deg,
+      transparentize($hint, 0.85),
+      transparentize($hint, 0.85) 5px,
+      transparentize($hint, 0.95) 5px,
+      transparentize($hint, 0.95) 10px
+    );
+  }
   & .mdc-icon-button {
     color: $hint;
     &:last-of-type {
@@ -341,3 +340,8 @@
     }
   }
 }
+
+.assignment-list .mdc-menu {
+    min-width: 180px;
+    transform: translate(-100%, -8px);
+  }
