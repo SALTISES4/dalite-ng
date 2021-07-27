@@ -148,44 +148,13 @@ class Assignment(models.Model):
 
     @property
     def includes_flagged_question(self):
-        """
-        Assignment is invalid if:
-        - A PI question does not have at least two answer choices
-        - A PI question does not have at least two sample answers (excluding
-          expert answers) for each answer choice
-        - Any question is flagged
-        """
-        pi_queryset = self.questions.filter(type="PI")
-
-        missing_answer_choices = (
-            pi_queryset.annotate(
-                answer_choice_count=models.Count("answerchoice")
-            )
-            .filter(answer_choice_count__lte=1)
-            .exists()
+        return any(
+            [
+                Question.is_missing_answer_choices(self.questions),
+                Question.is_missing_sample_answers(self.questions),
+                Question.is_flagged(self.questions),
+            ]
         )
-
-        missing_sample_answers = (
-            pi_queryset.values(
-                "pk", "answer__first_answer_choice", "answer__expert"
-            )
-            .exclude(answer__expert=True)
-            .annotate(
-                answer_count_for_choice=models.Count(
-                    "answer__first_answer_choice"
-                )
-            )
-            .filter(answer_count_for_choice__lte=1)
-            .exists()
-        )
-
-        flagged = (
-            self.questions.annotate(flagged=models.Count("questionflag"))
-            .filter(flagged__gt=0)
-            .exists()
-        )
-
-        return any([missing_answer_choices, missing_sample_answers, flagged])
 
 
 class AssignmentQuestions(models.Model):

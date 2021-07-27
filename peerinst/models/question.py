@@ -399,6 +399,44 @@ class Question(models.Model):
             60,
         )
 
+    @classmethod
+    def is_missing_answer_choices(cls, queryset):
+        if queryset.model is cls:
+            return (
+                queryset.filter(type="PI")
+                .annotate(answer_choice_count=models.Count("answerchoice"))
+                .filter(answer_choice_count__lte=1)
+                .exists()
+            )
+        raise TypeError("Queryset must be of type Question")
+
+    @classmethod
+    def is_missing_sample_answers(cls, queryset):
+        if queryset.model is cls:
+            return (
+                queryset.filter(type="PI")
+                .values("pk", "answer__first_answer_choice", "answer__expert")
+                .exclude(answer__expert=True)
+                .annotate(
+                    answer_count_for_choice=models.Count(
+                        "answer__first_answer_choice"
+                    )
+                )
+                .filter(answer_count_for_choice__lte=1)
+                .exists()
+            )
+        raise TypeError("Queryset must be of type Question")
+
+    @classmethod
+    def is_flagged(cls, queryset):
+        if queryset.model is cls:
+            return (
+                queryset.annotate(flagged=models.Count("questionflag"))
+                .filter(flagged__gt=0)
+                .exists()
+            )
+        raise TypeError("Queryset must be of type Question")
+
     @property
     def answer_count(self):
         return self.get_student_answers().count()
@@ -423,10 +461,14 @@ class Question(models.Model):
 
     @property
     def is_valid(self):
-        """
-        TODO: Need to add a check that there are enough sample answers!
-        """
-        return self.answerchoice_set.count() > 0 or self.type == "RO"
+        self_as_queryset = Question.objects.filter(pk=self.pk)
+        return not any(
+            [
+                Question.is_missing_answer_choices(self_as_queryset),
+                Question.is_missing_sample_answers(self_as_queryset),
+                Question.is_flagged(self_as_queryset),
+            ]
+        )
 
     def get_start_form_class(self):
         from ..forms import FirstAnswerForm
