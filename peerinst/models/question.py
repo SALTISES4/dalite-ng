@@ -424,9 +424,24 @@ class Question(models.Model):
     @property
     def is_valid(self):
         """
-        TODO: Need to add a check that there are enough sample answers!
+        Check that question:
+        - has at least one answer_choice
+        - has at least one rationale for each answer_choice
+
+        or
+
+        The question is of type "Rationale Only"
         """
-        return self.answerchoice_set.count() > 0 or self.type == "RO"
+        enough_sample_rationales = (
+            0
+            not in self.get_frequency(all_rationales=True)[
+                "first_choice"
+            ].values()
+        )
+
+        return (
+            self.answerchoice_set.count() > 0 and enough_sample_rationales
+        ) or self.type == "RO"
 
     def get_start_form_class(self):
         from ..forms import FirstAnswerForm

@@ -148,22 +148,16 @@ class Assignment(models.Model):
 
     @property
     def includes_flagged_question(self):
+        valid_questions = [q for q in self.questions.all() if q.is_valid]
         return any(
             [
-                0
-                in q.get_frequency(all_rationales=True)[
-                    "first_choice"
-                ].values()
-                for q in self.questions.all()
-            ]
-            + [
                 True
                 if q.pk
                 in QuestionFlag.objects.all().values_list(
                     "question", flat=True
                 )
                 else False
-                for q in self.questions.all()
+                for q in valid_questions
             ]
         )
 
