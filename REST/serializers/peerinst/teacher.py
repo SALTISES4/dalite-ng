@@ -46,6 +46,7 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
     questions = QuestionSerializer(
         fields=[
             "answer_count",
+            "is_valid",
             "pk",
             "title",
             "type",
@@ -57,6 +58,7 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
     shared_questions = QuestionSerializer(
         fields=[
             "answer_count",
+            "is_valid",
             "pk",
             "title",
             "type",

@@ -62,6 +62,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     difficulty = serializers.SerializerMethodField()
     discipline = DisciplineSerializer(read_only=True)
     frequency = serializers.SerializerMethodField()
+    is_valid = serializers.ReadOnlyField()
     matrix = serializers.SerializerMethodField()
     most_convincing_rationales = serializers.SerializerMethodField()
     peer_impact = serializers.SerializerMethodField()
@@ -112,6 +113,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "frequency",
             "image",
             "image_alt_text",
+            "is_valid",
             "matrix",
             "most_convincing_rationales",
             "peer_impact",
