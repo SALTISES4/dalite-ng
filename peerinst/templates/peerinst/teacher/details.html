@@ -5,7 +5,7 @@
 {% block stylesheets %}
 {{ block.super }}
 {% compress js file preact %}
-<script src="{% static 'peerinst/js/preact.min.js' %}" defer="true"></script>
+<script src="{% static 'peerinst/js/preact.min.js' %}" defer></script>
 {% endcompress %}
 {% compress js file account %}
 <script src="{% static 'peerinst/js/account.min.js' %}" defer></script>
@@ -17,12 +17,6 @@
 {% compress css file rmwc %}
 <link href="{% static 'peerinst/css/rmwc.min.css' %}" rel="stylesheet">
 {% endcompress %}
-
-<style nonce="{{ request.csp_nonce }}">
-.deleted {
-  background-color: lightgray;
-}
-</style>
 {% endblock %}
 
 {% block body %}
@@ -75,104 +69,6 @@
               </a>
             </span>
           </li>
-          {% endfor %}
-          <li role="separator" class="mdc-list-divider"></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="foldable">
-      <h2 id="assignment-section" class="foldable--title mdc-typography--display1 mdc-theme--secondary">
-        {% trans 'Assignments' %}
-      </h2>
-      <div class="foldable--body">
-        <div class="admin-link">
-          <a href="{% url 'assignment-create' %}" id="assignment-create">{% trans 'Create new' %}</a>
-          <span class="links-divider">|</span><a href="{% url 'teacher-assignments' teacher.id %}">{% trans 'Manage assignments' %}</a>
-          <span class="links-divider">|</span><a href="{% url 'report_selector' %}">{% trans 'Custom reports' %}</a>
-        </div>
-        {% if not object.assignments.all %}
-        <p class='mdc-typography--body1'>{% blocktrans %}You do not have any assignments.{% endblocktrans %}</p>
-        {% endif %}
-        <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-          {% for a in object.assignments.all %}
-          <li role="separator" class="mdc-list-divider"></li>
-          <li class="mdc-list-item">
-            <span class="mdc-list-item__graphic mdc-theme--primary">
-              <i class="clickable mdc-theme--primary material-icons md-36 pointer assignment-link">assignment</i>
-            </span>
-            <span class="mdc-list-item__text mdc-theme--secondary bold">
-              <a class="mdc-theme--secondary" href="{% url 'question-list' a.pk %}">{{ a.identifier }}</a>
-              <span class="mdc-list-item__secondary-text">
-
-                {% if a.includes_flagged_question %}
-                <a href="{% url 'research-assignment-question-index-by-assignment' assignment_id=a.identifier %}">
-                  <i class="material-icons md-24 mdc-ripple-surface icon-list red" title="{% trans 'Contains problematic question' %}">
-                    error
-                  </i>
-                </a>
-                {% endif %}
-
-                {{ a.questions.count }} {% trans "questions" %}, {{ a.answer_set.count }} {% trans "answers" %}
-              </span>
-            </span>
-            <span class="mdc-list-item__meta">
-              <i id="activate-dialog-{{a.pk|slugify}}" class="material-icons md-24 mdc-ripple-surface icon-list">info</i>
-              <a href="{% url 'report-all-groups' assignment_id=a.identifier|urlencode:"" %}">
-                <i class="material-icons md-24 mdc-ripple-surface icon-list">bar_chart</i>
-              </a>
-              {% if object.user in a.owner.all and a.editable %}
-                <a  id="edit-assignment-{{ a.pk|slugify }}" href="{% url 'assignment-update' a.pk %}">
-                  <i class="material-icons md-24 mdc-ripple-surface icon-list">mode_edit</i>
-                </a>
-              {% else %}
-                <a  id="copy-assignment-{{ a.pk|slugify }}" href="{% url 'assignment-copy' a.pk %}">
-                  <i class="material-icons md-24 mdc-ripple-surface icon-list">file_copy</i>
-                </a>
-              {% endif %}
-              <a href="{% url 'student-group-assignment-create' a.pk %}">
-                <i class="material-icons md-24 mdc-ripple-surface icon-list">share</i>
-              </a>
-            </span>
-          </li>
-
-          <aside id="dialog-{{a.pk|slugify}}"
-            class="mdc-dialog"
-            role="alertdialog"
-            aria-labelledby="assignment-parameters-label"
-            aria-describedby="assignment-parameters-description">
-            <div class="mdc-dialog__surface">
-              <header class="mdc-dialog__header">
-                <h2 id="assignment-parameters-label" class="mdc-dialog__header__title">
-                  {% trans 'How to use in your course through LTI' %}
-                </h2>
-              </header>
-              <section id="assignment-parameters-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
-                <p class="mdc-typography--body1">{% blocktrans %}Use the following to configure the LTI tool in your Learning Management System (e.g. Moodle, OpenEdx){% endblocktrans %}:</p>
-                <ul>
-                    <li>{% trans 'LTI Launch URL' %} : {{ LTI_launch_url }}</li>
-                    <li>{% trans 'LTI Consumer Key' %} : {{ LTI_key }}</li>
-                    <li>{% trans 'LTI Shared Secret' %} : {{ LTI_secret }}</li>
-                </ul>
-                <p class="mdc-typography--body1">{% blocktrans %}To import any of the questions below, copy and paste the text below the question title into the <em>Custom Paramaters</em> box of your LTI tool{% endblocktrans %}:</p>
-                <ul>
-                {% for q in a.questions.all %}
-                  <li><span class="bold">{{ q.title }}:</span>
-                    <ul>
-                      <li>assignment_id={{ a.identifier }}</li>
-                      <li>question_id={{ q.id }}</li>
-                      <li>teacher_id={{ teacher.hash }}</li>
-                    </ul>
-                {% endfor %}
-                </ul>
-              </section>
-              <footer class="mdc-dialog__footer">
-                <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
-              </footer>
-            </div>
-            <div class="mdc-dialog__backdrop"></div>
-          </aside>
-
           {% endfor %}
           <li role="separator" class="mdc-list-divider"></li>
         </ul>
@@ -436,6 +332,7 @@
 {{ block.super }}
 <script nonce="{{ request.csp_nonce }}">
   window.addEventListener('load', function() {
+    // Preact apps
     const QuestionApp = () => {
       return preact.h(
         account.TeacherAccountQuestionApp, {
@@ -468,30 +365,26 @@
         });
     }
     preact.render(AssignmentApp(), document.getElementById("assignments-app"));
-  });
-</script>
 
-<script nonce="{{ request.csp_nonce }}">
-  bundle.addDialog();
+    // Vanilla JS
+    bundle.addDialog();
 
-  $.ajaxSetup({
-      beforeSend: function(xhr, settings) {
-          if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
-              xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
-          }
-      }
-  });
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+            }
+        }
+    });
 
-  function edit_user() {
-    location="{% url 'password_change' %}";
-  }
+    function edit_user() {
+      location="{% url 'password_change' %}";
+    }
 
-  function edit_identity() {
-    location="{% url 'teacher-update' teacher.id %}";
-  }
-</script>
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
+    function edit_identity() {
+      location="{% url 'teacher-update' teacher.id %}";
+    }
+
     // Remember state of unfolded elements
     // All h2 require ids
     $(".foldable").each(function() {
@@ -511,59 +404,50 @@
       window.location.href='{% url 'group-details' g.hash %}';
     });
     {% endfor %}
-    links = document.getElementsByClassName("assignment-link");
-    {% for a in object.assignments.all %}
-    links[{{ forloop.counter0 }}].addEventListener("click", function() {
-      window.location.href='{% url 'question-list' a.pk %}';
-    });
-    {% endfor %}
+
     {% for a in object.blinkassignment_set.all %}
     document.getElementById("edit-blink-{{a.pk}}").addEventListener("click", function() {
       window.location.href="{% url 'blink:blink-waiting' username=object.user.username assignment=a.key %}";
     });
     {% endfor %}
-    // document.getElementById("quality-eval-edit").addEventListener("click", function() {
-    //   window.location.href='{% url 'quality:edit' %}?type=validation&teacher=true&next={{ request.path }}';
-    // });
+
     document.getElementById("edit-user-btn").addEventListener("click", function() {
       edit_user();
     });
+
     [...document.getElementsByClassName("edit-identity-btn")].forEach(function(btn) {
       btn.addEventListener("click", function() {
         edit_identity();
       });
     });
+
     document.getElementById("tos-modify-btn").addEventListener("click", function() {
       window.location.href="{% url 'tos:tos_modify' 'teacher' %}?next={{ request.path }}";
     });
+
     document.getElementById("email-modify-btn").addEventListener("click", function() {
       window.location.href="{% url 'tos:email_modify' 'teacher' %}?next={{ request.path }}";
     });
-  });
-  [].forEach.call(document.querySelectorAll(".collection-icon"), el => {
-    el.addEventListener("click", () => {
-      const pk=el.getAttribute('id');
-      const collectionUrl = "{% url 'collection-detail' 0 %}"
-      window.location.assign(collectionUrl.replace("0", pk ));
+
+    [].forEach.call(document.querySelectorAll(".collection-icon"), el => {
+      el.addEventListener("click", () => {
+        const pk=el.getAttribute('id');
+        const collectionUrl = "{% url 'collection-detail' 0 %}"
+        window.location.assign(collectionUrl.replace("0", pk ));
+      });
     });
-  });
-  $.ajaxSetup({
-      beforeSend: function(xhr, settings) {
-          if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
-              xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
-          }
-      },
-  });
-  [].forEach.call(document.querySelectorAll(".collection-stats"), el => {
-    el.addEventListener("click", () => {
-      const pk=el.getAttribute("pk");
-      var posting = $.post("{% url 'collection-statistics' %}", {pk: pk});
-      posting.done(function(data) {
-        document.getElementById("total-answers-"+pk).innerHTML = ("{% trans 'Total Answers' %}: " +data.totalAnswers);
-        document.getElementById("correct-first-answers-"+pk).innerHTML = ("{% trans 'Correct Answers on First Attempt' %}: " +data.correctFirstAnswers);
-        document.getElementById("correct-second-answers-"+pk).innerHTML = ("{% trans 'Correct Answers on Second Attempt' %}: " +data.correctSecondAnswers);
-        document.getElementById("switches-"+pk).innerHTML = ("{% trans 'Answers Switched' %}: " +data.switches);
-    })
+
+    [].forEach.call(document.querySelectorAll(".collection-stats"), el => {
+      el.addEventListener("click", () => {
+        const pk=el.getAttribute("pk");
+        var posting = $.post("{% url 'collection-statistics' %}", {pk: pk});
+        posting.done(function(data) {
+          document.getElementById("total-answers-"+pk).innerHTML = ("{% trans 'Total Answers' %}: " +data.totalAnswers);
+          document.getElementById("correct-first-answers-"+pk).innerHTML = ("{% trans 'Correct Answers on First Attempt' %}: " +data.correctFirstAnswers);
+          document.getElementById("correct-second-answers-"+pk).innerHTML = ("{% trans 'Correct Answers on Second Attempt' %}: " +data.correctSecondAnswers);
+          document.getElementById("switches-"+pk).innerHTML = ("{% trans 'Answers Switched' %}: " +data.switches);
+      })
+      });
     });
   });
 </script>
