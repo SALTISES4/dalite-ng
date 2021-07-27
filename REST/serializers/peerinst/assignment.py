@@ -248,7 +248,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         }
 
     def get_is_valid(self, obj):
-        return not obj.includes_flagged_question
+        return obj.is_valid
 
     def validate_questions(self, data):
         assignment_questions = list(

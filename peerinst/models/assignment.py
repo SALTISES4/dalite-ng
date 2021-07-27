@@ -147,8 +147,8 @@ class Assignment(models.Model):
         )
 
     @property
-    def includes_flagged_question(self):
-        return any(
+    def is_valid(self):
+        return not any(
             [
                 Question.is_missing_answer_choices(self.questions),
                 Question.is_missing_sample_answers(self.questions),
