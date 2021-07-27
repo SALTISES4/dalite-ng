@@ -141,6 +141,8 @@ export class AssignmentUpdateApp extends Component {
       );
       this.setState({
         favourites: data["favourite_questions"],
+        snackbarIsOpen: true,
+        snackbarMessage: data["snackbar_message"],
       });
     } catch (error) {
       this.setState({
@@ -365,7 +367,6 @@ export class AssignmentUpdateApp extends Component {
                   showChoices={this.state.showChoices}
                   showImages={this.state.showImages}
                   minimizeCards={this.state.minimizeCards}
-                  teacherURL={this.props.teacherURL}
                 />
               ))}
             </div>

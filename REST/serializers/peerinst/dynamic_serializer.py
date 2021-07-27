@@ -19,10 +19,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
         # Add filter based on querystring
-        if (
-            "request" in self.context
-            and self.context["request"].method == "GET"
-        ):
+        if "request" in self.context:
             requested_fields = self.context["request"].GET.getlist("field")
             if requested_fields:
                 allowed = set(requested_fields)
