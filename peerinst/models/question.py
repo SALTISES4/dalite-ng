@@ -404,7 +404,7 @@ class Question(models.Model):
         if queryset.model is cls:
             return (
                 queryset.filter(type="PI")
-                .annotate(answer_choice_count=models.Count("answerchoice"))
+                .annotate(answer_choice_count=Count("answerchoice"))
                 .filter(answer_choice_count__lte=1)
                 .exists()
             )
@@ -418,7 +418,7 @@ class Question(models.Model):
                 .values("pk", "answer__first_answer_choice", "answer__expert")
                 .exclude(answer__expert=True)
                 .annotate(
-                    answer_count_for_choice=models.Count(
+                    answer_count_for_choice=Count(
                         "answer__first_answer_choice"
                     )
                 )
@@ -431,7 +431,11 @@ class Question(models.Model):
     def is_flagged(cls, queryset):
         if queryset.model is cls:
             return (
-                queryset.annotate(flagged=models.Count("questionflag"))
+                queryset.annotate(
+                    flagged=Count(
+                        "questionflag", filter=Q(questionflag__flag=True)
+                    )
+                )
                 .filter(flagged__gt=0)
                 .exists()
             )
