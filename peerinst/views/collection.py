@@ -1,8 +1,29 @@
-from django.http import JsonResponse, HttpResponse
+import collections
+
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core import serializers
-from django.views.generic.edit import CreateView
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Q
 from django.forms import ModelForm
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404
+from django.template.response import TemplateResponse
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.http import require_POST
+from django.views.generic import DeleteView, DetailView, ListView, UpdateView
+from django.views.generic.edit import CreateView
+
+from dalite.views.utils import get_json_params
+from peerinst.admin_views import get_assignment_aggregates
+
+from ..mixins import (
+    LoginRequiredMixin,
+    NoStudentsMixin,
+    TOSAcceptanceRequiredMixin,
+    student_check,
+)
 from ..models import (
     Assignment,
     Collection,
@@ -10,25 +31,7 @@ from ..models import (
     StudentGroupAssignment,
     Teacher,
 )
-from ..mixins import (
-    LoginRequiredMixin,
-    NoStudentsMixin,
-    student_check,
-    TOSAcceptanceRequiredMixin,
-)
-from django.shortcuts import get_object_or_404
-from django.urls import reverse
-from peerinst.admin_views import get_assignment_aggregates
-import collections
-from dalite.views.utils import get_json_params
 from .decorators import teacher_required
-from django.views.decorators.http import require_POST
-from django.core.exceptions import PermissionDenied
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Q
-from django.template.response import TemplateResponse
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.utils.translation import ugettext_lazy as _
 
 
 class CollectionForm(ModelForm):
