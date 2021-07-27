@@ -67,12 +67,6 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     peer_impact = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
 
-    def get_answer_count(self, obj):
-        return obj.answer_count
-
-    def get_assignment_count(self, obj):
-        return obj.assignment_count
-
     def get_answerchoice_set(self, obj):
         return [
             {
@@ -206,8 +200,8 @@ class RankSerializer(serializers.ModelSerializer):
 
 
 class AssignmentSerializer(DynamicFieldsModelSerializer):
-    editable = serializers.SerializerMethodField()
-    is_valid = serializers.SerializerMethodField()
+    editable = serializers.ReadOnlyField()
+    is_valid = serializers.ReadOnlyField()
     question_pks = serializers.SerializerMethodField()
     questions = RankSerializer(
         source="assignmentquestions_set",
@@ -227,9 +221,6 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
     )
     urls = serializers.SerializerMethodField()
 
-    def get_editable(self, obj):
-        return obj.editable
-
     def get_question_pks(self, obj):
         return list(obj.questions.values_list("pk", flat=True))
 
@@ -246,9 +237,6 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
             "preview": obj.get_absolute_url(),
             "update": reverse("assignment-update", args=(obj.pk,)),
         }
-
-    def get_is_valid(self, obj):
-        return obj.is_valid
 
     def validate_questions(self, data):
         assignment_questions = list(
