@@ -22,6 +22,7 @@ import { Typography } from "@rmwc/typography";
 
 import { CopyBox } from "../clipboard";
 import { Info } from "../question";
+import { ListedQuestion } from "./questionList";
 
 import "@rmwc/button/node_modules/@material/button/dist/mdc.button.min.css";
 import "@rmwc/dialog/node_modules/@material/dialog/dist/mdc.dialog.min.css";
@@ -31,36 +32,11 @@ import "@rmwc/menu/node_modules/@material/menu/dist/mdc.menu.css";
 import "@rmwc/menu/node_modules/@material/menu-surface/dist/mdc.menu-surface.css";
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
-type BasicQuestion = {
-  answer_count: number; // eslint-disable-line camelcase
-  answerchoice_set: { correct: boolean; text: string }[]; // eslint-disable-line camelcase
-
-  category: { title: string }[];
-  collaborators?: string[];
-  discipline: { title: string };
-  frequency: {
-    first_choice: Record<string, number>; // eslint-disable-line camelcase
-    second_choice: Record<string, number>; // eslint-disable-line camelcase
-  };
-  image: string;
-  image_alt_text: string; // eslint-disable-line camelcase
-  matrix: { easy: number; hard: number; tricky: number; peer: number };
-  pk: number;
-  text: string;
-  title: string;
-  user: { username: string } | null;
-};
-
 export type Assignment = {
   editable: boolean;
   is_valid: boolean; // eslint-disable-line camelcase
   pk: string;
-  questions?: {
-    assignment: string;
-    pk: number;
-    question: BasicQuestion;
-    rank: number;
-  }[];
+  questions_basic?: ListedQuestion[]; // eslint-disable-line camelcase
   question_pks: number[]; // eslint-disable-line camelcase
   title: string;
   urls: {
@@ -269,8 +245,8 @@ class AssignmentListItem extends Component<
     if (
       !this.props.archived &&
       this.props.assignment.is_valid &&
-      this.props.assignment?.questions &&
-      this.props.assignment.questions.length > 0
+      this.props.assignment?.questions_basic &&
+      this.props.assignment.questions_basic.length > 0
     ) {
       return (
         <IconButton
@@ -312,8 +288,8 @@ class AssignmentListItem extends Component<
 
   ltiDialog = (): JSX.Element | undefined => {
     if (
-      this.props.assignment?.questions &&
-      this.props.assignment.questions.length > 0
+      this.props.assignment?.questions_basic &&
+      this.props.assignment.questions_basic.length > 0
     ) {
       return (
         <Dialog
@@ -389,7 +365,7 @@ class AssignmentListItem extends Component<
               )}
               type="tip"
             />
-            {this.props.assignment.questions.map((q, i): JSX.Element => {
+            {this.props.assignment.questions_basic.map((q, i): JSX.Element => {
               return (
                 <div key={i} style={{ marginLeft: 26, marginTop: 10 }}>
                   <Typography
@@ -398,13 +374,13 @@ class AssignmentListItem extends Component<
                     tag="div"
                     style={{ fontWeight: "bold", marginBottom: 4 }}
                   >
-                    Q{i + 1}. {q.question.title}
+                    Q{i + 1}. {q.title}
                   </Typography>
                   <Typography use="body2" tag="div">
                     <CopyBox gettext={this.props.gettext}>
                       <ul style={{ paddingLeft: 8 }}>
                         <li>assignment_id={this.props.assignment.pk}</li>
-                        <li>question_id={q.question.pk}</li>
+                        <li>question_id={q.pk}</li>
                         <li>teacher_id={this.props.lti.teacherHash}</li>
                       </ul>
                     </CopyBox>

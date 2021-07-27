@@ -19,7 +19,7 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
             "editable",
             "is_valid",
             "pk",
-            "questions",
+            "questions_basic",
             "question_pks",
             "title",
             "urls",

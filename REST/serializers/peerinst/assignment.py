@@ -208,12 +208,23 @@ class RankSerializer(serializers.ModelSerializer):
 class AssignmentSerializer(DynamicFieldsModelSerializer):
     editable = serializers.SerializerMethodField()
     is_valid = serializers.SerializerMethodField()
+    question_pks = serializers.SerializerMethodField()
     questions = RankSerializer(
         source="assignmentquestions_set",
         many=True,
         required=False,
     )
-    question_pks = serializers.SerializerMethodField()
+    questions_basic = QuestionSerializer(
+        fields=[
+            "answer_count",
+            "pk",
+            "title",
+            "type",
+        ],
+        many=True,
+        read_only=True,
+        source="questions",
+    )
     urls = serializers.SerializerMethodField()
 
     def get_editable(self, obj):
@@ -296,6 +307,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
             "pk",
             "question_pks",
             "questions",
+            "questions_basic",
             "title",
             "urls",
         ]
