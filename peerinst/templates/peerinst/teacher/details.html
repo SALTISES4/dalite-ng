@@ -213,38 +213,6 @@
       </div>
     </div>
 
-    {% comment %} <div class="foldable"> {% endcomment %}
-      {% comment %} <h2 id="quality-section" class="foldable--title mdc-typography--display1 mdc-theme--secondary"> {% endcomment %}
-        {% comment %} {% trans 'Quality control' %} {% endcomment %}
-      {% comment %} </h2> {% endcomment %}
-      {% comment %} <div class="foldable--body"> {% endcomment %}
-        {% comment %} <ul class="mdc-list mdc-list--two-line"> {% endcomment %}
-          {% comment %} <li role="separator" class="mdc-list-divider"></li> {% endcomment %}
-          {% comment %} <li class="mdc-list-item pointer" {% endcomment %}
-              {% comment %} title="{% trans 'Quality evaluation for allowing rationale submission' %}" {% endcomment %}
-              {% comment %} id="quality-eval-edit"> {% endcomment %}
-            {% comment %} <span class="mdc-list-item__graphic mdc-theme--primary"> {% endcomment %}
-              {% comment %} <i class="mdc-theme--primary material-icons md-36"> {% endcomment %}
-                {% comment %} assistant {% endcomment %}
-              {% comment %} </i> {% endcomment %}
-            {% comment %} </span> {% endcomment %}
-            {% comment %} <span class="mdc-list-item__text mdc-theme--secondary bold"> {% endcomment %}
-              {% comment %} {% trans 'Submission quality' %} {% endcomment %}
-              {% comment %} <div class="mdc-list-item__secondary-text"> {% endcomment %}
-                {% comment %} {% if teacher.quality %} {% endcomment %}
-                  {% comment %} {% for criterion in teacher.quality.criterions.all %} {% endcomment %}
-                    {% comment %} {{ criterion.name }}{% if not forloop.last %}, {% endif %} {% endcomment %}
-                  {% comment %} {% endfor %} {% endcomment %}
-                {% comment %} {% endif %} {% endcomment %}
-              {% comment %} </div> {% endcomment %}
-            {% comment %} </span> {% endcomment %}
-          {% comment %} </li> {% endcomment %}
-          {% comment %} <li role="separator" class="mdc-list-divider"></li> {% endcomment %}
-        {% comment %} </ul> {% endcomment %}
-      {% comment %} </div> {% endcomment %}
-{% comment %}  {% endcomment %}
-    {% comment %} </div> {% endcomment %}
-
     <div class="foldable">
       <h2 id="identity-section" class="foldable--title mdc-typography--display1 mdc-theme--secondary">
         {% trans 'Identity' %}
