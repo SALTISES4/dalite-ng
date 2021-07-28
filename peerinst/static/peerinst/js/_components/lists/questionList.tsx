@@ -18,6 +18,7 @@ import "@rmwc/list/node_modules/@material/list/dist/mdc.list.css";
 
 export type ListedQuestion = {
   answer_count: number; // eslint-disable-line camelcase
+  is_editable: boolean; // eslint-disable-line camelcase
   is_valid: boolean; // eslint-disable-line camelcase
   pk: number;
   title: string;
@@ -122,6 +123,7 @@ export function QuestionList({
                 <QuestionListItem
                   archived={archived.includes(q.pk)}
                   deleted={deleted.includes(q.pk)}
+                  editable={q.is_editable}
                   editURL={editURL}
                   gettext={gettext}
                   handleToggleArchived={handleToggleArchived}
@@ -141,6 +143,7 @@ export function QuestionList({
 type QuestionListItemProps = {
   archived: boolean;
   deleted: boolean;
+  editable: boolean;
   editURL: string;
   gettext: (a: string) => string;
   handleToggleArchived: (a: number) => Promise<void>;
@@ -152,6 +155,7 @@ type QuestionListItemProps = {
 function QuestionListItem({
   archived,
   deleted,
+  editable,
   editURL,
   gettext,
   handleToggleArchived,
@@ -195,11 +199,20 @@ function QuestionListItem({
 
   const editIcon = (): JSX.Element | undefined => {
     if (!deleted && !archived) {
+      if (editable) {
+        return (
+          <IconButton
+            icon="edit"
+            onClick={() => (window.location.href = editURL + question.pk)}
+            title={gettext("Edit this question to make changes.")}
+          />
+        );
+      }
       return (
         <IconButton
-          icon="edit"
+          icon="file_copy"
           onClick={() => (window.location.href = editURL + question.pk)}
-          title={gettext("Edit or clone this question to make changes.")}
+          title={gettext("Copy this question to make changes.")}
         />
       );
     }
@@ -209,8 +222,8 @@ function QuestionListItem({
     return (
       <div style={{ marginLeft: "auto" }}>
         {deleteIcon()}
-        {archiveIcon()}
         {editIcon()}
+        {archiveIcon()}
       </div>
     );
   };
