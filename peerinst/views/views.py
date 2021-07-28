@@ -292,7 +292,7 @@ def browse_database(request):
 
     return TemplateResponse(
         request,
-        "peerinst/browse_database_beta.html",
+        "peerinst/browse_database.html",
         context={"static_url": settings.STATIC_URL},
     )
 
