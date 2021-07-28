@@ -18,6 +18,7 @@ import "@rmwc/list/node_modules/@material/list/dist/mdc.list.css";
 
 export type ListedQuestion = {
   answer_count: number; // eslint-disable-line camelcase
+  is_valid: boolean; // eslint-disable-line camelcase
   pk: number;
   title: string;
   type: string;
@@ -225,14 +226,20 @@ function QuestionListItem({
         }
       >
         <ListItemGraphic
-          icon={question.type == "RO" ? "chat" : "question_answer"}
+          icon={
+            question.is_valid
+              ? question.type == "RO"
+                ? "chat"
+                : "question_answer"
+              : "report"
+          }
           style={{ fontSize: 36 }}
-          theme="primary"
+          theme={question.is_valid ? "primary" : "error"}
         />
         <ListItemText>
           <ListItemPrimaryText
             style={{ fontWeight: "bold" }}
-            theme="secondary"
+            theme={question.is_valid ? "secondary" : "error"}
           >
             {question.pk}: {question.title}
           </ListItemPrimaryText>
