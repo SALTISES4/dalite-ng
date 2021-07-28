@@ -326,7 +326,7 @@
           },
           urls: {
             assignmentCreate: "{% url 'assignment-create' %}",
-            assignmentList: "{% url 'REST:teacher' teacher.pk %}?field=assignments&field=owned_assignments",
+            assignmentList: "{% url 'REST:teacher' teacher.pk %}?field=assignments&field=owned_assignments&field=assignment_pks",
             assignmentSearch: "{% url 'teacher-assignments' teacher.id %}",
             generateReport: "{% url 'report_selector' %}",
           }

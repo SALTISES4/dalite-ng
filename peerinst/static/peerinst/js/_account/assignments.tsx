@@ -79,11 +79,13 @@ export class TeacherAccountAssignmentApp extends Component<
 
     const _assignments: Assignment[] = Array.from(this.state.assignments);
     const _archived: Assignment[] = Array.from(this.state.archived);
+
     if (_archived.map((_a) => _a.pk).includes(a.pk)) {
       _assignments.push(a);
     } else {
       _assignments.splice(_assignments.indexOf(a), 1);
     }
+
     try {
       const data = await submitData(
         this.props.urls.assignmentList,
@@ -91,12 +93,13 @@ export class TeacherAccountAssignmentApp extends Component<
         "PUT",
       );
       console.debug(data);
+      const archived = this.archived(
+        data["assignments"],
+        data["owned_assignments"],
+      );
       this.setState(
         {
-          archived: this.archived(
-            data["assignments"],
-            data["owned_assignments"],
-          ),
+          archived,
           assignments: data["assignments"],
         },
         this.updateView,
