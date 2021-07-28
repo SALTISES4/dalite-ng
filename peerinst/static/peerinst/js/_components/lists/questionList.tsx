@@ -215,6 +215,21 @@ function QuestionListItem({
     );
   };
 
+  const caption = (): JSX.Element => {
+    if (question.is_valid) {
+      return (
+        <span>
+          {question.answer_count} {gettext("student answers")}
+        </span>
+      );
+    }
+    return (
+      <span style={{ color: "var(--mdc-theme-error)" }}>
+        {gettext("There is a problem with this question.")}
+      </span>
+    );
+  };
+
   return (
     <Fragment>
       <ListDivider />
@@ -244,7 +259,7 @@ function QuestionListItem({
             {question.pk}: {question.title}
           </ListItemPrimaryText>
           <ListItemSecondaryText theme="textHintOnBackground">
-            {question.answer_count} {gettext("student answers")}
+            {caption()}
           </ListItemSecondaryText>
         </ListItemText>
         {icons()}
