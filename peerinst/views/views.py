@@ -620,17 +620,14 @@ class QuestionUpdateView(
 
     def get_form(self, form_class=None):
         # Check if student answers exist
-        if self.object.answer_set.exclude(user_token__exact="").count() > 0:
+        if not self.object.is_editable:
             return None
         else:
             return super(QuestionUpdateView, self).get_form(form_class)
 
     def post(self, request, *args, **kwargs):
         # Check if student answers exist
-        if (
-            self.get_object().answer_set.exclude(user_token__exact="").count()
-            > 0
-        ):
+        if not self.get_object().is_editable:
             raise PermissionDenied
         else:
             return super(QuestionUpdateView, self).post(
@@ -682,7 +679,7 @@ def answer_choice_form(request, question_id):
     if request.user.has_perm("peerinst.change_question", question):
 
         # Check if student answers exist
-        if question.answer_set.exclude(user_token__exact="").count() > 0:
+        if not question.is_editable:
             return TemplateResponse(
                 request,
                 "peerinst/question/answer_choice_form.html",
@@ -738,11 +735,7 @@ def sample_answer_form_done(request, question_id):
                 for a in assignments:
                     if teacher.user in a.owner.all():
                         # Check for student answers
-                        if (
-                            a.answer_set.exclude(user_token__exact="").count()
-                            == 0
-                            and question not in a.questions.all()
-                        ):
+                        if a.editable and question not in a.questions.all():
                             a.questions.add(question)
                     else:
                         raise PermissionDenied

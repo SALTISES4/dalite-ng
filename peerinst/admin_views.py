@@ -1,18 +1,18 @@
 import collections
 import itertools
-import urllib.request
-import urllib.parse
-import urllib.error
 import re
+import urllib.error
+import urllib.parse
+import urllib.request
 
 from django import forms
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.urls import reverse
 from django.db.models import F
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
+from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
@@ -936,8 +936,11 @@ class StudentGroupAssignmentManagement(StaffMemberRequiredMixin, TemplateView):
                 group_assignment = form.cleaned_data["group_assignment"]
                 group = group_assignment.group
                 student_list = models.Student.objects.filter(groups=group)
-                student_assignment_list = models.StudentAssignment.objects.filter(  # noqa
-                    student__in=student_list, group_assignment=group_assignment
+                student_assignment_list = (
+                    models.StudentAssignment.objects.filter(  # noqa
+                        student__in=student_list,
+                        group_assignment=group_assignment,
+                    )
                 )
 
         context.update(form=form)

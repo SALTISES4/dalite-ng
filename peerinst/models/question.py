@@ -464,12 +464,13 @@ class Question(models.Model):
         return self.id in Collection.featured_questions()
 
     @property
-    def is_deletable(self):
-        raise NotImplementedError
-
-    @property
     def is_editable(self):
-        raise NotImplementedError
+        return (
+            self.answer_set.filter(expert=False)
+            .exclude(user_token__exact="")
+            .count()
+            == 0
+        )
 
     @property
     def is_valid(self):
