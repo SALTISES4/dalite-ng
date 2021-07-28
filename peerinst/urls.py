@@ -20,7 +20,7 @@ def old_patterns():
         # Assignment table of contents - Enforce sameorigin to prevent access from LMS  # noqa
         path(
             "browse/",
-            xframe_options_sameorigin(views.browse_database_beta),
+            xframe_options_sameorigin(views.browse_database),
             name="browse-database",
         ),
         path(
