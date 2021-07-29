@@ -600,6 +600,10 @@ class QuestionPreviewViewBase(
             assignment_count=assignment_form.queryset.count(),
             save_allowed=save_allowed,
         )
+        # reset session variable that may have been set in Quality Control /
+        # research_discipline_question_index view
+        self.request.session["assignment_id"] = None
+
         return context
 
     def form_valid(self, form):
