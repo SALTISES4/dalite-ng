@@ -152,9 +152,9 @@ class Assignment(models.Model):
     def is_valid(self):
         return not any(
             [
-                Question.is_missing_answer_choices(self.questions),
-                Question.is_missing_sample_answers(self.questions),
-                Question.is_flagged(self.questions),
+                Question.is_missing_answer_choices(self.questions.all()),
+                Question.is_missing_sample_answers(self.questions.all()),
+                Question.is_flagged(self.questions.all()),
             ]
         )
 

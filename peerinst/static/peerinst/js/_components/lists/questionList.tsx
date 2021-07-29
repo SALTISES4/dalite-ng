@@ -23,6 +23,7 @@ export type ListedQuestion = {
   pk: number;
   title: string;
   type: string;
+  urls: { fix: string };
 };
 
 type QuestionListProps = {
@@ -261,12 +262,22 @@ function QuestionListItem({
                 : "question_answer"
               : "report"
           }
-          style={{ fontSize: 36 }}
+          onClick={() =>
+            (window.location.href = question.is_valid
+              ? "#"
+              : question.urls.fix)
+          }
+          style={{ cursor: "pointer", fontSize: 36 }}
           theme={question.is_valid ? "primary" : "error"}
         />
         <ListItemText>
           <ListItemPrimaryText
-            style={{ fontWeight: "bold" }}
+            onClick={() =>
+              (window.location.href = question.is_valid
+                ? "#"
+                : question.urls.fix)
+            }
+            style={{ cursor: "pointer", fontWeight: "bold" }}
             theme={question.is_valid ? "secondary" : "error"}
           >
             {question.pk}: {question.title}

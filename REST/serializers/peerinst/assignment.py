@@ -67,6 +67,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     matrix = serializers.SerializerMethodField()
     most_convincing_rationales = serializers.SerializerMethodField()
     peer_impact = serializers.SerializerMethodField()
+    urls = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
 
     def get_answerchoice_set(self, obj):
@@ -100,6 +101,9 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         pi = obj.get_peer_impact()
         return {"score": pi[0], "label": str(pi[1])}
 
+    def get_urls(self, obj):
+        return {"fix": reverse("question-fix", args=(obj.pk,))}
+
     class Meta:
         model = Question
         fields = [
@@ -123,6 +127,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "text",
             "title",
             "type",
+            "urls",
             "user",
             "video_url",
         ]

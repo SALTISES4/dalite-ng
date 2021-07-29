@@ -588,6 +588,32 @@ class QuestionCloneView(QuestionCreateView):
         return context
 
 
+class QuestionFixView(
+    LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, DetailView
+):
+    model = models.Question
+    template_name = "peerinst/question/fix.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(QuestionFixView, self).get_context_data(**kwargs)
+        context.update(
+            teacher=self.request.user.teacher,
+        )
+
+        qs = Question.objects.filter(pk=self.object.pk)
+        if Question.is_flagged(qs):
+            context.update(
+                flagged=True,
+                message=_(
+                    "This question has been flagged for copyright \
+                    infringement.  Flags are reviewed by SALTISE and removed \
+                    once question is corrected.  To create a new question \
+                    that resolves the flagged issue, use the link below."
+                ),
+            )
+        return context
+
+
 class QuestionUpdateView(
     LoginRequiredMixin,
     NoStudentsMixin,

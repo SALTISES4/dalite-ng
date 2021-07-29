@@ -401,45 +401,71 @@ class Question(models.Model):
 
     @classmethod
     def is_missing_answer_choices(cls, queryset):
-        if queryset.model is cls:
-            return (
-                queryset.filter(type="PI")
-                .annotate(answer_choice_count=Count("answerchoice"))
-                .filter(answer_choice_count__lte=1)
-                .exists()
-            )
-        raise TypeError("Queryset must be of type Question")
+        if not isinstance(queryset, models.query.EmptyQuerySet):
+            if isinstance(queryset, models.query.QuerySet):
+                if queryset.model is cls:
+                    return (
+                        queryset.filter(type="PI")
+                        .annotate(answer_choice_count=Count("answerchoice"))
+                        .filter(answer_choice_count__lte=1)
+                        .exists()
+                    )
+                raise TypeError("Queryset must be of type Question")
+            else:
+                raise TypeError(
+                    f"Method only implemented for querysets.  Passed {type(queryset)}"  # noqa E501
+                )
+        return False
 
     @classmethod
     def is_missing_sample_answers(cls, queryset):
-        if queryset.model is cls:
-            return (
-                queryset.filter(type="PI")
-                .values("pk", "answer__first_answer_choice", "answer__expert")
-                .exclude(answer__expert=True)
-                .annotate(
-                    answer_count_for_choice=Count(
-                        "answer__first_answer_choice"
+        if not isinstance(queryset, models.query.EmptyQuerySet):
+            if isinstance(queryset, models.query.QuerySet):
+                if queryset.model is cls:
+                    return (
+                        queryset.filter(type="PI")
+                        .values(
+                            "pk",
+                            "answer__first_answer_choice",
+                            "answer__expert",
+                        )
+                        .exclude(answer__expert=True)
+                        .annotate(
+                            answer_count_for_choice=Count(
+                                "answer__first_answer_choice"
+                            )
+                        )
+                        .filter(answer_count_for_choice__lte=1)
+                        .exists()
                     )
+                raise TypeError("Queryset must be of type Question")
+            else:
+                raise TypeError(
+                    f"Method only implemented for querysets.  Passed {type(queryset)}"  # noqa E501
                 )
-                .filter(answer_count_for_choice__lte=1)
-                .exists()
-            )
-        raise TypeError("Queryset must be of type Question")
+        return False
 
     @classmethod
     def is_flagged(cls, queryset):
-        if queryset.model is cls:
-            return (
-                queryset.annotate(
-                    flagged=Count(
-                        "questionflag", filter=Q(questionflag__flag=True)
+        if not isinstance(queryset, models.query.EmptyQuerySet):
+            if isinstance(queryset, models.query.QuerySet):
+                if queryset.model is cls:
+                    return (
+                        queryset.annotate(
+                            flagged=Count(
+                                "questionflag",
+                                filter=Q(questionflag__flag=True),
+                            )
+                        )
+                        .filter(flagged__gt=0)
+                        .exists()
                     )
+                raise TypeError("Queryset must be of type Question")
+            else:
+                raise TypeError(
+                    f"Method only implemented for querysets.  Passed {type(queryset)}"  # noqa E501
                 )
-                .filter(flagged__gt=0)
-                .exists()
-            )
-        raise TypeError("Queryset must be of type Question")
+        return False
 
     @property
     def answer_count(self):
