@@ -71,7 +71,7 @@ class QuestionDocument(Document):
     category = NestedField(
         properties={
             "title": TextField(
-                analyzer=autocomplete,
+                analyzer=full_term,
             )
         }
     )  # don't break on spaces?
@@ -90,7 +90,7 @@ class QuestionDocument(Document):
         }
     )
     discipline = ObjectField(
-        properties={"title": TextField(analyzer=autocomplete)}
+        properties={"title": TextField(analyzer=full_term)}
     )  # don't break on spaces?
     featured = BooleanField()
     frequency = ObjectField(
