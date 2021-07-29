@@ -325,7 +325,7 @@ FEATURE_POLICY = [
     "vr *",
 ]
 
-REFERRER_POLICY = "no-referrer-when-downgrade"
+REFERRER_POLICY = "no-referrer, strict-origin-when-cross-origin"
 
 ELASTICSEARCH_DSL = {
     "default": {"hosts": "localhost:9200"},
