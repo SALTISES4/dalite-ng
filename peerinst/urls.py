@@ -511,6 +511,11 @@ def collection_patterns():
             name="collection-create",
         ),
         path(
+            "collection/copy/",
+            views.collection_copy,
+            name="collection-copy",
+        ),
+        path(
             "collection/<int:pk>",
             views.CollectionDetailView.as_view(),
             name="collection-detail",

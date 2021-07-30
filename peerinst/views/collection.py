@@ -1,12 +1,18 @@
 import collections
 
+from django import forms
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core import serializers
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
 from django.forms import ModelForm
-from django.http import HttpResponse, JsonResponse
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseRedirect,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.urls import reverse
@@ -51,6 +57,37 @@ class CollectionForm(ModelForm):
         super(CollectionForm, self).__init__(*args, **kwargs)
         self.fields["private"].initial = True
         self.fields["discipline"].queryset = teacher.disciplines.all()
+
+
+class CollectionCopyForm(forms.Form):
+    pk = forms.ModelChoiceField(
+        queryset=Collection.objects.filter(private=False)
+    )
+
+
+@require_POST
+@login_required
+@user_passes_test(student_check, login_url="/access_denied_and_logout/")
+def collection_copy(request):
+
+    form = CollectionCopyForm(request.POST)
+    if form.is_valid():
+        # Get the collection to copy
+        collection_to_copy = Collection.objects.get(
+            pk=form.cleaned_data["pk"].pk,
+        )
+        # Make the copy
+        new_collection = Collection.objects.create(
+            discipline=collection_to_copy.discipline,
+            title=collection_to_copy.title,
+            owner=request.user.teacher,
+        )
+
+        return HttpResponseRedirect(
+            reverse("collection-detail", args=(new_collection.pk,))
+        )
+
+    return HttpResponseBadRequest("")
 
 
 class CollectionCreateView(

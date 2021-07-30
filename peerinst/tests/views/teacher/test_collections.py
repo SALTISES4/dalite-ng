@@ -98,21 +98,28 @@ def test_collections__copy_access(client, collection, student, teacher):
     assert response.status_code == 405
 
     # 3. Must be authenticated
-    response = client.post(url, {})
-    assert response.status_code == 403
+    response = client.post(url, {}, follow=True)
+    assert "registration/login.html" in [t.name for t in response.templates]
 
     # 4. Must be a teacher
     assert login_student(client, student)
     response = client.post(url, {})
-    assert response.status_code == 403
+    assert "/access_denied_and_logout/" in response.url
 
     # 5. Requires pk
     assert login_teacher(client, teacher)
     response = client.post(url, {})
     assert response.status_code == 400
 
-    response = client.post(url, {"pk": collection.pk})
+    response = client.post(url, {"pk": collection.pk}, follow=True)
     assert response.status_code == 200
+
+    # 6. Requires not private
+    collection.private = True
+    collection.save()
+
+    response = client.post(url, {"pk": collection.pk}, follow=True)
+    assert response.status_code == 400
 
 
 def test_collections__copy(client, collections, teacher):
@@ -120,7 +127,7 @@ def test_collections__copy(client, collections, teacher):
 
     assert login_teacher(client, teacher)
     collection_count = Collection.objects.count()
-    collection_to_copy = collections[0]
+    collection_to_copy = collections[3]
     assignment_count = Assignment.objects.count()
 
     response = client.post(url, {"pk": collection_to_copy.pk})
