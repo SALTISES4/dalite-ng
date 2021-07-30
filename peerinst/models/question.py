@@ -419,6 +419,7 @@ class Question(models.Model):
 
     @classmethod
     def is_missing_sample_answers(cls, queryset):
+
         if not isinstance(queryset, models.query.EmptyQuerySet):
             if isinstance(queryset, models.query.QuerySet):
                 if queryset.model is cls:
@@ -435,7 +436,7 @@ class Question(models.Model):
                                 "answer__first_answer_choice"
                             )
                         )
-                        .filter(answer_count_for_choice__lte=1)
+                        .filter(answer_count_for_choice__lt=1)
                         .exists()
                     )
                 raise TypeError("Queryset must be of type Question")

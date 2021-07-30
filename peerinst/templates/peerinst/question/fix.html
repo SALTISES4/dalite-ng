@@ -25,6 +25,18 @@
       {% trans 'Create' %}
     </a>
     {% endif %}
+
+    {% if missing_answer_choices %}
+    <a class="mdc-button mdc-button--raised" href="{% url 'answer-choice-form' object.pk %}">
+      {% trans 'Add answers' %}
+    </a>
+    {% endif %}
+
+    {% if missing_sample_answers %}
+    <a class="mdc-button mdc-button--raised" href="{% url 'sample-answer-form' object.pk %}">
+      {% trans 'Add samples' %}
+    </a>
+    {% endif %}
   </section>
 </main>
 {% endblock %}

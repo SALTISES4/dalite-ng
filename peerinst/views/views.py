@@ -608,7 +608,23 @@ class QuestionFixView(
                     "This question has been flagged for copyright \
                     infringement.  Flags are reviewed by SALTISE and removed \
                     once question is corrected.  To create a new question \
-                    that resolves the flagged issue, use the link below."
+                    that resolves the flagged issue, use the button below."
+                ),
+            )
+        elif Question.is_missing_answer_choices(qs):
+            context.update(
+                missing_answer_choices=True,
+                message=_(
+                    "This question is missing answer choices.  To add answer \
+                    choices, use the button below."
+                ),
+            )
+        elif Question.is_missing_sample_answers(qs):
+            context.update(
+                missing_sample_answers=True,
+                message=_(
+                    "This question does not have enough sample answers.  To \
+                    add sample answers, use the button below."
                 ),
             )
         return context
