@@ -602,14 +602,23 @@ class QuestionFixView(
 
         qs = Question.objects.filter(pk=self.object.pk)
         if Question.is_flagged(qs):
+            message_start = _(
+                "This question has been flagged by a fellow member of the \
+                SALTISE community. \
+                Flags are reviewed by SALTISE administrators and removed \
+                once the issue has been resolved. \
+                To create a new question that resolves the flagged issue, \
+                use the button below.\
+                The reason that this question was flagged: "
+            )
+            message_reason = "; ".join(
+                qs.first()
+                .questionflag_set.all()
+                .values_list("flag_reason__title", flat=True)
+            )
             context.update(
                 flagged=True,
-                message=_(
-                    "This question has been flagged for copyright \
-                    infringement.  Flags are reviewed by SALTISE and removed \
-                    once question is corrected.  To create a new question \
-                    that resolves the flagged issue, use the button below."
-                ),
+                message=message_start + message_reason,
             )
         elif Question.is_missing_answer_choices(qs):
             context.update(
