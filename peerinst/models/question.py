@@ -995,9 +995,11 @@ class QuestionFlagReason(models.Model):
         ),
         (
             "Wrong answer marked as correct",
-            """
-            Wrong answer marked as correct
-            """,
+            _(
+                """
+                Wrong answer marked as correct
+                """
+            ),
         ),
     )
 
@@ -1006,7 +1008,6 @@ class QuestionFlagReason(models.Model):
         unique=True,
         max_length=100,
         help_text=_("Reason for flagging a question."),
-        validators=[no_hyphens],
         choices=CHOICES,
         default=CHOICES[0][0],
     )
