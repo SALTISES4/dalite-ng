@@ -8,15 +8,19 @@ from peerinst.tests.fixtures.teacher import login_teacher
 def test_fix_question_view(client, teacher, question, student):
     # Make a fully invalid question
     qs = Question.objects.filter(pk=question.pk)
+    # make flag object, and attach question
     flag = QuestionFlag.objects.create(
         question=question, user=teacher.user, flag=True
     )
+    # create reason for flagging question
     flag_reason, _ = QuestionFlagReason.objects.get_or_create(
-        title=QuestionFlagReason.CHOICES[0]
+        title=QuestionFlagReason.CHOICES[0][0]
     )
     message = str(QuestionFlagReason.CHOICES[0][1])
+    # attach reason to flag object
     flag.flag_reason.add(flag_reason)
     flag.save()
+
     assert Question.is_flagged(qs)
     assert Question.is_missing_answer_choices(qs)
     assert Question.is_missing_sample_answers(qs)
@@ -46,7 +50,6 @@ def test_fix_question_view(client, teacher, question, student):
     response = client.get(url)
     assert response.status_code == 200
 
-    print(response.content.decode())
     assert message in response.content.decode()
 
     link = 'href="/en/question/create"'
