@@ -959,12 +959,56 @@ class Question(models.Model):
 
 
 class QuestionFlagReason(models.Model):
+
+    CHOICES = (
+        (
+            "Clarification needed",
+            _("The question, or one of the answer choices, is unclear."),
+        ),
+        (
+            "No Expert Rationale",
+            _(
+                """
+                A rationale must be provided for each correct answer \
+                choice that would represent the opinion of an expert in \
+                the discipline.
+                """
+            ),
+        ),
+        (
+            "No seed rationales",
+            _(
+                """
+                A sample answer must be provided for each answer choice, \
+                whether correct or incorrect.
+                """
+            ),
+        ),
+        (
+            "Potential copyright issues",
+            _(
+                """
+                Some part of the question, perhaps the image or \
+                attached video, may come from a copyrighted source.
+                """
+            ),
+        ),
+        (
+            "Wrong answer marked as correct",
+            """
+            Wrong answer marked as correct
+            """,
+        ),
+    )
+
     title = models.CharField(
         _("Reason for flagging a question"),
         unique=True,
         max_length=100,
         help_text=_("Reason for flagging a question."),
         validators=[no_hyphens],
+        choices=CHOICES,
+        default=CHOICES[0][0],
     )
 
     def __str__(self):

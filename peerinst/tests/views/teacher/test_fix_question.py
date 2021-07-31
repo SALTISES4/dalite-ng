@@ -1,7 +1,6 @@
 from django.urls import reverse
-from django.utils.translation import gettext as _
 
-from peerinst.models import Question, QuestionFlag
+from peerinst.models import Question, QuestionFlag, QuestionFlagReason
 from peerinst.tests.fixtures.student import login_student
 from peerinst.tests.fixtures.teacher import login_teacher
 
@@ -10,9 +9,14 @@ def test_fix_question_view(client, teacher, question, student):
     # Make a fully invalid question
     qs = Question.objects.filter(pk=question.pk)
     flag = QuestionFlag.objects.create(
-        question=question,
-        user=teacher.user,
+        question=question, user=teacher.user, flag=True
     )
+    flag_reason, _ = QuestionFlagReason.objects.get_or_create(
+        title=QuestionFlagReason.CHOICES[0]
+    )
+    message = str(QuestionFlagReason.CHOICES[0][1])
+    flag.flag_reason.add(flag_reason)
+    flag.save()
     assert Question.is_flagged(qs)
     assert Question.is_missing_answer_choices(qs)
     assert Question.is_missing_sample_answers(qs)
@@ -42,14 +46,8 @@ def test_fix_question_view(client, teacher, question, student):
     response = client.get(url)
     assert response.status_code == 200
 
-    message = _(
-        "This question has been flagged for copyright infringement.  Flags \
-        are reviewed by SALTISE and removed once question is corrected.  To \
-        create a new question that resolves the flagged issue, use the link \
-        below."
-    )
-
-    assert " ".join(message.split()) in response.content.decode()
+    print(response.content.decode())
+    assert message in response.content.decode()
 
     link = 'href="/en/question/create"'
 

@@ -191,6 +191,9 @@ class QuestionFlagReasonAdmin(admin.ModelAdmin):
 @admin.register(QuestionFlag)
 class QuestionFlagAdmin(admin.ModelAdmin):
     list_display = ["question_link", "flag_reason_list", "user", "comment"]
+    exclude = [
+        "user",
+    ]
 
     def question_link(self, obj):
         link = reverse(

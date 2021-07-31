@@ -75,6 +75,7 @@ from ..models import (
     InstitutionalLMS,
     NewUserRequest,
     Question,
+    QuestionFlagReason,
     RationaleOnlyQuestion,
     ShownRationale,
     Student,
@@ -609,16 +610,24 @@ class QuestionFixView(
                 once the issue has been resolved. \
                 To create a new question that resolves the flagged issue, \
                 use the button below.\
-                The reason that this question was flagged: "
+                The reason(s) that this question was flagged: "
             )
-            message_reason = "; ".join(
+            labels = (
                 qs.first()
                 .questionflag_set.all()
                 .values_list("flag_reason__title", flat=True)
             )
+            reasons = [
+                str(verbose)
+                for label, verbose in QuestionFlagReason.CHOICES
+                if label in labels
+            ]
+
+            message_reasons = "; ".join(reasons)
+
             context.update(
                 flagged=True,
-                message=message_start + message_reason,
+                message=message_start + message_reasons,
             )
         elif Question.is_missing_answer_choices(qs):
             context.update(
