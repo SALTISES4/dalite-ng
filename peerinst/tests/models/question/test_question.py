@@ -1,16 +1,38 @@
-import factory
-import pytest
 import random
 from timeit import default_timer as timer
 
+import factory
+import pytest
+from django.db import IntegrityError
 from django.test import TestCase
 
 from peerinst import models
+from peerinst.models import Question
 from peerinst.tests.factories import (
     AnswerFactory,
+    CollectionFactory,
     QuestionFactory,
     UserFactory,
 )
+
+
+def test_question_custom_save_strip():
+    q = Question.objects.create(title="  question title  ")
+
+    assert q.title == "question title"
+    assert not q.title == "  question title  "
+
+
+def test_question_custom_save_bleach():
+    q = Question.objects.create(title="<script>new title</script>")
+
+    assert q.title == "new title"
+
+
+def test_question_title_unique_case_insensitive():
+    Question.objects.create(title="Title")
+    with pytest.raises(IntegrityError):
+        Question.objects.create(title="title")
 
 
 class QuestionTestCase(TestCase):
@@ -102,3 +124,43 @@ class QuestionMethodTests(QuestionTestCase):
             )
             self.assertTrue(abs(m["tricky"] / (prob * (1 - prob)) - 1) <= 0.1)
             self.assertTrue(abs(m["peer"] / ((1 - prob) * prob) - 1) <= 0.1)
+
+
+class QuestionPropertyTests(TestCase):
+    def setUp(self):
+        for i in range(20):
+            CollectionFactory(assignments=10)
+
+        print(f"{models.Collection.objects.count()} collections created")
+        print(f"{models.Assignment.objects.count()} assignments created")
+        print(f"{models.Question.objects.count()} questions created")
+
+    def test_featured(self):
+
+        start = timer()
+        featured = []
+        for q in models.Question.objects.all():
+            if q.featured:
+                featured.append(q)
+        end = timer()
+        duration = end - start
+        print(duration)
+
+        self.assertEqual(
+            100
+            * models.Collection.objects.filter(
+                featured=True, private=False
+            ).count(),
+            len(featured),
+        )
+
+    def test_collections(self):
+        question = (
+            models.Collection.objects.first()
+            .assignments.first()
+            .questions.first()
+        )
+        self.assertEqual(question.collections.count(), 1)
+        self.assertEqual(
+            question.collections[0], models.Collection.objects.first()
+        )

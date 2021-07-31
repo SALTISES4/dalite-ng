@@ -1,27 +1,27 @@
-# -*- coding: utf-8 -*-
-
-
 import hashlib
 import itertools
 import string
 from datetime import datetime
-import pandas as pd
-import bleach
 
+import bleach
+import pandas as pd
 import pytz
+from django.apps import apps
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core import exceptions
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.utils.html import escape, strip_tags
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
+from peerinst.grammar import basic_syntax
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 from reputation.models import Reputation
 
 from .. import rationale_choice
-from ..templatetags.bleach_html import ALLOWED_TAGS
 from .search import MetaSearch
 
 
@@ -42,27 +42,38 @@ def images(instance, filename):
 
 class Category(models.Model):
     title = models.CharField(
-        _("Category Name"),
+        _("Category"),
         unique=True,
         max_length=100,
-        help_text=_("Enter the name of a new question category."),
+        help_text=_("Enter the title of the question category."),
         validators=[no_hyphens],
     )
+
+    def save(self, *args, **kwargs):
+        """Bleach"""
+        self.title = bleach.clean(
+            self.title,
+            tags=[],
+            styles=[],
+            strip=True,
+        ).strip()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
 
     class Meta:
+        ordering = ("title",)
         verbose_name = _("category")
         verbose_name_plural = _("categories")
 
 
 class Subject(models.Model):
     title = models.CharField(
-        _("Subject name"),
+        _("Subject"),
         unique=True,
         max_length=100,
-        help_text=_("Enter the name of a new subject."),
+        help_text=_("Enter the title of the subject."),
         validators=[no_hyphens],
     )
     discipline = models.ForeignKey(
@@ -72,27 +83,49 @@ class Subject(models.Model):
         Category, related_name="subjects", blank=True
     )
 
+    def save(self, *args, **kwargs):
+        """Bleach"""
+        self.title = bleach.clean(
+            self.title,
+            tags=[],
+            styles=[],
+            strip=True,
+        ).strip()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.title
 
     class Meta:
+        ordering = ("title",)
         verbose_name = _("subject")
         verbose_name_plural = _("subjects")
 
 
 class Discipline(models.Model):
     title = models.CharField(
-        _("Discipline name"),
+        _("Discipline"),
         unique=True,
         max_length=100,
-        help_text=_("Enter the name of a new discipline."),
+        help_text=_("Enter the title of the discipline."),
         validators=[no_hyphens],
     )
+
+    def save(self, *args, **kwargs):
+        """Bleach"""
+        self.title = bleach.clean(
+            self.title,
+            tags=[],
+            styles=[],
+            strip=True,
+        ).strip()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
 
     class Meta:
+        ordering = ("title",)
         verbose_name = _("discipline")
         verbose_name_plural = _("disciplines")
 
@@ -267,7 +300,7 @@ class Question(models.Model):
             "Optional. Select the discipline to which this item should "
             "be associated."
         ),
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
     fake_attributions = models.BooleanField(
         _("Add fake attributions"),
@@ -322,6 +355,78 @@ class Question(models.Model):
         if self.discipline:
             return "{} - {}".format(self.discipline, self.title)
         return self.title
+
+    def save(self, *args, **kwargs):
+        """Bleach"""
+        self.text = bleach.clean(
+            self.text,
+            tags=ALLOWED_TAGS,
+            styles=[],
+            strip=True,
+        ).strip()
+        self.title = bleach.clean(
+            self.title,
+            tags=ALLOWED_TAGS,
+            styles=[],
+            strip=True,
+        ).strip()
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def deleted_questions(cls):
+        """
+        Exclude questions which are part of any Teacher's deleted_questions,
+        and have no answers
+        """
+        Teacher = apps.get_model(app_label="peerinst", model_name="teacher")
+
+        return cache.get_or_set(
+            "deleted_questions",
+            cls.objects.filter(
+                pk__in=set(
+                    Teacher.objects.all()
+                    .prefetch_related("deleted_questions__question")
+                    .values_list("deleted_questions__question", flat=True)
+                ).intersection(
+                    set(
+                        cls.objects.all()
+                        .annotate(answer_count=Count("answer"))
+                        .filter(answer_count=0)
+                        .values_list("id", flat=True)
+                    )
+                )
+            ),
+            60,
+        )
+
+    @property
+    def answer_count(self):
+        return self.get_student_answers().count()
+
+    @property
+    def assignment_count(self):
+        return self.assignment_set.all().count()
+
+    @property
+    def collections(self):
+        Collection = apps.get_model(
+            app_label="peerinst", model_name="collection"
+        )
+        return Collection.objects.filter(assignments__questions=self)
+
+    @property
+    def featured(self):
+        Collection = apps.get_model(
+            app_label="peerinst", model_name="collection"
+        )
+        return self.id in Collection.featured_questions()
+
+    @property
+    def is_valid(self):
+        """
+        TODO: Need to add a check that there are enough sample answers!
+        """
+        return self.answerchoice_set.count() > 0 or self.type == "RO"
 
     def get_start_form_class(self):
         from ..forms import FirstAnswerForm
@@ -412,6 +517,108 @@ class Question(models.Model):
     def is_correct(self, index):
         return self.answerchoice_set.all()[index - 1].correct
 
+    def get_correct_choices(self):
+        answerchoice_correct = self.answerchoice_set.values_list(
+            "correct", flat=True
+        )
+        return list(
+            itertools.compress(itertools.count(1), answerchoice_correct)
+        )
+
+    def get_student_answers(self):
+        return (
+            self.answer_set.filter(expert=False)
+            .filter(second_answer_choice__gt=0)
+            .exclude(user_token="")
+        )
+
+    def get_answers_by_type(self, answer_type):
+        """
+        Arguments:
+        ----------
+            answer_type: string, one of following possible choices:
+                        - *R (second answer choice correct)
+                        - *W (second answer choice wrong)
+                        - RR (right to right),
+                        - RW (right to wrong),
+                        - WR,
+                        - WR
+        Returns:
+        -------
+            queryset of student answers
+
+        """
+        student_answers = self.get_student_answers()
+        correct_choices = self.get_correct_choices()
+
+        if answer_type == "*R":
+            qs = student_answers.filter(
+                second_answer_choice__in=correct_choices
+            )
+        if answer_type == "*W":
+            qs = student_answers.exclude(
+                second_answer_choice__in=correct_choices
+            )
+        elif answer_type == "RR":
+            qs = student_answers.filter(
+                first_answer_choice__in=correct_choices
+            ).filter(second_answer_choice__in=correct_choices)
+        elif answer_type == "RW":
+            qs = student_answers.filter(
+                first_answer_choice__in=correct_choices
+            ).exclude(second_answer_choice__in=correct_choices)
+        elif answer_type == "WR":
+            qs = student_answers.exclude(
+                first_answer_choice__in=correct_choices
+            ).filter(second_answer_choice__in=correct_choices)
+        elif answer_type == "WW":
+            qs = student_answers.exclude(
+                first_answer_choice__in=correct_choices
+            ).exclude(second_answer_choice__in=correct_choices)
+
+        return qs
+
+    def get_difficulty(self):
+        MIN_ANSWERS = 30
+        UPPER_BOUND = 0.50
+        LOWER_BOUND = 0.25
+
+        N = self.get_student_answers().count()
+        if N > MIN_ANSWERS:
+            difficulty = self.get_answers_by_type(answer_type="*W").count() / N
+            if difficulty >= UPPER_BOUND:
+                difficulty_str = _("Hard")
+            elif difficulty < LOWER_BOUND:
+                difficulty_str = _("Easy")
+            else:
+                difficulty_str = _("Avg")
+        else:
+            difficulty = None
+            difficulty_str = _("Not enough data")
+        return (difficulty, difficulty_str)
+
+    def get_peer_impact(self):
+        MIN_ANSWERS = 30
+        UPPER_BOUND = 0.25
+        LOWER_BOUND = 0.05
+        N = self.get_student_answers().count()
+
+        if N > MIN_ANSWERS:
+            peer_impact = (
+                self.get_answers_by_type(answer_type="RW").count()
+                + self.get_answers_by_type(answer_type="WR").count()
+            ) / N
+            if peer_impact >= UPPER_BOUND:
+                peer_impact_str = _("High")
+            elif peer_impact < LOWER_BOUND:
+                peer_impact_str = _("Low")
+            else:
+                peer_impact_str = _("Med")
+        else:
+            peer_impact = None
+            peer_impact_str = _("Not enough data")
+        return (peer_impact, peer_impact_str)
+
     def get_matrix(self):
         matrix = {}
         matrix[str("easy")] = 0
@@ -420,46 +627,19 @@ class Question(models.Model):
         matrix[str("peer")] = 0
 
         answer_choices = self.answerchoice_set.all()
-        answerchoice_correct = self.answerchoice_set.values_list(
-            "correct", flat=True
-        )
-        correct_choices = list(
-            itertools.compress(itertools.count(1), answerchoice_correct)
-        )
+        correct_choices = self.get_correct_choices()
 
         # There must be more choices than correct choices for valid matrix
         if answer_choices.count() > len(correct_choices):
-            student_answers = (
-                self.answer_set.filter(expert=False)
-                .filter(second_answer_choice__gt=0)
-                .exclude(user_token="")
-            )
+            student_answers = self.get_student_answers()
             N = len(student_answers)
             if N > 0:
 
-                easy = (
-                    student_answers.filter(
-                        first_answer_choice__in=correct_choices
-                    )
-                    .filter(second_answer_choice__in=correct_choices)
-                    .count()
-                )
+                easy = self.get_answers_by_type(answer_type="RR").count()
 
-                hard = (
-                    student_answers.exclude(
-                        first_answer_choice__in=correct_choices
-                    )
-                    .exclude(second_answer_choice__in=correct_choices)
-                    .count()
-                )
+                hard = self.get_answers_by_type(answer_type="WW").count()
 
-                tricky = (
-                    student_answers.filter(
-                        first_answer_choice__in=correct_choices
-                    )
-                    .exclude(second_answer_choice__in=correct_choices)
-                    .count()
-                )
+                tricky = self.get_answers_by_type(answer_type="RW").count()
 
                 # peer = (
                 #     student_answers.exclude(
@@ -614,7 +794,16 @@ class Question(models.Model):
         )
 
         q_answerchoices = {
-            i: (label, correct, text)
+            i: (
+                label,
+                correct,
+                bleach.clean(
+                    text,
+                    tags=ALLOWED_TAGS,
+                    styles=[],
+                    strip=True,
+                ).strip(),
+            )
             for i, (correct, (label, text)) in enumerate(
                 zip(answerchoice_correct, self.get_choices()), start=1
             )
@@ -638,8 +827,10 @@ class Question(models.Model):
 
             df = pd.merge(df_answers, df_votes, left_on="id", right_index=True)
 
+            # TODO: Replace length filter with quality filter
             df_top5 = (
-                df.sort_values(
+                df.loc[df["rationale"].str.len() >= 10, :]
+                .sort_values(
                     ["first_answer_choice", "times_chosen", "times_shown"],
                     ascending=[True, False, False],
                 )
@@ -652,8 +843,8 @@ class Question(models.Model):
                 "first_answer_choice"
             ):
                 d = {}
-                d["Answer"] = q_answerchoices[first_answer_choice][0]
-                d["answer_text"] = bleach.clean(
+                d["label"] = q_answerchoices[first_answer_choice][0]
+                d["text"] = bleach.clean(
                     q_answerchoices[first_answer_choice][2],
                     tags=ALLOWED_TAGS,
                     styles=[],
@@ -666,7 +857,9 @@ class Question(models.Model):
                 most_convincing["rationale"] = most_convincing[
                     "rationale"
                 ].apply(
-                    lambda x: bleach.clean(x, tags=[], styles=[], strip=True)
+                    lambda x: basic_syntax(
+                        bleach.clean(x, tags=[], styles=[], strip=True)
+                    )
                 )
                 d["most_convincing"] = most_convincing.to_dict(
                     orient="records"

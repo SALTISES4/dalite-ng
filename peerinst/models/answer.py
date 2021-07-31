@@ -1,8 +1,11 @@
+import bleach
+from django.apps import apps
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 from quality.models import Quality
 
 from .assignment import Assignment
@@ -11,18 +14,12 @@ from .question import GradingScheme, Question
 
 class AnswerMayShowManager(models.Manager):
     def get_queryset(self):
-        never_show = [
-            a
-            for a in set(
-                AnswerAnnotation.objects.filter(score=0).values_list(
-                    "answer", flat=True
-                )
-            )
-        ]
+
         return (
             super(AnswerMayShowManager, self)
             .get_queryset()
-            .exclude(pk__in=never_show)
+            .prefetch_related("answerannotation_set")
+            .exclude(answerannotation__score=0)
             .exclude(expert=True)
         )
 
@@ -31,6 +28,16 @@ class AnswerChoice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     text = models.CharField(_("Text"), max_length=500)
     correct = models.BooleanField(_("Correct?"))
+
+    def save(self, *args, **kwargs):
+        """Bleach"""
+        self.text = bleach.clean(
+            self.text,
+            tags=ALLOWED_TAGS,
+            styles=[],
+            strip=True,
+        ).strip()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.text
@@ -177,7 +184,7 @@ class Answer(models.Model):
 
     @property
     def grade(self):
-        """ Compute grade based on grading scheme of question. """
+        """Compute grade based on grading scheme of question."""
         if (
             self.question.grading_scheme == GradingScheme.STANDARD
             or isinstance(self.question, RationaleOnlyQuestion)
@@ -219,6 +226,24 @@ class Answer(models.Model):
             Time taken to answer second part
         """
         return self.datetime_second - self.datetime_first
+
+    @property
+    def global_quality(self):
+        """
+        Use global quality used for validation to provide a real value that
+        can be used for filtering
+        """
+        Quality = apps.get_model(app_label="quality", model_name="quality")
+        try:
+            quality = Quality.objects.get(
+                quality_type__type="global",
+                quality_use_type__type="validation",
+            )
+            quality_score, quality_description = quality.evaluate(self)
+            return quality_score
+
+        except Quality.DoesNotExist:
+            return 1.0
 
 
 class AnswerVote(models.Model):

@@ -1,7 +1,6 @@
 import bleach
-
-from rest_framework import serializers
 from django.contrib.auth.models import User
+from rest_framework import serializers
 
 from peerinst.models import (
     Answer,
@@ -10,10 +9,10 @@ from peerinst.models import (
     ShownRationale,
     StudentGroupAssignment,
 )
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 
 from .assignment import QuestionSerializer
 from .dynamic_serializer import DynamicFieldsModelSerializer
-from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 
 
 class AnswerSerializer(DynamicFieldsModelSerializer):
@@ -25,7 +24,13 @@ class AnswerSerializer(DynamicFieldsModelSerializer):
     shown_count = serializers.SerializerMethodField()
     timestamp = serializers.SerializerMethodField()
     question = QuestionSerializer(
-        fields=("title", "text", "image", "choices",), read_only=True
+        fields=(
+            "answerchoice_set",
+            "image",
+            "text",
+            "title",
+        ),
+        read_only=True,
     )
 
     def get_vote_count(self, obj):

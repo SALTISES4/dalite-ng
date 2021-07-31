@@ -2,6 +2,7 @@ import json
 import logging
 import random
 import re
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -43,6 +44,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
+from peerinst.elasticsearch import question_search as qs_ES
 
 # tos
 from tos.models import Consent, Tos
@@ -90,9 +92,12 @@ from ..util import (
     report_data_by_student,
     roundrobin,
 )
+from .decorators import ajax_login_required, ajax_user_passes_test
 
 LOGGER = logging.getLogger(__name__)
 LOGGER_teacher_activity = logging.getLogger("teacher_activity")
+performance_logger = logging.getLogger("performance")
+search_logger = logging.getLogger("search")
 
 
 # Views related to Auth
@@ -281,10 +286,14 @@ def access_denied_and_logout(request):
 
 
 @login_required
+@user_passes_test(student_check, login_url="/access_denied_and_logout/")
+@user_passes_test(lambda u: hasattr(u, "teacher"))  # Teacher is required
 def browse_database(request):
 
     return TemplateResponse(
-        request, "peerinst/browse_database.html", context={}
+        request,
+        "peerinst/browse_database.html",
+        context={"static_url": settings.STATIC_URL},
     )
 
 
@@ -807,7 +816,7 @@ def disciplines_select_form(request, pk=None):
 class CategoryCreateView(
     LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, CreateView
 ):
-    """ View to create a new category outside of admin. """
+    """View to create a new category outside of admin."""
 
     model = Category
     fields = ["title"]
@@ -1637,7 +1646,9 @@ def question(request, assignment_id, question_id):
             LtiUserData, user=request.user, custom_key=custom_key
         ),
         answer=models.Answer.objects.filter(
-            assignment=assignment, question=question, user_token=user_token,
+            assignment=assignment,
+            question=question,
+            user_token=user_token,
         ).last(),
     )
 
@@ -1678,7 +1689,7 @@ def question(request, assignment_id, question_id):
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
 def reset_question(request, assignment_id, question_id):
-    """ Clear all answers from user (for testing) """
+    """Clear all answers from user (for testing)"""
 
     assignment = get_object_or_404(models.Assignment, pk=assignment_id)
     question = get_object_or_404(models.Question, pk=question_id)
@@ -2175,7 +2186,86 @@ def collection_search_function(search_string, pre_filtered_list=None):
 
 
 # AJAX functions
+@ajax_login_required
+@ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
+def question_search_beta(request):
+    FILTERS = [
+        "category__title",
+        "discipline.title",
+        "difficulty.label",
+        "peer_impact.label",
+    ]
+
+    search_string = request.GET.get("search_string", default="")
+
+    if search_string:
+        start = time.perf_counter()
+        # Parse to remove filter terms from search string
+        filters = []
+        terms = search_string.split()
+        query = []
+        for t in terms:
+            if t.split("::")[0].lower() in FILTERS:
+                filters.append(
+                    (
+                        f"{t.split('::')[0]}".lower(),
+                        t.split("::")[1].replace("_", " ").lower(),
+                    )
+                )
+            else:
+                query.append(t)
+
+        # Question flags need to be real time, not from index
+        flagged = list(Question.flagged_objects.values_list("id", flat=True))
+        # Search
+        s = qs_ES(" ".join(query), filters, flagged)
+        # Serialize
+        results = [hit.to_dict() for hit in s[:50]]
+        # Add metadata
+        if results:
+            _c = []
+            for c in map(
+                lambda x: x["category"] if "category" in x else [],
+                results,
+            ):
+                for a in c:
+                    _c.append(a["title"])
+            categories = list(sorted(set(_c)))
+            difficulties = list(
+                sorted(set(r["difficulty"]["label"] for r in results))
+            )
+            disciplines = list(
+                sorted(set(r["discipline"]["title"] for r in results))
+            )
+            impacts = list(
+                sorted(set(r["peer_impact"]["label"] for r in results))
+            )
+            meta = {
+                "categories": categories,
+                "difficulties": difficulties,
+                "disciplines": disciplines,
+                "impacts": impacts,
+            }
+        else:
+            meta = {
+                "categories": [],
+                "difficulties": [],
+                "disciplines": [],
+                "impacts": [],
+            }
+
+        search_logger.info(
+            f"{time.perf_counter() - start:.2e}s - {search_string}"
+        )
+
+        return JsonResponse({"results": results, "meta": meta}, safe=False)
+
+    return JsonResponse({})
+
+
 def question_search(request):
+
+    start = time.perf_counter()
 
     if not Teacher.objects.filter(user=request.user).exists():
         return HttpResponse(
@@ -2293,10 +2383,7 @@ def question_search(request):
             query_term = query_term.exclude(id__in=q_qs).distinct()
 
             query_term = [
-                q
-                for q in query_term
-                if q not in query_all
-                and (q.answerchoice_set.count() > 0 or q.type == "RO")
+                q for q in query_term if q not in query_all and q.is_valid
             ]
 
             query_meta[term] = query_term
@@ -2321,6 +2408,13 @@ def question_search(request):
             ]
             query_dict["count"] = len(query_dict["questions"])
             query.append(query_dict)
+
+        end = time.perf_counter()
+
+        performance_logger.info(
+            f"ORM time to query '{search_string}': {end - start:E}s"
+        )
+        performance_logger.info(f"Hit count: {len(query_all)}")
 
         return TemplateResponse(
             request,

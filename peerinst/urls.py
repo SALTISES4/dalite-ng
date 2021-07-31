@@ -80,7 +80,9 @@ def old_patterns():
             name="category-form",
         ),
         path(
-            "category/form", views.category_select_form, name="category-form",
+            "category/form",
+            views.category_select_form,
+            name="category-form",
         ),
         path(
             "answer-choice/form/<int:question_id>",
@@ -118,7 +120,9 @@ def old_patterns():
             name="assignment-edit",
         ),
         path(
-            "question-search/", views.question_search, name="question-search",
+            "question-search/",
+            views.question_search_beta,
+            name="question-search",
         ),
         path(
             "collection-search/",
@@ -396,9 +400,15 @@ def search_patterns():
             name="search-categories",
         ),
         path(
-            "search/username", views.search_usernames, name="search-usernames",
+            "search/username",
+            views.search_usernames,
+            name="search-usernames",
         ),
-        path("search/subject", views.search_subjects, name="search-subjects",),
+        path(
+            "search/subject",
+            views.search_subjects,
+            name="search-subjects",
+        ),
         path(
             "search/discipline",
             views.search_disciplines,

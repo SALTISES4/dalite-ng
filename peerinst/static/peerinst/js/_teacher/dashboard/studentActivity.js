@@ -1,5 +1,3 @@
-"use strict";
-
 export function init(data) {
   function draw() {
     $(".progress-chart").each((i, el) => {

@@ -2,7 +2,7 @@ from django.conf.urls import include
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from REST import views
+from REST import form_helpers, views
 
 app_name = "REST"
 
@@ -11,7 +11,9 @@ peerinst_api.register(
     r"assignments", views.AssignmentViewSet, basename="assignment"
 )
 peerinst_api.register(
-    r"disciplines", views.DisciplineViewSet, basename="discipline",
+    r"disciplines",
+    views.DisciplineViewSet,
+    basename="discipline",
 )
 peerinst_api.register(
     r"assignment-questions",
@@ -19,7 +21,9 @@ peerinst_api.register(
     basename="assignment_question",
 )
 peerinst_api.register(
-    r"questions", views.QuestionViewSet, basename="question",
+    r"questions",
+    views.QuestionViewSet,
+    basename="question",
 )
 
 
@@ -55,7 +59,11 @@ urlpatterns = [
         views.StudentGroupAssignmentAnswers.as_view({"get": "retrieve"}),
         name="student-group-assigment-answers",
     ),
-    path("teacher/<int:pk>/", views.TeacherView.as_view(), name="teacher",),
+    path(
+        "teacher/<int:pk>/",
+        views.TeacherView.as_view(),
+        name="teacher",
+    ),
     path(
         "teacher/search/",
         views.TeacherSearch.as_view({"get": "list"}),
@@ -75,5 +83,16 @@ urlpatterns = [
         "teacher/feedback/through_answer/<int:pk>/",
         views.TeacherFeedbackThroughAnswerDetail.as_view(),
         name="teacher-feedback-through-answer-detail",
+    ),
+    # Form helpers
+    path(
+        "form-helpers/assignment/check-id/",
+        form_helpers.check_assignment_id_is_valid,
+        name="assignment-check-id",
+    ),
+    path(
+        "form-helpers/assignment/help-texts/",
+        form_helpers.get_assignment_help_texts,
+        name="assignment-help-texts",
     ),
 ]

@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { buildReq } from "../ajax.js";
-import { clear, createSvg } from "../utils.js";
+import { clear, createSvg } from "../utils.ts";
 import { quintileScale } from "../_theming/colours.js";
 
 /*********/

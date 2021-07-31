@@ -8,10 +8,11 @@ repos:
         args: ["--profile", "black"]
 
   - repo: https://github.com/ambv/black
-    rev: 21.4b2
+    rev: 21.6b0
     hooks:
       - id: black
         exclude: "^.*/migrations/.*.py$"
+        args: [--line-length=79, --safe]
 
   - repo: https://github.com/pycqa/flake8
     rev: 3.9.1
@@ -20,20 +21,30 @@ repos:
         exclude: "^.*/migrations/.*.py$"
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v7.3.1
+    rev: v7.30.0
     hooks:
       - id: eslint
         args: [--fix]
         additional_dependencies:
-          - eslint@7.3.1
-          - babel-eslint@10.0.3
+          - eslint@7.30.0
+          - eslint-config-developit@1.2.0
           - eslint-config-google@0.14.0
+          - eslint-config-preact@1.1.4
+          - eslint-config-prettier@8.3.0
+          - eslint-plugin-prettier@3.4.0
+          - "@babel/eslint-parser@7.14.7"
+          - "@typescript-eslint/parser"
+          - "@typescript-eslint/eslint-plugin"
         exclude: "^.*\\.min\\..*$"
+        files: \.[jt]sx?$
+        types: [file]
 
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v2.1.0
     hooks:
       - id: prettier
+        additional_dependencies:
+          - prettier@2.3.2
         files: \.js$
         exclude: "^.*\\.min\\..*$"
 
@@ -44,11 +55,11 @@ repos:
         args: [--fix]
         exclude: "^.*\\.min\\..*$"
         additional_dependencies:
-          - stylelint@13.6.1
-          - stylelint-config-recommended-scss@4.2.0
-          - stylelint-config-recommended@3.0.0
+          - stylelint@13.13.1
+          - stylelint-config-recommended-scss@4.3.0
+          - stylelint-config-recommended@5.0.0
           - stylelint-order@4.1.0
-          - stylelint-scss@3.18.0
+          - stylelint-scss@3.19.0
 
   - repo: local
     hooks:

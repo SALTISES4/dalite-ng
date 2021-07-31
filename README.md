@@ -370,3 +370,18 @@ Tools
     Runs pytest with migration and coverage options
   `make test-cdb`:
     Runs pytest with migration and coverage options, re-creating the db
+
+
+
+ElasticSearch
+-------------
+
+1. Build the index
+
+  `$ ./manage.py search_index --rebuild`
+
+2. Add config to `local_settings.py`:
+
+  `ELASTICSEARCH_DSL = {
+      "default": {"hosts": "<username>:<password>@localhost:9200"},
+  }`

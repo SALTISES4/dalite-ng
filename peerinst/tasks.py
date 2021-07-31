@@ -6,7 +6,8 @@ import operator
 import smtplib
 
 from celery import shared_task
-from django.core.mail import send_mail, mail_managers
+from django.core.mail import mail_managers, send_mail
+from django.core.management import call_command
 
 from dalite.celery import app, try_async
 
@@ -16,7 +17,7 @@ logger = logging.getLogger("peerinst-models")
 @shared_task
 def update_question_meta_search_difficulty():
     # Prevent circular import
-    from peerinst.models import Question, MetaFeature, MetaSearch
+    from peerinst.models import MetaFeature, MetaSearch, Question
 
     qs = Question.objects.all()
     difficulty_levels = qs[0].get_matrix().keys()
@@ -40,6 +41,13 @@ def update_question_meta_search_difficulty():
         assert (
             q.meta_search.filter(meta_feature__key="difficulty").count() == 1
         )
+
+
+@app.task
+def elasticsearch_reindex():
+    call_command("search_index", "--rebuild", "-f")
+    logger.info("rebuilt elasticsearch index")
+    return
 
 
 @try_async

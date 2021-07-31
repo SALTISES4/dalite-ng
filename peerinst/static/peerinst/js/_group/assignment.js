@@ -1,7 +1,7 @@
 import { initStudentProgress } from "./student_progress.js";
 
 import { editField } from "./common.js";
-import { clear, formatDatetime } from "../utils.js";
+import { clear, formatDatetime } from "../utils.ts";
 import { buildReq } from "../ajax.js";
 
 /*********/

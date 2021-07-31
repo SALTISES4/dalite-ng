@@ -3,9 +3,9 @@ import base64
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.urls import reverse
 from django.db import models
 from django.db.models import Q
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from quality.models import Quality
@@ -36,6 +36,9 @@ class Teacher(models.Model):
     institutions = models.ManyToManyField(Institution, blank=True)
     disciplines = models.ManyToManyField(Discipline, blank=True)
     assignments = models.ManyToManyField(Assignment, blank=True)
+    archived_questions = models.ManyToManyField(
+        Question, blank=True, related_name="archived_questions"
+    )
     deleted_questions = models.ManyToManyField(Question, blank=True)
     favourite_questions = models.ManyToManyField(
         Question, blank=True, related_name="favourite_questions"
@@ -125,7 +128,7 @@ class LastLogout(models.Model):
 
 
 class TeacherNotification(models.Model):
-    """ Generic framework for notifications based on ContentType """
+    """Generic framework for notifications based on ContentType"""
 
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     notification_type = models.ForeignKey(

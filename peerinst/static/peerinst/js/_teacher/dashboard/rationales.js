@@ -1,5 +1,3 @@
-"use strict";
-
 const transition = {
   duration: 600,
   direction: "right",

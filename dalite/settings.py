@@ -32,6 +32,7 @@ INSTALLED_APPS = (
     "blink",
     # "channels",
     "REST",
+    "django_elasticsearch_dsl",
     "cookielaw",
     "csp",
     "security_headers",
@@ -223,181 +224,7 @@ AXES_LOCKOUT_TEMPLATE = "registration/lockout.html"
 
 GRAPPELLI_ADMIN_TITLE = "Dalite NG administration"
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "simple": {"format": "%(levelname)s | %(asctime)s | %(message)s"},
-        "complete": {
-            "format": "%(asctime)s - %(name)s - %(levelname)s - "
-            "%(filename)s: %(lineno)d - %(message)s",
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        },
-    },
-    "handlers": {
-        "file_debug_log": {
-            "level": "DEBUG",
-            "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "log/debug.log"),
-        },
-        "file_student_log": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "log/student.log"),
-        },
-        "file_teacher_log": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "log/teacher_activity.log"),
-        },
-        "tos_file_log": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "formatter": "complete",
-            "filename": os.path.join(BASE_DIR, "log/tos.log"),
-        },
-        "tos_console_log": {
-            "level": "DEBUG" if DEBUG else "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "complete",
-            "stream": "ext://sys.stdout",
-        },
-        "peerinst_file_log": {
-            "level": "DEBUG" if DEBUG else "INFO",
-            "class": "logging.FileHandler",
-            "formatter": "complete",
-            "filename": os.path.join(BASE_DIR, "log", "peerinst.log"),
-        },
-        "peerinst_console_log": {
-            "level": "DEBUG" if DEBUG else "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "complete",
-            "stream": "ext://sys.stdout",
-        },
-        "dalite_file_log": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "log/dalite.log"),
-        },
-        "dalite_console_log": {
-            "level": "DEBUG" if DEBUG else "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "complete",
-            "stream": "ext://sys.stdout",
-        },
-        "quality_file_log": {
-            "level": "DEBUG" if DEBUG else "INFO",
-            "class": "logging.FileHandler",
-            "formatter": "complete",
-            "filename": os.path.join(BASE_DIR, "log", "quality.log"),
-        },
-        "quality_console_log": {
-            "level": "DEBUG" if DEBUG else "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "complete",
-            "stream": "ext://sys.stdout",
-        },
-        "reputation_file_log": {
-            "level": "DEBUG" if DEBUG else "INFO",
-            "class": "logging.FileHandler",
-            "formatter": "complete",
-            "filename": os.path.join(BASE_DIR, "log", "reputation.log"),
-        },
-        "reputation_console_log": {
-            "level": "DEBUG" if DEBUG else "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "complete",
-            "stream": "ext://sys.stdout",
-        },
-        "analytics_file_log": {
-            "level": "DEBUG" if DEBUG else "INFO",
-            "class": "logging.FileHandler",
-            "formatter": "complete",
-            "filename": os.path.join(BASE_DIR, "log", "analytics.log"),
-        },
-        "analytics_console_log": {
-            "level": "DEBUG" if DEBUG else "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "complete",
-            "stream": "ext://sys.stdout",
-        },
-    },
-    "loggers": {
-        "django.request": {
-            "handlers": ["file_debug_log"],
-            "level": "DEBUG",
-            "propagate": True,
-        },
-        "peerinst.views": {
-            "handlers": ["file_student_log"],
-            "level": "INFO",
-            "propagate": True,
-        },
-        "tos-views": {
-            "handlers": ["tos_file_log", "tos_console_log"],
-            "level": "INFO",
-            "propagate": True,
-        },
-        "tos-models": {
-            "handlers": ["tos_file_log", "tos_console_log"],
-            "level": "INFO",
-            "propagate": True,
-        },
-        "django_lti_tool_provider.views": {
-            "handlers": ["file_debug_log"],
-            "level": "DEBUG",
-            "propagate": True,
-        },
-        "teacher_activity": {
-            "handlers": ["file_teacher_log"],
-            "level": "INFO",
-            "propagate": True,
-        },
-        "peerinst-models": {
-            "handlers": ["peerinst_file_log", "peerinst_console_log"],
-            "level": "DEBUG" if DEBUG else "INFO",
-            "propagate": True,
-        },
-        "peerinst-views": {
-            "handlers": ["peerinst_file_log", "peerinst_console_log"],
-            "level": "DEBUG" if DEBUG else "INFO",
-            "propagate": True,
-        },
-        "peerinst-auth": {
-            "handlers": ["peerinst_file_log", "peerinst_console_log"],
-            "level": "DEBUG" if DEBUG else "INFO",
-            "propagate": True,
-        },
-        "peerinst-scheduled": {
-            "handlers": ["peerinst_file_log", "peerinst_console_log"],
-            "level": "DEBUG" if DEBUG else "INFO",
-            "propagate": True,
-        },
-        "dalite": {
-            "handlers": ["dalite_file_log", "dalite_console_log"],
-            "level": "DEBUG" if DEBUG else "INFO",
-            "propagate": True,
-        },
-        "quality": {
-            "handlers": ["quality_file_log", "quality_console_log"],
-            "level": "DEBUG" if DEBUG else "INFO",
-            "propagate": True,
-        },
-        "reputation": {
-            "handlers": ["reputation_file_log", "reputation_console_log"],
-            "level": "DEBUG" if DEBUG else "INFO",
-            "propagate": True,
-        },
-        "analytics": {
-            "handlers": ["analytics_file_log", "analytics_console_log"],
-            "level": "DEBUG" if DEBUG else "INFO",
-            "propagate": True,
-        },
-    },
-}
-
 # LTI integration
-
 # these are sensitive settings, so it is better to fail early than use some
 # defaults visible on public repo
 LTI_CLIENT_KEY = os.environ.get("LTI_CLIENT_KEY", None)
@@ -500,6 +327,11 @@ FEATURE_POLICY = [
 
 REFERRER_POLICY = "no-referrer, strict-origin-when-cross-origin"
 
+ELASTICSEARCH_DSL = {
+    "default": {"hosts": "localhost:9200"},
+}
+ELASTICSEARCH_DSL_AUTOSYNC = False
+
 # External framing
 CSP_FRAME_ANCESTORS = ["*"]
 FRAMING_ALLOWED_FROM = ["*"]
@@ -522,3 +354,204 @@ except ImportError:
         "see README.md."
     )
     pass
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {"format": "%(levelname)s | %(asctime)s | %(message)s"},
+        "complete": {
+            "format": "%(asctime)s - %(name)s - %(levelname)s - "
+            "%(filename)s: %(lineno)d - %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "file_debug_log": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "log/debug.log"),
+        },
+        "file_student_log": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "log/student.log"),
+        },
+        "file_teacher_log": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "log/teacher_activity.log"),
+        },
+        "tos_file_log": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "complete",
+            "filename": os.path.join(BASE_DIR, "log/tos.log"),
+        },
+        "tos_console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
+        "peerinst_file_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "complete",
+            "filename": os.path.join(BASE_DIR, "log", "peerinst.log"),
+        },
+        "peerinst_console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
+        "dalite_file_log": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "log/dalite.log"),
+        },
+        "dalite_console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
+        "quality_file_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "complete",
+            "filename": os.path.join(BASE_DIR, "log", "quality.log"),
+        },
+        "quality_console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
+        "reputation_file_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "complete",
+            "filename": os.path.join(BASE_DIR, "log", "reputation.log"),
+        },
+        "reputation_console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
+        "analytics_file_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "complete",
+            "filename": os.path.join(BASE_DIR, "log", "analytics.log"),
+        },
+        "analytics_console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
+        "search_file_log": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "complete",
+            "filename": os.path.join(BASE_DIR, "log", "search.log"),
+        },
+        "performance_console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
+    },
+    "loggers": {
+        "django.request": {
+            "handlers": ["file_debug_log"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "peerinst.views": {
+            "handlers": ["file_student_log"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "tos-views": {
+            "handlers": ["tos_file_log", "tos_console_log"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "tos-models": {
+            "handlers": ["tos_file_log", "tos_console_log"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "django_lti_tool_provider.views": {
+            "handlers": ["file_debug_log"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "teacher_activity": {
+            "handlers": ["file_teacher_log"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "peerinst-models": {
+            "handlers": ["peerinst_file_log", "peerinst_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "peerinst-views": {
+            "handlers": ["peerinst_file_log", "peerinst_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "peerinst-auth": {
+            "handlers": ["peerinst_file_log", "peerinst_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "peerinst-scheduled": {
+            "handlers": ["peerinst_file_log", "peerinst_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "dalite": {
+            "handlers": ["dalite_file_log", "dalite_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "quality": {
+            "handlers": ["quality_file_log", "quality_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "reputation": {
+            "handlers": ["reputation_file_log", "reputation_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "analytics": {
+            "handlers": ["analytics_file_log", "analytics_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "performance": {
+            "handlers": ["performance_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "nlp": {
+            "handlers": ["performance_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "search": {
+            "handlers": ["search_file_log"],
+            "level": "INFO",
+            "propagate": True,
+        },
+    },
+}

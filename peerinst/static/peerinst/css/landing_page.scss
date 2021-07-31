@@ -25,6 +25,10 @@ header {
 .small-embedded-video {
   padding: 1%;
 }
+.video-tray {
+  display: flex;
+  justify-content: space-around;
+}
 .site-content {
   // margin-bottom: 80pt;
   padding: 0;
@@ -87,6 +91,7 @@ header {
 .embedded-video {
   display: block;
   margin: auto;
+  padding: 1%
 }
 .white {
   background-color: white;

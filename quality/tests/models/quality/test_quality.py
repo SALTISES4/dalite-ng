@@ -258,8 +258,7 @@ def test_batch_evaluate__different_weights(assignment_validation_quality):
                 assert q["weight"] == i + 1
 
 
-@pytest.mark.skip
-# This test fails randomly
+@pytest.mark.skip(reason="This test fails randomly")
 def test_batch_evaluate__cached_all(assignment_validation_quality):
     answers = [mock.Mock() for _ in range(3)]
     for i, answer in enumerate(answers):
@@ -320,6 +319,7 @@ def test_batch_evaluate__cached_all(assignment_validation_quality):
         assert qualities_1 == qualities_2
 
 
+@pytest.mark.skip(reason="This test fails randomly")
 def test_batch_evaluate__cached_some(assignment_validation_quality):
     answers = [mock.Mock() for _ in range(3)]
     for i, answer in enumerate(answers):

@@ -1,23 +1,23 @@
 import json
+
 import mock
 import pytest
-
 from django.urls import reverse
 from rest_framework import status
 
-from peerinst.models import AssignmentQuestions, Question
+from peerinst.models import Assignment, AssignmentQuestions, Question
 from peerinst.tests.fixtures import *  # noqa
-from peerinst.tests.fixtures.teacher import login_teacher
 from peerinst.tests.fixtures.student import login_student
+from peerinst.tests.fixtures.teacher import login_teacher
 
 
 @pytest.mark.django_db
-def test_assignment_list(client, assignments, teacher):
+def test_assignment_list(client, assignments, student, teacher):
     """
     Requirements:
     1. Must be authenticated
     2. Must be owner to GET own list
-    3. No one can POST
+    3. Only teachers can POST to create new
     """
 
     # Setup
@@ -43,11 +43,28 @@ def test_assignment_list(client, assignments, teacher):
     assert len(retrieved_assignments) == 1
     assert retrieved_assignments[0]["title"] == assignments[0].title
 
-    # 3. No one can POST
+    # 3. Only teachers can POST to create new assignments
     response = client.post(
-        url, {"title": "New assignment", "identifier": "UNIQUE"}
+        url, {"title": "<script>New assignment</script>", "pk": "UNIQUE"}
     )
-    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert response.status_code == status.HTTP_201_CREATED
+
+    response = client.get(url)
+    retrieved_assignments = json.loads(response.content)
+    assert len(retrieved_assignments) == 2
+
+    created_assignment = Assignment.objects.get(pk="UNIQUE")
+    assert teacher.user in created_assignment.owner.all()
+    assert created_assignment in teacher.assignments.all()
+    # NB: Just double check that model save() is called
+    assert created_assignment.title == "New assignment"
+
+    assert login_student(client, student)
+    response = client.post(
+        url, {"title": "Another new assignment", "pk": "DIFFERENT"}
+    )
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 @pytest.mark.django_db
