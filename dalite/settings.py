@@ -553,5 +553,10 @@ LOGGING = {
             "level": "INFO",
             "propagate": True,
         },
+        "peerinst.tasks": {
+            "handlers": ["peerinst_console_log"],
+            "level": "INFO",
+            "propagate": True,
+        },
     },
 }

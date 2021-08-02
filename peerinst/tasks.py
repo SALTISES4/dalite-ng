@@ -11,7 +11,7 @@ from django.core.management import call_command
 
 from dalite.celery import app, try_async
 
-logger = logging.getLogger("peerinst-models")
+logger = logging.getLogger(__name__)
 
 
 @shared_task
@@ -45,6 +45,7 @@ def update_question_meta_search_difficulty():
 
 @app.task
 def elasticsearch_reindex():
+    logger.info("start rebuild elasticsearch index")
     call_command("search_index", "--rebuild", "-f")
     logger.info("rebuilt elasticsearch index")
     return
