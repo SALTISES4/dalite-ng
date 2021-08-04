@@ -173,27 +173,28 @@
     position: absolute;
     right: 20px;
     top: 20px;
+  }
 
-    & .rating {
-      border-radius: 50%;
-      border-style: solid;
-      border-width: thin;
-      font-size: x-small;
-      height: 32px;
-      margin-bottom: 8px;
-      position: relative;
-      width: 32px;
+  & .rating {
+    border-radius: 50%;
+    border-style: solid;
+    border-width: thin;
+    font-size: x-small;
+    height: 32px;
+    margin-bottom: 8px;
+    position: relative;
+    width: 32px;
 
-      & > .label {
-        font-weight: bold;
-        left: 50%;
-        position: absolute;
-        top: 50%;
-        transform: translate(-50%, -50%);
-      }
+    & > .label {
+      font-weight: bold;
+      left: 50%;
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
   }
 }
+
 
 /* Search related css */
 .spinner {

@@ -1,12 +1,35 @@
 {% extends user.student|yesno:'peerinst/student/base.html,peerinst/base.html' %}
 
-{% load i18n %}
+{% load compress i18n static %}
+
+{% block mdc %}{% endblock %}
+
+{% block stylesheets %}
+{{ block.super }}
+{% compress js file preact %}
+<script src="{% static 'peerinst/js/preact.min.js' %}" defer></script>
+{% endcompress %}
+{% compress js file preview %}
+<script src="{% static 'peerinst/js/preview.min.js' %}" defer></script>
+{% endcompress %}
+
+{% compress css file preview %}
+<link href="{% static 'peerinst/js/preview.min.css' %}" rel="stylesheet">
+{% endcompress %}
+{% compress css file rmwc %}
+<link href="{% static 'peerinst/css/rmwc.min.css' %}" rel="stylesheet">
+{% endcompress %}
+{% endblock %}
 
 {% block body %}
 <main>
   <section>
-
-    <h1 class="mdc-typography--display3">{% trans 'Question Fix' %}
+    <h1 class="mdc-typography--display3">
+      {% if object.is_valid %}
+        {% trans 'Preview Questions' %}
+      {% else %}
+        {% trans 'Fix Questions' %}
+      {% endif %}
       <svg class="underline" width=150 height=4></svg>
     </h1>
 
@@ -14,29 +37,22 @@
       <a href="{% url 'teacher' teacher.pk %}">{% trans 'Back to My Account' %}</a>
     </div>
 
-    <h2 class="mdc-typography--display1 mdc-theme--secondary">{{ object.title|striptags }}</h2>
-
-    <p class="mdc-typography--body1">
-    {{ message }}
-    </p>
-
-    {% if flagged %}
-    <a class="mdc-button mdc-button--raised" href="{% url 'question-create' %}">
-      {% trans 'Create' %}
-    </a>
-    {% endif %}
-
-    {% if missing_answer_choices %}
-    <a class="mdc-button mdc-button--raised" href="{% url 'answer-choice-form' object.pk %}">
-      {% trans 'Add answers' %}
-    </a>
-    {% endif %}
-
-    {% if missing_sample_answers %}
-    <a class="mdc-button mdc-button--raised" href="{% url 'sample-answer-form' object.pk %}">
-      {% trans 'Add samples' %}
-    </a>
-    {% endif %}
+    <div id="question-preview-app"></div>
   </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
+  window.addEventListener("load", function() {
+    const QuestionPreviewApp = preact.h(preview.QuestionPreviewApp, {
+      gettext: gettext,
+      urls: {
+        load: "{{ load_url|safe }}",
+      }
+    });
+    preact.render(QuestionPreviewApp, document.getElementById("question-preview-app"));
+  })
+</script>
 {% endblock %}

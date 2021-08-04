@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from peerinst.models import (
@@ -72,17 +73,26 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Read-only endpoint for questions.
 
-    TODO: Remove list option to reduce db load.
+    Override default list method to only return questions in querystring
     """
 
     permission_classes = [IsAuthenticated, IsNotStudent]
     queryset = Question.objects.all()
     renderer_classes = [JSONRenderer]
+    serializer_class = QuestionSerializer
 
-    def get_serializer(self, *args, **kwargs):
-        return QuestionSerializer(
-            fields=["answerchoice_set", "pk", "text", "title"], *args, **kwargs
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+            pk__in=request.GET.getlist("q")
         )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class QuestionListViewSet(viewsets.ModelViewSet):

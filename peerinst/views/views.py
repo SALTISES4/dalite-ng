@@ -75,7 +75,6 @@ from ..models import (
     InstitutionalLMS,
     NewUserRequest,
     Question,
-    QuestionFlagReason,
     RationaleOnlyQuestion,
     ShownRationale,
     Student,
@@ -589,6 +588,21 @@ class QuestionCloneView(QuestionCreateView):
         return context
 
 
+class AssignmentFixView(
+    LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, DetailView
+):
+    model = models.Assignment
+    template_name = "peerinst/question/fix.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(AssignmentFixView, self).get_context_data(**kwargs)
+        context.update(
+            load_url=f"{reverse('REST:question-list')}?q={'&q='.join(str(q.pk) for q in self.object.questions.all())}",  # noqa E501
+            teacher=self.request.user.teacher,
+        )
+        return context
+
+
 class QuestionFixView(
     LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, DetailView
 ):
@@ -598,53 +612,9 @@ class QuestionFixView(
     def get_context_data(self, **kwargs):
         context = super(QuestionFixView, self).get_context_data(**kwargs)
         context.update(
+            load_url=f"{reverse('REST:question-list')}?q={self.object.pk}",
             teacher=self.request.user.teacher,
         )
-
-        qs = Question.objects.filter(pk=self.object.pk)
-        if Question.is_flagged(qs):
-            message_start = _(
-                "This question has been flagged by a fellow member of the \
-                SALTISE community. \
-                Flags are reviewed by SALTISE administrators and removed \
-                once the issue has been resolved. \
-                To create a new question that resolves the flagged issue, \
-                use the button below.\
-                The reason(s) that this question was flagged: "
-            )
-            labels = (
-                qs.first()
-                .questionflag_set.all()
-                .values_list("flag_reason__title", flat=True)
-            )
-            reasons = [
-                str(verbose)
-                for label, verbose in QuestionFlagReason.CHOICES
-                if label in labels
-            ]
-
-            message_reasons = "; ".join(reasons)
-
-            context.update(
-                flagged=True,
-                message=message_start + message_reasons,
-            )
-        elif Question.is_missing_answer_choices(qs):
-            context.update(
-                missing_answer_choices=True,
-                message=_(
-                    "This question is missing answer choices.  To add answer \
-                    choices, use the button below."
-                ),
-            )
-        elif Question.is_missing_sample_answers(qs):
-            context.update(
-                missing_sample_answers=True,
-                message=_(
-                    "This question does not have enough sample answers.  To \
-                    add sample answers, use the button below."
-                ),
-            )
         return context
 
 

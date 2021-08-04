@@ -63,6 +63,9 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     discipline = DisciplineSerializer(read_only=True)
     frequency = serializers.SerializerMethodField()
     is_editable = serializers.ReadOnlyField()
+    is_not_flagged = serializers.ReadOnlyField()
+    is_not_missing_answer_choices = serializers.ReadOnlyField()
+    is_not_missing_sample_answers = serializers.ReadOnlyField()
     is_valid = serializers.ReadOnlyField()
     matrix = serializers.SerializerMethodField()
     most_convincing_rationales = serializers.SerializerMethodField()
@@ -102,7 +105,16 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         return {"score": pi[0], "label": str(pi[1])}
 
     def get_urls(self, obj):
-        return {"fix": reverse("question-fix", args=(obj.pk,))}
+        return {
+            "add_answer_choices": reverse(
+                "answer-choice-form", args=(obj.pk,)
+            ),
+            "add_new_question": reverse("question-create"),
+            "add_sample_answers": reverse(
+                "sample-answer-form", args=(obj.pk,)
+            ),
+            "fix": reverse("question-fix", args=(obj.pk,)),
+        }
 
     class Meta:
         model = Question
@@ -119,6 +131,9 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "image",
             "image_alt_text",
             "is_editable",
+            "is_not_flagged",
+            "is_not_missing_answer_choices",
+            "is_not_missing_sample_answers",
             "is_valid",
             "matrix",
             "most_convincing_rationales",
@@ -240,7 +255,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
                 "student-group-assignment-create", args=(obj.pk,)
             ),
             "fix": reverse(
-                "research-assignment-question-index-by-assignment",
+                "assignment-fix",
                 args=(obj.pk,),
             ),
             "preview": obj.get_absolute_url(),

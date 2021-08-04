@@ -400,7 +400,9 @@ export function QuestionDialog({
 }: QuestionDialogProps): JSX.Element {
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>{question.title}</DialogTitle>
+      <DialogTitle>
+        #{question.pk} - {question.title}
+      </DialogTitle>
       <DialogContent>
         <div style={{ marginBottom: 16 }}>
           <Info
@@ -897,7 +899,7 @@ function Video({ show = true, url }: VideoProps) {
 }
 
 type QuestionCardHeaderProps = {
-  featuredIconURL: string[];
+  featuredIconURL?: string[];
   gettext: (a: string) => string;
   question: Question;
 };
@@ -908,7 +910,7 @@ function QuestionCardHeader({
   question,
 }: QuestionCardHeaderProps) {
   const byline = () => {
-    if (question.user.username) {
+    if (question.user?.username) {
       return (
         <div style={{ display: "inline" }}>
           <span>
@@ -938,7 +940,7 @@ function QuestionCardHeader({
   };
 
   const featured = () => {
-    if (question.featured && question.collections) {
+    if (featuredIconURL && question.featured && question.collections) {
       return (
         <Featured
           collection={question.collections[0]}
@@ -1010,7 +1012,10 @@ type RatingsProps = {
 
 function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
   const difficulty = () => {
-    if (Object.prototype.hasOwnProperty.call(question.difficulty, "score")) {
+    if (
+      Object.prototype.hasOwnProperty.call(question.difficulty, "score") &&
+      question.difficulty.score
+    ) {
       const colourScale = scaleThreshold(triScale).domain([0.25, 0.5]);
       const color = colourScale(question.difficulty.score);
       const opacity = "30";
@@ -1064,7 +1069,10 @@ function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
   };
 
   const impact = () => {
-    if (Object.prototype.hasOwnProperty.call(question.peer_impact, "score")) {
+    if (
+      Object.prototype.hasOwnProperty.call(question.peer_impact, "score") &&
+      question.peer_impact.score
+    ) {
       const colourScale = scaleThreshold(triScale).domain([0.05, 0.25]);
       const color = colourScale(question.peer_impact.score);
       const opacity = "30";
@@ -1154,6 +1162,183 @@ export function SearchQuestionCard({
               handleToggle={() => handleToggleFavourite(question.pk)}
               question={question.pk}
             />
+          </CardActionIcons>
+        </CardActions>
+      </Card>
+    </div>
+  );
+}
+
+type ValidityCheckProps = {
+  gettext: (a: string) => string;
+  label: string;
+  onClick: () => void;
+  passes: boolean | undefined;
+  pk: number;
+  title: string;
+};
+
+function ValidityCheck({
+  gettext,
+  label,
+  onClick,
+  passes,
+  pk,
+  title,
+}: ValidityCheckProps): JSX.Element {
+  const colourScale = scaleThreshold(triScale).domain([0.25, 0.5]);
+  const color = passes ? colourScale(0) : colourScale(1);
+  const opacity = "30";
+  return (
+    <div
+      class="rating"
+      style={{
+        backgroundColor: color + opacity,
+        borderColor: color,
+        cursor: passes ? "unset" : "pointer",
+        margin: 8,
+      }}
+      onClick={passes ? undefined : onClick}
+      title={title}
+    >
+      <svg
+        width="40"
+        height="40"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ overflow: "visible" }}
+      >
+        <path
+          id={`validity-path-${pk}`}
+          d="M -3 16 A 19 19 0 0 1 35 16"
+          fill="transparent"
+        />
+        <text text-anchor="middle">
+          {/* @ts-ignore: TS doesn't recognize textPath */}
+          <textPath
+            fill={color}
+            startOffset="50%"
+            style={{ fill: color, fontSize: 8 }}
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+            xlinkHref={`#validity-path-${pk}`}
+          >
+            {passes ? "" : gettext("Fix!")}
+            {/* @ts-ignore: TS doesn't recognize textPath  */}
+          </textPath>
+        </text>
+        {label.split(" ").map((word, i) => {
+          return (
+            <text
+              key={i}
+              text-anchor="middle"
+              style={{ fill: color, fontSize: 8 }}
+              x={15}
+              y={42 + 9 * i}
+            >
+              {word}
+            </text>
+          );
+        })}
+      </svg>
+      <div
+        class="label"
+        style={{
+          color,
+        }}
+      >
+        <Icon
+          icon={passes ? "check" : "close"}
+          iconOptions={{ strategy: "ligature", size: "small" }}
+          style={{ verticalAlign: "middle" }}
+        />
+      </div>
+    </div>
+  );
+}
+
+type PreviewQuestionCardProps = {
+  gettext: (a: string) => string;
+  handleToggleDialog: (a: Question) => void;
+  question: Question;
+};
+
+export function PreviewQuestionCard({
+  gettext,
+  handleToggleDialog,
+  question,
+}: PreviewQuestionCardProps): JSX.Element {
+  return (
+    <div>
+      <Card className="question" style={{ position: "relative" }}>
+        <Ratings
+          gettext={gettext}
+          question={question}
+          handleToggleDialog={handleToggleDialog}
+        />
+        <div style={{ paddingRight: 40 }}>
+          <QuestionCardHeader gettext={gettext} question={question} />
+          <QuestionCardBody question={question} />
+        </div>
+        <CardActions>
+          <QuestionCardActionButtons gettext={gettext} question={question} />
+          <CardActionIcons>
+            {[
+              {
+                label: question.is_not_flagged
+                  ? gettext("Unflagged")
+                  : gettext("Flagged"),
+                onClick: () => {
+                  if (question.urls) {
+                    window.location.href = question.urls.add_new_question;
+                  }
+                },
+                passes: question.is_not_flagged,
+                title: question.is_not_flagged
+                  ? gettext("This question has not been flagged")
+                  : gettext(
+                      "This question has been flagged by a fellow member of the SALTISE community. Flags are reviewed by SALTISE administrators and removed once the issue has been resolved. Click to create a new question.",
+                    ),
+              },
+              {
+                label: gettext("Answer choices"),
+                onClick: () => {
+                  if (question.urls) {
+                    window.location.href = question.urls.add_answer_choices;
+                  }
+                },
+                passes: question.is_not_missing_answer_choices,
+                title: question.is_not_missing_answer_choices
+                  ? gettext("This question has enough answer choices")
+                  : gettext(
+                      "This question is missing answer choices. Click to add more.",
+                    ),
+              },
+              {
+                label: gettext("Sample answers"),
+                onClick: () => {
+                  if (question.urls) {
+                    window.location.href = question.urls.add_sample_answers;
+                  }
+                },
+                passes: question.is_not_missing_sample_answers,
+                title: question.is_not_missing_sample_answers
+                  ? gettext("This question has enough sample answers")
+                  : gettext(
+                      "This question does not have enough sample answers.  Click to add more.",
+                    ),
+              },
+            ].map((el, i) => {
+              return (
+                <ValidityCheck
+                  gettext={gettext}
+                  key={i}
+                  label={el.label}
+                  onClick={el.onClick}
+                  passes={el.passes}
+                  pk={question.pk}
+                  title={el.title}
+                />
+              );
+            })}
           </CardActionIcons>
         </CardActions>
       </Card>

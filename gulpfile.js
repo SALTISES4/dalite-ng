@@ -88,6 +88,7 @@ const scriptBuilds = [
       "search",
       "search_beta",
       "index",
+      "preview",
       "question",
       "teacher",
       "custom_elements",

@@ -419,7 +419,6 @@ class Question(models.Model):
 
     @classmethod
     def is_missing_sample_answers(cls, queryset):
-
         if not isinstance(queryset, models.query.EmptyQuerySet):
             if isinstance(queryset, models.query.QuerySet):
                 if queryset.model is cls:
@@ -498,6 +497,21 @@ class Question(models.Model):
             .count()
             == 0
         )
+
+    @property
+    def is_not_flagged(self):
+        self_as_queryset = Question.objects.filter(pk=self.pk)
+        return not Question.is_flagged(self_as_queryset)
+
+    @property
+    def is_not_missing_answer_choices(self):
+        self_as_queryset = Question.objects.filter(pk=self.pk)
+        return not Question.is_missing_answer_choices(self_as_queryset)
+
+    @property
+    def is_not_missing_sample_answers(self):
+        self_as_queryset = Question.objects.filter(pk=self.pk)
+        return not Question.is_missing_sample_answers(self_as_queryset)
 
     @property
     def is_valid(self):
