@@ -151,7 +151,7 @@ contextualspellcheck==0.4.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
-coverage==5.0.3
+coverage==6.0b1
     # via
     #   -r requirements/requirements-test.txt
     #   pytest-cov
@@ -510,7 +510,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==8.2.0
+pillow==8.3.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt

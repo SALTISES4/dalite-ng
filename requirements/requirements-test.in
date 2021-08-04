@@ -1,6 +1,6 @@
 -r requirements-base.txt
 
-coverage
+coverage>=6.0b1
 ddt
 factory_boy
 Faker
