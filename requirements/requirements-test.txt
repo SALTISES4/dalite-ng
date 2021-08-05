@@ -104,7 +104,7 @@ constantly==15.1.0
     #   twisted
 contextualspellcheck==0.4.1
     # via -r requirements/requirements-base.txt
-coverage==5.0.3
+coverage==6.0b1
     # via
     #   -r requirements/requirements-test.in
     #   pytest-cov
@@ -352,7 +352,7 @@ pbr==5.4.4
     # via
     #   -r requirements/requirements-base.txt
     #   stevedore
-pillow==8.2.0
+pillow==8.3.1
     # via -r requirements/requirements-base.txt
 pluggy==0.13.1
     # via pytest

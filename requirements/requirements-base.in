@@ -15,7 +15,7 @@ django-inlinecss
 django-ipware==2.1.0  # Temporary pin awaiting django-axes fix
 django<3.0.0
 mysqlclient
-pillow>=8.1.2
+pillow>8.2.0
 pyjwt
 # pymysql
 python-memcached==1.59

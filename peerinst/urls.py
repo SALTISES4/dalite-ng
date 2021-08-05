@@ -35,11 +35,6 @@ def old_patterns():
             name="browse-database",
         ),
         path(
-            "browse_beta/",
-            xframe_options_sameorigin(views.browse_database_beta),
-            name="browse-database-beta",
-        ),
-        path(
             "assignment-list/",
             xframe_options_sameorigin(views.AssignmentListView.as_view()),
             name="assignment-list",
@@ -146,13 +141,8 @@ def old_patterns():
         ),
         path(
             "question-search/",
-            views.question_search,
-            name="question-search",
-        ),
-        path(
-            "question-search-beta/",
             views.question_search_beta,
-            name="question-search-beta",
+            name="question-search",
         ),
         path(
             "collection-search/",

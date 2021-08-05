@@ -298,22 +298,12 @@ def access_denied_and_logout(request):
 
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
-@user_passes_test(lambda u: hasattr(u, "teacher"))
+@user_passes_test(lambda u: hasattr(u, "teacher"))  # Teacher is required
 def browse_database(request):
 
     return TemplateResponse(
-        request, "peerinst/browse_database.html", context={}
-    )
-
-
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
-@user_passes_test(lambda u: hasattr(u, "teacher"))  # Teacher is required
-def browse_database_beta(request):
-
-    return TemplateResponse(
         request,
-        "peerinst/browse_database_beta.html",
+        "peerinst/browse_database.html",
         context={"static_url": settings.STATIC_URL},
     )
 
