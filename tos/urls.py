@@ -1,4 +1,5 @@
 from django.urls import path
+
 from . import views
 
 app_name = "tos"
@@ -15,12 +16,20 @@ urlpatterns = [
         name="tos_modify",
     ),
     path(
-        "tos/<role>/modify/", views.tos.tos_consent_modify, name="tos_modify",
+        "tos/<role>/modify/",
+        views.tos.tos_consent_modify,
+        name="tos_modify",
     ),
     path(
-        "tos/<role>/<int:version>/", views.tos.tos_consent, name="tos_consent",
+        "tos/<role>/<int:version>/",
+        views.tos.tos_consent,
+        name="tos_consent",
     ),
-    path("tos/<role>/", views.tos.tos_consent, name="tos_consent",),
+    path(
+        "tos/<role>/",
+        views.tos.tos_consent,
+        name="tos_consent",
+    ),
     path(
         "email/<role>/modify",
         views.email.email_consent_modify,

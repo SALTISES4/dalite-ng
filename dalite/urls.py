@@ -1,3 +1,4 @@
+from csp.decorators import csp_replace
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.i18n import i18n_patterns
@@ -5,11 +6,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from django.utils.translation import ugettext_lazy as _
-from django.views.decorators.clickjacking import xframe_options_sameorigin
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.i18n import JavaScriptCatalog
 
-from . import views
 from peerinst import views as peerinst_views
+
+from . import views
 
 admin.site.site_header = admin.site.site_title = _(
     "SALTISE admin site for mydalite.org "
@@ -36,23 +38,25 @@ urlpatterns += i18n_patterns(
         "assignment/<assignment_id>/",
         include(
             [
-                # Question table of contents for assignment - Enforce
-                # sameorigin to prevent access from LMS
                 path(
                     "",
-                    xframe_options_sameorigin(
-                        peerinst_views.QuestionListView.as_view()
-                    ),
+                    peerinst_views.QuestionListView.as_view(),
                     name="question-list",
                 ),
                 path(
                     r"<int:question_id>/",
                     include(
                         [
-                            # Dalite question
-                            path("", peerinst_views.question, name="question"),
-                            # Question reset (for testing purposes) - Enforce
-                            # sameorigin to prevent access from LMS
+                            # Dalite question - Only view allowed to be framed
+                            path(
+                                "",
+                                csp_replace(CSP_FRAME_ANCESTORS=["*"])(
+                                    xframe_options_exempt(
+                                        peerinst_views.question
+                                    )
+                                ),
+                                name="question",
+                            ),
                             path(
                                 "reset/",
                                 peerinst_views.reset_question,

@@ -3,7 +3,6 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import user_passes_test
 from django.urls import path
-from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 from . import admin_views, views
 from .forms import NonStudentPasswordResetForm
@@ -16,16 +15,14 @@ def not_authenticated(user):
 
 def old_patterns():
     return [
-        # DALITE
-        # Assignment table of contents - Enforce sameorigin to prevent access from LMS  # noqa
         path(
             "browse/",
-            xframe_options_sameorigin(views.browse_database),
+            views.browse_database,
             name="browse-database",
         ),
         path(
             "assignment-list/",
-            xframe_options_sameorigin(views.AssignmentListView.as_view()),
+            views.AssignmentListView.as_view(),
             name="assignment-list",
         ),
         path(

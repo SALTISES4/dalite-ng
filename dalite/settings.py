@@ -63,6 +63,7 @@ MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "peerinst.middleware.NotificationMiddleware",
     "dalite.custom_middleware.resp_405_middleware",
     "dalite.custom_middleware.resp_503_middleware",
@@ -333,7 +334,6 @@ ELASTICSEARCH_DSL = {
 ELASTICSEARCH_DSL_AUTOSYNC = False
 
 # External framing
-CSP_FRAME_ANCESTORS = ["*"]
 FRAMING_ALLOWED_FROM = ["*"]
 
 # Functional tests that scrape web console logs currently require chromedriver
