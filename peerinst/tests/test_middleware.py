@@ -26,5 +26,5 @@ def test_lti_login(client, student, assignment):
     assert response.status_code == 200
 
     # - Can't access non-LTI student views
-    response = client.get(reverse("student-page"))
+    response = client.get(reverse("student-page"), follow=True)
     assert response.status_code == 403

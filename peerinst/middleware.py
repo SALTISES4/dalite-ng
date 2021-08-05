@@ -1,5 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from .models import TeacherNotification
 
@@ -49,7 +50,8 @@ class LTIAccessMiddleware:
         if request.session.get("LTI", False) and not getattr(
             view_func, "lti_access_allowed", False
         ):
-            raise PermissionDenied
+            # If access is denied, force a logout to prevent being stuck
+            return HttpResponseRedirect(reverse("access_denied_and_logout"))
 
 
 def lti_access_allowed(view_func):
