@@ -9,13 +9,15 @@ django-celery-beat
 django-analytical
 django-compressor>=2.3
 django-cookie-law
+django-csp
 django-elasticsearch-dsl
 django-grappelli
 django-htmlmin
 django-inlinecss
 django-ipware==2.1.0  # Temporary pin awaiting django-axes fix
+django-permissions-policy
+django-referrer-policy
 django-samesite-none
-django-security-headers>=0.3
 django<3.0.0
 djangorestframework>=3.11.2  # Reqd by safety
 lxml >= 4.6.2  # Reqd by safety

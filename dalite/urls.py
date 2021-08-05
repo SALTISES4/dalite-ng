@@ -93,13 +93,6 @@ urlpatterns += i18n_patterns(
 # Media
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# Security check in development
-# if settings.DEBUG:
-#     from security_headers.views import scan_url
-#     urlpatterns += i18n_patterns(
-#         re_path(r"^security/(?P<url_name>[\w-]+)/", scan_url, name="scan")
-#     )
-
 # Errors
 #  handler400 = views.errors.response_400
 #  handler403 = views.errors.response_403

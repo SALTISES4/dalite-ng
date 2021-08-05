@@ -1,7 +1,16 @@
 import datetime
 import os
+import warnings
 
-from security_headers.defaults import *  # noqa
+try:
+    from .default_security_settings import *  # noqa F403
+except ImportError:
+    warnings.warn(
+        """
+        File default_security_settings.py not found.
+        You probably want to add it.
+        """
+    )
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -35,7 +44,6 @@ INSTALLED_APPS = (
     "django_elasticsearch_dsl",
     "cookielaw",
     "csp",
-    "security_headers",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -54,15 +62,15 @@ INSTALLED_APPS = (
 MIDDLEWARE = (
     "django_samesite_none.middleware.SameSiteNoneMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "django_referrer_policy.middleware.ReferrerPolicyMiddleware",
+    "django_permissions_policy.PermissionsPolicyMiddleware",
     "csp.middleware.CSPMiddleware",
-    "security_headers.middleware.extra_security_headers_middleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.security.SecurityMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "peerinst.middleware.NotificationMiddleware",
     "dalite.custom_middleware.resp_405_middleware",
@@ -314,27 +322,10 @@ CSP_OBJECT_SRC = [
     "docs.google.com",
 ]
 
-FEATURE_POLICY = [
-    "autoplay 'none'",
-    "camera 'none'",
-    "encrypted-media 'none'",
-    "fullscreen *",
-    "geolocation 'none'",
-    "microphone 'none'",
-    "midi 'none'",
-    "payment 'none'",
-    "vr *",
-]
-
-REFERRER_POLICY = "no-referrer, strict-origin-when-cross-origin"
-
 ELASTICSEARCH_DSL = {
     "default": {"hosts": "localhost:9200"},
 }
 ELASTICSEARCH_DSL_AUTOSYNC = False
-
-# External framing
-FRAMING_ALLOWED_FROM = ["*"]
 
 # Functional tests that scrape web console logs currently require chromedriver
 TESTING_BROWSER = "chrome"
@@ -347,8 +338,6 @@ try:
     except NameError:
         pass
 except ImportError:
-    import warnings
-
     warnings.warn(
         "File local_settings.py not found. You probably want to add it -- "
         "see README.md."
