@@ -34,6 +34,8 @@ appdirs==1.4.3
     # via
     #   black
     #   virtualenv
+appnope==0.1.2
+    # via ipython
 asgiref==3.2.10
     # via
     #   -r requirements/requirements-base.txt
