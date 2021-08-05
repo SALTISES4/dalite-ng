@@ -221,7 +221,7 @@ def old_patterns():
             ),
             name="login",
         ),
-        path("logout/", views.logout_view, name="logout"),
+        path("logout/", lti_access_allowed(views.logout_view), name="logout"),
         path("welcome/", views.welcome, name="welcome"),
         # Only non-students can change their password
         path(
@@ -372,7 +372,7 @@ def student_patterns():
         ),
         path(
             "student/login-confirm/",
-            views.student.send_signin_link,
+            lti_access_allowed(views.student.send_signin_link),
             name="student-send-signin-link",
         ),
         path(
