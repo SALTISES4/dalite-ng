@@ -4,6 +4,8 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import user_passes_test
 from django.urls import path
 
+from peerinst.middleware import lti_access_allowed
+
 from . import admin_views, views
 from .forms import NonStudentPasswordResetForm
 from .mixins import student_check
@@ -129,7 +131,7 @@ def old_patterns():
         # Standalone
         path(
             "live/access/<token>/<assignment_hash>",  # noqa
-            views.live,
+            lti_access_allowed(views.live),
             name="live",
         ),
         path(
@@ -139,7 +141,7 @@ def old_patterns():
         ),
         path(
             "live/signup/form/<group_hash>",
-            views.signup_through_link,
+            lti_access_allowed(views.signup_through_link),
             name="signup-through-link",
         ),
         path(
@@ -210,7 +212,7 @@ def old_patterns():
             name="report_rationales_chosen",
         ),
         # Auth
-        path("", views.landing_page, name="landing_page"),
+        path("", lti_access_allowed(views.landing_page), name="landing_page"),
         path("signup/", views.sign_up, name="sign_up"),
         path(
             "login/",
@@ -262,10 +264,14 @@ def old_patterns():
             views.terms_teacher,
             name="terms_teacher",
         ),
-        path("access_denied/", views.access_denied, name="access_denied"),
+        path(
+            "access_denied/",
+            lti_access_allowed(views.access_denied),
+            name="access_denied",
+        ),
         path(
             "access_denied_and_logout/",
-            views.access_denied_and_logout,
+            lti_access_allowed(views.access_denied_and_logout),
             name="access_denied_and_logout",
         ),
     ]
@@ -359,7 +365,11 @@ def student_patterns():
             views.student.toggle_group_notifications,
             name="student-toggle-group-notifications",
         ),
-        path("student/login/", views.student.login_page, name="student-login"),
+        path(
+            "student/login/",
+            lti_access_allowed(views.student.login_page),
+            name="student-login",
+        ),
         path(
             "student/login-confirm/",
             views.student.send_signin_link,

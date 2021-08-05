@@ -10,6 +10,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.i18n import JavaScriptCatalog
 
 from peerinst import views as peerinst_views
+from peerinst.middleware import lti_access_allowed
 
 from . import views
 
@@ -52,7 +53,9 @@ urlpatterns += i18n_patterns(
                                 "",
                                 csp_replace(CSP_FRAME_ANCESTORS=["*"])(
                                     xframe_options_exempt(
-                                        peerinst_views.question
+                                        lti_access_allowed(
+                                            peerinst_views.question
+                                        )
                                     )
                                 ),
                                 name="question",

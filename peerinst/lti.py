@@ -134,6 +134,9 @@ class ApplicationHookManager(AbstractApplicationHookManager):
 
         # TL; DR; Sets session expiry on browser close.
         request.session.set_expiry(0)
+
+        # Attaches login type to session to allow view access control via
+        # middleware
         request.session["LTI"] = True
 
     def is_user_staff(self, extra_params):
