@@ -28,3 +28,11 @@ def test_lti_login(client, student, assignment):
     # - Can't access non-LTI student views
     response = client.get(reverse("student-page"), follow=True)
     assert response.status_code == 403
+
+    assert login_student(client, student)
+    session = client.session
+    session["LTI"] = True
+    session.save()
+
+    response = client.get(reverse("welcome"), follow=True)
+    assert response.status_code == 403
