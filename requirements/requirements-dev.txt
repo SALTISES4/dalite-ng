@@ -34,6 +34,8 @@ appdirs==1.4.3
     # via
     #   black
     #   virtualenv
+appnope==0.1.2
+    # via ipython
 asgiref==3.2.10
     # via
     #   -r requirements/requirements-base.txt
@@ -202,7 +204,8 @@ django==2.2.24
     #   django-inlinecss
     #   django-lti-tool-provider
     #   django-model-utils
-    #   django-security-headers
+    #   django-permissions-policy
+    #   django-referrer-policy
     #   django-sslserver
     #   django-timezone-field
     #   djangorestframework
@@ -243,16 +246,10 @@ django-cookie-law==2.0.3
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
-django-cookies-samesite-fork==0.2.1
-    # via
-    #   -r requirements/requirements-base.txt
-    #   -r requirements/requirements-test.txt
-    #   django-security-headers
 django-csp==3.6
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
-    #   django-security-headers
     #   saltise-course-flow
 django-elasticsearch-dsl==7.2.0
     # via
@@ -280,20 +277,20 @@ django-model-utils==4.1.1
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
+django-permissions-policy==4.1.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+django-referrer-policy==1.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
 django-samesite-none==0.0.2
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
-django-security-headers==0.3.1
-    # via
-    #   -r requirements/requirements-base.txt
-    #   -r requirements/requirements-test.txt
 django-sslserver==0.22
-    # via
-    #   -r requirements/requirements-base.txt
-    #   -r requirements/requirements-dev.in
-    #   -r requirements/requirements-test.txt
-    #   django-security-headers
+    # via -r requirements/requirements-dev.in
 django-timezone-field==4.0
     # via
     #   -r requirements/requirements-base.txt
