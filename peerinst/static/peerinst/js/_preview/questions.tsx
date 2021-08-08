@@ -4,6 +4,10 @@ import { get } from "../_ajax/ajax";
 import { QuestionDialog, PreviewQuestionCard } from "../_components/question";
 import { Question } from "../_components/types";
 
+import { CircularProgress } from "@rmwc/circular-progress";
+
+import "@rmwc/circular-progress/circular-progress.css";
+
 type QuestionPreviewAppProps = {
   gettext: (a: string) => string;
   urls: {
@@ -57,6 +61,9 @@ export class QuestionPreviewApp extends Component<
   }
 
   render(): JSX.Element {
+    if (!this.state.loaded) {
+      return <CircularProgress className="spinner" size="xlarge" />;
+    }
     return (
       <div>
         <QuestionDialog

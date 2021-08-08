@@ -1172,7 +1172,7 @@ export function SearchQuestionCard({
 type ValidityCheckProps = {
   gettext: (a: string) => string;
   label: string;
-  onClick: () => void;
+  onClick: () => void | undefined;
   passes: boolean | undefined;
   pk: number;
   title: string;
@@ -1195,7 +1195,7 @@ function ValidityCheck({
       style={{
         backgroundColor: color + opacity,
         borderColor: color,
-        cursor: passes ? "unset" : "pointer",
+        cursor: passes || !onClick ? "default" : "pointer",
         margin: 8,
       }}
       onClick={passes ? undefined : onClick}
@@ -1221,7 +1221,7 @@ function ValidityCheck({
             xmlnsXlink="http://www.w3.org/1999/xlink"
             xlinkHref={`#validity-path-${pk}`}
           >
-            {passes ? "" : gettext("Fix!")}
+            {passes || !onClick ? "" : gettext("Fix!")}
             {/* @ts-ignore: TS doesn't recognize textPath  */}
           </textPath>
         </text>
@@ -1286,23 +1286,24 @@ export function PreviewQuestionCard({
                 label: question.is_not_flagged
                   ? gettext("Unflagged")
                   : gettext("Flagged"),
-                onClick: () => {
-                  if (question.urls) {
-                    window.location.href = question.urls.add_new_question;
-                  }
-                },
+                onClick: undefined,
                 passes: question.is_not_flagged,
                 title: question.is_not_flagged
                   ? gettext("This question has not been flagged")
                   : gettext(
-                      "This question has been flagged by a fellow member of the SALTISE community. Flags are reviewed by SALTISE administrators and removed once the issue has been resolved. Click to create a new question.",
+                      "This question has been flagged by a fellow member of the SALTISE community. Flags are reviewed by SALTISE administrators and removed once the issue has been resolved.",
                     ),
               },
               {
                 label: gettext("Answer choices"),
                 onClick: () => {
                   if (question.urls) {
-                    window.location.href = question.urls.add_answer_choices;
+                    const tab = window.open(
+                      question.urls.add_answer_choices,
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
+                    if (tab) tab.focus();
                   }
                 },
                 passes: question.is_not_missing_answer_choices,
@@ -1316,7 +1317,12 @@ export function PreviewQuestionCard({
                 label: gettext("Sample answers"),
                 onClick: () => {
                   if (question.urls) {
-                    window.location.href = question.urls.add_sample_answers;
+                    const tab = window.open(
+                      question.urls.add_sample_answers,
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
+                    if (tab) tab.focus();
                   }
                 },
                 passes: question.is_not_missing_sample_answers,
