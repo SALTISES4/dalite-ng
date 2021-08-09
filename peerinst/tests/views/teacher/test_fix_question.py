@@ -45,24 +45,18 @@ def test_fix_question_view(client, teacher, question, student):
     response = client.post(url, {})
     assert response.status_code == 405
 
-    # 4. If flagged, nothing can be done but state why and offer to create
-    # new question
+    # 4. If flagged, nothing can be done, but give reason and offer clone
     response = client.get(url)
     assert response.status_code == 200
 
-    assert message in response.content.decode()
-
-    link = 'href="/en/question/create"'
-
-    assert link in response.content.decode()
-
-    # 5. If missing answer choices, check ownership and then provide link
-    # to add
+    # 5. If missing answer choices, check ownership, check is_editable and
+    # then provide link to add
     flag.delete()
     response = client.get(url)
     assert response.status_code == 200
 
-    # assert "you cannot fix this problem, but you can copy question, remove
+    # assert "you cannot fix this problem, but you can make an editable copy"
+    # question, remove
     # old question from teacher list, add new and redirect"
 
     question.owner = teacher.user

@@ -524,6 +524,14 @@ class Question(models.Model):
             ]
         )
 
+    @property
+    def flag_reasons(self):
+        return (
+            QuestionFlag.objects.filter(question=self, flag=True)
+            .values("flag_reason__title")
+            .annotate(Count("flag_reason"))
+        )
+
     def get_start_form_class(self):
         from ..forms import FirstAnswerForm
 

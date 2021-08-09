@@ -1172,7 +1172,7 @@ export function SearchQuestionCard({
 type ValidityCheckProps = {
   gettext: (a: string) => string;
   label: string;
-  onClick: () => void | undefined;
+  onClick: (() => void) | undefined;
   passes: boolean | undefined;
   pk: number;
   title: string;

@@ -61,6 +61,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     collaborators = UserSerializer(many=True, read_only=True)
     difficulty = serializers.SerializerMethodField()
     discipline = DisciplineSerializer(read_only=True)
+    flag_reasons = serializers.ReadOnlyField()
     frequency = serializers.SerializerMethodField()
     is_editable = serializers.ReadOnlyField()
     is_not_flagged = serializers.ReadOnlyField()
@@ -127,6 +128,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "collaborators",
             "difficulty",
             "discipline",
+            "flag_reasons",
             "frequency",
             "image",
             "image_alt_text",
