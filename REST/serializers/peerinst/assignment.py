@@ -66,6 +66,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     is_editable = serializers.SerializerMethodField()
     is_not_flagged = serializers.ReadOnlyField()
     is_not_missing_answer_choices = serializers.ReadOnlyField()
+    is_not_missing_expert_rationale = serializers.ReadOnlyField()
     is_not_missing_sample_answers = serializers.ReadOnlyField()
     is_valid = serializers.ReadOnlyField()
     matrix = serializers.SerializerMethodField()
@@ -144,6 +145,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "is_editable",
             "is_not_flagged",
             "is_not_missing_answer_choices",
+            "is_not_missing_expert_rationale",
             "is_not_missing_sample_answers",
             "is_valid",
             "matrix",

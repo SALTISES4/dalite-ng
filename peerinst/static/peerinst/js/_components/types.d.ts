@@ -42,7 +42,9 @@ export type Question = {
   is_editable?: boolean; // eslint-disable-line camelcase
   is_not_flagged?: boolean; // eslint-disable-line camelcase
   is_not_missing_answer_choices?: boolean; // eslint-disable-line camelcase
+  is_not_missing_expert_rationale?: boolean; // eslint-disable-line camelcase
   is_not_missing_sample_answers?: boolean; // eslint-disable-line camelcase
+  is_valid: boolean; // eslint-disable-line camelcase
   matrix: { easy: number; hard: number; tricky: number; peer: number };
   // eslint-disable-next-line camelcase
   most_convincing_rationales: {
@@ -70,6 +72,5 @@ export type Question = {
     fix: string;
   };
   user?: { username: string; saltise: boolean; expert: boolean };
-  valid: boolean;
   video_url: string; // eslint-disable-line camelcase
 };

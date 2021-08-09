@@ -423,6 +423,24 @@ class Question(models.Model):
             if isinstance(queryset, models.query.QuerySet):
                 if queryset.model is cls:
                     return False
+                    # return (
+                    #     # Check if any expert answers exist
+                    #     not queryset.filter(type="PI")
+                    #     .values(
+                    #         "pk",
+                    #         "answer__first_answer_choice",
+                    #         "answer__expert",
+                    #     )
+                    #     .filter(answer__expert=True)
+                    #     .exists()
+                    #     # Make sure one for each correct answer choice
+                    #     or queryset.filter(type="PI")
+                    #     .values(
+                    #         "pk",
+                    #         "answerchoice",
+                    #     )
+                    #     .filter(answerchoice__correct=True)
+                    # )
                 raise TypeError("Queryset must be of type Question")
             else:
                 raise TypeError(
@@ -440,12 +458,11 @@ class Question(models.Model):
                         .values(
                             "pk",
                             "answer__first_answer_choice",
-                            "answer__expert",
                         )
-                        .exclude(answer__expert=True)
                         .annotate(
                             answer_count_for_choice=Count(
-                                "answer__first_answer_choice"
+                                "answer__first_answer_choice",
+                                exclude=Q(answer__expert=True),
                             )
                         )
                         .filter(answer_count_for_choice__lt=1)
@@ -520,6 +537,11 @@ class Question(models.Model):
     def is_not_missing_answer_choices(self):
         self_as_queryset = Question.objects.filter(pk=self.pk)
         return not Question.is_missing_answer_choices(self_as_queryset)
+
+    @property
+    def is_not_missing_expert_rationale(self):
+        self_as_queryset = Question.objects.filter(pk=self.pk)
+        return not Question.is_missing_expert_rationale(self_as_queryset)
 
     @property
     def is_not_missing_sample_answers(self):

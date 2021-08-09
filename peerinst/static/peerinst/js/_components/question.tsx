@@ -1423,7 +1423,9 @@ export function PreviewQuestionCard({
                 onClick: () => {
                   if (question.urls) {
                     const tab = window.open(
-                      question.urls.add_sample_answers,
+                      question.is_not_missing_answer_choices
+                        ? question.urls.add_sample_answers
+                        : question.urls.add_answer_choices,
                       "_blank",
                       "noopener,noreferrer",
                     );
@@ -1435,6 +1437,19 @@ export function PreviewQuestionCard({
                   ? gettext("This question has enough sample answers")
                   : gettext(
                       "This question does not have enough sample answers.  Click to add more.",
+                    ),
+              },
+              {
+                include: true,
+                label: gettext("Expert rationale"),
+                onClick: undefined,
+                passes: question.is_not_missing_expert_rationale,
+                title: question.is_not_missing_expert_rationale
+                  ? gettext(
+                      "This question has an expert rationale associated with all correct answer choices.",
+                    )
+                  : gettext(
+                      "This question does not have an expert rationale for all correct answer choices.",
                     ),
               },
             ].map((el, i) => {
