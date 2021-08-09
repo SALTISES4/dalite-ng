@@ -39,6 +39,7 @@ export type Question = {
   };
   image: string;
   image_alt_text: string; // eslint-disable-line camelcase
+  is_editable?: boolean; // eslint-disable-line camelcase
   is_not_flagged?: boolean; // eslint-disable-line camelcase
   is_not_missing_answer_choices?: boolean; // eslint-disable-line camelcase
   is_not_missing_sample_answers?: boolean; // eslint-disable-line camelcase

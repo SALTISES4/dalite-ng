@@ -1278,7 +1278,12 @@ export function PreviewQuestionCard({
   handleToggleDialog,
   question,
 }: PreviewQuestionCardProps): JSX.Element {
-  const { dialogOpen, toggleDialog } = useToggle();
+  const { dialogOpen: flagDialogOpen, toggleDialog: toggleFlaggedDialog } =
+    useToggle();
+  const {
+    dialogOpen: ineditableDialogOpen,
+    toggleDialog: toggleIneditableDialog,
+  } = useToggle();
 
   const copy = () => {
     if (question.urls?.copy_question) {
@@ -1295,7 +1300,7 @@ export function PreviewQuestionCard({
     }
   };
 
-  const flagReasons = () => {
+  const flagReasonsDialog = () => {
     if (question?.flag_reasons) {
       const body = (
         <Typography use="body1" tag="p">
@@ -1316,9 +1321,35 @@ export function PreviewQuestionCard({
           )}
         </Typography>
       );
+
       return (
-        <Dialog open={dialogOpen} onClose={toggleDialog}>
+        <Dialog open={flagDialogOpen} onClose={toggleFlaggedDialog}>
           <DialogTitle>{gettext("Question flags")}</DialogTitle>
+          <DialogContent>{body}</DialogContent>
+          <DialogActions>
+            {copy()}
+            <DialogButton action="accept" isDefaultAction>
+              {gettext("Close")}
+            </DialogButton>
+          </DialogActions>
+        </Dialog>
+      );
+    }
+  };
+
+  const ineditableDialog = () => {
+    if (question?.is_editable == false) {
+      const body = (
+        <Typography use="body1" tag="p">
+          {gettext(
+            "This question cannot be edited, but you can make an editable copy.",
+          )}
+        </Typography>
+      );
+
+      return (
+        <Dialog open={ineditableDialogOpen} onClose={toggleIneditableDialog}>
+          <DialogTitle>{gettext("Question not editable")}</DialogTitle>
           <DialogContent>{body}</DialogContent>
           <DialogActions>
             {copy()}
@@ -1333,7 +1364,8 @@ export function PreviewQuestionCard({
 
   return (
     <div>
-      {flagReasons()}
+      {flagReasonsDialog()}
+      {ineditableDialog()}
       <Card className="question" style={{ position: "relative" }}>
         <Ratings
           gettext={gettext}
@@ -1352,7 +1384,7 @@ export function PreviewQuestionCard({
                 label: question.is_not_flagged
                   ? gettext("Unflagged")
                   : gettext("Flagged"),
-                onClick: toggleDialog,
+                onClick: toggleFlaggedDialog,
                 passes: question.is_not_flagged,
                 title: question.is_not_flagged
                   ? gettext("This question has not been flagged")
@@ -1364,12 +1396,16 @@ export function PreviewQuestionCard({
                 label: gettext("Answer choices"),
                 onClick: () => {
                   if (question.urls) {
-                    const tab = window.open(
-                      question.urls.add_answer_choices,
-                      "_blank",
-                      "noopener,noreferrer",
-                    );
-                    if (tab) tab.focus();
+                    if (question.is_editable) {
+                      const tab = window.open(
+                        question.urls.add_answer_choices,
+                        "_blank",
+                        "noopener,noreferrer",
+                      );
+                      if (tab) tab.focus();
+                    } else {
+                      toggleIneditableDialog();
+                    }
                   }
                 },
                 passes: question.is_not_missing_answer_choices,

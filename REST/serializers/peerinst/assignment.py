@@ -63,7 +63,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     discipline = DisciplineSerializer(read_only=True)
     flag_reasons = serializers.ReadOnlyField()
     frequency = serializers.SerializerMethodField()
-    is_editable = serializers.ReadOnlyField()
+    is_editable = serializers.SerializerMethodField()
     is_not_flagged = serializers.ReadOnlyField()
     is_not_missing_answer_choices = serializers.ReadOnlyField()
     is_not_missing_sample_answers = serializers.ReadOnlyField()
@@ -94,6 +94,14 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
     def get_frequency(self, obj):
         return obj.get_frequency()
+
+    def get_is_editable(self, obj):
+        if "request" in self.context:
+            return obj.is_editable and (
+                self.context["request"].user == obj.user
+                or self.context["request"].user in obj.collaborators.all()
+            )
+        return obj.is_editable
 
     def get_matrix(self, obj):
         return obj.get_matrix()

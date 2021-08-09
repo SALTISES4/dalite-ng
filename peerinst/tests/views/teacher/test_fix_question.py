@@ -68,5 +68,3 @@ def test_fix_question_view(client, teacher, question, student):
     # assert button to answerchoice create in page
 
     # 6. If only missing sample answers, anyone can add them
-
-    # 7. If is_valid, say so

@@ -418,6 +418,19 @@ class Question(models.Model):
         return False
 
     @classmethod
+    def is_missing_expert_rationale(cls, queryset):
+        if not isinstance(queryset, models.query.EmptyQuerySet):
+            if isinstance(queryset, models.query.QuerySet):
+                if queryset.model is cls:
+                    return False
+                raise TypeError("Queryset must be of type Question")
+            else:
+                raise TypeError(
+                    f"Method only implemented for querysets.  Passed {type(queryset)}"  # noqa E501
+                )
+        return False
+
+    @classmethod
     def is_missing_sample_answers(cls, queryset):
         if not isinstance(queryset, models.query.EmptyQuerySet):
             if isinstance(queryset, models.query.QuerySet):
@@ -519,6 +532,7 @@ class Question(models.Model):
         return not any(
             [
                 Question.is_missing_answer_choices(self_as_queryset),
+                Question.is_missing_expert_rationale(self_as_queryset),
                 Question.is_missing_sample_answers(self_as_queryset),
                 Question.is_flagged(self_as_queryset),
             ]
