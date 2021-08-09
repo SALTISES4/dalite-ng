@@ -1381,6 +1381,7 @@ export function PreviewQuestionCard({
           <CardActionIcons>
             {[
               {
+                include: true,
                 label: question.is_not_flagged
                   ? gettext("Unflagged")
                   : gettext("Flagged"),
@@ -1393,6 +1394,7 @@ export function PreviewQuestionCard({
                     ),
               },
               {
+                include: question.type == "PI",
                 label: gettext("Answer choices"),
                 onClick: () => {
                   if (question.urls) {
@@ -1416,6 +1418,7 @@ export function PreviewQuestionCard({
                     ),
               },
               {
+                include: question.type == "PI",
                 label: gettext("Sample answers"),
                 onClick: () => {
                   if (question.urls) {
@@ -1435,17 +1438,19 @@ export function PreviewQuestionCard({
                     ),
               },
             ].map((el, i) => {
-              return (
-                <ValidityCheck
-                  gettext={gettext}
-                  key={i}
-                  label={el.label}
-                  onClick={el.onClick}
-                  passes={el.passes}
-                  pk={question.pk}
-                  title={el.title}
-                />
-              );
+              if (el.include) {
+                return (
+                  <ValidityCheck
+                    gettext={gettext}
+                    key={i}
+                    label={el.label}
+                    onClick={el.onClick}
+                    passes={el.passes}
+                    pk={question.pk}
+                    title={el.title}
+                  />
+                );
+              }
             })}
           </CardActionIcons>
         </CardActions>
