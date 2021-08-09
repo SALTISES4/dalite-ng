@@ -1,4 +1,5 @@
 import { Component, Fragment, h } from "preact";
+import { useCallback, useState } from "preact/hooks";
 import { triScale } from "../_theming/colours.js";
 import { scaleThreshold } from "d3";
 import { Favourites } from "./providers.js";
@@ -1261,13 +1262,78 @@ type PreviewQuestionCardProps = {
   question: Question;
 };
 
+function useToggle(): {
+  dialogOpen: boolean;
+  toggleDialog: () => void;
+} {
+  const [dialogOpen, setValue] = useState(false);
+  const toggleDialog = useCallback(() => {
+    setValue(!dialogOpen);
+  }, [dialogOpen]);
+  return { dialogOpen, toggleDialog };
+}
+
 export function PreviewQuestionCard({
   gettext,
   handleToggleDialog,
   question,
 }: PreviewQuestionCardProps): JSX.Element {
+  const { dialogOpen, toggleDialog } = useToggle();
+
+  const copy = () => {
+    if (question.urls?.copy_question) {
+      return (
+        <DialogButton
+          action="close"
+          onClick={() => {
+            window.open(question.urls?.copy_question);
+          }}
+        >
+          {gettext("Copy")}
+        </DialogButton>
+      );
+    }
+  };
+
+  const flagReasons = () => {
+    if (question?.flag_reasons) {
+      const body = (
+        <Typography use="body1" tag="p">
+          {gettext(
+            "This question has been flagged by fellow members of the SALTISE community for the following reasons:",
+          )}
+          <ul>
+            {question.flag_reasons
+              .sort((a, b) => a.flag_reason__count - b.flag_reason__count)
+              .map((fr, i) => (
+                <li key={i} style={{ listStyleType: "disc" }}>
+                  {fr.flag_reason__title} ({fr.flag_reason__count})
+                </li>
+              ))}
+          </ul>
+          {gettext(
+            "Flags are reviewed by SALTISE administrators and removed once the issue has been resolved.  You can, however, copy this question, make the necessary changes and then use the new version in your assignments.",
+          )}
+        </Typography>
+      );
+      return (
+        <Dialog open={dialogOpen} onClose={toggleDialog}>
+          <DialogTitle>{gettext("Question flags")}</DialogTitle>
+          <DialogContent>{body}</DialogContent>
+          <DialogActions>
+            {copy()}
+            <DialogButton action="accept" isDefaultAction>
+              {gettext("Close")}
+            </DialogButton>
+          </DialogActions>
+        </Dialog>
+      );
+    }
+  };
+
   return (
     <div>
+      {flagReasons()}
       <Card className="question" style={{ position: "relative" }}>
         <Ratings
           gettext={gettext}
@@ -1286,7 +1352,7 @@ export function PreviewQuestionCard({
                 label: question.is_not_flagged
                   ? gettext("Unflagged")
                   : gettext("Flagged"),
-                onClick: undefined,
+                onClick: toggleDialog,
                 passes: question.is_not_flagged,
                 title: question.is_not_flagged
                   ? gettext("This question has not been flagged")

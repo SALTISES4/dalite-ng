@@ -32,6 +32,7 @@ export type Question = {
   difficulty: { score?: number | null; label: string };
   discipline: { title: string };
   featured: boolean;
+  flag_reasons?: { flag_reason__count: number; flag_reason__title: string }[]; // eslint-disable-line camelcase
   frequency: {
     first_choice: Record<string, number>; // eslint-disable-line camelcase
     second_choice: Record<string, number>; // eslint-disable-line camelcase
@@ -64,6 +65,7 @@ export type Question = {
     add_answer_choices: string; // eslint-disable-line camelcase
     add_new_question: string; // eslint-disable-line camelcase
     add_sample_answers: string; // eslint-disable-line camelcase
+    copy_question: string; // eslint-disable-line camelcase
     fix: string;
   };
   user?: { username: string; saltise: boolean; expert: boolean };
