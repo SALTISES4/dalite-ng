@@ -119,6 +119,9 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "add_answer_choices": reverse(
                 "answer-choice-form", args=(obj.pk,)
             ),
+            "add_expert_rationales": reverse(
+                "research-fix-expert-rationale", args=(obj.pk,)
+            ),
             "add_new_question": reverse("question-create"),
             "add_sample_answers": reverse(
                 "sample-answer-form", args=(obj.pk,)

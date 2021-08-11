@@ -13,7 +13,7 @@ from django.core import exceptions
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, Q
+from django.db.models import Count, OuterRef, Q, Subquery
 from django.utils.html import escape, strip_tags
 from django.utils.translation import gettext_lazy as _
 
@@ -407,7 +407,16 @@ class Question(models.Model):
                     return (
                         queryset.filter(type="PI")
                         .annotate(answer_choice_count=Count("answerchoice"))
-                        .filter(answer_choice_count__lte=1)
+                        .annotate(
+                            correct_answer_choice_count=Count(
+                                "answerchoice",
+                                filter=Q(answerchoice__correct=True),
+                            )
+                        )
+                        .filter(
+                            Q(answer_choice_count__lte=1)
+                            | Q(correct_answer_choice_count=0)
+                        )
                         .exists()
                     )
                 raise TypeError("Queryset must be of type Question")
@@ -422,25 +431,45 @@ class Question(models.Model):
         if not isinstance(queryset, models.query.EmptyQuerySet):
             if isinstance(queryset, models.query.QuerySet):
                 if queryset.model is cls:
-                    return False
-                    # return (
-                    #     # Check if any expert answers exist
-                    #     not queryset.filter(type="PI")
-                    #     .values(
-                    #         "pk",
-                    #         "answer__first_answer_choice",
-                    #         "answer__expert",
-                    #     )
-                    #     .filter(answer__expert=True)
-                    #     .exists()
-                    #     # Make sure one for each correct answer choice
-                    #     or queryset.filter(type="PI")
-                    #     .values(
-                    #         "pk",
-                    #         "answerchoice",
-                    #     )
-                    #     .filter(answerchoice__correct=True)
-                    # )
+                    Answer = apps.get_model(
+                        app_label="peerinst", model_name="answer"
+                    )
+                    expert_answers = Answer.objects.filter(expert=True).filter(
+                        question=OuterRef("pk")
+                    )
+
+                    return (
+                        queryset.filter(type="PI")
+                        .values("answerchoice", "answerchoice__correct")
+                        .annotate(
+                            rank=Subquery(
+                                cls.objects.filter(pk=OuterRef("pk"))
+                                .values("answerchoice")
+                                .filter(
+                                    answerchoice__lte=OuterRef("answerchoice")
+                                )
+                                .annotate(count=Count("answerchoice"))
+                                .values("count")[:1],
+                                output_field=models.IntegerField(),
+                            ),
+                        )
+                        .annotate(
+                            expert_answers_for_choice=Subquery(
+                                expert_answers.filter(
+                                    first_answer_choice=OuterRef("rank")
+                                )
+                                .values("pk")
+                                .annotate(count=Count("pk"))
+                                .values("count")[:1],
+                                output_field=models.IntegerField(),
+                            )
+                        )
+                        .filter(
+                            Q(answerchoice__correct=True)
+                            & Q(expert_answers_for_choice__lt=1)
+                        )
+                        .exists()
+                    )
                 raise TypeError("Queryset must be of type Question")
             else:
                 raise TypeError(
@@ -462,7 +491,7 @@ class Question(models.Model):
                         .annotate(
                             answer_count_for_choice=Count(
                                 "answer__first_answer_choice",
-                                exclude=Q(answer__expert=True),
+                                filter=Q(answer__expert=False),
                             )
                         )
                         .filter(answer_count_for_choice__lt=1)

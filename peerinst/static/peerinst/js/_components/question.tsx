@@ -1442,8 +1442,25 @@ export function PreviewQuestionCard({
               {
                 include: true,
                 label: gettext("Expert rationale"),
-                onClick: undefined,
-                passes: question.is_not_missing_expert_rationale,
+                onClick: () => {
+                  if (question.urls) {
+                    if (question.is_editable) {
+                      const tab = window.open(
+                        question.is_not_missing_answer_choices
+                          ? question.urls.add_expert_rationales
+                          : question.urls.add_answer_choices,
+                        "_blank",
+                        "noopener,noreferrer",
+                      );
+                      if (tab) tab.focus();
+                    } else {
+                      toggleIneditableDialog();
+                    }
+                  }
+                },
+                passes:
+                  question.is_not_missing_expert_rationale &&
+                  question.is_not_missing_answer_choices,
                 title: question.is_not_missing_expert_rationale
                   ? gettext(
                       "This question has an expert rationale associated with all correct answer choices.",
