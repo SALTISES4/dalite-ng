@@ -8,7 +8,7 @@ import urllib.request
 from django import forms
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import F
+from django.db.models import Count, F, Q
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -593,14 +593,61 @@ class QuestionPreviewViewBase(
         assignment_form = AssignmentMultiselectForm(
             self.request.user, self.question
         )
+
+        choices = (
+            self.question.answer_set.exclude(expert=True)
+            .values("first_answer_choice")
+            .annotate(
+                student_answer_count=Count(
+                    "first_answer_choice", filter=~Q(user_token="")
+                )
+            )
+            .annotate(
+                sample_answer_count=Count(
+                    "first_answer_choice", filter=Q(user_token="")
+                )
+            )
+        )
+
+        sample_answers = []
+        for c in choices.order_by("first_answer_choice").all():
+            if c["sample_answer_count"] > 0:
+                for s in (
+                    self.question.answer_set.exclude(expert=True)
+                    .filter(first_answer_choice=c["first_answer_choice"])
+                    .filter(user_token="")
+                ):
+                    sample_answers.append(
+                        {
+                            "first_answer_choice_label": s.first_answer_choice_label(),  # noqa E501
+                            "text": s.rationale,
+                        }
+                    )
+            elif c["student_answer_count"] > 0:
+                queryset = (
+                    self.question.answer_set.exclude(expert=True)
+                    .filter(first_answer_choice=c["first_answer_choice"])
+                    .filter(~Q(user_token=""))
+                )
+                count = queryset.count()
+                label = queryset.first().first_answer_choice_label()
+                sample_answers.append(
+                    {
+                        "first_answer_choice_label": label,
+                        "text": f"{count} {_('student answer(s)')}",
+                    }
+                )
+
         context.update(
-            question=self.question,
             answer_choices=self.answer_choices,
             assignment_form=assignment_form,
             assignment_count=assignment_form.queryset.count(),
+            question=self.question,
+            sample_answers=sample_answers,
             save_allowed=save_allowed,
         )
-        # reset session variable that may have been set in Quality Control /
+
+        # Reset session variable that may have been set in Quality Control /
         # research_discipline_question_index view
         self.request.session["assignment_id"] = None
 
