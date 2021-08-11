@@ -483,19 +483,40 @@ class Question(models.Model):
         if not isinstance(queryset, models.query.EmptyQuerySet):
             if isinstance(queryset, models.query.QuerySet):
                 if queryset.model is cls:
+                    Answer = apps.get_model(
+                        app_label="peerinst", model_name="answer"
+                    )
+                    sample_answers = Answer.objects.filter(
+                        expert=False
+                    ).filter(question=OuterRef("pk"))
+
                     return (
                         queryset.filter(type="PI")
-                        .values(
-                            "pk",
-                            "answer__first_answer_choice",
+                        .values("answerchoice")
+                        .annotate(
+                            rank=Subquery(
+                                cls.objects.filter(pk=OuterRef("pk"))
+                                .values("answerchoice")
+                                .filter(
+                                    answerchoice__lte=OuterRef("answerchoice")
+                                )
+                                .annotate(count=Count("answerchoice"))
+                                .values("count")[:1],
+                                output_field=models.IntegerField(),
+                            ),
                         )
                         .annotate(
-                            answer_count_for_choice=Count(
-                                "answer__first_answer_choice",
-                                filter=Q(answer__expert=False),
+                            sample_answers_for_choice=Subquery(
+                                sample_answers.filter(
+                                    first_answer_choice=OuterRef("rank")
+                                )
+                                .values("pk")
+                                .annotate(count=Count("pk"))
+                                .values("count")[:1],
+                                output_field=models.IntegerField(),
                             )
                         )
-                        .filter(answer_count_for_choice__lt=1)
+                        .filter(sample_answers_for_choice__isnull=True)
                         .exists()
                     )
                 raise TypeError("Queryset must be of type Question")

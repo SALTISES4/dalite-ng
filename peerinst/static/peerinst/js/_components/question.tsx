@@ -1418,28 +1418,6 @@ export function PreviewQuestionCard({
                     ),
               },
               {
-                include: question.type == "PI",
-                label: gettext("Sample answers"),
-                onClick: () => {
-                  if (question.urls) {
-                    const tab = window.open(
-                      question.is_not_missing_answer_choices
-                        ? question.urls.add_sample_answers
-                        : question.urls.add_answer_choices,
-                      "_blank",
-                      "noopener,noreferrer",
-                    );
-                    if (tab) tab.focus();
-                  }
-                },
-                passes: question.is_not_missing_sample_answers,
-                title: question.is_not_missing_sample_answers
-                  ? gettext("This question has enough sample answers")
-                  : gettext(
-                      "This question does not have enough sample answers.  Click to add more.",
-                    ),
-              },
-              {
                 include: true,
                 label: gettext("Expert rationale"),
                 onClick: () => {
@@ -1467,6 +1445,28 @@ export function PreviewQuestionCard({
                     )
                   : gettext(
                       "This question does not have an expert rationale for all correct answer choices.",
+                    ),
+              },
+              {
+                include: question.type == "PI",
+                label: gettext("Sample answers"),
+                onClick: () => {
+                  if (question.urls) {
+                    const tab = window.open(
+                      question.is_not_missing_answer_choices
+                        ? question.urls.add_sample_answers
+                        : question.urls.add_answer_choices,
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
+                    if (tab) tab.focus();
+                  }
+                },
+                passes: question.is_not_missing_sample_answers,
+                title: question.is_not_missing_sample_answers
+                  ? gettext("This question has enough sample answers")
+                  : gettext(
+                      "This question does not have enough sample answers.  Click to add more.",
                     ),
               },
             ].map((el, i) => {
