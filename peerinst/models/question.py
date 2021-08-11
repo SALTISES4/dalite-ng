@@ -13,7 +13,7 @@ from django.core import exceptions
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, OuterRef, Q, Subquery
+from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.utils.html import escape, strip_tags
 from django.utils.translation import gettext_lazy as _
 
@@ -453,6 +453,7 @@ class Question(models.Model):
                                 output_field=models.IntegerField(),
                             ),
                         )
+                        .annotate(correct=F("answerchoice__correct"))
                         .annotate(
                             expert_answers_for_choice=Subquery(
                                 expert_answers.filter(
@@ -465,8 +466,8 @@ class Question(models.Model):
                             )
                         )
                         .filter(
-                            Q(answerchoice__correct=True)
-                            & Q(expert_answers_for_choice__lt=1)
+                            Q(correct=True)
+                            & Q(expert_answers_for_choice__isnull=True)
                         )
                         .exists()
                     )
