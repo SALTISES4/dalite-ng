@@ -1422,18 +1422,14 @@ export function PreviewQuestionCard({
                 label: gettext("Expert rationale"),
                 onClick: () => {
                   if (question.urls) {
-                    if (question?.is_owner) {
-                      const tab = window.open(
-                        question.is_not_missing_answer_choices
-                          ? question.urls.add_expert_rationales
-                          : question.urls.add_answer_choices,
-                        "_blank",
-                        "noopener,noreferrer",
-                      );
-                      if (tab) tab.focus();
-                    } else {
-                      toggleIneditableDialog();
-                    }
+                    const tab = window.open(
+                      question.is_not_missing_answer_choices
+                        ? question.urls.add_expert_rationales
+                        : question.urls.add_answer_choices,
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
+                    if (tab) tab.focus();
                   }
                 },
                 passes:
