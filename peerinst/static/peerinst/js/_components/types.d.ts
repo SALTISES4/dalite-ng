@@ -44,6 +44,7 @@ export type Question = {
   is_not_missing_answer_choices?: boolean; // eslint-disable-line camelcase
   is_not_missing_expert_rationale?: boolean; // eslint-disable-line camelcase
   is_not_missing_sample_answers?: boolean; // eslint-disable-line camelcase
+  is_owner?: boolean; // eslint-disable-line camelcase
   is_valid: boolean; // eslint-disable-line camelcase
   matrix: { easy: number; hard: number; tricky: number; peer: number };
   // eslint-disable-next-line camelcase

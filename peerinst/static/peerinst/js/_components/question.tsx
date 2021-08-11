@@ -1422,7 +1422,7 @@ export function PreviewQuestionCard({
                 label: gettext("Expert rationale"),
                 onClick: () => {
                   if (question.urls) {
-                    if (question.is_editable) {
+                    if (question?.is_owner) {
                       const tab = window.open(
                         question.is_not_missing_answer_choices
                           ? question.urls.add_expert_rationales

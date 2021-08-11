@@ -68,6 +68,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     is_not_missing_answer_choices = serializers.ReadOnlyField()
     is_not_missing_expert_rationale = serializers.ReadOnlyField()
     is_not_missing_sample_answers = serializers.ReadOnlyField()
+    is_owner = serializers.SerializerMethodField()
     is_valid = serializers.ReadOnlyField()
     matrix = serializers.SerializerMethodField()
     most_convincing_rationales = serializers.SerializerMethodField()
@@ -103,6 +104,14 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                 or self.context["request"].user in obj.collaborators.all()
             )
         return obj.is_editable
+
+    def get_is_owner(self, obj):
+        if "request" in self.context:
+            return (
+                self.context["request"].user == obj.user
+                or self.context["request"].user in obj.collaborators.all()
+            )
+        return False
 
     def get_matrix(self, obj):
         return obj.get_matrix()
@@ -150,6 +159,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "is_not_missing_answer_choices",
             "is_not_missing_expert_rationale",
             "is_not_missing_sample_answers",
+            "is_owner",
             "is_valid",
             "matrix",
             "most_convincing_rationales",
