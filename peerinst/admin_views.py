@@ -685,7 +685,7 @@ class QuestionExpertRationaleView(QuestionPreviewViewBase):
             ]
         )
         assignment_id = self.request.session.get("assignment_id")
-        question_id = self.request.session.get("question_id")
+        question_id = context["question"].pk
         context.update(
             expert_rationales=expert_rationales,
             save_allowed=save_allowed,
