@@ -2415,7 +2415,11 @@ def question_search(request):
             query_term = query_term.exclude(id__in=q_qs).distinct()
 
             query_term = [
-                q for q in query_term if q not in query_all and q.is_valid
+                q
+                for q in query_term
+                if q not in query_all
+                and q.is_not_flagged
+                and q.is_not_missing_answer_choices
             ]
 
             query_meta[term] = query_term

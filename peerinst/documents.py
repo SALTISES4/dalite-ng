@@ -252,7 +252,9 @@ class QuestionDocument(Document):
         }
 
     def prepare_valid(self, instance):
-        return instance.is_valid
+        return (
+            instance.is_not_flagged and instance.is_not_missing_answer_choices
+        )
 
     def get_queryset(self):
         return super().get_queryset().select_related("discipline", "user")
