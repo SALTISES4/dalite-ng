@@ -181,7 +181,7 @@
     border-width: thin;
     font-size: x-small;
     height: 32px;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
     position: relative;
     width: 32px;
 
@@ -191,6 +191,16 @@
       position: absolute;
       top: 50%;
       transform: translate(-50%, -50%);
+    }
+    & > .title {
+      font-size: 8px;
+      font-weight: normal;
+      left: 50%;
+      line-height: normal;
+      position: absolute;
+      text-align: center;
+      top: calc(100% + 2px);
+      transform: translate(-50%, 0%);
     }
   }
 }

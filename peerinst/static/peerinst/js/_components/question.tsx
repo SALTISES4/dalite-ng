@@ -1055,6 +1055,14 @@ function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
                 {/* @ts-ignore: TS doesn't recognize textPath  */}
               </textPath>
             </text>
+            <text
+              text-anchor="middle"
+              style={{ fill: color, fontSize: 8 }}
+              x={15}
+              y={42}
+            >
+              {gettext("Difficulty")}
+            </text>
           </svg>
           <div
             class="label"
@@ -1087,6 +1095,9 @@ function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
         >
           <div class="label" style={{ color }}>
             {question.peer_impact.label}
+          </div>
+          <div class="title" style={{ color }}>
+            {gettext("Peer impact")}
           </div>
         </div>
       );
