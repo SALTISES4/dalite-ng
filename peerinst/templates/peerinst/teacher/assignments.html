@@ -80,7 +80,7 @@
         <span class="mdc-list-item__meta">
           <form class="inline" method="post">
               {% csrf_token %}
-              <input type="hidden" id="id_assignment" name="assignment" value="{{g.pk}}"/>
+              <input type="hidden" name="assignment" value="{{g.pk}}"/>
               <div class="mdc-ripple-surface input-ripple-wrapper">
                 <input class="material-icons md-24 mdc-button small-button no-whitespace" type="submit" value="remove_circle"/>
               </div>
@@ -109,7 +109,7 @@
           <form method="post">
             {% csrf_token %}
             <input class="material-icons small-button mdc-button mdc-button--raised" type="submit" value="add"/>
-            <input type="hidden" id="id_assignment" name="assignment" value="{{g.pk}}"/>
+            <input type="hidden" name="assignment" value="{{g.pk}}"/>
           </form>
         </span>
         <span class="mdc-list-item__text mdc-theme--secondary bold">

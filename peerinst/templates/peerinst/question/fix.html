@@ -41,7 +41,6 @@
     <section id="assignment-errors">
       {% if broken_by_flags or broken_by_answerchoices %}
       <h2>{% trans 'Ooops...' %}</h2>
-      {% endif %}
       <p class="mdc-typography--body1">
         {% trans "Unfortunately, this assignment may not be entirely fixable due to:" %}
         <dl class="mdc-typography--body1">
@@ -71,6 +70,7 @@
         </dl>
       </p>
       <br/>
+      {% endif %}
     </section>
     {% endif %}
 
