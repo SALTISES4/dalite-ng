@@ -369,3 +369,10 @@
   padding: 0px 20px 0px 8px;
   width: fit-content;
 }
+
+#assignment-errors {
+  dt {
+    float: unset;
+    font-weight: bold;
+  }
+}

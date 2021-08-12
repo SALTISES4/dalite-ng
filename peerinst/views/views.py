@@ -581,12 +581,28 @@ class QuestionCloneView(QuestionCreateView):
 class AssignmentFixView(
     LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, DetailView
 ):
+    """
+    Assignment is not fixable if:
+    - Any question is flagged and assignment is not editable by user;
+    - Any question is missing answer choices and is not editable or user is not
+      owner;
+    """
+
     model = models.Assignment
     template_name = "peerinst/question/fix.html"
 
     def get_context_data(self, **kwargs):
+        broken_by_flags = Question.is_flagged(self.object.questions.all())
+
+        broken_by_answerchoices = Question.is_missing_answer_choices(
+            self.object.questions.all()
+        )
+
         context = super(AssignmentFixView, self).get_context_data(**kwargs)
         context.update(
+            assignment=True,
+            broken_by_flags=broken_by_flags,
+            broken_by_answerchoices=broken_by_answerchoices,
             load_url=f"{reverse('REST:question-list')}?q={'&q='.join(str(q.pk) for q in self.object.questions.all())}",  # noqa E501
             teacher=self.request.user.teacher,
         )
