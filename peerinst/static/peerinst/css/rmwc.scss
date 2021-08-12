@@ -126,6 +126,9 @@
   }
 }
 
+#rationale-table-app .mdc-dialog__container {
+  max-width: unset;
+}
 
 .mdc-dialog__container {
   max-width: 600px;
