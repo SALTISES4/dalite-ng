@@ -149,9 +149,8 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
     open = true,
   ): void => {
     console.debug(
-      `Toggle flag for question: ${
-        question ? question.pk + question.title : ""
-      }`,
+      "Toggle flag for question: " +
+        (question ? question.pk + question.title : ""),
     );
     this.setState({
       flagDialogOpen: open,
@@ -204,10 +203,9 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
             },
             () =>
               console.debug(
-                `Search time: ${(
-                  (performance.now() - startTime) /
-                  1000
-                ).toExponential(3)}s`,
+                "Search time: " +
+                  ((performance.now() - startTime) / 1000).toExponential(3) +
+                  "s",
               ),
           );
         } catch (error) {
@@ -292,7 +290,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
     if (added.length == 1) {
       message += added[0];
     } else {
-      message += `${added.length} ${this.props.gettext("assignments")}`;
+      message += added.length + " " + this.props.gettext("assignments");
     }
     console.debug(message);
     this.setState(
@@ -369,12 +367,15 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
                     this.setState(
                       {
                         selectedCategories: sc,
-                        query: `${sc
-                          .map(
-                            (_c: string) =>
-                              `category__title::${_c.replaceAll(" ", "_")}`,
-                          )
-                          .join(" ")} ${_query}`,
+                        query:
+                          sc
+                            .map(
+                              (_c: string) =>
+                                "category__title::" + _c.replaceAll(" ", "_"),
+                            )
+                            .join(" ") +
+                          " " +
+                          _query,
                       },
                       this.handleSubmit,
                     );
@@ -447,10 +448,11 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
                       this.setState(
                         {
                           selectedDifficulty: d,
-                          query: `difficulty.label::${d.replaceAll(
-                            " ",
-                            "_",
-                          )} ${this.state.query}`,
+                          query:
+                            "difficulty.label::" +
+                            d.replaceAll(" ", "_") +
+                            " " +
+                            this.state.query,
                         },
                         this.handleSubmit,
                       );
@@ -523,10 +525,11 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
                       this.setState(
                         {
                           selectedDiscipline: d,
-                          query: `discipline.title::${d.replaceAll(
-                            " ",
-                            "_",
-                          )} ${this.state.query}`,
+                          query:
+                            "discipline.title::" +
+                            d.replaceAll(" ", "_") +
+                            " " +
+                            this.state.query,
                         },
                         this.handleSubmit,
                       );
@@ -599,10 +602,11 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
                       this.setState(
                         {
                           selectedImpact: d,
-                          query: `peer_impact.label::${d.replaceAll(
-                            " ",
-                            "_",
-                          )} ${this.state.query}`,
+                          query:
+                            "peer_impact.label::" +
+                            d.replaceAll(" ", "_") +
+                            " " +
+                            this.state.query,
                         },
                         this.handleSubmit,
                       );

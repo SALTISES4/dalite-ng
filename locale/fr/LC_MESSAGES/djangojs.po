@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-30 19:33-0400\n"
+"POT-Creation-Date: 2021-08-11 23:20-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,12 +18,646 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: peerinst/static/peerinst/js/_question/start.js:60
-#: static/peerinst/js/_question/start.js:60
+#: peerinst/static/peerinst/js/_account/assignments.tsx:139
+#: peerinst/static/peerinst/js/_account/questions.tsx:136
+msgid "Manage archived"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_account/assignments.tsx:151
+msgid "Search"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_account/assignments.tsx:160
+msgid "Generate report"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_account/assignments.tsx:170
+#: peerinst/static/peerinst/js/_account/questions.tsx:159
+msgid "Return to list"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_account/assignments.tsx:181
+#: peerinst/static/peerinst/js/_account/questions.tsx:171
+msgid "Create new"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_account/heading.tsx:32
+msgid "Collapse to hide list."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_account/heading.tsx:33
+msgid "Expand to show list."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_account/questions.tsx:147
+msgid "Manage deleted"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/analytics.jsx:59
+msgid "Right > Right"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/question.jsx:221
+#: peerinst/static/peerinst/js/_components/question.tsx:925
+msgid "by"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/search.jsx:54
+msgid "Type search terms"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/search.jsx:67
+msgid ""
+"The quick add search engine checks question meta data for the complete "
+"phrase only.  You can also search on username to find all content from a "
+"certain contributor.  Search results are filtered to remove questions "
+"already part of this assignment."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/search.jsx:106
+#: peerinst/static/peerinst/js/_assignment/update.jsx:172
+#: peerinst/static/peerinst/js/_group/rationale_table.jsx:317
+#: peerinst/static/peerinst/js/_student/feedback.jsx:178
+#: peerinst/static/peerinst/js/search_beta.tsx:216
+msgid "An error occurred.  Try refreshing this page."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/search.jsx:122
+#: peerinst/static/peerinst/js/_assignment/update.jsx:188
+msgid "Could not load favourites.  Try refreshing this page."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/update.jsx:25
+msgid "Reorder questions?"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/update.jsx:29
+#: peerinst/static/peerinst/js/_assignment/update.jsx:35
+msgid "Click to enable question reordering"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/update.jsx:49
+msgid "Show images"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/update.jsx:52
+#: peerinst/static/peerinst/js/_assignment/update.jsx:56
+msgid "Click to show question images"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/update.jsx:61
+msgid "Show choices"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/update.jsx:64
+#: peerinst/static/peerinst/js/_assignment/update.jsx:68
+msgid "Click to show answer choices"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/update.jsx:151
+#: peerinst/static/peerinst/js/_assignment/update.jsx:212
+#: peerinst/static/peerinst/js/_assignment/update.jsx:219
+#: peerinst/static/peerinst/js/_assignment/update.jsx:244
+#: peerinst/static/peerinst/js/search_beta.tsx:263
+#: peerinst/static/peerinst/js/search_beta.tsx:284
+#: peerinst/static/peerinst/js/search_beta.tsx:331
+msgid "An error occurred."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/update.jsx:213
+msgid "Item removed."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/update.jsx:237
+msgid "Changes saved."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_assignment/update.jsx:285
+msgid ""
+"There are currently no questions in this assignment.  You can search for "
+"questions to add below."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/clipboard.tsx:34
+msgid "Copied to clipboard"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/clipboard.tsx:39
+msgid "An error occurred"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/clipboard.tsx:50
+msgid "Copy to clipboard."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:104
+msgid ""
+"You are not currently following any assignments.  You can create one, search "
+"for one in the database, or unarchive an old one."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:115
+msgid ""
+"This is the list of assignments you have authored or are currently "
+"following, and for which reports will be available.  You can archive or "
+"unfollow any assignments you are no longer using."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:126
+msgid "This is the list of assignments you have authored and archived."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:214
+msgid "Unarchive this assignment."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:216
+msgid "Archive this assignment to hide it."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:217
+msgid "Unfollow this assignment."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:236
+msgid "Edit this assignment to make changes."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:237
+msgid "Copy this assignment to make changes."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:256
+msgid "Distribute this assignment to one of your groups."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:278
+msgid "questions"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:284
+msgid "There is a problem with this assignment."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:304
+msgid ""
+"Use the following information to configure the LTI tool in\n"
+"             your Learning Management System (e.g. Moodle, OpenEdx):"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:316
+msgid "LTI Launch URL"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:332
+msgid "LTI Consumer Key"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:348
+msgid "LTI Shared Secret"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:362
+msgid ""
+"To import assignment questions, copy and paste the text\n"
+"                 below the question title into the Custom Parameters box of "
+"your\n"
+"                 LTI tool:"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:399
+msgid "OK"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:423
+msgid "Distribute via LMS (e.g. Moodle)"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:430
+msgid "Distribute via myDALITE"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/questionList.tsx:61
+msgid ""
+"This is the list of questions for which you are the primary author or a co-"
+"author."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/questionList.tsx:72
+msgid ""
+"This is the list of questions for which you are the primary author or a co-"
+"author and that you have archived."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/questionList.tsx:83
+msgid ""
+"This is the list of questions for which you are the primary author and that "
+"you have marked for deletion.  From time to time, questions marked for "
+"deletion that are not part of any assignment and that have no associated "
+"student answers will be removed from the database.  Questions that have been "
+"included in any assignment or have student answers cannot be deleted, only "
+"archived."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/questionList.tsx:101
+msgid ""
+"You do not have any questions (or they are all archived/deleted).  You can "
+"create one using the link above."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/questionList.tsx:175
+msgid "Undelete this question."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/questionList.tsx:177
+msgid ""
+"Delete this question.  If there are no student answers associated  with it, "
+"deleting removes it from search results but won't prevent other teachers "
+"from using it if they have already included it in their assignments."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/questionList.tsx:193
+msgid "Unarchive this question."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/questionList.tsx:194
+msgid "Archive this question to hide it."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/questionList.tsx:208
+msgid "Edit this question to make changes."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/questionList.tsx:216
+msgid "Copy this question to make changes."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/questionList.tsx:236
+msgid "student answers"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/lists/questionList.tsx:242
+msgid "There is a problem with this question."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:118
+msgid "This identifier has already been used."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:139
+msgid "Back"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:152
+msgid ""
+"You have no editable assignments to which this\n"
+"             question can be added, but you can create a new one below.  "
+"The\n"
+"             question will be added to the new assignment automatically."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:162
+msgid ""
+"You can add this question to an existing assignment (if it is\n"
+"           editable) or use this question to start a new assignment."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:177
+msgid "Assignment title"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:194
+msgid "Assignment identifier"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:214
+msgid "Assignment description (optional)"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:231
+msgid "Assignment introduction (optional)"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:248
+msgid "Assignment conclusion (optional)"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:285
+msgid "Create assignment"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:374
+#: peerinst/static/peerinst/js/_components/question.tsx:555
+msgid "Cancel"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:382
+#: peerinst/static/peerinst/js/_components/question.tsx:563
+msgid "Submit"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:412
+msgid ""
+"The distribution of first and second choices along with the\n"
+"            statistics for each possible outcome are shown in the figure\n"
+"            below.  The most convincing rationales submitted by students\n"
+"            (i.e. most selected be peers) are also listed for each answer\n"
+"            choice."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:426
+msgid "Distribution of answer choices"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:443
+#: peerinst/static/peerinst/js/_group/rationale_table.jsx:483
+#: peerinst/static/peerinst/js/_student/feedback.jsx:230
+msgid "Done"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:521
+msgid ""
+"You can flag this question as problematic using the form below.\n"
+"                This will immediately remove it from search results pending\n"
+"                review.  It will not remove it from assignments."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:548
+msgid "Please select the reason for flagging this question."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:575
+msgid "Discipline"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:579
+msgid "Unlabelled"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:583
+#: peerinst/static/peerinst/js/search_beta.tsx:346
+msgid "Categories"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:589
+msgid "Uncategorized"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:593
+msgid "Student answers"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:642
+msgid "Shown: "
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:643
+msgid "Chosen: "
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:645
+msgid "Rate: "
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:763
+msgid ""
+"This question is part of featured content curated by SALTISE.  Click to open "
+"the associated collection"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:805
+msgid "Select or remove this question as one of your favourites"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:852
+msgid "Flag question for removal"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:873
+msgid "Add question to an assignment"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:939
+msgid "EXPERT"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1061
+msgid "Click!"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1071
+msgid "Difficulty"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1107
+msgid "Peer impact"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1243
+msgid "Fix!"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1315
+msgid "Copy"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1326
+msgid ""
+"This question has been flagged by fellow members of the SALTISE community "
+"for the following reasons:"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1338
+msgid ""
+"Flags are reviewed by SALTISE administrators and removed once the issue has "
+"been resolved.  You can, however, copy this question, make the necessary "
+"changes and then use the new version in your assignments."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1345
+msgid "Question flags"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1350
+#: peerinst/static/peerinst/js/_components/question.tsx:1375
+msgid "Close"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1363
+msgid "This question cannot be edited, but you can make an editable copy."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1370
+msgid "Question not editable"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1404
+msgid "Unflagged"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1405
+msgid "Flagged"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1409
+msgid "This question has not been flagged"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1411
+msgid ""
+"This question has been flagged by a fellow member of the SALTISE community. "
+"Flags are reviewed by SALTISE administrators and removed once the issue has "
+"been resolved."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1416
+#, fuzzy
+#| msgid "An answer choice is required."
+msgid "Answer choices"
+msgstr "Un choix de réponse est nécessaire."
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1433
+msgid "This question has enough answer choices"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1435
+msgid "This question is missing answer choices. Click to add more."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1440
+#, fuzzy
+#| msgid "A rationale is required."
+msgid "Expert rationale"
+msgstr "Une explication est nécessaire."
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1458
+msgid ""
+"This question has an expert rationale associated with all correct answer "
+"choices."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1461
+msgid ""
+"This question does not have an expert rationale for all correct answer "
+"choices."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1466
+msgid "Sample answers"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1481
+msgid "This question has enough sample answers"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_components/question.tsx:1483
+msgid "This question does not have enough sample answers.  Click to add more."
+msgstr ""
+
+#: peerinst/static/peerinst/js/_group/rationale_table.jsx:112
+#: peerinst/static/peerinst/js/_student/feedback.jsx:29
+msgid "Not convincing"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_group/rationale_table.jsx:113
+#: peerinst/static/peerinst/js/_student/feedback.jsx:30
+msgid "Somewhat convincing"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_group/rationale_table.jsx:114
+#: peerinst/static/peerinst/js/_student/feedback.jsx:31
+msgid "Very convincing"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_group/rationale_table.jsx:256
+msgid "Never show"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_group/rationale_table.jsx:385
+msgid "Student"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_question/start.js:63
 msgid "An answer choice is required."
 msgstr "Un choix de réponse est nécessaire."
 
-#: peerinst/static/peerinst/js/_question/start.js:62
-#: static/peerinst/js/_question/start.js:62
+#: peerinst/static/peerinst/js/_question/start.js:65
 msgid "A rationale is required."
 msgstr "Une explication est nécessaire."
+
+#: peerinst/static/peerinst/js/_student/feedback.jsx:28
+msgid "Unacceptable"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_student/feedback.jsx:39
+msgid "Your teacher commented:"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_student/feedback.jsx:58
+msgid "because"
+msgstr ""
+
+#: peerinst/static/peerinst/js/_student/feedback.jsx:70
+#, fuzzy
+#| msgid "A rationale is required."
+msgid "Your rationale is: "
+msgstr "Une explication est nécessaire."
+
+#: peerinst/static/peerinst/js/_student/feedback.jsx:131
+msgid "You thought:"
+msgstr ""
+
+#: peerinst/static/peerinst/js/search_beta.tsx:289
+msgid "Added to "
+msgstr ""
+
+#: peerinst/static/peerinst/js/search_beta.tsx:293
+msgid "assignments"
+msgstr ""
+
+#: peerinst/static/peerinst/js/search_beta.tsx:426
+msgid "Difficulty levels"
+msgstr ""
+
+#: peerinst/static/peerinst/js/search_beta.tsx:503
+msgid "Disciplines"
+msgstr ""
+
+#: peerinst/static/peerinst/js/search_beta.tsx:580
+msgid "Peer impact levels"
+msgstr ""
+
+#: peerinst/static/peerinst/js/search_beta.tsx:691
+msgid "No search results"
+msgstr ""
+
+#: peerinst/static/peerinst/js/search_beta.tsx:694
+msgid ""
+"Ugh... doesn't look like there are any questions that match your query.  May "
+"we suggest:"
+msgstr ""
+
+#: peerinst/static/peerinst/js/search_beta.tsx:700
+msgid "Try the search again, but with different keywords and/or fewer filters;"
+msgstr ""
+
+#: peerinst/static/peerinst/js/search_beta.tsx:705
+msgid ""
+"Create the question you are looking for by selecting 'Create question' from "
+"the menu."
+msgstr ""
+
+#: peerinst/static/peerinst/js/search_beta.tsx:736
+#: peerinst/static/peerinst/js/search_beta.tsx:752
+msgid "Error.  Try refreshing this page."
+msgstr ""
+
+#: peerinst/static/peerinst/js/search_beta.tsx:771
+msgid "Type something..."
+msgstr ""
+
+#: peerinst/static/peerinst/js/search_beta.tsx:804
+msgid ""
+"You can search for keywords in question and answer texts, by username, by "
+"question id, by category, and by discipline."
+msgstr ""

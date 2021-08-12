@@ -289,6 +289,7 @@ export class AssignmentDialog extends Component<
           .filter((a) => a.question_pks.indexOf(this.props.question.pk) < 0)
           .sort((x, y) => x.title.localeCompare(y.title))
           .map((a, i) => {
+            const label = a.title + " (#" + a.pk + ")";
             return (
               <div key={i}>
                 <Checkbox
@@ -298,7 +299,7 @@ export class AssignmentDialog extends Component<
                     ).indexOf(a.pk) >= 0
                   }
                   onChange={() => this.selectAssignment(a.pk)}
-                  label={`${a.title} (#${a.pk})`}
+                  label={label}
                   required={this.state.assignmentsSelected.length == 0}
                 />
               </div>
@@ -624,7 +625,7 @@ function MostConvincingRationales(props) {
   if (props.rationales) {
     return (
       <div>
-        {props.rationales.map((r, i) => {
+        {props.rationales.map((r, i: number) => {
           return (
             <div key={i}>
               <Typography
@@ -633,11 +634,16 @@ function MostConvincingRationales(props) {
                 theme="text-secondary-on-background"
                 // This field is bleached and safe
                 // eslint-disable-next-line
-                dangerouslySetInnerHTML={{ __html: `${r.label}. ${r.text}` }}
+                dangerouslySetInnerHTML={{ __html: r.label + ". " + r.text }}
                 style={{ fontWeight: "bold" }}
               />
               <ul>
-                {r.most_convincing.map((a, i) => {
+                {r.most_convincing.map((a, i: number) => {
+                  const shown = props.gettext("Shown: ") + a.times_shown;
+                  const chosen = props.gettext("Chosen: ") + a.times_chosen;
+                  const rate =
+                    props.gettext("Rate: ") +
+                    ((a.times_chosen / a.times_shown) * 100).toFixed(1);
                   return (
                     <Fragment key={i}>
                       <Typography
@@ -657,14 +663,13 @@ function MostConvincingRationales(props) {
                         use="caption"
                         tag="div"
                         dangerouslySetInnerHTML={{
-                          __html: `${props.gettext("Shown:")} ${
-                            a.times_shown
-                          } &middot; ${props.gettext("Chosen:")} ${
-                            a.times_chosen
-                          } &middot; ${props.gettext("Rate:")} ${(
-                            (a.times_chosen / a.times_shown) *
-                            100
-                          ).toFixed(1)}%`,
+                          __html:
+                            shown +
+                            " &middot; " +
+                            chosen +
+                            " &middot; " +
+                            rate +
+                            "%",
                         }}
                       />
                     </Fragment>
@@ -753,9 +758,11 @@ class Featured extends Component<FeaturedProps, FeaturedState> {
           href={this.props.collection.url}
           rel="noreferrer"
           target="_blank"
-          title={`${this.props.gettext(
-            "This question is part of featured content curated by SALTISE.  Click to open the associated collection ",
-          )}'${this.props.collection.title}' in a new tab.`}
+          title={
+            this.props.gettext(
+              "This question is part of featured content curated by SALTISE.  Click to open the associated collection: ",
+            ) + this.props.collection.title
+          }
         >
           <div
             class="featured-icon"
@@ -763,8 +770,8 @@ class Featured extends Component<FeaturedProps, FeaturedState> {
             onMouseLeave={() => this.setState({ hovered: false })}
             style={{
               backgroundImage: this.state.hovered
-                ? `url('${this.props.url[1]}')`
-                : `url('${this.props.url[0]}')`,
+                ? "url(" + this.props.url[1] + ")"
+                : "url(" + this.props.url[0] + ")",
             }}
           />
         </a>
@@ -1038,7 +1045,7 @@ function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
             style={{ overflow: "visible" }}
           >
             <path
-              id={`path-${question.pk}`}
+              id={"path-" + question.pk}
               d="M -3 16 A 19 19 0 0 1 35 16"
               fill="transparent"
             />
@@ -1049,7 +1056,7 @@ function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
                 startOffset="50%"
                 style={{ fill: color, fontSize: 8 }}
                 xmlnsXlink="http://www.w3.org/1999/xlink"
-                xlinkHref={`#path-${question.pk}`}
+                xlinkHref={"#path-" + question.pk}
               >
                 {gettext("Click!")}
                 {/* @ts-ignore: TS doesn't recognize textPath  */}
@@ -1220,7 +1227,7 @@ function ValidityCheck({
         style={{ overflow: "visible" }}
       >
         <path
-          id={`validity-path-${pk}`}
+          id={"validity-path-" + pk}
           d="M -3 16 A 19 19 0 0 1 35 16"
           fill="transparent"
         />
@@ -1231,7 +1238,7 @@ function ValidityCheck({
             startOffset="50%"
             style={{ fill: color, fontSize: 8 }}
             xmlnsXlink="http://www.w3.org/1999/xlink"
-            xlinkHref={`#validity-path-${pk}`}
+            xlinkHref={"#validity-path-" + pk}
           >
             {passes || !onClick ? "" : gettext("Fix!")}
             {/* @ts-ignore: TS doesn't recognize textPath  */}
