@@ -39,7 +39,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
       <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
     </div>
 
-    <div class="foldable foldable__unfolded">
+    <div class="foldable foldable__unfolded" id="characteristics">
       <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
         {% trans 'Characteristics' %}
         <a href="{% url 'group-update' group.hash %}">
@@ -51,7 +51,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
 
         <div data-update-url="{% url 'group-details-update' group.hash %}">
 
-          <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
+          <ul class="mdc-list mdc-list--two-line">
             <li class="mdc-list-divider" role="separator"></li>
 
             <li class="mdc-list-item">
@@ -176,9 +176,9 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
                 <i class="mdc-theme--primary material-icons md-48">verified_user</i>
               </span>
               <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {% trans 'Teachers with access' %}
+                <span>{% trans 'Teachers with access' %}</span>
                 <div name="teacher" class="mdc-list-item__secondary-text">
-                  <ul id="teachers-with-access-list">
+                  <ul>
                     {% for t in group.teacher.all %}
                     <li class="mdc-list-item__secondary-text">
                       {{ t.user.username }}
@@ -518,6 +518,12 @@ async function courseLinking(
 
   window.addEventListener("load", () => {
     group.initDetails({{ data|safe }});
+
+    [].forEach.call(document.querySelectorAll("#characteristics .mdc-list-item"), el => {
+      el.addEventListener("click", () => {
+        window.location.assign("{% url 'group-update' group.hash %}");
+      });
+    });
 
     {% comment %}
     courseLinking(
