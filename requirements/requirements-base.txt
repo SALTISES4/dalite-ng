@@ -121,6 +121,7 @@ django==2.2.24
     #   django-classy-tags
     #   django-cookie-law
     #   django-csp
+    #   django-decorator-include
     #   django-inlinecss
     #   django-lti-tool-provider
     #   django-model-utils
@@ -155,6 +156,8 @@ django-csp==3.6
     # via
     #   -r requirements/requirements-base.in
     #   saltise-course-flow
+django-decorator-include==3.0
+    # via -r requirements/requirements-base.in
 django-elasticsearch-dsl==7.2.0
     # via -r requirements/requirements-base.in
 django-grappelli==2.14.1

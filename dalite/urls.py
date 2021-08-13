@@ -1,4 +1,5 @@
 from csp.decorators import csp_replace
+from decorator_include import decorator_include
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.i18n import i18n_patterns
@@ -20,7 +21,19 @@ admin.site.site_header = admin.site.site_title = _(
 
 
 # LTI
-urlpatterns = [path("lti/", include("django_lti_tool_provider.urls"))]
+urlpatterns = [
+    path(
+        "lti/",
+        decorator_include(
+            (
+                csp_replace(CSP_FRAME_ANCESTORS=["*"]),
+                xframe_options_exempt,
+                lti_access_allowed,
+            ),
+            "django_lti_tool_provider.urls",
+        ),
+    )
+]
 
 # Apps
 urlpatterns += i18n_patterns(

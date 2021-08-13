@@ -10,6 +10,7 @@ django-analytical
 django-compressor>=2.3
 django-cookie-law
 django-csp
+django-decorator-include
 django-elasticsearch-dsl
 django-grappelli
 django-htmlmin
