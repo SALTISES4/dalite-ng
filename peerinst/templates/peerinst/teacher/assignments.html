@@ -2,10 +2,19 @@
 
 {% load i18n add_class compress static %}
 
+{% block stylesheets %}
+{{ block.super }}
+<style nonce="{{ request.csp_nonce }}">
+  .mdc-list-item__text {
+    max-width: unset;
+  }
+</style>
+{% endblock %}
+
 {% block body %}
 <main>
   <section>
-    <h1 class="mdc-typography--display3">{% trans 'Manage Assignments' %}
+    <h1 class="mdc-typography--display3">{% trans 'Assignment Index' %}
       <svg class="underline" width=150 height=4></svg>
     </h1>
 
@@ -13,96 +22,12 @@
       <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
     </div>
 
-    <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'My assignments' %}</h2>
+    <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Active list' %}</h2>
 
-    <p class='mdc-typography--body1'>{% trans 'These are the assignments for which you are an author. If the assignment has already been used, you cannot edit it directly: you must make a copy first.' %}</p>
-
-    {% if not owned_assignments %}
-      <p class='mdc-typography--body1'>{% blocktrans %} You currently do not have editing rights on any assignments. Make a new assignment using the menu to be able to modify it.{% endblocktrans %}</p>
-    {% endif %}
+    <p class='mdc-typography--body1'>{% trans 'These are all the assignments in the database that have a minimum number of student answers per question.  You can add one to your account using the plus icon.' %}</p>
 
     <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-      {% for a in owned_assignments %}
-      <li role="separator" class="mdc-list-divider"></li>
-      <li class="mdc-list-item">
-        <span class="mdc-list-item__graphic mdc-theme--primary">
-            <a class="translate-4" href="{% url 'question-list' a.pk %}">
-              <i class="mdc-theme--primary material-icons md-48">assignment</i>
-            </a>
-        </span>
-        <span class="mdc-list-item__text mdc-theme--secondary bold">
-          {{ a.identifier }}
-          <span class="mdc-list-item__secondary-text">
-            {{ a.n_questions }} {% trans "questions" %};
-            {{ a.n_answers }} {% trans "answers" %}
-          </span>
-        </span>
-        <span class="mdc-list-item__meta">
-          {% if user in a.owner.all and a.editable %}
-            <a  id="edit-assignment-{{ a.pk|slugify }}" href="{% url 'assignment-update' a.pk %}">
-              <i class="material-icons md-24 mdc-ripple-surface icon-list">mode_edit</i>
-            </a>
-          {% else %}
-            <a  id="copy-assignment-{{ a.pk|slugify }}" href="{% url 'assignment-copy' a.pk %}">
-              <i class="material-icons md-24 mdc-ripple-surface icon-list">file_copy</i>
-            </a>
-          {% endif %}
-        </span>
-      </li>
-      {% endfor %}
-      <li role="separator" class="mdc-list-divider"></li>
-    </ul>
-
-    <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Following' %}</h2>
-
-    <p class='mdc-typography--body1'>{% blocktrans %} These are the assignments you are following, and for which reports will be available (based on your selected groups).{% endblocktrans %}</p>
-
-    {% if not followed_assignments %}
-    <p class='mdc-typography--body1'>{% blocktrans %} You do not have any assignments.  You can select and modify an existing assignment from the list below or create a new one.{% endblocktrans %}</p>
-    {% endif %}
-
-    <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-      {% for g in followed_assignments %}
-      <li role="separator" class="mdc-list-divider"></li>
-      <li class="mdc-list-item">
-        <span class="mdc-list-item__graphic mdc-theme--primary">
-            <a class="translate-4" href="{% url 'question-list' g.pk %}">
-              <i class="mdc-theme--primary material-icons md-48">assignment</i>
-            </a>
-        </span>
-        <span class="mdc-list-item__text mdc-theme--secondary bold">
-          {{ g.identifier }}
-          <span class="mdc-list-item__secondary-text">
-            {{ g.n_questions }} {% trans "questions" %};
-            {{ g.n_answers }} {% trans "answers" %}
-          </span>
-        </span>
-        <span class="mdc-list-item__meta">
-          <form class="inline" method="post">
-              {% csrf_token %}
-              <input type="hidden" name="assignment" value="{{g.pk}}"/>
-              <div class="mdc-ripple-surface input-ripple-wrapper">
-                <input class="material-icons md-24 mdc-button small-button no-whitespace" type="submit" value="remove_circle"/>
-              </div>
-          </form>
-          {% if g.owner == teacher.user %}
-          <a href="{% url 'assignment-update' g.pk %}" class="md-24">
-            <i class="material-icons md-24 mdc-ripple-surface icon-list">mode_edit</i>
-          </a>
-          {% endif %}
-
-        </span>
-      </li>
-      {% endfor %}
-      <li role="separator" class="mdc-list-divider"></li>
-    </ul>
-
-    <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'All' %}</h2>
-
-    <p class='mdc-typography--body1'>{% trans 'These are all the assignments in the database that have at least 5 associated answers.' %}</p>
-
-    <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-      {% for g in other_assignments %}
+      {% for g in object_list %}
       <li role="separator" class="mdc-list-divider"></li>
       <li class="mdc-list-item">
         <span class="mdc-list-item__graphic mdc-theme--primary">
@@ -113,9 +38,12 @@
           </form>
         </span>
         <span class="mdc-list-item__text mdc-theme--secondary bold">
-          {{ g.identifier }}
+          {{ g.title }}
           <span class="mdc-list-item__secondary-text">
-            {{ g.questions.count }} {% trans "questions" %};
+            {{ g.pk }}
+          </span>
+          <span class="mdc-list-item__secondary-text">
+            {{ g.n_questions }} {% trans "questions" %};
             {{ g.n_answers }} {% trans "answers" %}
           </span>
         </span>

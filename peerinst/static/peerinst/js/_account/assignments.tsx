@@ -148,7 +148,7 @@ export class TeacherAccountAssignmentApp extends Component<
         onClick={() =>
           (window.location.href = this.props.urls.assignmentSearch)
         }
-        text={this.props.gettext("Search")}
+        text={this.props.gettext("Index")}
       />
     );
   };

@@ -19,8 +19,9 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 # reports
-from django.db.models import Count, Q
+from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.db.models.expressions import Func
+from django.db.models.fields import IntegerField
 from django.forms import Textarea, inlineformset_factory
 from django.http import (
     Http404,
@@ -68,6 +69,7 @@ from ..models import AnswerChoice  # LtiEvent,
 from ..models import (
     Answer,
     Assignment,
+    AssignmentQuestions,
     Category,
     Collection,
     Discipline,
@@ -1899,37 +1901,42 @@ class TeacherAssignments(TeacherBase, ListView):
 
     def get_queryset(self):
         self.teacher = get_object_or_404(Teacher, user=self.request.user)
-        return Assignment.objects.annotate(
-            n_questions=Count("assignmentquestions", distinct=True)
+
+        # Exclude assignments with less than 5 student answers per question
+        # on average
+        return (
+            Assignment.objects.exclude(
+                identifier__in=self.teacher.assignments.all()
+            )
+            .values("pk", "title")
+            .annotate(
+                n_answers=Subquery(
+                    Answer.objects.filter(assignment=OuterRef("pk"))
+                    .values("assignment")
+                    .annotate(count=Count("pk"))
+                    .values("count")[:1],
+                    output_field=IntegerField(),
+                )
+            )
+            .annotate(
+                n_questions=Subquery(
+                    AssignmentQuestions.objects.filter(
+                        assignment=OuterRef("identifier")
+                    )
+                    .values("assignment")
+                    .annotate(count=Count("pk"))
+                    .values("count")[:1],
+                    output_field=IntegerField(),
+                )
+            )
+            .annotate(a_per_q=F("n_answers") / F("n_questions"))
+            .exclude(a_per_q__lt=5)
+            .order_by("title")
         )
 
     def get_context_data(self, **kwargs):
         context = super(TeacherAssignments, self).get_context_data(**kwargs)
         context["teacher"] = self.teacher
-
-        context["owned_assignments"] = (
-            self.get_queryset()
-            .filter(owner=self.teacher.user)
-            .annotate(n_answers=Count("answer"))
-            .order_by("-created_on")
-        )
-
-        context["followed_assignments"] = (
-            self.teacher.assignments.exclude(owner=self.teacher.user)
-            .annotate(n_questions=Count("assignmentquestions", distinct=True))
-            .annotate(n_answers=Count("answer"))
-            .order_by("-created_on")
-        )
-
-        # exclude assignments with less than 5 answers from
-        # "All other assignments"
-        context["other_assignments"] = (
-            self.get_queryset()
-            .exclude(identifier__in=self.teacher.assignments.all())
-            .annotate(n_answers=Count("answer"))
-            .exclude(n_answers__lte=5)
-        )
-
         context["form"] = forms.TeacherAssignmentsForm()
 
         return context
@@ -1944,16 +1951,7 @@ class TeacherAssignments(TeacherBase, ListView):
             else:
                 self.teacher.assignments.add(assignment)
             self.teacher.save()
-        else:
-            return render(
-                request,
-                self.template_name,
-                {
-                    "teacher": self.teacher,
-                    "form": form,
-                    "object_list": Assignment.objects.all(),
-                },
-            )
+
         return HttpResponseRedirect(
             reverse("teacher-assignments", kwargs={"pk": self.teacher.pk})
         )
