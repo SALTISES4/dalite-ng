@@ -48,4 +48,4 @@ PERMISSIONS_POLICY = {
 }
 
 # django-referrer-policy
-REFERRER_POLICY = "no-referrer"
+REFERRER_POLICY = "same-origin"
