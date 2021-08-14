@@ -1075,25 +1075,6 @@ class QuestionFlagReason(models.Model):
             _("The question, or one of the answer choices, is unclear."),
         ),
         (
-            "No Expert Rationale",
-            _(
-                """
-                A rationale must be provided for each correct answer \
-                choice that would represent the opinion of an expert in \
-                the discipline.
-                """
-            ),
-        ),
-        (
-            "No seed rationales",
-            _(
-                """
-                A sample answer must be provided for each answer choice, \
-                whether correct or incorrect.
-                """
-            ),
-        ),
-        (
             "Potential copyright issues",
             _(
                 """
