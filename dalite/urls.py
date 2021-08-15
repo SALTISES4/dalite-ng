@@ -99,11 +99,33 @@ urlpatterns += i18n_patterns(
 )
 
 # Set language view
-urlpatterns += [path("i18n/", include("django.conf.urls.i18n"))]
+urlpatterns += [
+    path(
+        "i18n/",
+        decorator_include(
+            (
+                csp_replace(FRAME_ANCESTORS=["*"]),
+                xframe_options_exempt,
+                lti_access_allowed,
+            ),
+            "django.conf.urls.i18n",
+        ),
+    )
+]
+
 
 # Javascript translations
 urlpatterns += i18n_patterns(
-    path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
+    path(
+        "jsi18n/",
+        csp_replace(FRAME_ANCESTORS=["*"])(
+            xframe_options_exempt(
+                lti_access_allowed(
+                    JavaScriptCatalog.as_view(), name="javascript-catalog"
+                )
+            )
+        ),
+    ),
 )
 
 # Media
