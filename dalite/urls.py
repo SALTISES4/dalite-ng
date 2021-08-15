@@ -26,7 +26,7 @@ urlpatterns = [
         "lti/",
         decorator_include(
             (
-                csp_replace(CSP_FRAME_ANCESTORS=["*"]),
+                csp_replace(FRAME_ANCESTORS=["*"]),
                 xframe_options_exempt,
                 lti_access_allowed,
             ),
@@ -64,7 +64,7 @@ urlpatterns += i18n_patterns(
                             # Dalite question - Only view allowed to be framed
                             path(
                                 "",
-                                csp_replace(CSP_FRAME_ANCESTORS=["*"])(
+                                csp_replace(FRAME_ANCESTORS=["*"])(
                                     xframe_options_exempt(
                                         lti_access_allowed(
                                             peerinst_views.question
