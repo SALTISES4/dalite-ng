@@ -61,10 +61,16 @@ urlpatterns += i18n_patterns(
                     r"<int:question_id>/",
                     include(
                         [
-                            # Dalite question - Only view allowed to be framed
+                            # myDalite question - Must allow to be framed
                             path(
                                 "",
-                                peerinst_views.question,
+                                csp_replace(FRAME_ANCESTORS=["*"])(
+                                    xframe_options_exempt(
+                                        lti_access_allowed(
+                                            peerinst_views.question
+                                        )
+                                    )
+                                ),
                                 name="question",
                             ),
                             path(
