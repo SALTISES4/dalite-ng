@@ -121,10 +121,11 @@ urlpatterns += i18n_patterns(
         csp_replace(FRAME_ANCESTORS=["*"])(
             xframe_options_exempt(
                 lti_access_allowed(
-                    JavaScriptCatalog.as_view(), name="javascript-catalog"
+                    JavaScriptCatalog.as_view(),
                 )
             )
         ),
+        name="javascript-catalog",
     ),
 )
 
