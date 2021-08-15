@@ -75,7 +75,13 @@ urlpatterns += i18n_patterns(
                             ),
                             path(
                                 "reset/",
-                                peerinst_views.reset_question,
+                                csp_replace(FRAME_ANCESTORS=["*"])(
+                                    xframe_options_exempt(
+                                        lti_access_allowed(
+                                            peerinst_views.reset_question
+                                        )
+                                    )
+                                ),
                                 name="reset-question",
                             ),
                         ]
