@@ -64,13 +64,7 @@ urlpatterns += i18n_patterns(
                             # Dalite question - Only view allowed to be framed
                             path(
                                 "",
-                                csp_replace(FRAME_ANCESTORS=["*"])(
-                                    xframe_options_exempt(
-                                        lti_access_allowed(
-                                            peerinst_views.question
-                                        )
-                                    )
-                                ),
+                                peerinst_views.question,
                                 name="question",
                             ),
                             path(

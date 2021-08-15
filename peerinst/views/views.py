@@ -9,6 +9,7 @@ import urllib.request
 from datetime import datetime
 
 import pytz
+from csp.decorators import csp_replace
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -38,6 +39,7 @@ from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_safe
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView, View
@@ -51,6 +53,7 @@ from opaque_keys.edx.keys import CourseKey
 from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
 from peerinst.elasticsearch import question_search as qs_ES
+from peerinst.middleware import lti_access_allowed
 
 # tos
 from tos.models import Consent, Tos
@@ -943,6 +946,9 @@ class QuestionFormView(QuestionMixin, FormView):
 
     template_name = "peerinst/question/form.html"
 
+    @method_decorator(csp_replace(FRAME_ANCESTORS=["*"]))
+    @method_decorator(xframe_options_exempt)
+    @method_decorator(lti_access_allowed)
     def dispatch(self, *args, **kwargs):
         # Check for any TOS
         if Consent.get(self.request.user.username, "student") is None:
