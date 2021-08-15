@@ -1,4 +1,6 @@
+from csp.decorators import csp_replace
 from django.urls import path
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from peerinst.middleware import lti_access_allowed
 
@@ -9,27 +11,43 @@ urlpatterns = [
     path("required/", views.tos.tos_required, name="tos_required"),
     path(
         "tos/<role>/<int:version>/update/",
-        lti_access_allowed(views.tos.tos_consent_update),
+        csp_replace(FRAME_ANCESTORS=["*"])(
+            xframe_options_exempt(
+                lti_access_allowed(views.tos.tos_consent_update)
+            )
+        ),
         name="tos_update",
     ),
     path(
         "tos/<role>/<int:version>/modify/",
-        lti_access_allowed(views.tos.tos_consent_modify),
+        csp_replace(FRAME_ANCESTORS=["*"])(
+            xframe_options_exempt(
+                lti_access_allowed(views.tos.tos_consent_modify)
+            )
+        ),
         name="tos_modify",
     ),
     path(
         "tos/<role>/modify/",
-        lti_access_allowed(views.tos.tos_consent_modify),
+        csp_replace(FRAME_ANCESTORS=["*"])(
+            xframe_options_exempt(
+                lti_access_allowed(views.tos.tos_consent_modify)
+            )
+        ),
         name="tos_modify",
     ),
     path(
         "tos/<role>/<int:version>/",
-        lti_access_allowed(views.tos.tos_consent),
+        csp_replace(FRAME_ANCESTORS=["*"])(
+            xframe_options_exempt(lti_access_allowed(views.tos.tos_consent))
+        ),
         name="tos_consent",
     ),
     path(
         "tos/<role>/",
-        lti_access_allowed(views.tos.tos_consent),
+        csp_replace(FRAME_ANCESTORS=["*"])(
+            xframe_options_exempt(lti_access_allowed(views.tos.tos_consent))
+        ),
         name="tos_consent",
     ),
     path(
