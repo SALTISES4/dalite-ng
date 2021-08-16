@@ -1094,6 +1094,18 @@ class QuestionFormView(QuestionMixin, FormView):
                     group.discipline = self.question.discipline
                 group.save()
 
+            student = Student.objects.get(
+                student=User.objects.get(username=self.user_token),
+            )
+
+            if group not in student.groups.all():
+                student.join_group(group=group)
+
+            sga, created = StudentGroupAssignment.objects.get_or_create(
+                group=group,
+                assignment=self.assignment,
+            )
+
             # If teacher_id specified, add teacher to group
             teacher_hash = self.lti_data.edx_lti_parameters.get(
                 "custom_teacher_id"
