@@ -84,6 +84,7 @@ type SearchAppState = {
   difficulties: string[];
   disciplines: string[];
   favourites: number[];
+  favouritesLoading: boolean;
   flagDialogOpen: boolean;
   flagDialogQuestion: { title: string; pk: number };
   impacts: string[];
@@ -112,6 +113,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
     difficulties: [],
     disciplines: [],
     favourites: [],
+    favouritesLoading: false,
     flagDialogOpen: false,
     flagDialogQuestion: {} as { title: string; pk: number },
     impacts: [],
@@ -304,32 +306,37 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
   };
 
   handleToggleFavourite = async (questionPK: number): Promise<void> => {
-    const currentFavourites: number[] = Array.from(this.state.favourites);
-    const _favourites: number[] = Array.from(this.state.favourites);
+    if (!this.state.favouritesLoading) {
+      const currentFavourites: number[] = Array.from(this.state.favourites);
+      const _favourites: number[] = Array.from(this.state.favourites);
 
-    if (_favourites.includes(questionPK)) {
-      _favourites.splice(_favourites.indexOf(questionPK), 1);
-    } else {
-      _favourites.push(questionPK);
-    }
+      if (_favourites.includes(questionPK)) {
+        _favourites.splice(_favourites.indexOf(questionPK), 1);
+      } else {
+        _favourites.push(questionPK);
+      }
 
-    try {
-      const data = await submitData(
-        this.props.teacherURL,
-        { favourite_questions: _favourites },
-        "PUT",
-      );
-      this.setState({
-        favourites: data["favourite_questions"],
-        snackbarIsOpen: true,
-        snackbarMessage: data["snackbar_message"],
-      });
-    } catch (error) {
-      this.setState({
-        favourites: currentFavourites,
-        snackbarIsOpen: true,
-        snackbarMessage: this.props.gettext("An error occurred."),
-      });
+      try {
+        this.setState({ favouritesLoading: true });
+        const data = await submitData(
+          this.props.teacherURL,
+          { favourite_questions: _favourites },
+          "PUT",
+        );
+        this.setState({
+          favourites: data["favourite_questions"],
+          favouritesLoading: false,
+          snackbarIsOpen: true,
+          snackbarMessage: data["snackbar_message"],
+        });
+      } catch (error) {
+        this.setState({
+          favourites: currentFavourites,
+          favouritesLoading: false,
+          snackbarIsOpen: true,
+          snackbarMessage: this.props.gettext("An error occurred."),
+        });
+      }
     }
     return;
   };
