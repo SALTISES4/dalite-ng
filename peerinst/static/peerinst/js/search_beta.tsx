@@ -67,6 +67,7 @@ type SearchAppProps = {
   questionFlagURLs: string[];
   staticURL: string;
   url: string;
+  teacherFavouritesURL: string;
   teacherURL: string;
   featuredIconURL: string[];
 };
@@ -319,7 +320,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
       try {
         this.setState({ favouritesLoading: true });
         const data = await submitData(
-          this.props.teacherURL,
+          this.props.teacherFavouritesURL,
           { favourite_questions: _favourites },
           "PUT",
         );
