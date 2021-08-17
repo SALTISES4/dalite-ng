@@ -2300,9 +2300,9 @@ def question_search_beta(request):
             )
             meta = {
                 "categories": categories,
-                "difficulties": difficulties,
+                "difficulties": Question.order_difficulty(difficulties),
                 "disciplines": disciplines,
-                "impacts": impacts,
+                "impacts": Question.order_peer_impact(impacts),
             }
         else:
             meta = {
