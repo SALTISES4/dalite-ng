@@ -51,6 +51,7 @@ export type Assignment = {
 type AssignmentListProps = {
   archived: Assignment[];
   assignments: Assignment[];
+  disabled: boolean;
   gettext: (a: string) => string;
   handleToggleArchived: (a: Assignment) => Promise<void>;
   lti: {
@@ -66,6 +67,7 @@ type AssignmentListProps = {
 export function AssignmentList({
   archived,
   assignments,
+  disabled,
   gettext,
   handleToggleArchived,
   lti,
@@ -94,6 +96,8 @@ export function AssignmentList({
     }
     return +ownedPks.includes(b.pk) - +ownedPks.includes(a.pk);
   };
+
+  const sortedAssignments = assignments.concat(archived).sort(sort);
 
   const info = (): JSX.Element | undefined => {
     if (assignments.length == 0 && view == "") {
@@ -140,9 +144,7 @@ export function AssignmentList({
         twoLine
         style={{ position: "relative" }}
       >
-        {assignments
-          .concat(archived)
-          .sort(sort)
+        {sortedAssignments
           .filter((a) => {
             return view == "archived"
               ? archivedPks.includes(a.pk)
@@ -154,6 +156,7 @@ export function AssignmentList({
                 <AssignmentListItem
                   archived={archivedPks.includes(a.pk)}
                   assignment={a}
+                  disabled={disabled}
                   gettext={gettext}
                   handleToggleArchived={handleToggleArchived}
                   lti={lti}
@@ -171,6 +174,7 @@ export function AssignmentList({
 type AssignmentListItemProps = {
   archived: boolean;
   assignment: Assignment;
+  disabled: boolean;
   gettext: (a: string) => string;
   handleToggleArchived: (a: Assignment) => Promise<void>;
   lti: {
@@ -201,6 +205,7 @@ class AssignmentListItem extends Component<
   archiveIcon = (): JSX.Element | undefined => {
     return (
       <IconButton
+        disabled={this.props.disabled}
         icon={
           this.props.owned && this.props.archived
             ? "unarchive"

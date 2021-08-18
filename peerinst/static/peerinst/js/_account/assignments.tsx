@@ -37,6 +37,7 @@ type TeacherAccountAssignmentAppState = {
   open: boolean;
   ownedAssignments: Assignment[];
   view: string;
+  waitingOnResponse: boolean;
 };
 
 export class TeacherAccountAssignmentApp extends Component<
@@ -51,6 +52,7 @@ export class TeacherAccountAssignmentApp extends Component<
       localStorage.getItem("teacher-account-assignment-section") === "true",
     ownedAssignments: [],
     view: "",
+    waitingOnResponse: true,
   };
 
   archived = (
@@ -74,38 +76,43 @@ export class TeacherAccountAssignmentApp extends Component<
   };
 
   handleToggleArchived = async (a: Assignment): Promise<void> => {
-    console.debug("Toggle archived");
-    console.debug(a);
+    if (!this.state.waitingOnResponse) {
+      console.debug("Toggle archived");
+      console.debug(a);
 
-    const _assignments: Assignment[] = Array.from(this.state.assignments);
-    const _archived: Assignment[] = Array.from(this.state.archived);
+      const _assignments: Assignment[] = Array.from(this.state.assignments);
+      const _archived: Assignment[] = Array.from(this.state.archived);
 
-    if (_archived.map((_a) => _a.pk).includes(a.pk)) {
-      _assignments.push(a);
-    } else {
-      _assignments.splice(_assignments.indexOf(a), 1);
-    }
+      if (_archived.map((_a) => _a.pk).includes(a.pk)) {
+        _assignments.push(a);
+      } else {
+        _assignments.splice(_assignments.indexOf(a), 1);
+      }
 
-    try {
-      const data = await submitData(
-        this.props.urls.assignmentList,
-        { assignment_pks: _assignments.map((a) => a.pk) },
-        "PUT",
-      );
-      console.debug(data);
-      const archived = this.archived(
-        data["assignments"],
-        data["owned_assignments"],
-      );
-      this.setState(
-        {
-          archived,
-          assignments: data["assignments"],
-        },
-        this.updateView,
-      );
-    } catch (error) {
-      console.error(error);
+      try {
+        this.setState({ waitingOnResponse: true });
+        const data = await submitData(
+          this.props.urls.assignmentList,
+          { assignment_pks: _assignments.map((a) => a.pk) },
+          "PUT",
+        );
+        console.debug(data);
+        const archived = this.archived(
+          data["assignments"],
+          data["owned_assignments"],
+        );
+        this.setState(
+          {
+            archived,
+            assignments: data["assignments"],
+            waitingOnResponse: false,
+          },
+          this.updateView,
+        );
+      } catch (error) {
+        console.error(error);
+        this.setState({ waitingOnResponse: false });
+      }
     }
   };
 
@@ -114,18 +121,16 @@ export class TeacherAccountAssignmentApp extends Component<
       const data = await get(this.props.urls.assignmentList);
       console.debug(data);
 
-      this.setState(
-        {
-          archived: this.archived(
-            data["assignments"],
-            data["owned_assignments"],
-          ),
-          assignments: data["assignments"],
-          loaded: true,
-          ownedAssignments: data["owned_assignments"],
-        },
-        () => console.debug(this.state, this.props),
-      );
+      this.setState({
+        archived: this.archived(
+          data["assignments"],
+          data["owned_assignments"],
+        ),
+        assignments: data["assignments"],
+        loaded: true,
+        ownedAssignments: data["owned_assignments"],
+        waitingOnResponse: false,
+      });
     } catch (error) {
       console.error(error);
     }
@@ -202,6 +207,7 @@ export class TeacherAccountAssignmentApp extends Component<
           <AssignmentList
             archived={this.state.archived}
             assignments={this.state.assignments}
+            disabled={this.state.waitingOnResponse}
             gettext={this.props.gettext}
             lti={this.props.lti}
             handleToggleArchived={this.handleToggleArchived}
