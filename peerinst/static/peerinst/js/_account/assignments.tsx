@@ -22,10 +22,10 @@ type TeacherAccountAssignmentAppProps = {
     teacherHash: string;
   };
   urls: {
+    assignmentArchive: string;
     assignmentCreate: string;
     assignmentList: string;
     assignmentSearch: string;
-    assignmentUpdate: string;
     generateReport: string;
   };
 };
@@ -92,19 +92,19 @@ export class TeacherAccountAssignmentApp extends Component<
       try {
         this.setState({ waitingOnResponse: true });
         const data = await submitData(
-          this.props.urls.assignmentList,
+          this.props.urls.assignmentArchive,
           { assignment_pks: _assignments.map((a) => a.pk) },
           "PUT",
         );
         console.debug(data);
         const archived = this.archived(
-          data["assignments"],
-          data["owned_assignments"],
+          _assignments,
+          this.state.ownedAssignments,
         );
         this.setState(
           {
             archived,
-            assignments: data["assignments"],
+            assignments: _assignments,
             waitingOnResponse: false,
           },
           this.updateView,
