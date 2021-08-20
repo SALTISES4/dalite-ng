@@ -306,7 +306,9 @@
         account.TeacherAccountQuestionApp, {
           gettext: gettext,
           urls: {
+            questionArchive: "{% url 'REST:teacher' teacher.pk %}?field=archived_questions",
             questionCreate: "{% url 'question-create' %}",
+            questionDeleted: "{% url 'REST:teacher' teacher.pk %}?field=deleted_questions",
             questionEdit: "{% url 'question-update-path' %}",
             questionList: "{% url 'REST:teacher' teacher.pk %}?field=archived_questions&field=deleted_questions&field=questions&field=shared_questions"
           },

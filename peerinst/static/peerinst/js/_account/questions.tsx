@@ -14,7 +14,13 @@ import "@rmwc/linear-progress/node_modules/@material/linear-progress/dist/mdc.li
 
 type TeacherAccountQuestionAppProps = {
   gettext: (a: string) => string;
-  urls: { questionCreate: string; questionEdit: string; questionList: string };
+  urls: {
+    questionArchive: string;
+    questionCreate: string;
+    questionDeleted: string;
+    questionEdit: string;
+    questionList: string;
+  };
 };
 
 type TeacherAccountQuestionAppState = {
@@ -69,7 +75,7 @@ export class TeacherAccountQuestionApp extends Component<
       try {
         this.setState({ waitingOnResponse: true });
         const data = await submitData(
-          this.props.urls.questionList,
+          this.props.urls.questionArchive,
           { archived_questions: _archived },
           "PUT",
         );
@@ -102,7 +108,7 @@ export class TeacherAccountQuestionApp extends Component<
       try {
         this.setState({ waitingOnResponse: true });
         const data = await submitData(
-          this.props.urls.questionList,
+          this.props.urls.questionDeleted,
           { deleted_questions: _deleted },
           "PUT",
         );
