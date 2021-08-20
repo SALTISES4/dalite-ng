@@ -317,8 +317,8 @@ class AssignmentListItem extends Component<
             <Info
               className="large"
               text={this.props.gettext(
-                `Use the following information to configure the LTI tool in
-             your Learning Management System (e.g. Moodle, OpenEdx):`,
+                "Use the following information to configure the LTI tool in " +
+                  "your Learning Management System (e.g. Moodle, OpenEdx):",
               )}
               type="tip"
             />
@@ -375,9 +375,9 @@ class AssignmentListItem extends Component<
             <Info
               className="large"
               text={this.props.gettext(
-                `To import assignment questions, copy and paste the text
-                 below the question title into the Custom Parameters box of your
-                 LTI tool:`,
+                "To import assignment questions, copy and paste the text " +
+                  "below the question title into the Custom Parameters box " +
+                  "of your LTI tool:",
               )}
               type="tip"
             />
@@ -412,7 +412,7 @@ class AssignmentListItem extends Component<
               isDefaultAction
               theme="primary"
             >
-              {this.props.gettext("OK")}
+              {this.props.gettext("Ok")}
             </DialogButton>
           </DialogActions>
         </Dialog>

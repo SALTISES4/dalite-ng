@@ -149,9 +149,9 @@ export class AssignmentDialog extends Component<
         <Info
           type="alert"
           text={this.props.gettext(
-            `You have no editable assignments to which this
-             question can be added, but you can create a new one below.  The
-             question will be added to the new assignment automatically.`,
+            "You have no editable assignments to which this " +
+              "question can be added, but you can create a new one below.  " +
+              "The question will be added to the new assignment automatically.",
           )}
         />
       );
@@ -159,8 +159,8 @@ export class AssignmentDialog extends Component<
     return (
       <Info
         text={this.props.gettext(
-          `You can add this question to an existing assignment (if it is
-           editable) or use this question to start a new assignment.`,
+          "You can add this question to an existing assignment (if it is " +
+            "editable) or use this question to start a new assignment.",
         )}
       />
     );
@@ -409,11 +409,11 @@ export function QuestionDialog({
         <div style={{ marginBottom: 16 }}>
           <Info
             text={gettext(
-              `The distribution of first and second choices along with the
-            statistics for each possible outcome are shown in the figure
-            below.  The most convincing rationales submitted by students
-            (i.e. most selected be peers) are also listed for each answer
-            choice.`,
+              "The distribution of first and second choices along with the " +
+                "statistics for each possible outcome are shown in the " +
+                "figure below.  The most convincing rationales submitted by " +
+                "students (i.e. most selected be peers) are also listed for " +
+                "each answer choice.",
             )}
           />
         </div>
@@ -518,9 +518,9 @@ export class QuestionFlagDialog extends Component<
           <div style={{ marginBottom: 16 }}>
             <Info
               text={this.props.gettext(
-                `You can flag this question as problematic using the form below.
-                This will immediately remove it from search results pending
-                review.  It will not remove it from assignments.`,
+                "You can flag this question as problematic using the form " +
+                  "below. This will immediately remove it from search results " +
+                  "pending review.  It will not remove it from assignments.",
               )}
             />
           </div>

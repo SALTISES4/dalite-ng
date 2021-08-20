@@ -31,12 +31,12 @@ export class CopyBox extends Component<CopyBoxProps, CopyBoxState> {
       window.navigator.clipboard.writeText(this.ref.current.innerText);
       this.setState({
         snackbarIsOpen: true,
-        snackbarMessage: this.props.gettext("Copied to clipboard"),
+        snackbarMessage: this.props.gettext("Copied to clipboard."),
       });
     } catch (error) {
       this.setState({
         snackbarIsOpen: true,
-        snackbarMessage: this.props.gettext("An error occurred"),
+        snackbarMessage: this.props.gettext("An error occurred."),
       });
     }
   };

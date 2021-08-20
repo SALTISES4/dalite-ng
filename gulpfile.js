@@ -256,7 +256,13 @@ function buildScript(app, module) {
       "material/snackbar": "material/snackbar",
     },
     name,
-    plugins: [terser()],
+    plugins: [
+      terser({
+        mangle: {
+          reserved: ["gettext"],
+        },
+      }),
+    ],
     sourcemap: true,
   };
 

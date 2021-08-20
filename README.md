@@ -391,7 +391,7 @@ Translations
 
 Delete static directory in project root and run:
 
-`django-admin makemessages -d djangojs -l fr -i=node_modules/* -i=venv* -i=*.min.js -e=js,jsx,ts,tsx`
+`django-admin makemessages -d djangojs -l fr -i=node_modules/* -i=venv*`
 
 `../manage.py compilemessages -l fr`
 
