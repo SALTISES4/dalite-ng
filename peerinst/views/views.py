@@ -2300,9 +2300,19 @@ def question_search_beta(request):
             )
             meta = {
                 "categories": categories,
-                "difficulties": Question.order_difficulty(difficulties),
+                "difficulties": [
+                    (d, _d[1])
+                    for _d in Question.DIFFICULTY_LABELS
+                    for d in difficulties
+                    if _d[0] == d
+                ],
                 "disciplines": disciplines,
-                "impacts": Question.order_peer_impact(impacts),
+                "impacts": [
+                    (i, _i[1])
+                    for _i in Question.PEER_IMPACT_LABELS
+                    for i in impacts
+                    if _i[0] == i
+                ],
             }
         else:
             meta = {

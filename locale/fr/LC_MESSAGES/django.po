@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-17 22:10-0400\n"
+"POT-Creation-Date: 2021-08-19 18:37-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -943,6 +943,34 @@ msgstr "disciplines"
 #| msgid "Create question"
 msgid "flagged question"
 msgstr "Créer une question"
+
+#: peerinst/models/question.py:196
+msgid "Easy"
+msgstr "Facile"
+
+#: peerinst/models/question.py:197
+msgid "Avg"
+msgstr "Moy"
+
+#: peerinst/models/question.py:198
+msgid "Hard"
+msgstr "Diff"
+
+#: peerinst/models/question.py:199 peerinst/models/question.py:206
+msgid "Not enough data"
+msgstr "Pas assez de réponses"
+
+#: peerinst/models/question.py:203
+msgid "Low"
+msgstr "Bas"
+
+#: peerinst/models/question.py:204
+msgid "Med"
+msgstr "Inter"
+
+#: peerinst/models/question.py:205
+msgid "High"
+msgstr "Élévé"
 
 #: peerinst/models/question.py:212
 msgid ""

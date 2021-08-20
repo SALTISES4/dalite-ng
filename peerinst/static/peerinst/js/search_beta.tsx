@@ -51,9 +51,9 @@ function Chip({ onClick, selected, text }: ChipProps) {
 type SearchData = {
   meta: {
     categories: string[];
-    difficulties: string[];
+    difficulties: [number, string][];
     disciplines: string[];
-    impacts: string[];
+    impacts: [number, string][];
   };
   results: Question[];
 };
@@ -82,19 +82,19 @@ type SearchAppState = {
   categories: string[];
   dialogOpen: boolean;
   dialogQuestion: Question;
-  difficulties: string[];
+  difficulties: [number, string][];
   disciplines: string[];
   favourites: number[];
   favouritesLoading: boolean;
   flagDialogOpen: boolean;
   flagDialogQuestion: { title: string; pk: number };
-  impacts: string[];
+  impacts: [number, string][];
   lastKeyStroke: number;
   searching: boolean;
   selectedCategories: string[];
-  selectedDifficulty: string;
+  selectedDifficulty: number;
   selectedDiscipline: string;
-  selectedImpact: string;
+  selectedImpact: number;
   snackbarIsOpen: boolean;
   snackbarMessage: string;
   timeoutID: number;
@@ -121,9 +121,9 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
     lastKeyStroke: 0,
     searching: false,
     selectedCategories: [],
-    selectedDifficulty: "",
+    selectedDifficulty: 0,
     selectedDiscipline: "",
-    selectedImpact: "",
+    selectedImpact: 0,
     snackbarIsOpen: false,
     snackbarMessage: "",
     timeoutID: 0,
@@ -228,9 +228,9 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
           disciplines: [],
           impacts: [],
           selectedCategories: [],
-          selectedDifficulty: "",
+          selectedDifficulty: 0,
           selectedDiscipline: "",
-          selectedImpact: "",
+          selectedImpact: 0,
         });
       }
     } else {
@@ -433,49 +433,44 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
           >
             {this.props.gettext("Difficulty levels")}
           </Typography>
-          {this.state.difficulties.map((d: string, i) => {
-            if (d.length > 0) {
-              return (
-                <Chip
-                  selected={this.state.selectedDifficulty == d}
-                  text={d}
-                  key={i}
-                  onClick={() => {
-                    if (this.state.selectedDifficulty) {
-                      this.setState(
-                        {
-                          selectedDifficulty: "",
-                          query: this.state.query
-                            .replace(/difficulty.label::\S+/gi, "")
-                            .replace(/\s+/g, " ")
-                            .trim(),
-                        },
-                        this.handleSubmit,
-                      );
-                    } else {
-                      this.setState(
-                        {
-                          selectedDifficulty: d,
-                          query:
-                            "difficulty.label::" +
-                            d.replaceAll(" ", "_") +
-                            " " +
-                            this.state.query,
-                        },
-                        this.handleSubmit,
-                      );
-                    }
-                  }}
-                />
-              );
-            }
+          {this.state.difficulties.map((d: [number, string], i) => {
+            return (
+              <Chip
+                selected={this.state.selectedDifficulty == d[0]}
+                text={d[0] + ": " + d[1]}
+                key={i}
+                onClick={() => {
+                  if (this.state.selectedDifficulty) {
+                    this.setState(
+                      {
+                        selectedDifficulty: 0,
+                        query: this.state.query
+                          .replace(/difficulty.label::\S+/gi, "")
+                          .replace(/\s+/g, " ")
+                          .trim(),
+                      },
+                      this.handleSubmit,
+                    );
+                  } else {
+                    this.setState(
+                      {
+                        selectedDifficulty: d[0],
+                        query:
+                          "difficulty.label::" + d[0] + " " + this.state.query,
+                      },
+                      this.handleSubmit,
+                    );
+                  }
+                }}
+              />
+            );
           })}
           <i
             class="material-icons"
             onClick={() => {
               this.setState(
                 {
-                  selectedDifficulty: "",
+                  selectedDifficulty: 0,
                   query: this.state.query
                     .replace(/difficulty.label::\S+/gi, "")
                     .replace(/\s+/g, " ")
@@ -587,18 +582,18 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
           >
             {this.props.gettext("Peer impact levels")}
           </Typography>
-          {this.state.impacts.map((d: string, i) => {
+          {this.state.impacts.map((d: [number, string], i) => {
             if (d.length > 0) {
               return (
                 <Chip
-                  selected={this.state.selectedImpact == d}
-                  text={d}
+                  selected={this.state.selectedImpact == d[0]}
+                  text={d[0] + ": " + d[1]}
                   key={i}
                   onClick={() => {
                     if (this.state.selectedImpact) {
                       this.setState(
                         {
-                          selectedImpact: "",
+                          selectedImpact: 0,
                           query: this.state.query
                             .replace(/peer_impact.label::\S+/gi, "")
                             .replace(/\s+/g, " ")
@@ -609,10 +604,10 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
                     } else {
                       this.setState(
                         {
-                          selectedImpact: d,
+                          selectedImpact: d[0],
                           query:
                             "peer_impact.label::" +
-                            d.replaceAll(" ", "_") +
+                            d[0] +
                             " " +
                             this.state.query,
                         },
@@ -629,7 +624,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
             onClick={() => {
               this.setState(
                 {
-                  selectedImpact: "",
+                  selectedImpact: 0,
                   query: this.state.query
                     .replace(/peer_impact.label::\S+/gi, "")
                     .replace(/\s+/g, " ")
@@ -795,9 +790,9 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
                     disciplines: [],
                     impacts: [],
                     selectedCategories: [],
-                    selectedDifficulty: "",
+                    selectedDifficulty: 0,
                     selectedDiscipline: "",
-                    selectedImpact: "",
+                    selectedImpact: 0,
                   })
                 }
               />

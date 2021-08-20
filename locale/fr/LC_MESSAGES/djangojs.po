@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-11 23:20-0400\n"
+"POT-Creation-Date: 2021-08-19 18:35-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,25 +18,25 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: peerinst/static/peerinst/js/_account/assignments.tsx:139
+#: peerinst/static/peerinst/js/_account/assignments.tsx:144
 #: peerinst/static/peerinst/js/_account/questions.tsx:136
 msgid "Manage archived"
 msgstr ""
 
-#: peerinst/static/peerinst/js/_account/assignments.tsx:151
-msgid "Search"
+#: peerinst/static/peerinst/js/_account/assignments.tsx:156
+msgid "Index"
 msgstr ""
 
-#: peerinst/static/peerinst/js/_account/assignments.tsx:160
+#: peerinst/static/peerinst/js/_account/assignments.tsx:165
 msgid "Generate report"
 msgstr ""
 
-#: peerinst/static/peerinst/js/_account/assignments.tsx:170
+#: peerinst/static/peerinst/js/_account/assignments.tsx:175
 #: peerinst/static/peerinst/js/_account/questions.tsx:159
 msgid "Return to list"
 msgstr ""
 
-#: peerinst/static/peerinst/js/_account/assignments.tsx:181
+#: peerinst/static/peerinst/js/_account/assignments.tsx:186
 #: peerinst/static/peerinst/js/_account/questions.tsx:171
 msgid "Create new"
 msgstr ""
@@ -78,7 +78,7 @@ msgstr ""
 #: peerinst/static/peerinst/js/_assignment/update.jsx:172
 #: peerinst/static/peerinst/js/_group/rationale_table.jsx:317
 #: peerinst/static/peerinst/js/_student/feedback.jsx:178
-#: peerinst/static/peerinst/js/search_beta.tsx:216
+#: peerinst/static/peerinst/js/search_beta.tsx:219
 msgid "An error occurred.  Try refreshing this page."
 msgstr ""
 
@@ -118,9 +118,9 @@ msgstr ""
 #: peerinst/static/peerinst/js/_assignment/update.jsx:212
 #: peerinst/static/peerinst/js/_assignment/update.jsx:219
 #: peerinst/static/peerinst/js/_assignment/update.jsx:244
-#: peerinst/static/peerinst/js/search_beta.tsx:263
-#: peerinst/static/peerinst/js/search_beta.tsx:284
-#: peerinst/static/peerinst/js/search_beta.tsx:331
+#: peerinst/static/peerinst/js/search_beta.tsx:266
+#: peerinst/static/peerinst/js/search_beta.tsx:287
+#: peerinst/static/peerinst/js/search_beta.tsx:338
 msgid "An error occurred."
 msgstr ""
 
@@ -150,74 +150,74 @@ msgstr ""
 msgid "Copy to clipboard."
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:104
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:108
 msgid ""
 "You are not currently following any assignments.  You can create one, search "
 "for one in the database, or unarchive an old one."
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:115
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:119
 msgid ""
 "This is the list of assignments you have authored or are currently "
 "following, and for which reports will be available.  You can archive or "
 "unfollow any assignments you are no longer using."
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:126
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:130
 msgid "This is the list of assignments you have authored and archived."
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:214
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:219
 msgid "Unarchive this assignment."
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:216
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:221
 msgid "Archive this assignment to hide it."
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:217
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:222
 msgid "Unfollow this assignment."
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:236
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:241
 msgid "Edit this assignment to make changes."
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:237
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:242
 msgid "Copy this assignment to make changes."
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:256
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:261
 msgid "Distribute this assignment to one of your groups."
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:278
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:283
 msgid "questions"
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:284
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:289
 msgid "There is a problem with this assignment."
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:304
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:309
 msgid ""
 "Use the following information to configure the LTI tool in\n"
 "             your Learning Management System (e.g. Moodle, OpenEdx):"
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:316
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:321
 msgid "LTI Launch URL"
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:332
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:337
 msgid "LTI Consumer Key"
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:348
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:353
 msgid "LTI Shared Secret"
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:362
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:367
 msgid ""
 "To import assignment questions, copy and paste the text\n"
 "                 below the question title into the Custom Parameters box of "
@@ -225,15 +225,15 @@ msgid ""
 "                 LTI tool:"
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:399
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:404
 msgid "OK"
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:423
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:428
 msgid "Distribute via LMS (e.g. Moodle)"
 msgstr ""
 
-#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:430
+#: peerinst/static/peerinst/js/_components/lists/assignmentList.tsx:435
 msgid "Distribute via myDALITE"
 msgstr ""
 
@@ -395,7 +395,7 @@ msgid "Unlabelled"
 msgstr ""
 
 #: peerinst/static/peerinst/js/_components/question.tsx:583
-#: peerinst/static/peerinst/js/search_beta.tsx:346
+#: peerinst/static/peerinst/js/search_beta.tsx:354
 msgid "Categories"
 msgstr ""
 
@@ -422,7 +422,7 @@ msgstr ""
 #: peerinst/static/peerinst/js/_components/question.tsx:763
 msgid ""
 "This question is part of featured content curated by SALTISE.  Click to open "
-"the associated collection"
+"the associated collection: "
 msgstr ""
 
 #: peerinst/static/peerinst/js/_components/question.tsx:805
@@ -607,56 +607,56 @@ msgstr "Une explication est nécessaire."
 msgid "You thought:"
 msgstr ""
 
-#: peerinst/static/peerinst/js/search_beta.tsx:289
+#: peerinst/static/peerinst/js/search_beta.tsx:292
 msgid "Added to "
 msgstr ""
 
-#: peerinst/static/peerinst/js/search_beta.tsx:293
+#: peerinst/static/peerinst/js/search_beta.tsx:296
 msgid "assignments"
 msgstr ""
 
-#: peerinst/static/peerinst/js/search_beta.tsx:426
+#: peerinst/static/peerinst/js/search_beta.tsx:434
 msgid "Difficulty levels"
 msgstr ""
 
-#: peerinst/static/peerinst/js/search_beta.tsx:503
+#: peerinst/static/peerinst/js/search_beta.tsx:511
 msgid "Disciplines"
 msgstr ""
 
-#: peerinst/static/peerinst/js/search_beta.tsx:580
+#: peerinst/static/peerinst/js/search_beta.tsx:588
 msgid "Peer impact levels"
 msgstr ""
 
-#: peerinst/static/peerinst/js/search_beta.tsx:691
+#: peerinst/static/peerinst/js/search_beta.tsx:699
 msgid "No search results"
 msgstr ""
 
-#: peerinst/static/peerinst/js/search_beta.tsx:694
+#: peerinst/static/peerinst/js/search_beta.tsx:702
 msgid ""
 "Ugh... doesn't look like there are any questions that match your query.  May "
 "we suggest:"
 msgstr ""
 
-#: peerinst/static/peerinst/js/search_beta.tsx:700
+#: peerinst/static/peerinst/js/search_beta.tsx:708
 msgid "Try the search again, but with different keywords and/or fewer filters;"
 msgstr ""
 
-#: peerinst/static/peerinst/js/search_beta.tsx:705
+#: peerinst/static/peerinst/js/search_beta.tsx:713
 msgid ""
 "Create the question you are looking for by selecting 'Create question' from "
 "the menu."
 msgstr ""
 
-#: peerinst/static/peerinst/js/search_beta.tsx:736
-#: peerinst/static/peerinst/js/search_beta.tsx:752
+#: peerinst/static/peerinst/js/search_beta.tsx:744
+#: peerinst/static/peerinst/js/search_beta.tsx:760
 msgid "Error.  Try refreshing this page."
 msgstr ""
 
-#: peerinst/static/peerinst/js/search_beta.tsx:771
+#: peerinst/static/peerinst/js/search_beta.tsx:779
 msgid "Type something..."
 msgstr ""
 
-#: peerinst/static/peerinst/js/search_beta.tsx:804
+#: peerinst/static/peerinst/js/search_beta.tsx:812
 msgid ""
 "You can search for keywords in question and answer texts, by username, by "
 "question id, by category, and by discipline."

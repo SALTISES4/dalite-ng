@@ -193,17 +193,17 @@ class Question(models.Model):
     unflagged_objects = UnflaggedQuestionManager()
 
     DIFFICULTY_LABELS = (
-        (1, "Easy"),
-        (2, "Avg"),
-        (3, "Hard"),
-        (4, "Not enough data"),
+        (1, _("Easy")),
+        (2, _("Avg")),
+        (3, _("Hard")),
+        (4, _("Not enough data")),
     )
 
     PEER_IMPACT_LABELS = (
-        (1, "Low"),
-        (2, "Med"),
-        (3, "High"),
-        (4, "Not enough data"),
+        (1, _("Low")),
+        (2, _("Med")),
+        (3, _("High")),
+        (4, _("Not enough data")),
     )
 
     id = models.AutoField(
@@ -385,18 +385,6 @@ class Question(models.Model):
             strip=True,
         ).strip()
         super().save(*args, **kwargs)
-
-    @classmethod
-    def order_difficulty(cls, labels):
-        return [
-            label[1] for label in cls.DIFFICULTY_LABELS if label[1] in labels
-        ]
-
-    @classmethod
-    def order_peer_impact(cls, labels):
-        return [
-            label[1] for label in cls.PEER_IMPACT_LABELS if label[1] in labels
-        ]
 
     @classmethod
     def deleted_questions(cls):
@@ -804,15 +792,15 @@ class Question(models.Model):
         if N > MIN_ANSWERS:
             difficulty = self.get_answers_by_type(answer_type="*W").count() / N
             if difficulty >= UPPER_BOUND:
-                difficulty_str = self.DIFFICULTY_LABELS[2][1]
+                difficulty_label = self.DIFFICULTY_LABELS[2]
             elif difficulty < LOWER_BOUND:
-                difficulty_str = self.DIFFICULTY_LABELS[0][1]
+                difficulty_label = self.DIFFICULTY_LABELS[0]
             else:
-                difficulty_str = self.DIFFICULTY_LABELS[1][1]
+                difficulty_label = self.DIFFICULTY_LABELS[1]
         else:
             difficulty = None
-            difficulty_str = self.DIFFICULTY_LABELS[3][1]
-        return (difficulty, difficulty_str)
+            difficulty_label = self.DIFFICULTY_LABELS[3]
+        return (difficulty, *difficulty_label)
 
     def get_peer_impact(self):
         MIN_ANSWERS = 30
@@ -826,15 +814,15 @@ class Question(models.Model):
                 + self.get_answers_by_type(answer_type="WR").count()
             ) / N
             if peer_impact >= UPPER_BOUND:
-                peer_impact_str = self.PEER_IMPACT_LABELS[2][1]
+                peer_impact_label = self.PEER_IMPACT_LABELS[2]
             elif peer_impact < LOWER_BOUND:
-                peer_impact_str = self.PEER_IMPACT_LABELS[0][1]
+                peer_impact_label = self.PEER_IMPACT_LABELS[0]
             else:
-                peer_impact_str = self.PEER_IMPACT_LABELS[1][1]
+                peer_impact_label = self.PEER_IMPACT_LABELS[1]
         else:
             peer_impact = None
-            peer_impact_str = self.PEER_IMPACT_LABELS[3][1]
-        return (peer_impact, peer_impact_str)
+            peer_impact_label = self.PEER_IMPACT_LABELS[3]
+        return (peer_impact, *peer_impact_label)
 
     def get_matrix(self):
         matrix = {}
