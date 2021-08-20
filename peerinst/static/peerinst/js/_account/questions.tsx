@@ -2,7 +2,7 @@ import { Component, Fragment, h } from "preact";
 
 import { get, submitData } from "../_ajax/ajax";
 
-import { CircularProgress } from "@rmwc/circular-progress";
+import { LinearProgress } from "@rmwc/linear-progress";
 
 import { Breadcrumb, Heading } from "./heading";
 import {
@@ -10,7 +10,7 @@ import {
   QuestionList,
 } from "../_components/lists/questionList";
 
-import "@rmwc/circular-progress/circular-progress.css";
+import "@rmwc/linear-progress/node_modules/@material/linear-progress/dist/mdc.linear-progress.min.css";
 
 type TeacherAccountQuestionAppProps = {
   gettext: (a: string) => string;
@@ -25,6 +25,7 @@ type TeacherAccountQuestionAppState = {
   questions: ListedQuestion[];
   shared: ListedQuestion[];
   view: string;
+  waitingOnResponse: boolean;
 };
 
 export class TeacherAccountQuestionApp extends Component<
@@ -39,6 +40,7 @@ export class TeacherAccountQuestionApp extends Component<
     questions: [],
     shared: [],
     view: "",
+    waitingOnResponse: true,
   };
 
   updateView = (): void => {
@@ -54,58 +56,68 @@ export class TeacherAccountQuestionApp extends Component<
   };
 
   handleToggleArchived = async (pk: number): Promise<void> => {
-    console.debug("Toggle archived");
-    console.debug(pk);
+    if (!this.state.waitingOnResponse) {
+      console.debug("Toggle archived");
+      console.debug(pk);
 
-    const _archived: number[] = Array.from(this.state.archived);
-    if (_archived.includes(pk)) {
-      _archived.splice(_archived.indexOf(pk), 1);
-    } else {
-      _archived.push(pk);
-    }
-    try {
-      const data = await submitData(
-        this.props.urls.questionList,
-        { archived_questions: _archived },
-        "PUT",
-      );
-      console.debug(data);
-      this.setState(
-        {
-          archived: data["archived_questions"],
-        },
-        this.updateView,
-      );
-    } catch (error) {
-      console.error(error);
+      const _archived: number[] = Array.from(this.state.archived);
+      if (_archived.includes(pk)) {
+        _archived.splice(_archived.indexOf(pk), 1);
+      } else {
+        _archived.push(pk);
+      }
+      try {
+        this.setState({ waitingOnResponse: true });
+        const data = await submitData(
+          this.props.urls.questionList,
+          { archived_questions: _archived },
+          "PUT",
+        );
+        console.debug(data);
+        this.setState(
+          {
+            archived: data["archived_questions"],
+            waitingOnResponse: false,
+          },
+          this.updateView,
+        );
+      } catch (error) {
+        console.error(error);
+        this.setState({ waitingOnResponse: false });
+      }
     }
   };
 
   handleToggleDeleted = async (pk: number): Promise<void> => {
-    console.debug("Toggle deleted");
-    console.debug(pk);
+    if (!this.state.waitingOnResponse) {
+      console.debug("Toggle deleted");
+      console.debug(pk);
 
-    const _deleted: number[] = Array.from(this.state.deleted);
-    if (_deleted.includes(pk)) {
-      _deleted.splice(_deleted.indexOf(pk), 1);
-    } else {
-      _deleted.push(pk);
-    }
-    try {
-      const data = await submitData(
-        this.props.urls.questionList,
-        { deleted_questions: _deleted },
-        "PUT",
-      );
-      console.debug(data);
-      this.setState(
-        {
-          deleted: data["deleted_questions"],
-        },
-        this.updateView,
-      );
-    } catch (error) {
-      console.error(error);
+      const _deleted: number[] = Array.from(this.state.deleted);
+      if (_deleted.includes(pk)) {
+        _deleted.splice(_deleted.indexOf(pk), 1);
+      } else {
+        _deleted.push(pk);
+      }
+      try {
+        this.setState({ waitingOnResponse: true });
+        const data = await submitData(
+          this.props.urls.questionList,
+          { deleted_questions: _deleted },
+          "PUT",
+        );
+        console.debug(data);
+        this.setState(
+          {
+            deleted: data["deleted_questions"],
+            waitingOnResponse: false,
+          },
+          this.updateView,
+        );
+      } catch (error) {
+        console.error(error);
+        this.setState({ waitingOnResponse: false });
+      }
     }
   };
 
@@ -120,6 +132,7 @@ export class TeacherAccountQuestionApp extends Component<
           loaded: true,
           questions: data["questions"],
           shared: data["shared_questions"],
+          waitingOnResponse: false,
         },
         () => console.debug(this.state),
       );
@@ -180,7 +193,7 @@ export class TeacherAccountQuestionApp extends Component<
 
   content = (): JSX.Element | undefined => {
     if (this.state.open && !this.state.loaded) {
-      return <CircularProgress className="spinner" size="xlarge" />;
+      return <LinearProgress determinate={false} style={{ width: 600 }} />;
     }
     if (this.state.open) {
       return (
@@ -191,6 +204,7 @@ export class TeacherAccountQuestionApp extends Component<
           <QuestionList
             archived={this.state.archived}
             deleted={this.state.deleted}
+            disabled={this.state.waitingOnResponse}
             editURL={this.props.urls.questionEdit}
             gettext={this.props.gettext}
             handleToggleArchived={this.handleToggleArchived}

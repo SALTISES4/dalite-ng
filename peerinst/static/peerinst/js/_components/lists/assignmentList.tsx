@@ -1,5 +1,6 @@
 import { Component, createRef, Fragment, h } from "preact";
 
+import { CircularProgress } from "@rmwc/circular-progress";
 import {
   Dialog,
   DialogActions,
@@ -25,6 +26,7 @@ import { Info } from "../question";
 import { ListedQuestion } from "./questionList";
 
 import "@rmwc/button/node_modules/@material/button/dist/mdc.button.min.css";
+import "@rmwc/circular-progress/circular-progress.css";
 import "@rmwc/dialog/node_modules/@material/dialog/dist/mdc.dialog.min.css";
 import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-button.min.css";
 import "@rmwc/list/node_modules/@material/list/dist/mdc.list.css";
@@ -203,6 +205,15 @@ class AssignmentListItem extends Component<
   menuRef = createRef();
 
   archiveIcon = (): JSX.Element | undefined => {
+    if (this.props.disabled) {
+      return (
+        <CircularProgress
+          className="spinner"
+          size="small"
+          style={{ display: "inline-block", marginLeft: 28 }}
+        />
+      );
+    }
     return (
       <IconButton
         disabled={this.props.disabled}

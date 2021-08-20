@@ -1,5 +1,6 @@
 import { Fragment, h } from "preact";
 
+import { CircularProgress } from "@rmwc/circular-progress";
 import { IconButton } from "@rmwc/icon-button";
 import {
   List,
@@ -13,6 +14,7 @@ import {
 
 import { Info } from "../question";
 
+import "@rmwc/circular-progress/circular-progress.css";
 import "@rmwc/icon-button/node_modules/@material/icon-button/dist/mdc.icon-button.min.css";
 import "@rmwc/list/node_modules/@material/list/dist/mdc.list.css";
 
@@ -29,6 +31,7 @@ export type ListedQuestion = {
 type QuestionListProps = {
   archived: number[];
   deleted: number[];
+  disabled: boolean;
   editURL: string;
   gettext: (a: string) => string;
   handleToggleArchived: (a: number) => Promise<void>;
@@ -41,6 +44,7 @@ type QuestionListProps = {
 export function QuestionList({
   archived,
   deleted,
+  disabled,
   editURL,
   gettext,
   handleToggleArchived,
@@ -124,6 +128,7 @@ export function QuestionList({
                 <QuestionListItem
                   archived={archived.includes(q.pk)}
                   deleted={deleted.includes(q.pk)}
+                  disabled={disabled}
                   editable={q.is_editable}
                   editURL={editURL}
                   gettext={gettext}
@@ -144,6 +149,7 @@ export function QuestionList({
 type QuestionListItemProps = {
   archived: boolean;
   deleted: boolean;
+  disabled: boolean;
   editable: boolean;
   editURL: string;
   gettext: (a: string) => string;
@@ -156,6 +162,7 @@ type QuestionListItemProps = {
 function QuestionListItem({
   archived,
   deleted,
+  disabled,
   editable,
   editURL,
   gettext,
@@ -166,8 +173,18 @@ function QuestionListItem({
 }: QuestionListItemProps): JSX.Element {
   const deleteIcon = (): JSX.Element | undefined => {
     if (!shared) {
+      if (disabled) {
+        return (
+          <CircularProgress
+            className="spinner"
+            size="small"
+            style={{ display: "inline-block", marginLeft: 28 }}
+          />
+        );
+      }
       return (
         <IconButton
+          disabled={disabled}
           icon={deleted ? "restore_from_trash" : "delete"}
           onClick={() => handleToggleDeleted(question.pk)}
           title={
@@ -184,8 +201,18 @@ function QuestionListItem({
 
   const archiveIcon = (): JSX.Element | undefined => {
     if (!deleted) {
+      if (disabled) {
+        return (
+          <CircularProgress
+            className="spinner"
+            size="small"
+            style={{ display: "inline-block", marginLeft: 28 }}
+          />
+        );
+      }
       return (
         <IconButton
+          disabled={disabled}
           icon={archived ? "unarchive" : "archive"}
           onClick={() => handleToggleArchived(question.pk)}
           title={

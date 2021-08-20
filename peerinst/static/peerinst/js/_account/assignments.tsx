@@ -2,7 +2,7 @@ import { Component, Fragment, h } from "preact";
 
 import { get, submitData } from "../_ajax/ajax";
 
-import { CircularProgress } from "@rmwc/circular-progress";
+import { LinearProgress } from "@rmwc/linear-progress";
 
 import { Breadcrumb, Heading } from "./heading";
 
@@ -11,7 +11,7 @@ import {
   AssignmentList,
 } from "../_components/lists/assignmentList";
 
-import "@rmwc/circular-progress/circular-progress.css";
+import "@rmwc/linear-progress/node_modules/@material/linear-progress/dist/mdc.linear-progress.min.css";
 
 type TeacherAccountAssignmentAppProps = {
   gettext: (a: string) => string;
@@ -196,7 +196,7 @@ export class TeacherAccountAssignmentApp extends Component<
 
   content = (): JSX.Element | undefined => {
     if (this.state.open && !this.state.loaded) {
-      return <CircularProgress className="spinner" size="xlarge" />;
+      return <LinearProgress determinate={false} style={{ width: 600 }} />;
     }
     if (this.state.open) {
       return (
