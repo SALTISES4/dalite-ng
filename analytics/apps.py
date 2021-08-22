@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class AnalyticsConfig(AppConfig):
     name = "analytics"
-    verbose_name = _("Dalite analytics")
+    verbose_name = _("myDalite analytics")
 
     def ready(self):
         from . import signals  # noqa

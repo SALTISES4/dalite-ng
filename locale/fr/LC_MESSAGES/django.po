@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-19 18:37-0400\n"
+"POT-Creation-Date: 2021-08-21 20:52-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,33 +20,27 @@ msgstr ""
 
 #: REST/views.py:269
 msgid "removed from favourites"
-msgstr ""
+msgstr "supprimée des favorites"
 
 #: REST/views.py:272
 msgid "added to favourites"
-msgstr ""
+msgstr "ajoutée aux favorites"
 
 #: analytics/apps.py:7
-#, fuzzy
-#| msgid "Analytics"
-msgid "Dalite analytics"
-msgstr "Analytique"
+msgid "myDalite analytics"
+msgstr "Analyse des données de myDalite"
 
 #: analytics/templates/analytics/teachers/index.html:45
-#, fuzzy
-#| msgid "Teacher"
 msgid "Teachers"
-msgstr "Professeur(e)"
+msgstr "Professeurs"
 
 #: analytics/templates/analytics/teachers/index.html:52
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
 #: analytics/templates/analytics/teachers/index.html:53
-#, fuzzy
-#| msgid "Back to login"
 msgid "Last Login"
-msgstr "Se connecter"
+msgstr "Dernière connexion"
 
 #: analytics/views/decorators.py:19 analytics/views/decorators.py:30
 #: peerinst/views/decorators.py:56 peerinst/views/decorators.py:70
@@ -58,7 +52,7 @@ msgstr "Se connecter"
 #: reputation/views/decorators.py:19 reputation/views/decorators.py:35
 #: reputation/views/student.py:26
 msgid "You don't have access to this resource."
-msgstr ""
+msgstr "Vous n'avez pas accès à cette ressource."
 
 #: blink/forms.py:27 peerinst/forms.py:41
 msgid "Choose one of these answers:"
@@ -66,7 +60,7 @@ msgstr "Choisissez l'une de ces réponses :"
 
 #: blink/forms.py:73
 msgid "Set the time limit to be used for each question."
-msgstr ""
+msgstr "Définir la limite de temps à utiliser pour chaque question."
 
 #: blink/models.py:12
 msgid "Time limit"
@@ -117,7 +111,7 @@ msgstr "Lien pour l'étudiant(e)"
 
 #: blink/templates/blink/blink_waiting.html:37
 msgid "Start"
-msgstr ""
+msgstr "Débuter"
 
 #: blink/templates/blink/blink_waiting.html:41
 msgid "Waiting for teacher"
@@ -214,8 +208,6 @@ msgstr "Non classé"
 #: peerinst/templates/peerinst/question/cards/question_card.html:64
 #: peerinst/templates/peerinst/question/list.html:69
 #: peerinst/templates/peerinst/question/search_results.html:98
-#, fuzzy
-#| msgid "Student Responses"
 msgid "Student answers"
 msgstr "Réponses des étudiants"
 
@@ -247,6 +239,8 @@ msgid ""
 "The list will be filtered to retain entries with content that contains the "
 "above string."
 msgstr ""
+"La liste sera filtrée pour conserver les entrées dont le contenu contient "
+"les termes ci-dessus."
 
 #: blink/templates/blink/blinkassignment_detail.html:198
 msgid ""
@@ -295,7 +289,7 @@ msgstr "Mot clés: "
 
 #: blink/templates/blink/blinkassignment_detail.html:265
 msgid "Clear"
-msgstr ""
+msgstr "Effacer"
 
 #: blink/templates/blink/blinkassignment_form.html:8
 msgid "Create Script"
@@ -303,17 +297,17 @@ msgstr "Génerer une séquence"
 
 #: blink/templates/blink/blinkquestion_detail.html:42
 msgid "Round:"
-msgstr ""
+msgstr "Tour :"
 
 #: blink/templates/blink/blinkquestion_detail.html:44
-#, fuzzy
-#| msgid "Total Number Responses:"
 msgid "Number of respondents:"
-msgstr "Nombre total de réponses"
+msgstr "Nombre de répondants :"
 
 #: dalite/models/custom_fields.py:10
+#, fuzzy
+#| msgid "Probabilité entre 0 et 1"
 msgid "Probability between 0 and 1"
-msgstr ""
+msgstr "Probabilité entre 0 et 1"
 
 #: dalite/models/custom_fields.py:12
 #, python-format
@@ -322,7 +316,7 @@ msgstr ""
 
 #: dalite/models/custom_fields.py:27
 msgid "Comma separated list"
-msgstr ""
+msgstr "Liste séparée par des virgules"
 
 #: dalite/models/custom_fields.py:29
 #, python-format
@@ -366,10 +360,6 @@ msgid "Associated answer"
 msgstr "Réponse connexe"
 
 #: peerinst/admin.py:79
-#, fuzzy
-#| msgid ""
-#| "An example rationale that will be shown to students during the answer "
-#| "review."
 msgid ""
 "An example rationale that will be shown to students during "
 "the                 answer review."
@@ -378,10 +368,6 @@ msgstr ""
 "des réponses."
 
 #: peerinst/admin.py:83
-#, fuzzy
-#| msgid ""
-#| "The number of the associated answer; 1 = first answer, 2 = second answer "
-#| "etc."
 msgid ""
 "The number of the associated answer; 1 = first answer, 2 =                 "
 "second answer etc."
@@ -391,18 +377,13 @@ msgstr ""
 
 #: peerinst/admin.py:92
 msgid "example answer"
-msgstr "Exemple de réponse"
+msgstr "exemple de réponse"
 
 #: peerinst/admin.py:93
 msgid "example answers"
-msgstr "Exemples de réponse"
+msgstr "exemples de réponse"
 
 #: peerinst/admin.py:101
-#, fuzzy
-#| msgid ""
-#| "You can add example answers more comfortably by using the \"Preview\" "
-#| "button in the top right corner.  The button appears after saving the "
-#| "question for the first time."
 msgid ""
 "You can add example answers more comfortably by using the             "
 "\"Preview\" button in the top right corner.  The button appears             "
@@ -497,22 +478,15 @@ msgid "Total number of participating students:"
 msgstr "Nombre total d'étudiants ayant participé :"
 
 #: peerinst/admin_views.py:432
-#, fuzzy
-#| msgid "Correct answer choices â second attempt:"
 msgid "Correct answer choices – first attempt:"
-msgstr "Bon choix de réponse à la deuxième tentative :"
+msgstr "Bon choix de réponse à la première tentative :"
 
-# msgid "Bon choix de réponse à la première tentative :"
 #: peerinst/admin_views.py:433 peerinst/admin_views.py:435
 #: peerinst/admin_views.py:437
-#, fuzzy
-#| msgid "â³ Percentage of total answers:"
-msgid "↳ Percentage of total answers:"
-msgstr "â³ Pourcentage des réponses au total :"
+msgid " > Percentage of total answers:"
+msgstr " > Pourcentage des réponses au total :"
 
 #: peerinst/admin_views.py:434
-#, fuzzy
-#| msgid "Correct answer choices â second attempt:"
 msgid "Correct answer choices – second attempt:"
 msgstr "Bon choix de réponse à la deuxième tentative :"
 
@@ -571,37 +545,29 @@ msgid "Expert answer"
 msgstr "Réponse d'expert"
 
 #: peerinst/admin_views.py:670
-#, fuzzy
-#| msgid "Example answer saved."
 msgid "Sample answer saved."
 msgstr "Exemple de réponse sauvegardée."
 
 #: peerinst/admin_views.py:757
-#, fuzzy
-#| msgid "Expert rationale?"
 msgid "Expert rationale saved."
-msgstr "Explication d'expert?"
+msgstr "Explication d'expert sauvegardée."
 
 #: peerinst/admin_views.py:830
 #, python-brace-format
 msgid "List of {model_name} saved."
-msgstr ""
+msgstr "Liste de {model_name} sauvegardée."
 
-# msgid "List of {model_name} saved."
-# msgstr "Liste de {nom_modèle} sauvegardée."
 #: peerinst/admin_views.py:875 peerinst/admin_views.py:880
 msgid "---all---"
-msgstr "toutes"
+msgstr "---toutes---"
 
 #: peerinst/apps.py:13
 msgid "Dalite Peer Instruction"
-msgstr "Instructions sur Dalite Peer"
+msgstr "Dalite - Instructions par les pairs"
 
 #: peerinst/forms.py:44
-#, fuzzy
-#| msgid "There must be at least two answer choices."
 msgid "Please make sure to select an answer choice."
-msgstr "Il doit y avoir au moins deux choix de réponses."
+msgstr "Assurez-vous de sélectionner un choix de réponse."
 
 #: peerinst/forms.py:174
 msgid "Please select exactly one rationale."
@@ -613,7 +579,7 @@ msgstr "Veuillez voter positivement ou négativement."
 
 #: peerinst/forms.py:244 peerinst/templates/peerinst/group/details.html:265
 msgid "Assignments"
-msgstr "Questionnaires"
+msgstr "Exercices"
 
 #: peerinst/forms.py:246
 msgid ""
@@ -641,23 +607,24 @@ msgstr ""
 msgid ""
 "Optional. Select the discipline to which this item should be associated."
 msgstr ""
+"Falcutatif.  Sélectionner la discipline à laquelle cet élément doit être associé."
 
 #: peerinst/forms.py:332 peerinst/models/question.py:305
 msgid ""
 "Type to search and select at least one category for this question. You can "
 "select multiple categories."
 msgstr ""
+"Tapez pour rechercher. Sélectionnez au moins une catégorie pour cette question. "
+"Vous pouvez sélectionner plusieurs catégories."
 
 #: peerinst/forms.py:341
-#, fuzzy
-#| msgid "Choose which groups you would like your report to include:"
 msgid "Choose which groups to include in report:"
 msgstr "Choisissez quels groupes vous souhaitez inclure dans votre rapport :"
 
 #: peerinst/forms.py:347
 msgid "Choose which assignments to include in report:"
 msgstr ""
-"Choisissez quels questionnaires vous souhaitez inclure dans votre rapport :"
+"Choisissez quels exercices vous souhaitez inclure dans votre rapport :"
 
 #: peerinst/models/answer.py:29
 msgid "Text"
@@ -685,7 +652,7 @@ msgstr "Deuxième choix de réponse"
 
 #: peerinst/models/answer.py:79
 msgid "Corresponds to the user's username."
-msgstr ""
+msgstr "Correspond au nom d'utilisateur."
 
 #: peerinst/models/answer.py:81
 msgid "Show to others?"
@@ -710,35 +677,31 @@ msgstr "Type de vote"
 
 #: peerinst/models/answer.py:341
 msgid "0-Never Show"
-msgstr ""
+msgstr "0-Afficher jamais"
 
 #: peerinst/models/answer.py:342
 msgid "1-Not Convincing"
-msgstr ""
+msgstr "1-Pas convaincant"
 
 #: peerinst/models/answer.py:343
 msgid "2-Somewhat Convincing"
-msgstr ""
+msgstr "2-Un peu convaincant"
 
 #: peerinst/models/answer.py:344
 msgid "3-Very Convincing"
-msgstr ""
+msgstr "3-Très convaincant"
 
 #: peerinst/models/assignment.py:32
 msgid "identifier"
 msgstr "identifiant"
 
 #: peerinst/models/assignment.py:36
-#, fuzzy
-#| msgid ""
-#| "A unique identifier for this assignment used for inclusion in a course.  "
-#| "Only use letters, numbers and/or the underscore for the identifier."
 msgid ""
 "The assignment identifier is used to access the assignment through an LMS (e."
 "g. Moodle).  Only use letters, numbers and the underscore for the "
 "identifier.  Max length is 100 characters."
 msgstr ""
-"Identifiant unique, pour ce questionnaire, utilisé pour s'inscrire au cours."
+"Identifiant unique pour l'exercice est utilisé pour s'inscrire au cours."
 
 #: peerinst/models/assignment.py:49
 msgid ""
@@ -748,10 +711,8 @@ msgid ""
 msgstr ""
 
 #: peerinst/models/assignment.py:55
-#, fuzzy
-#| msgid "question"
 msgid "Description"
-msgstr "question"
+msgstr "Description"
 
 #: peerinst/models/assignment.py:59
 msgid ""
@@ -1146,24 +1107,24 @@ msgstr ""
 "s'il s'en tient ensuite à la bonne réponse ou s'il change sa réponse pour la "
 "bonne réponse."
 
-#: peerinst/models/question.py:680
+#: peerinst/models/question.py:668
 msgid "You can only specify one of the image and video URL fields."
 msgstr ""
 "Vous pouvez seulement préciser une adresse URL pour une seule image ou une "
 "seule vidéo."
 
-#: peerinst/models/question.py:685
+#: peerinst/models/question.py:673
 msgid ""
 "You must provide alternative text for accessibility if providing an image."
 msgstr ""
 "Vous devez fournir un texte alternatif, pour des raisons d'accessibilité, si "
 "vous fournissez une image."
 
-#: peerinst/models/question.py:1092
+#: peerinst/models/question.py:1080
 msgid "question"
 msgstr "question"
 
-#: peerinst/models/question.py:1093
+#: peerinst/models/question.py:1081
 #: peerinst/templates/peerinst/collection/collection_update.html:176
 #: peerinst/templates/peerinst/collection/collection_update.html:229
 #: peerinst/templates/peerinst/collection/collection_update.html:284
@@ -1171,11 +1132,11 @@ msgstr "question"
 msgid "questions"
 msgstr "questions"
 
-#: peerinst/models/question.py:1101
+#: peerinst/models/question.py:1089
 msgid "The question, or one of the answer choices, is unclear."
 msgstr ""
 
-#: peerinst/models/question.py:1106
+#: peerinst/models/question.py:1094
 msgid ""
 "\n"
 "                Some part of the question, perhaps the image "
@@ -1183,22 +1144,22 @@ msgid ""
 "                "
 msgstr ""
 
-#: peerinst/models/question.py:1115
+#: peerinst/models/question.py:1103
 msgid ""
 "\n"
 "                Wrong answer marked as correct\n"
 "                "
 msgstr ""
 
-#: peerinst/models/question.py:1123
+#: peerinst/models/question.py:1111
 msgid "Reason for flagging a question"
 msgstr ""
 
-#: peerinst/models/question.py:1126
+#: peerinst/models/question.py:1114
 msgid "Reason for flagging a question."
 msgstr ""
 
-#: peerinst/models/question.py:1135
+#: peerinst/models/question.py:1123
 #, fuzzy
 #| msgid "Question categories"
 msgid "Question flag reason"
@@ -1892,7 +1853,7 @@ msgstr "Statistiques par pays"
 #: peerinst/templates/peerinst/collection/collection_detail_page.html:40
 #: peerinst/templates/peerinst/collection/collection_distribute.html:47
 #: peerinst/templates/peerinst/teacher/details.html:188
-#: peerinst/templates/peerinst/teacher/details.html:413
+#: peerinst/templates/peerinst/teacher/details.html:416
 #, fuzzy
 #| msgid "Total answers"
 msgid "Total Answers"
@@ -1902,7 +1863,7 @@ msgstr "Nombre total de réponses"
 #: peerinst/templates/peerinst/collection/collection_detail_page.html:44
 #: peerinst/templates/peerinst/collection/collection_distribute.html:51
 #: peerinst/templates/peerinst/teacher/details.html:191
-#: peerinst/templates/peerinst/teacher/details.html:416
+#: peerinst/templates/peerinst/teacher/details.html:419
 #, fuzzy
 #| msgid "Answer choice"
 msgid "Answers Switched"
@@ -1912,7 +1873,7 @@ msgstr "Choix de réponse"
 #: peerinst/templates/peerinst/collection/collection_detail_page.html:53
 #: peerinst/templates/peerinst/collection/collection_distribute.html:55
 #: peerinst/templates/peerinst/teacher/details.html:194
-#: peerinst/templates/peerinst/teacher/details.html:414
+#: peerinst/templates/peerinst/teacher/details.html:417
 #, fuzzy
 #| msgid "Correct answer choices â second attempt:"
 msgid "Correct Answers on First Attempt"
@@ -1922,7 +1883,7 @@ msgstr "Bon choix de réponse à la deuxième tentative :"
 #: peerinst/templates/peerinst/collection/collection_detail_page.html:57
 #: peerinst/templates/peerinst/collection/collection_distribute.html:59
 #: peerinst/templates/peerinst/teacher/details.html:197
-#: peerinst/templates/peerinst/teacher/details.html:415
+#: peerinst/templates/peerinst/teacher/details.html:418
 #, fuzzy
 #| msgid "Correct answer choices â second attempt:"
 msgid "Correct Answers on Second Attempt"
@@ -5120,14 +5081,14 @@ msgid "Some parameters are wrong."
 msgstr ""
 
 #: peerinst/views/collection.py:108 peerinst/views/views.py:2145
-#: peerinst/views/views.py:2331
+#: peerinst/views/views.py:2341
 msgid ""
 "You must be logged in as a teacher to search the database. Log in again with "
 "a teacher account."
 msgstr ""
 
 #: peerinst/views/collection.py:152 peerinst/views/views.py:2232
-#: peerinst/views/views.py:2496
+#: peerinst/views/views.py:2506
 msgid "An error occurred.  Retry search after logging in again."
 msgstr ""
 

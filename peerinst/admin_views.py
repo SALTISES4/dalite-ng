@@ -430,11 +430,11 @@ class AssignmentResultsViewBase(TemplateView):
             _("Total number of answers recorded:"),
             _("Total number of participating students:"),
             _("Correct answer choices – first attempt:"),
-            _("↳ Percentage of total answers:"),
+            _(" > Percentage of total answers:"),
             _("Correct answer choices – second attempt:"),
-            _("↳ Percentage of total answers:"),
+            _(" > Percentage of total answers:"),
             _("Number of answer choice switches:"),
-            _("↳ Percentage of total answers:"),
+            _(" > Percentage of total answers:"),
         ]
         for choice_index in switch_columns:
             labels.append(
