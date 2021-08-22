@@ -1094,12 +1094,10 @@ class QuestionFormView(QuestionMixin, FormView):
                     group.discipline = self.question.discipline
                 group.save()
 
-            student = Student.objects.get(
-                student=User.objects.get(username=self.user_token),
-            )
-
-            if group not in student.groups.all():
-                student.join_group(group=group)
+            # If this user is a student, add group to student
+            if hasattr(self.request.user, "student"):
+                if group not in self.request.user.student.groups.all():
+                    self.request.user.student.join_group(group=group)
 
             sga, created = StudentGroupAssignment.objects.get_or_create(
                 group=group,
@@ -1116,10 +1114,6 @@ class QuestionFormView(QuestionMixin, FormView):
                     group.teacher.add(teacher)
                     teacher.current_groups.add(group)
                     teacher.save()
-
-            # If this user is a student, add group to student
-            if hasattr(self.request.user, "student"):
-                self.request.user.student.groups.add(group)
 
     def submission_error(self):
         messages.error(

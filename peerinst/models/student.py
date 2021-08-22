@@ -4,6 +4,7 @@ from operator import itemgetter
 from urllib.parse import urlparse
 
 import pytz
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import IntegrityError, models
@@ -209,6 +210,8 @@ class Student(models.Model):
                 student=self, group=group
             )
             membership.current_member = True
+            if not mail_type:
+                membership.send_emails = False
             membership.save()
             logger.info(
                 "Student %d added back to group %d.", self.pk, group.pk
@@ -223,17 +226,17 @@ class Student(models.Model):
                 group.pk,
             )
 
-        for assignment in StudentGroupAssignment.objects.filter(
-            group=group, distribution_date__isnull=False
-        ):
-            self.add_assignment(assignment, send_email=False)
+        StudentGroup = apps.get_model(
+            app_label="peerinst", model_name="StudentGroup"
+        )
+        if group.mode_created == StudentGroup.STANDALONE:
+            for assignment in StudentGroupAssignment.objects.filter(
+                group=group, distribution_date__isnull=False
+            ):
+                self.add_assignment(assignment, send_email=False)
 
         if mail_type is not None:
             self.send_email(mail_type, group=group, request=request)
-
-        # TODO to remove eventually when groups are fully integrated in
-        # group membership
-        self.groups.add(group)
 
     def leave_group(self, group):
         try:
@@ -386,6 +389,14 @@ class StudentGroupMembership(models.Model):
     current_member = models.BooleanField(default=True)
     send_emails = models.BooleanField(default=True)
     student_school_id = models.TextField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        StudentGroup = apps.get_model(
+            app_label="peerinst", model_name="StudentGroup"
+        )
+        if self.group.mode_created == StudentGroup.LTI:
+            self.send_emails = False
+        super().save(*args, **kwargs)
 
     class Meta:
         unique_together = ("student", "group")
