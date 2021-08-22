@@ -3,10 +3,12 @@ import hashlib
 import pytest
 from django.core import mail
 from django.urls import reverse
+from django.utils import timezone
 
 from peerinst.models import (
     Student,
     StudentAssignment,
+    StudentGroupAssignment,
     StudentGroupMembership,
     StudentNotification,
 )
@@ -130,12 +132,47 @@ def test_send_email__no_email(student):
     assert not mail.outbox
 
 
-def test_join_group(student, group):
+def test_join_group(student, group, assignment):
+    StudentGroupAssignment.objects.create(
+        group=group, assignment=assignment, distribution_date=timezone.now()
+    )
+
     student.join_group(group)
+    membership = StudentGroupMembership.objects.get(
+        group=group, student=student
+    )
 
     assert group in student.groups.all()
     assert group in student.current_groups
     assert group not in student.old_groups
+
+    assert membership.send_emails is True
+    assert StudentNotification.objects.filter(student=student).count() == 1
+    assert not mail.outbox
+
+
+def test_join_group_lti(django_assert_num_queries, student, group, assignment):
+    group.mode_created = group.LTI
+    group.save()
+
+    StudentGroupAssignment.objects.create(
+        group=group, assignment=assignment, distribution_date=timezone.now()
+    )
+
+    with django_assert_num_queries(2):
+        # Should be exactly two queries: one to check existence, one to create
+        student.join_group(group)
+
+    membership = StudentGroupMembership.objects.get(
+        group=group, student=student
+    )
+
+    assert group in student.groups.all()
+    assert group in student.current_groups
+    assert group not in student.old_groups
+
+    assert membership.send_emails is False
+    assert StudentNotification.objects.filter(student=student).count() == 0
     assert not mail.outbox
 
 

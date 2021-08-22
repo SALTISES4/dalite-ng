@@ -4,7 +4,6 @@ from operator import itemgetter
 from urllib.parse import urlparse
 
 import pytz
-from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import IntegrityError, models
@@ -321,7 +320,6 @@ class Student(models.Model):
 
     @property
     def current_groups(self):
-        # TODO add lti_student groups
         return [
             g.group
             for g in StudentGroupMembership.objects.filter(
@@ -331,7 +329,6 @@ class Student(models.Model):
 
     @property
     def old_groups(self):
-        # TODO add lti_student groups
         return [
             g.group
             for g in StudentGroupMembership.objects.filter(
@@ -386,10 +383,7 @@ class StudentGroupMembership(models.Model):
     student_school_id = models.TextField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        StudentGroup = apps.get_model(
-            app_label="peerinst", model_name="StudentGroup"
-        )
-        if self.group.mode_created == StudentGroup.LTI:
+        if self.group.mode_created == self.group.LTI:
             self.send_emails = False
         super().save(*args, **kwargs)
 
