@@ -1,11 +1,10 @@
 import json
 import random
-import pytest
-
 from datetime import datetime
 
 import ddt
 import mock
+import pytest
 import pytz
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -20,6 +19,7 @@ from peerinst.models import (
     NewUserRequest,
     Question,
     ShownRationale,
+    Student,
     UserUrl,
 )
 from peerinst.tests import factories
@@ -87,6 +87,7 @@ class QuestionViewTestCase(TestCase):
         no_consent.save()
 
         self.user = factories.UserFactory()
+        s, _ = Student.objects.get_or_create(student=self.user)
         self.assignment = factories.AssignmentFactory()
         self.set_question(
             factories.QuestionFactory(

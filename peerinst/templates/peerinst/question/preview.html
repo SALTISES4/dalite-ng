@@ -24,14 +24,14 @@
     <p class="mdc-typography--body1"><small>
       {% if question.type == "PI" %}
       {% blocktrans %}
-      This is a preview of how the question looks in the student interface.  You can add example
-      rationales here that will be shown as choices to students.  You need to provide at least one example
-      rationale for each of the possible answer choices. This is where you can enter <em>distractor</em> rationales,
-      even for the correct answer choices.
+      This is a preview of how the question will look in the student interface.  You can add sample
+      rationales here that will be shown as choices to the first students who answer this question.
+      All new questions need at least one sample rationale for each answer choice.
+      You should include <em>distractor</em> rationales, especially for correct answer choices.
       {% endblocktrans %}
       {% else %}
       {% blocktrans %}
-      This is a preview of how the question looks in the student interface.
+      This is a preview of how the question will look in the student interface.
       {% endblocktrans %}
       {% endif %}
     </small></p>
@@ -50,25 +50,23 @@
 {% endfor %}
 {% endblock %}
 
-{% block submit_button %}{% trans 'Submit sample answer' %}{% endblock %}
+{% block submit_button %}{% trans 'Submit sample rationales' %}{% endblock %}
 {% block extra_content %}
 {% if question.type == "PI" %}
   {{ form.errors }}
   <hr class="simple-hr">
   <h3>{% trans 'Existing sample answers' %}</h3>
   {% if not save_allowed %}
-    <p class="errorlist">{% trans 'You must submit some at least one example rationale for each of the answer choices above' %}</p>
+    <p class="errorlist">{% trans 'At least one sample rationale is required for each answer choice.' %}</p>
   {% endif %}
   <ul class="mdc-list">
-    {% for sample in question.answer_set.all|dictsort:'first_answer_choice' %}
-      {% if not sample.user_token and not sample.expert %}
-        <li><span class='mdc-theme--primary bold'>{{ sample.first_answer_choice_label }}</span>: {{ sample.rationale|safe|striptags }}</li>
-      {% endif %}
+    {% for sample in sample_answers %}
+      <li><span class='mdc-theme--primary bold'>{{ sample.first_answer_choice_label }}</span>: {{ sample.text|safe|striptags }}</li>
     {% endfor %}
   </ul>
 
   <hr class="simple-hr">
-  <h3>{% trans 'Existing Expert rationales' %}</h3>
+  <h3>{% trans 'Existing expert rationales' %}</h3>
   <ul class="mdc-list">
     {% for sample in question.answer_set.all|dictsort:'first_answer_choice' %}
       {% if sample.expert %}
@@ -76,7 +74,6 @@
       {% endif %}
     {% endfor %}
   </ul>
-
 
 {% endif %}
 

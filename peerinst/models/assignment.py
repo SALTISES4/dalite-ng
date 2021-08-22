@@ -22,7 +22,7 @@ from ..util import (
 )
 from ..utils import format_time
 from .group import StudentGroup
-from .question import Question, QuestionFlag
+from .question import Question
 
 logger = logging.getLogger("peerinst-models")
 
@@ -140,30 +140,21 @@ class Assignment(models.Model):
     @property
     def editable(self):
         return (
-            not self.answer_set.exclude(user_token__exact="").count()
+            not self.answer_set.filter(expert=False)
+            .exclude(user_token__exact="")
+            .count()
             and not StudentGroupAssignment.objects.filter(
                 assignment=self
             ).exists()
         )
 
     @property
-    def includes_flagged_question(self):
-        return any(
+    def is_valid(self):
+        return not any(
             [
-                0
-                in q.get_frequency(all_rationales=True)[
-                    "first_choice"
-                ].values()
-                for q in self.questions.all()
-            ]
-            + [
-                True
-                if q.pk
-                in QuestionFlag.objects.all().values_list(
-                    "question", flat=True
-                )
-                else False
-                for q in self.questions.all()
+                Question.is_missing_answer_choices(self.questions.all()),
+                Question.is_missing_sample_answers(self.questions.all()),
+                Question.is_flagged(self.questions.all()),
             ]
         )
 
@@ -357,7 +348,7 @@ class StudentGroupAssignment(models.Model):
     def update_students(self):
         logger.info(
             "Updating %d students for student group assignment %d",
-            self.group.student_set.count(),
+            self.group.students.all().count(),
             self.pk,
         )
         distribute_assignment_to_students_async(self.pk)

@@ -1,3 +1,5 @@
+from csp.decorators import csp_replace
+from decorator_include import decorator_include
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.i18n import i18n_patterns
@@ -5,11 +7,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from django.utils.translation import ugettext_lazy as _
-from django.views.decorators.clickjacking import xframe_options_sameorigin
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.i18n import JavaScriptCatalog
 
-from . import views
 from peerinst import views as peerinst_views
+from peerinst.middleware import lti_access_allowed
+
+from . import views
 
 admin.site.site_header = admin.site.site_title = _(
     "SALTISE admin site for mydalite.org "
@@ -17,7 +21,19 @@ admin.site.site_header = admin.site.site_title = _(
 
 
 # LTI
-urlpatterns = [path("lti/", include("django_lti_tool_provider.urls"))]
+urlpatterns = [
+    path(
+        "lti/",
+        decorator_include(
+            (
+                csp_replace(FRAME_ANCESTORS=["*"]),
+                xframe_options_exempt,
+                lti_access_allowed,
+            ),
+            "django_lti_tool_provider.urls",
+        ),
+    )
+]
 
 # Apps
 urlpatterns += i18n_patterns(
@@ -36,26 +52,36 @@ urlpatterns += i18n_patterns(
         "assignment/<assignment_id>/",
         include(
             [
-                # Question table of contents for assignment - Enforce
-                # sameorigin to prevent access from LMS
                 path(
                     "",
-                    xframe_options_sameorigin(
-                        peerinst_views.QuestionListView.as_view()
-                    ),
+                    peerinst_views.QuestionListView.as_view(),
                     name="question-list",
                 ),
                 path(
                     r"<int:question_id>/",
                     include(
                         [
-                            # Dalite question
-                            path("", peerinst_views.question, name="question"),
-                            # Question reset (for testing purposes) - Enforce
-                            # sameorigin to prevent access from LMS
+                            # myDalite question - Must allow to be framed
+                            path(
+                                "",
+                                csp_replace(FRAME_ANCESTORS=["*"])(
+                                    xframe_options_exempt(
+                                        lti_access_allowed(
+                                            peerinst_views.question
+                                        )
+                                    )
+                                ),
+                                name="question",
+                            ),
                             path(
                                 "reset/",
-                                peerinst_views.reset_question,
+                                csp_replace(FRAME_ANCESTORS=["*"])(
+                                    xframe_options_exempt(
+                                        lti_access_allowed(
+                                            peerinst_views.reset_question
+                                        )
+                                    )
+                                ),
                                 name="reset-question",
                             ),
                         ]
@@ -79,22 +105,38 @@ urlpatterns += i18n_patterns(
 )
 
 # Set language view
-urlpatterns += [path("i18n/", include("django.conf.urls.i18n"))]
+urlpatterns += [
+    path(
+        "i18n/",
+        decorator_include(
+            (
+                csp_replace(FRAME_ANCESTORS=["*"]),
+                xframe_options_exempt,
+                lti_access_allowed,
+            ),
+            "django.conf.urls.i18n",
+        ),
+    )
+]
+
 
 # Javascript translations
 urlpatterns += i18n_patterns(
-    path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
+    path(
+        "jsi18n/",
+        csp_replace(FRAME_ANCESTORS=["*"])(
+            xframe_options_exempt(
+                lti_access_allowed(
+                    JavaScriptCatalog.as_view(),
+                )
+            )
+        ),
+        name="javascript-catalog",
+    ),
 )
 
 # Media
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-# Security check in development
-# if settings.DEBUG:
-#     from security_headers.views import scan_url
-#     urlpatterns += i18n_patterns(
-#         re_path(r"^security/(?P<url_name>[\w-]+)/", scan_url, name="scan")
-#     )
 
 # Errors
 #  handler400 = views.errors.response_400

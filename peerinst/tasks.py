@@ -76,7 +76,7 @@ def distribute_assignment_to_students_async(student_group_assignment_pk):
     student_group_assignment = StudentGroupAssignment.objects.get(
         pk=student_group_assignment_pk
     )
-    for student in student_group_assignment.group.student_set.all():
+    for student in student_group_assignment.group.students.all():
         logger.info(
             "Adding assignment %d for student %d",
             student_group_assignment.pk,

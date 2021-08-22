@@ -13,6 +13,10 @@
   font-size: 14px;
 }
 
+#characteristics .mdc-list-item {
+  cursor: pointer;
+}
+
 #student-list {
   user-select: none;
   & > li {
@@ -25,22 +29,19 @@
   }
 }
 
-.verified-user {
-  height: auto;
-  padding: 12px 12px;
-
-  & ul {
-    padding-left: 0;
+.verified_user {
+  height: fit-content !important;
+  & .mdc-list-item__text > span {
+    display: inline-block;
+    margin-bottom: 6px;
+  }
+  & li {
+    padding-top: 2px;
   }
 }
 
 #collection-select {
   color: $hint;
-}
-
-#teachers-with-access-list {
-  max-height: 45px;
-  overflow-y: auto;
 }
 
 #student-reputation-table {

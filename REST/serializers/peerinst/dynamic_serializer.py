@@ -17,3 +17,12 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
             existing = set(self.fields)
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
+
+        # Add filter based on querystring
+        if "request" in self.context:
+            requested_fields = self.context["request"].GET.getlist("field")
+            if requested_fields:
+                allowed = set(requested_fields)
+                existing = set(self.fields)
+                for field_name in existing - allowed:
+                    self.fields.pop(field_name)

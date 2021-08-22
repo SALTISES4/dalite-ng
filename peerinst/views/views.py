@@ -19,10 +19,16 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 # reports
-from django.db.models import Count, Q
+from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.db.models.expressions import Func
+from django.db.models.fields import IntegerField
 from django.forms import Textarea, inlineformset_factory
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import (
+    Http404,
+    HttpResponse,
+    HttpResponseRedirect,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.template.response import TemplateResponse
@@ -32,7 +38,7 @@ from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language
 from django.utils.translation import ugettext_lazy as _
-from django.views.decorators.http import require_POST, require_safe
+from django.views.decorators.http import require_safe
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, FormView, UpdateView
@@ -63,9 +69,12 @@ from ..models import AnswerChoice  # LtiEvent,
 from ..models import (
     Answer,
     Assignment,
+    AssignmentQuestions,
     Category,
     Collection,
     Discipline,
+    Institution,
+    InstitutionalLMS,
     NewUserRequest,
     Question,
     RationaleOnlyQuestion,
@@ -237,6 +246,10 @@ def sign_up(request):
         context["form"] = forms.SignUpForm()
 
     return render(request, template, context)
+
+
+def page_not_found(request):
+    raise Http404("")
 
 
 def admin_check(user):
@@ -567,6 +580,52 @@ class QuestionCloneView(QuestionCreateView):
         return context
 
 
+class AssignmentFixView(
+    LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, DetailView
+):
+    """
+    Assignment is not fixable if:
+    - Any question is flagged and assignment is not editable by user;
+    - Any question is missing answer choices and is not editable or user is not
+      owner;
+    """
+
+    model = models.Assignment
+    template_name = "peerinst/question/fix.html"
+
+    def get_context_data(self, **kwargs):
+        broken_by_flags = Question.is_flagged(self.object.questions.all())
+
+        broken_by_answerchoices = Question.is_missing_answer_choices(
+            self.object.questions.all()
+        )
+
+        context = super(AssignmentFixView, self).get_context_data(**kwargs)
+        context.update(
+            assignment=True,
+            broken_by_flags=broken_by_flags,
+            broken_by_answerchoices=broken_by_answerchoices,
+            load_url=f"{reverse('REST:question-list')}?q={'&q='.join(str(q.pk) for q in self.object.questions.all())}",  # noqa E501
+            teacher=self.request.user.teacher,
+        )
+        return context
+
+
+class QuestionFixView(
+    LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, DetailView
+):
+    model = models.Question
+    template_name = "peerinst/question/fix.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(QuestionFixView, self).get_context_data(**kwargs)
+        context.update(
+            load_url=f"{reverse('REST:question-list')}?q={self.object.pk}",
+            teacher=self.request.user.teacher,
+        )
+        return context
+
+
 class QuestionUpdateView(
     LoginRequiredMixin,
     NoStudentsMixin,
@@ -599,17 +658,14 @@ class QuestionUpdateView(
 
     def get_form(self, form_class=None):
         # Check if student answers exist
-        if self.object.answer_set.exclude(user_token__exact="").count() > 0:
+        if not self.object.is_editable:
             return None
         else:
             return super(QuestionUpdateView, self).get_form(form_class)
 
     def post(self, request, *args, **kwargs):
         # Check if student answers exist
-        if (
-            self.get_object().answer_set.exclude(user_token__exact="").count()
-            > 0
-        ):
+        if not self.get_object().is_editable:
             raise PermissionDenied
         else:
             return super(QuestionUpdateView, self).post(
@@ -642,25 +698,6 @@ class QuestionUpdateView(
 
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
-@require_POST
-def question_delete(request):
-    """Hide questions that a teacher deletes."""
-    if request.is_ajax():
-        # Ajax only
-        question = get_object_or_404(Question, pk=request.POST.get("pk"))
-        teacher = get_object_or_404(Teacher, user=request.user)
-        if question not in teacher.deleted_questions.all():
-            teacher.deleted_questions.add(question)
-            return JsonResponse({"action": "delete"})
-        else:
-            teacher.deleted_questions.remove(question)
-            return JsonResponse({"action": "restore"})
-    else:
-        return response_400(request)
-
-
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
 @user_passes_test(teacher_tos_accepted_check, login_url="/tos/required/")
 def answer_choice_form(request, question_id):
     AnswerChoiceFormSet = inlineformset_factory(
@@ -680,7 +717,7 @@ def answer_choice_form(request, question_id):
     if request.user.has_perm("peerinst.change_question", question):
 
         # Check if student answers exist
-        if question.answer_set.exclude(user_token__exact="").count() > 0:
+        if not question.is_editable:
             return TemplateResponse(
                 request,
                 "peerinst/question/answer_choice_form.html",
@@ -736,11 +773,7 @@ def sample_answer_form_done(request, question_id):
                 for a in assignments:
                     if teacher.user in a.owner.all():
                         # Check for student answers
-                        if (
-                            a.answer_set.exclude(user_token__exact="").count()
-                            == 0
-                            and question not in a.questions.all()
-                        ):
+                        if a.editable and question not in a.questions.all():
                             a.questions.add(question)
                     else:
                         raise PermissionDenied
@@ -1036,6 +1069,23 @@ class QuestionFormView(QuestionMixin, FormView):
                     group = StudentGroup(name=course_id)
                 group.semester = current_semester()
                 group.year = current_year()
+                group.mode_created = StudentGroup.LTI
+
+                lms_url = self.lti_data.edx_lti_parameters.get(
+                    "tool_consumer_instance_guid"
+                )
+                if lms_url:
+                    (
+                        institutional_lms,
+                        created,
+                    ) = InstitutionalLMS.objects.get_or_create(url=lms_url)
+                    if created:
+                        institution = Institution.objects.create(
+                            name=institutional_lms.url
+                        )
+                        institutional_lms.institution = institution
+
+                    group.institution = institutional_lms.institution
 
                 # since teachers do not necessarily set discipline for
                 # themselves, take discipline of first question seen
@@ -1043,6 +1093,16 @@ class QuestionFormView(QuestionMixin, FormView):
                 if self.question.discipline:
                     group.discipline = self.question.discipline
                 group.save()
+
+            # If this user is a student, add group to student
+            if hasattr(self.request.user, "student"):
+                if group not in self.request.user.student.groups.all():
+                    self.request.user.student.join_group(group=group)
+
+            sga, created = StudentGroupAssignment.objects.get_or_create(
+                group=group,
+                assignment=self.assignment,
+            )
 
             # If teacher_id specified, add teacher to group
             teacher_hash = self.lti_data.edx_lti_parameters.get(
@@ -1054,10 +1114,6 @@ class QuestionFormView(QuestionMixin, FormView):
                     group.teacher.add(teacher)
                     teacher.current_groups.add(group)
                     teacher.save()
-
-            # If this user is a student, add group to student
-            if hasattr(self.request.user, "student"):
-                self.request.user.student.groups.add(group)
 
     def submission_error(self):
         messages.error(
@@ -1851,37 +1907,42 @@ class TeacherAssignments(TeacherBase, ListView):
 
     def get_queryset(self):
         self.teacher = get_object_or_404(Teacher, user=self.request.user)
-        return Assignment.objects.annotate(
-            n_questions=Count("assignmentquestions", distinct=True)
+
+        # Exclude assignments with less than 5 student answers per question
+        # on average
+        return (
+            Assignment.objects.exclude(
+                identifier__in=self.teacher.assignments.all()
+            )
+            .values("pk", "title")
+            .annotate(
+                n_answers=Subquery(
+                    Answer.objects.filter(assignment=OuterRef("pk"))
+                    .values("assignment")
+                    .annotate(count=Count("pk"))
+                    .values("count")[:1],
+                    output_field=IntegerField(),
+                )
+            )
+            .annotate(
+                n_questions=Subquery(
+                    AssignmentQuestions.objects.filter(
+                        assignment=OuterRef("identifier")
+                    )
+                    .values("assignment")
+                    .annotate(count=Count("pk"))
+                    .values("count")[:1],
+                    output_field=IntegerField(),
+                )
+            )
+            .annotate(a_per_q=F("n_answers") / F("n_questions"))
+            .exclude(a_per_q__lt=5)
+            .order_by("title")
         )
 
     def get_context_data(self, **kwargs):
         context = super(TeacherAssignments, self).get_context_data(**kwargs)
         context["teacher"] = self.teacher
-
-        context["owned_assignments"] = (
-            self.get_queryset()
-            .filter(owner=self.teacher.user)
-            .annotate(n_answers=Count("answer"))
-            .order_by("-created_on")
-        )
-
-        context["followed_assignments"] = (
-            self.teacher.assignments.exclude(owner=self.teacher.user)
-            .annotate(n_questions=Count("assignmentquestions", distinct=True))
-            .annotate(n_answers=Count("answer"))
-            .order_by("-created_on")
-        )
-
-        # exclude assignments with less than 5 answers from
-        # "All other assignments"
-        context["other_assignments"] = (
-            self.get_queryset()
-            .exclude(identifier__in=self.teacher.assignments.all())
-            .annotate(n_answers=Count("answer"))
-            .exclude(n_answers__lte=5)
-        )
-
         context["form"] = forms.TeacherAssignmentsForm()
 
         return context
@@ -1896,16 +1957,7 @@ class TeacherAssignments(TeacherBase, ListView):
             else:
                 self.teacher.assignments.add(assignment)
             self.teacher.save()
-        else:
-            return render(
-                request,
-                self.template_name,
-                {
-                    "teacher": self.teacher,
-                    "form": form,
-                    "object_list": Assignment.objects.all(),
-                },
-            )
+
         return HttpResponseRedirect(
             reverse("teacher-assignments", kwargs={"pk": self.teacher.pk})
         )
@@ -2242,9 +2294,19 @@ def question_search_beta(request):
             )
             meta = {
                 "categories": categories,
-                "difficulties": difficulties,
+                "difficulties": [
+                    (d, _d[1])
+                    for _d in Question.DIFFICULTY_LABELS
+                    for d in difficulties
+                    if _d[0] == d
+                ],
                 "disciplines": disciplines,
-                "impacts": impacts,
+                "impacts": [
+                    (i, _i[1])
+                    for _i in Question.PEER_IMPACT_LABELS
+                    for i in impacts
+                    if _i[0] == i
+                ],
             }
         else:
             meta = {
@@ -2383,7 +2445,11 @@ def question_search(request):
             query_term = query_term.exclude(id__in=q_qs).distinct()
 
             query_term = [
-                q for q in query_term if q not in query_all and q.is_valid
+                q
+                for q in query_term
+                if q not in query_all
+                and q.is_not_flagged
+                and q.is_not_missing_answer_choices
             ]
 
             query_meta[term] = query_term

@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from rest_framework import serializers
 from rest_framework.exceptions import bad_request
 
@@ -60,17 +61,20 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     collaborators = UserSerializer(many=True, read_only=True)
     difficulty = serializers.SerializerMethodField()
     discipline = DisciplineSerializer(read_only=True)
+    flag_reasons = serializers.ReadOnlyField()
     frequency = serializers.SerializerMethodField()
+    is_editable = serializers.SerializerMethodField()
+    is_not_flagged = serializers.ReadOnlyField()
+    is_not_missing_answer_choices = serializers.ReadOnlyField()
+    is_not_missing_expert_rationale = serializers.ReadOnlyField()
+    is_not_missing_sample_answers = serializers.ReadOnlyField()
+    is_owner = serializers.SerializerMethodField()
+    is_valid = serializers.ReadOnlyField()
     matrix = serializers.SerializerMethodField()
     most_convincing_rationales = serializers.SerializerMethodField()
     peer_impact = serializers.SerializerMethodField()
+    urls = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
-
-    def get_answer_count(self, obj):
-        return obj.answer_count
-
-    def get_assignment_count(self, obj):
-        return obj.assignment_count
 
     def get_answerchoice_set(self, obj):
         return [
@@ -88,10 +92,26 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
     def get_difficulty(self, obj):
         d = obj.get_difficulty()
-        return {"score": d[0], "label": str(d[1])}
+        return {"score": d[0], "label": d[1]}
 
     def get_frequency(self, obj):
         return obj.get_frequency()
+
+    def get_is_editable(self, obj):
+        if "request" in self.context:
+            return obj.is_editable and (
+                self.context["request"].user == obj.user
+                or self.context["request"].user in obj.collaborators.all()
+            )
+        return obj.is_editable
+
+    def get_is_owner(self, obj):
+        if "request" in self.context:
+            return (
+                self.context["request"].user == obj.user
+                or self.context["request"].user in obj.collaborators.all()
+            )
+        return False
 
     def get_matrix(self, obj):
         return obj.get_matrix()
@@ -101,7 +121,23 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
     def get_peer_impact(self, obj):
         pi = obj.get_peer_impact()
-        return {"score": pi[0], "label": str(pi[1])}
+        return {"score": pi[0], "label": pi[1]}
+
+    def get_urls(self, obj):
+        return {
+            "add_answer_choices": reverse(
+                "answer-choice-form", args=(obj.pk,)
+            ),
+            "add_expert_rationales": reverse(
+                "research-fix-expert-rationale", args=(obj.pk,)
+            ),
+            "add_new_question": reverse("question-create"),
+            "add_sample_answers": reverse(
+                "sample-answer-form", args=(obj.pk,)
+            ),
+            "copy_question": reverse("question-clone", args=(obj.pk,)),
+            "fix": reverse("question-fix", args=(obj.pk,)),
+        }
 
     class Meta:
         model = Question
@@ -114,9 +150,17 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "collaborators",
             "difficulty",
             "discipline",
+            "flag_reasons",
             "frequency",
             "image",
             "image_alt_text",
+            "is_editable",
+            "is_not_flagged",
+            "is_not_missing_answer_choices",
+            "is_not_missing_expert_rationale",
+            "is_not_missing_sample_answers",
+            "is_owner",
+            "is_valid",
             "matrix",
             "most_convincing_rationales",
             "peer_impact",
@@ -124,6 +168,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "text",
             "title",
             "type",
+            "urls",
             "user",
             "video_url",
         ]
@@ -205,19 +250,43 @@ class RankSerializer(serializers.ModelSerializer):
 
 
 class AssignmentSerializer(DynamicFieldsModelSerializer):
-    editable = serializers.SerializerMethodField()
+    editable = serializers.ReadOnlyField()
+    is_valid = serializers.ReadOnlyField()
+    question_pks = serializers.SerializerMethodField()
     questions = RankSerializer(
         source="assignmentquestions_set",
         many=True,
         required=False,
     )
-    question_pks = serializers.SerializerMethodField()
-
-    def get_editable(self, obj):
-        return obj.editable
+    questions_basic = QuestionSerializer(
+        fields=[
+            "answer_count",
+            "pk",
+            "title",
+            "type",
+        ],
+        many=True,
+        read_only=True,
+        source="questions",
+    )
+    urls = serializers.SerializerMethodField()
 
     def get_question_pks(self, obj):
         return list(obj.questions.values_list("pk", flat=True))
+
+    def get_urls(self, obj):
+        return {
+            "copy": reverse("assignment-copy", args=(obj.pk,)),
+            "distribute": reverse(
+                "student-group-assignment-create", args=(obj.pk,)
+            ),
+            "fix": reverse(
+                "assignment-fix",
+                args=(obj.pk,),
+            ),
+            "preview": obj.get_absolute_url(),
+            "update": reverse("assignment-update", args=(obj.pk,)),
+        }
 
     def validate_questions(self, data):
         assignment_questions = list(
@@ -272,8 +341,11 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
             "description",
             "editable",
             "intro_page",
+            "is_valid",
             "pk",
             "question_pks",
             "questions",
+            "questions_basic",
             "title",
+            "urls",
         ]

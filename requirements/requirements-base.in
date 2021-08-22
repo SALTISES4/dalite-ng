@@ -9,27 +9,28 @@ django-celery-beat
 django-analytical
 django-compressor>=2.3
 django-cookie-law
+django-csp
+django-decorator-include
+django-elasticsearch-dsl
 django-grappelli
 django-htmlmin
 django-inlinecss
 django-ipware==2.1.0  # Temporary pin awaiting django-axes fix
+django-permissions-policy
+django-referrer-policy
+django-samesite-none
 django<3.0.0
+djangorestframework>=3.11.2  # Reqd by safety
+lxml >= 4.6.2  # Reqd by safety
 mysqlclient
-pillow>8.2.0
+packaging
+pandas
+pillow>8.2.0  # Reqd by safety
 pyjwt
-# pymysql
 python-memcached==1.59
 pytz
 requests
-django-security-headers>=0.3
-packaging
-djangorestframework>=3.11.2  # Reqd by safety
-pandas
-django-samesite-none
 urllib3 > 1.25.8  # Reqd by safety
-lxml >= 4.6.2  # Reqd by safety
-
-django-elasticsearch-dsl
 
 SALTISE_course_flow
 SALTISE_user_feedback > 0.1.1

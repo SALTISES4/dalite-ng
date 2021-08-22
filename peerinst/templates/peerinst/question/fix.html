@@ -1,0 +1,95 @@
+{% extends user.student|yesno:'peerinst/student/base.html,peerinst/base.html' %}
+
+{% load compress i18n static %}
+
+{% block mdc %}{% endblock %}
+
+{% block stylesheets %}
+{{ block.super }}
+{% compress js file preact %}
+<script src="{% static 'peerinst/js/preact.min.js' %}" defer></script>
+{% endcompress %}
+{% compress js file preview %}
+<script src="{% static 'peerinst/js/preview.min.js' %}" defer></script>
+{% endcompress %}
+
+{% compress css file preview %}
+<link href="{% static 'peerinst/js/preview.min.css' %}" rel="stylesheet">
+{% endcompress %}
+{% compress css file rmwc %}
+<link href="{% static 'peerinst/css/rmwc.min.css' %}" rel="stylesheet">
+{% endcompress %}
+{% endblock %}
+
+{% block body %}
+<main>
+  <section>
+    <h1 class="mdc-typography--display3">
+      {% if object.is_valid %}
+        {% trans 'Preview Questions' %}
+      {% else %}
+        {% trans 'Fix Questions' %}
+      {% endif %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
+
+    <div class="admin-link">
+      <a href="{% url 'teacher' teacher.pk %}">{% trans 'Back to My Account' %}</a>
+    </div>
+
+    {% if assignment %}
+    <section id="assignment-errors">
+      {% if broken_by_flags or broken_by_answerchoices %}
+      <h2>{% trans 'Ooops...' %}</h2>
+      <p class="mdc-typography--body1">
+        {% trans "Unfortunately, this assignment may not be entirely fixable due to:" %}
+        <dl class="mdc-typography--body1">
+        {% if broken_by_flags %}
+          <dt>{% trans "Question flags" %}</dt>
+
+          <dd>
+          {% if object.editable and request.user in object.owner.all %}
+            {% trans "However, you can edit this assignment to replace flagged questions." %}
+          {% else %}
+            {% trans "The best option is to fix whatever you can (look for 'Fix!' indicators) and then make a copy of the assignment.  In the new copy, you will be able to replace flagged questions." %}
+          {% endif %}
+          </dd>
+        {% endif %}
+
+        {% if broken_by_answerchoices %}
+          <dt>{% trans "Missing answer choices" %}</dt>
+
+          <dd>
+            {% if object.editable and request.user in object.owner.all %}
+              {% trans "If you are able to add the missing answer choices because you are the question author and the question is editable, great!  Otherwise, you can copy the problematic questions, fix them, and substitute for them by editing this assignment." %}
+            {% else %}
+              {% trans "If you are able to add the missing answer choices because you are the question author and the question is editable, great!  Otherwise, you will need to make a copy of this assignment and replace the problematic questions." %}
+            {% endif %}
+          </dd>
+        {% endif %}
+        </dl>
+      </p>
+      <br/>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <div id="question-preview-app"></div>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script nonce="{{ request.csp_nonce }}">
+  window.addEventListener("load", function() {
+    const QuestionPreviewApp = preact.h(preview.QuestionPreviewApp, {
+      gettext: gettext,
+      urls: {
+        load: "{{ load_url|safe }}",
+      }
+    });
+    preact.render(QuestionPreviewApp, document.getElementById("question-preview-app"));
+  })
+</script>
+{% endblock %}

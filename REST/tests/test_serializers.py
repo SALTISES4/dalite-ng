@@ -12,6 +12,49 @@ from peerinst.tests.fixtures.teacher import login_teacher
 
 
 @pytest.mark.django_db
+def test_dynamic_serializer_querystring(client, assignments, teacher):
+    """
+    Requirements:
+    1. Return subset of specified fields in querystring
+    """
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher", args=(teacher.pk,))
+    response = client.get(url)
+
+    data = json.loads(response.content)
+
+    # Check all fields present
+    fields = [
+        "archived_questions",
+        "assignment_pks",
+        "assignments",
+        "deleted_questions",
+        "favourite_questions",
+        "owned_assignments",
+        "pk",
+        "questions",
+        "shared_questions",
+        "user",
+    ]
+    for field in fields:
+        assert field in data
+
+    assert len(data.keys()) == len(fields)
+
+    requested_fields = ["assignments", "pk", "fake"]
+    url = f"{reverse('REST:teacher', args=(teacher.pk,))}?field={'&field='.join(requested_fields)}"  # noqa E501
+
+    response = client.get(url)
+
+    data = json.loads(response.content)
+    for field in ["assignments", "pk"]:
+        assert field in data
+
+    assert len(data.keys()) == 2
+
+
+@pytest.mark.django_db
 def test_assignment_list(client, assignments, student, teacher):
     """
     Requirements:
@@ -325,13 +368,16 @@ def test_discipline_list(client, disciplines, student, teacher):
 
 
 @pytest.mark.django_db
-def test_teacher_favourites(client, questions, teachers):
+def test_teacher_questions(client, questions, teachers):
     """
     Requirements:
     1. Must be authenticated
     2. Only current teacher endpoint is accessible via GET
     3. Can update favourites through PUT
-    4. No other http methods
+    4. Can update deleted and archived through PUT
+    5. Cannot delete a question we don't own
+    6. Can only archive questions we own or share
+    7. No other http methods
     """
 
     # Setup
@@ -376,7 +422,63 @@ def test_teacher_favourites(client, questions, teachers):
     assert questions[1].pk not in retrieved_favourites
     assert questions[1] not in teachers[0].favourite_questions.all()
 
-    # 4. No other http methods
+    # 4. Can update deleted_questions and archived_questions through PUT
+    assert login_teacher(client, teachers[1])
+
+    assert teachers[1].user.question_set.count() == 0
+    questions[0].user = teachers[1].user
+    questions[0].save()
+
+    new_deleted = [questions[0].pk]
+    new_archived = [questions[0].pk]
+
+    url = reverse("REST:teacher", args=[teachers[1].pk])
+    response = client.put(
+        url,
+        {"archived_questions": new_archived, "deleted_questions": new_deleted},
+        content_type="application/json",
+    )
+
+    assert questions[0] in teachers[1].deleted_questions.all()
+    assert questions[0] in teachers[1].archived_questions.all()
+    assert response.status_code == status.HTTP_200_OK
+
+    # 5. Cannot delete a question we don't own
+    assert questions[1].user != teachers[1].user
+
+    response = client.put(
+        url,
+        {
+            "deleted_questions": [questions[2].pk],
+        },
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    # 6. Can only archive questions we own or share
+    assert questions[2].user != teachers[1].user
+    assert teachers[1].user not in questions[2].collaborators.all()
+
+    response = client.put(
+        url,
+        {
+            "archived_questions": [questions[1].pk],
+        },
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    questions[3].collaborators.add(teachers[1].user)
+    response = client.put(
+        url,
+        {
+            "archived_questions": [questions[3].pk],
+        },
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    # 7. No other http methods
     disallowed = ["post", "patch", "delete", "head", "options", "trace"]
 
     for method in disallowed:

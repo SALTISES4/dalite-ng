@@ -39,23 +39,27 @@ function initModel(data, callback) {
 function distributeAssignment() {
   const button = document.querySelector("#assignment-distribution button");
   button.disabled = true;
-  const req = buildReq({}, "post");
-  fetch(model.urls.distributeAssignment, req)
-    .then((resp) => resp.json())
-    .then(function (assignment) {
-      model.assignment = {
-        hash: assignment.hash,
-        distributionDate: assignment.distribution_date
-          ? new Date(assignment.distribution_date)
-          : null,
-      };
-      distributedView();
-      initStudentProgress(model.urls.getAssignmentStudentProgress);
-    })
-    .catch(function (err) {
-      console.log(err);
-      button.disabled = null;
-    });
+  if (window.confirm(model.translations.distributionWarning)) {
+    const req = buildReq({}, "post");
+    fetch(model.urls.distributeAssignment, req)
+      .then((resp) => resp.json())
+      .then(function (assignment) {
+        model.assignment = {
+          hash: assignment.hash,
+          distributionDate: assignment.distribution_date
+            ? new Date(assignment.distribution_date)
+            : null,
+        };
+        distributedView();
+        initStudentProgress(model.urls.getAssignmentStudentProgress);
+      })
+      .catch(function (err) {
+        console.log(err);
+        button.disabled = null;
+      });
+  } else {
+    button.disabled = null;
+  }
 }
 
 function onQuestionListModified() {

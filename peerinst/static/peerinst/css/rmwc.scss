@@ -4,6 +4,7 @@
   --mdc-theme-primary: #{$mdc-theme-primary};
   --mdc-theme-secondary: #{$mdc-theme-secondary};
   --mdc-theme-text-secondary-on-background: #{$mdc-theme-secondary};
+  --mdc-theme-text-hint-on-background: rgba(0,0,0,.54);
 }
 
 .hint {
@@ -103,20 +104,31 @@
 /* Customize question cards */
 .info {
   color: $hint;
-  &.alert {
+  & i.alert {
       color: var(--mdc-theme-error);
+  }
+  & i.tip {
+      color: $mdc-theme-primary;
   }
   & p, div {
     font-family: $mdc-typography-font-family;
     font-size: 10px;
     -webkit-font-smoothing: auto;
-    letter-spacing: -0.01em;
+    letter-spacing: normal;
     line-height: 12px;
     margin-top: 1px;
     padding-left: 6px;
+
+    &.large {
+      font-size: 12px;
+      line-height: 14px;
+    }
   }
 }
 
+#rationale-table-app .mdc-dialog__container {
+  max-width: unset;
+}
 
 .mdc-dialog__container {
   max-width: 600px;
@@ -164,27 +176,38 @@
     position: absolute;
     right: 20px;
     top: 20px;
+  }
 
-    & .rating {
-      border-radius: 50%;
-      border-style: solid;
-      border-width: thin;
-      font-size: x-small;
-      height: 32px;
-      margin-bottom: 8px;
-      position: relative;
-      width: 32px;
+  & .rating {
+    border-radius: 50%;
+    border-style: solid;
+    border-width: thin;
+    font-size: x-small;
+    height: 32px;
+    margin-bottom: 16px;
+    position: relative;
+    width: 32px;
 
-      & > .label {
-        font-weight: bold;
-        left: 50%;
-        position: absolute;
-        top: 50%;
-        transform: translate(-50%, -50%);
-      }
+    & > .label {
+      font-weight: bold;
+      left: 50%;
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    & > .title {
+      font-size: 8px;
+      font-weight: normal;
+      left: 50%;
+      line-height: normal;
+      position: absolute;
+      text-align: center;
+      top: calc(100% + 2px);
+      transform: translate(-50%, 0%);
     }
   }
 }
+
 
 /* Search related css */
 .spinner {
@@ -295,5 +318,61 @@
   }
   & svg {
     vertical-align: middle;
+  }
+}
+
+/* Account page */
+.breadcrumb {
+  color: $hint;
+  cursor: pointer;
+  font-family: $mdc-typography-font-family;
+  -webkit-font-smoothing: auto;
+  letter-spacing: normal;
+
+  &:not(:first-of-type)::before {
+    color: $mdc-theme-secondary;
+    content: "\FF5C";
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+}
+
+.assignment-list-item, .question-list-item {
+  &.hatched {
+    background: repeating-linear-gradient(
+      -45deg,
+      transparentize($hint, 0.85),
+      transparentize($hint, 0.85) 5px,
+      transparentize($hint, 0.95) 5px,
+      transparentize($hint, 0.95) 10px
+    );
+  }
+  & .mdc-icon-button {
+    color: $hint;
+    &:last-of-type {
+      margin-right: -12px;
+    }
+  }
+}
+
+.assignment-list .mdc-menu {
+    min-width: 180px;
+    transform: translate(-100%, -8px);
+  }
+
+.copybox {
+  align-items: center;
+  border: solid thin $mdc-theme-secondary;
+  border-radius: 6px;
+  color: $mdc-theme-secondary;
+  display: flex;
+  padding: 0px 20px 0px 8px;
+  width: fit-content;
+}
+
+#assignment-errors {
+  dt {
+    float: unset;
+    font-weight: bold;
   }
 }

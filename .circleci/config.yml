@@ -1,4 +1,6 @@
-version: 2
+version: 2.1
+orbs:
+  aws-s3: circleci/aws-s3@3.0
 jobs:
   build:
     resource_class: medium
@@ -73,6 +75,9 @@ jobs:
             ./manage.py compress
       - store_artifacts:
           path: /home/circleci/repo/static
+      - aws-s3/sync:
+          from: /home/circleci/repo/static
+          to: 's3://staging-mydalite-static'
       - run:
           name: Tests
           command: |

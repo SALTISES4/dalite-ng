@@ -39,6 +39,16 @@
   @include mdc-card-corner-radius($radius);
 }
 
+/* Patch account page lists to match mdc and rmwc */
+.foldable .mdc-list-item__secondary-text {
+  color: rgba(0, 0, 0, 0.54);
+  margin-top: -7px;
+}
+
+.foldable .mdc-list--two-line .mdc-list-item__text {
+  align-self: unset;
+}
+
 /* - MDC icons */
 .material-icons {
   /* Support for IE. */

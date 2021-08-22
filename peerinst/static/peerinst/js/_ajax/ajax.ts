@@ -51,7 +51,7 @@ export async function submitData(
   url: string,
   data: Record<string, unknown>,
   method: string,
-): Promise<Record<string, unknown> | Error> {
+): Promise<Record<string, unknown> | unknown[] | Error> {
   // Only attach csrf token to unsafe methods
   if (["POST", "PATCH", "PUT", "DELETE"].includes(method.toUpperCase())) {
     const settings = {
@@ -72,7 +72,7 @@ export async function submitData(
 export async function get(
   url: string,
   method = "GET",
-): Promise<Record<string, unknown> | Error> {
+): Promise<Record<string, unknown> | unknown[] | Error> {
   const settings = {
     method,
   };

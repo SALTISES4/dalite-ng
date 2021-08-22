@@ -88,6 +88,7 @@ const scriptBuilds = [
       "search",
       "search_beta",
       "index",
+      "preview",
       "question",
       "teacher",
       "custom_elements",
@@ -163,7 +164,7 @@ function watchStyle(app, module) {
 
 function typescript() {
   const build = gulp
-    .src("**/*.tsx")
+    .src(["**/*.tsx"])
     // .src([
     //   "{analytics,peerinst,reputation,quality,tos}/**/*.{ts,tsx,js,jsx}",
     //   "!**/*.min.js",
@@ -255,7 +256,13 @@ function buildScript(app, module) {
       "material/snackbar": "material/snackbar",
     },
     name,
-    plugins: [terser()],
+    plugins: [
+      terser({
+        mangle: {
+          reserved: ["gettext"],
+        },
+      }),
+    ],
     sourcemap: true,
   };
 

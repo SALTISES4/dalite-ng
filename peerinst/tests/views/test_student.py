@@ -122,10 +122,9 @@ def test_leave_group_wrong_data(client, student, group):
 def test_leave_group_is_member_of_group(client, student, group):
     student.groups.add(group)
     assert login_student(client, student)
-    StudentGroupMembership.objects.create(student=student, group=group)
+    StudentGroupMembership.objects.get_or_create(student=student, group=group)
 
     assert group in student.groups.all()
-    assert group in student.student_groups.all()
     assert StudentGroupMembership.objects.get(
         student=student, group=group
     ).current_member

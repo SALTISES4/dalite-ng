@@ -1,4 +1,5 @@
 import { Component, Fragment, h } from "preact";
+import { useCallback, useState } from "preact/hooks";
 import { triScale } from "../_theming/colours.js";
 import { scaleThreshold } from "d3";
 import { Favourites } from "./providers.js";
@@ -148,9 +149,9 @@ export class AssignmentDialog extends Component<
         <Info
           type="alert"
           text={this.props.gettext(
-            `You have no editable assignments to which this
-             question can be added, but you can create a new one below.  The
-             question will be added to the new assignment automatically.`,
+            "You have no editable assignments to which this " +
+              "question can be added, but you can create a new one below.  " +
+              "The question will be added to the new assignment automatically.",
           )}
         />
       );
@@ -158,8 +159,8 @@ export class AssignmentDialog extends Component<
     return (
       <Info
         text={this.props.gettext(
-          `You can add this question to an existing assignment (if it is
-           editable) or use this question to start a new assignment.`,
+          "You can add this question to an existing assignment (if it is " +
+            "editable) or use this question to start a new assignment.",
         )}
       />
     );
@@ -288,6 +289,7 @@ export class AssignmentDialog extends Component<
           .filter((a) => a.question_pks.indexOf(this.props.question.pk) < 0)
           .sort((x, y) => x.title.localeCompare(y.title))
           .map((a, i) => {
+            const label = a.title + " (#" + a.pk + ")";
             return (
               <div key={i}>
                 <Checkbox
@@ -297,7 +299,7 @@ export class AssignmentDialog extends Component<
                     ).indexOf(a.pk) >= 0
                   }
                   onChange={() => this.selectAssignment(a.pk)}
-                  label={`${a.title} (#${a.pk})`}
+                  label={label}
                   required={this.state.assignmentsSelected.length == 0}
                 />
               </div>
@@ -400,16 +402,18 @@ export function QuestionDialog({
 }: QuestionDialogProps): JSX.Element {
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>{question.title}</DialogTitle>
+      <DialogTitle>
+        #{question.pk} - {question.title}
+      </DialogTitle>
       <DialogContent>
         <div style={{ marginBottom: 16 }}>
           <Info
             text={gettext(
-              `The distribution of first and second choices along with the
-            statistics for each possible outcome are shown in the figure
-            below.  The most convincing rationales submitted by students
-            (i.e. most selected be peers) are also listed for each answer
-            choice.`,
+              "The distribution of first and second choices along with the " +
+                "statistics for each possible outcome are shown in the " +
+                "figure below.  The most convincing rationales submitted by " +
+                "students (i.e. most selected be peers) are also listed for " +
+                "each answer choice.",
             )}
           />
         </div>
@@ -514,9 +518,9 @@ export class QuestionFlagDialog extends Component<
           <div style={{ marginBottom: 16 }}>
             <Info
               text={this.props.gettext(
-                `You can flag this question as problematic using the form below.
-                This will immediately remove it from search results pending
-                review.  It will not remove it from assignments.`,
+                "You can flag this question as problematic using the form " +
+                  "below. This will immediately remove it from search results " +
+                  "pending review.  It will not remove it from assignments.",
               )}
             />
           </div>
@@ -528,9 +532,9 @@ export class QuestionFlagDialog extends Component<
           >
             <Select
               autoFocus
-              onChange={(e) => {
+              onChange={(e: React.FormEvent<HTMLInputElement>) => {
                 this.setState({
-                  selectedReason: e.target.value,
+                  selectedReason: (e.target as HTMLInputElement).value,
                 });
               }}
               options={this.state.reasons}
@@ -579,7 +583,9 @@ function QuestionCardActionButtons(props) {
         {props.gettext("Categories")}:{" "}
         <span>
           {props.question.category
-            ? props.question.category.map((c) => c.title).join("; ")
+            ? props.question.category
+                .map((c: { title: string }) => c.title)
+                .join("; ")
             : props.gettext("Uncategorized")}
         </span>
       </Typography>
@@ -590,15 +596,26 @@ function QuestionCardActionButtons(props) {
   );
 }
 
-function Info(props) {
+type InfoProps = {
+  className?: string;
+  text: string;
+  type?: string;
+};
+
+export function Info({
+  className = "",
+  text,
+  type = "",
+}: InfoProps): JSX.Element {
   return (
-    <div class={`${props.type} info`} style={{ display: "flex" }}>
+    <div className="info" style={{ display: "flex" }}>
       <Icon
+        className={type}
         icon="info"
         iconOptions={{ strategy: "ligature", size: "small" }}
       />
-      <Typography use="caption" tag="p">
-        {props.text}
+      <Typography use="caption" tag="p" className={className}>
+        {text}
       </Typography>
     </div>
   );
@@ -608,7 +625,7 @@ function MostConvincingRationales(props) {
   if (props.rationales) {
     return (
       <div>
-        {props.rationales.map((r, i) => {
+        {props.rationales.map((r, i: number) => {
           return (
             <div key={i}>
               <Typography
@@ -617,11 +634,16 @@ function MostConvincingRationales(props) {
                 theme="text-secondary-on-background"
                 // This field is bleached and safe
                 // eslint-disable-next-line
-                dangerouslySetInnerHTML={{ __html: `${r.label}. ${r.text}` }}
+                dangerouslySetInnerHTML={{ __html: r.label + ". " + r.text }}
                 style={{ fontWeight: "bold" }}
               />
               <ul>
-                {r.most_convincing.map((a, i) => {
+                {r.most_convincing.map((a, i: number) => {
+                  const shown = props.gettext("Shown: ") + a.times_shown;
+                  const chosen = props.gettext("Chosen: ") + a.times_chosen;
+                  const rate =
+                    props.gettext("Rate: ") +
+                    ((a.times_chosen / a.times_shown) * 100).toFixed(1);
                   return (
                     <Fragment key={i}>
                       <Typography
@@ -641,14 +663,13 @@ function MostConvincingRationales(props) {
                         use="caption"
                         tag="div"
                         dangerouslySetInnerHTML={{
-                          __html: `${props.gettext("Shown:")} ${
-                            a.times_shown
-                          } &middot; ${props.gettext("Chosen:")} ${
-                            a.times_chosen
-                          } &middot; ${props.gettext("Rate:")} ${(
-                            (a.times_chosen / a.times_shown) *
-                            100
-                          ).toFixed(1)}%`,
+                          __html:
+                            shown +
+                            " &middot; " +
+                            chosen +
+                            " &middot; " +
+                            rate +
+                            "%",
                         }}
                       />
                     </Fragment>
@@ -688,8 +709,8 @@ function AnswerChoices(props) {
       Object.prototype.hasOwnProperty.call(props.question, "answerchoice_set")
     ) {
       return (
-        <div class="question-answers">
-          <ol type={props.question.answer_style == 0 ? "A" : "l"}>
+        <div className="question-answers">
+          <ol type={props.question.answer_style == 0 ? "A" : "1"}>
             {props.question.answerchoice_set.map((ac, i) => {
               return (
                 <Typography
@@ -737,9 +758,11 @@ class Featured extends Component<FeaturedProps, FeaturedState> {
           href={this.props.collection.url}
           rel="noreferrer"
           target="_blank"
-          title={`${this.props.gettext(
-            "This question is part of featured content curated by SALTISE.  Click to open the associated collection ",
-          )}'${this.props.collection.title}' in a new tab.`}
+          title={
+            this.props.gettext(
+              "This question is part of featured content curated by SALTISE.  Click to open the associated collection: ",
+            ) + this.props.collection.title
+          }
         >
           <div
             class="featured-icon"
@@ -747,8 +770,8 @@ class Featured extends Component<FeaturedProps, FeaturedState> {
             onMouseLeave={() => this.setState({ hovered: false })}
             style={{
               backgroundImage: this.state.hovered
-                ? `url('${this.props.url[1]}')`
-                : `url('${this.props.url[0]}')`,
+                ? "url(" + this.props.url[1] + ")"
+                : "url(" + this.props.url[0] + ")",
             }}
           />
         </a>
@@ -852,33 +875,39 @@ function AssignmentAddIcon({
   );
 }
 
-function Image(props) {
-  if (props.image && props.show) {
+type ImageProps = {
+  alt?: string;
+  image: string;
+  show?: boolean;
+};
+
+function Image({ alt = "", image, show = true }: ImageProps) {
+  if (image && show) {
     return (
       <Typography use="caption">
-        <img alt={props.alt} class="question-image" src={props.image} />
+        <img alt={alt} class="question-image" src={image} />
       </Typography>
     );
   }
   return <Fragment />;
 }
 
-function Video(props) {
-  if (props.url && props.show) {
+type VideoProps = {
+  show?: boolean;
+  url: string;
+};
+
+function Video({ show = true, url }: VideoProps) {
+  if (url && show) {
     return (
-      <object
-        class="question-image"
-        width="640"
-        height="390"
-        data={props.url}
-      />
+      <object class="question-image" width="640" height="390" data={url} />
     );
   }
   return <Fragment />;
 }
 
 type QuestionCardHeaderProps = {
-  featuredIconURL: string[];
+  featuredIconURL?: string[];
   gettext: (a: string) => string;
   question: Question;
 };
@@ -889,7 +918,7 @@ function QuestionCardHeader({
   question,
 }: QuestionCardHeaderProps) {
   const byline = () => {
-    if (question.user.username) {
+    if (question.user?.username) {
       return (
         <div style={{ display: "inline" }}>
           <span>
@@ -919,7 +948,7 @@ function QuestionCardHeader({
   };
 
   const featured = () => {
-    if (question.featured && question.collections) {
+    if (featuredIconURL && question.featured && question.collections) {
       return (
         <Featured
           collection={question.collections[0]}
@@ -957,7 +986,11 @@ function QuestionCardHeader({
   );
 }
 
-function QuestionCardBody(props) {
+type QuestionCardBodyProps = {
+  question: Question;
+};
+
+function QuestionCardBody({ question }: QuestionCardBodyProps) {
   return (
     <div>
       <Typography
@@ -966,15 +999,15 @@ function QuestionCardBody(props) {
         theme="text-secondary-on-background"
         // This field is bleached and safe
         // eslint-disable-next-line
-        dangerouslySetInnerHTML={{ __html: props.question.text }}
+        dangerouslySetInnerHTML={{ __html: question.text }}
       />
       <Image
-        alt={props.question.image_alt_text}
-        image={props.question.image}
+        alt={question.image_alt_text}
+        image={question.image}
         show={true}
       />
-      <Video url={props.question.video_url} show={true} />
-      <AnswerChoices question={props.question} show={true} />
+      <Video url={question.video_url} show={true} />
+      <AnswerChoices question={question} show={true} />
     </div>
   );
 }
@@ -987,7 +1020,10 @@ type RatingsProps = {
 
 function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
   const difficulty = () => {
-    if (Object.prototype.hasOwnProperty.call(question.difficulty, "score")) {
+    if (
+      Object.prototype.hasOwnProperty.call(question.difficulty, "score") &&
+      question.difficulty.score
+    ) {
       const colourScale = scaleThreshold(triScale).domain([0.25, 0.5]);
       const color = colourScale(question.difficulty.score);
       const opacity = "30";
@@ -1009,7 +1045,7 @@ function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
             style={{ overflow: "visible" }}
           >
             <path
-              id={`path-${question.pk}`}
+              id={"path-" + question.pk}
               d="M -3 16 A 19 19 0 0 1 35 16"
               fill="transparent"
             />
@@ -1020,11 +1056,19 @@ function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
                 startOffset="50%"
                 style={{ fill: color, fontSize: 8 }}
                 xmlnsXlink="http://www.w3.org/1999/xlink"
-                xlinkHref={`#path-${question.pk}`}
+                xlinkHref={"#path-" + question.pk}
               >
                 {gettext("Click!")}
                 {/* @ts-ignore: TS doesn't recognize textPath  */}
               </textPath>
+            </text>
+            <text
+              text-anchor="middle"
+              style={{ fill: color, fontSize: 8 }}
+              x={15}
+              y={42}
+            >
+              {gettext("Difficulty")}
             </text>
           </svg>
           <div
@@ -1041,7 +1085,10 @@ function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
   };
 
   const impact = () => {
-    if (Object.prototype.hasOwnProperty.call(question.peer_impact, "score")) {
+    if (
+      Object.prototype.hasOwnProperty.call(question.peer_impact, "score") &&
+      question.peer_impact.score
+    ) {
       const colourScale = scaleThreshold(triScale).domain([0.05, 0.25]);
       const color = colourScale(question.peer_impact.score);
       const opacity = "30";
@@ -1056,13 +1103,16 @@ function Ratings({ gettext, handleToggleDialog, question }: RatingsProps) {
           <div class="label" style={{ color }}>
             {question.peer_impact.label}
           </div>
+          <div class="title" style={{ color }}>
+            {gettext("Peer impact")}
+          </div>
         </div>
       );
     }
   };
 
   return (
-    <div class="ratings">
+    <div className="ratings">
       {difficulty()}
       {impact()}
     </div>
@@ -1107,7 +1157,7 @@ export function SearchQuestionCard({
             gettext={gettext}
             question={question}
           />
-          <QuestionCardBody gettext={gettext} question={question} />
+          <QuestionCardBody question={question} />
         </div>
         <CardActions>
           <QuestionCardActionButtons gettext={gettext} question={question} />
@@ -1131,6 +1181,323 @@ export function SearchQuestionCard({
               handleToggle={() => handleToggleFavourite(question.pk)}
               question={question.pk}
             />
+          </CardActionIcons>
+        </CardActions>
+      </Card>
+    </div>
+  );
+}
+
+type ValidityCheckProps = {
+  gettext: (a: string) => string;
+  label: string;
+  onClick: (() => void) | undefined;
+  passes: boolean | undefined;
+  pk: number;
+  title: string;
+};
+
+function ValidityCheck({
+  gettext,
+  label,
+  onClick,
+  passes,
+  pk,
+  title,
+}: ValidityCheckProps): JSX.Element {
+  const colourScale = scaleThreshold(triScale).domain([0.25, 0.5]);
+  const color = passes ? colourScale(0) : colourScale(1);
+  const opacity = "30";
+  return (
+    <div
+      class="rating"
+      style={{
+        backgroundColor: color + opacity,
+        borderColor: color,
+        cursor: passes || !onClick ? "default" : "pointer",
+        margin: 8,
+      }}
+      onClick={passes ? undefined : onClick}
+      title={title}
+    >
+      <svg
+        width="40"
+        height="40"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ overflow: "visible" }}
+      >
+        <path
+          id={"validity-path-" + pk}
+          d="M -3 16 A 19 19 0 0 1 35 16"
+          fill="transparent"
+        />
+        <text text-anchor="middle">
+          {/* @ts-ignore: TS doesn't recognize textPath */}
+          <textPath
+            fill={color}
+            startOffset="50%"
+            style={{ fill: color, fontSize: 8 }}
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+            xlinkHref={"#validity-path-" + pk}
+          >
+            {passes || !onClick ? "" : gettext("Fix!")}
+            {/* @ts-ignore: TS doesn't recognize textPath  */}
+          </textPath>
+        </text>
+        {label.split(" ").map((word, i) => {
+          return (
+            <text
+              key={i}
+              text-anchor="middle"
+              style={{ fill: color, fontSize: 8 }}
+              x={15}
+              y={42 + 9 * i}
+            >
+              {word}
+            </text>
+          );
+        })}
+      </svg>
+      <div
+        class="label"
+        style={{
+          color,
+        }}
+      >
+        <Icon
+          icon={passes ? "check" : "close"}
+          iconOptions={{ strategy: "ligature", size: "small" }}
+          style={{ verticalAlign: "middle" }}
+        />
+      </div>
+    </div>
+  );
+}
+
+type PreviewQuestionCardProps = {
+  gettext: (a: string) => string;
+  handleToggleDialog: (a: Question) => void;
+  question: Question;
+};
+
+function useToggle(): {
+  dialogOpen: boolean;
+  toggleDialog: () => void;
+} {
+  const [dialogOpen, setValue] = useState(false);
+  const toggleDialog = useCallback(() => {
+    setValue(!dialogOpen);
+  }, [dialogOpen]);
+  return { dialogOpen, toggleDialog };
+}
+
+export function PreviewQuestionCard({
+  gettext,
+  handleToggleDialog,
+  question,
+}: PreviewQuestionCardProps): JSX.Element {
+  const { dialogOpen: flagDialogOpen, toggleDialog: toggleFlaggedDialog } =
+    useToggle();
+  const {
+    dialogOpen: ineditableDialogOpen,
+    toggleDialog: toggleIneditableDialog,
+  } = useToggle();
+
+  const copy = () => {
+    if (question.urls?.copy_question) {
+      return (
+        <DialogButton
+          action="close"
+          onClick={() => {
+            window.open(question.urls?.copy_question);
+          }}
+        >
+          {gettext("Copy")}
+        </DialogButton>
+      );
+    }
+  };
+
+  const flagReasonsDialog = () => {
+    if (question?.flag_reasons) {
+      const body = (
+        <Typography use="body1" tag="p">
+          {gettext(
+            "This question has been flagged by fellow members of the SALTISE community for the following reasons:",
+          )}
+          <ul>
+            {question.flag_reasons
+              .sort((a, b) => a.flag_reason__count - b.flag_reason__count)
+              .map((fr, i) => (
+                <li key={i} style={{ listStyleType: "disc" }}>
+                  {fr.flag_reason__title} ({fr.flag_reason__count})
+                </li>
+              ))}
+          </ul>
+          {gettext(
+            "Flags are reviewed by SALTISE administrators and removed once the issue has been resolved.  You can, however, copy this question, make the necessary changes and then use the new version in your assignments.",
+          )}
+        </Typography>
+      );
+
+      return (
+        <Dialog open={flagDialogOpen} onClose={toggleFlaggedDialog}>
+          <DialogTitle>{gettext("Question flags")}</DialogTitle>
+          <DialogContent>{body}</DialogContent>
+          <DialogActions>
+            {copy()}
+            <DialogButton action="accept" isDefaultAction>
+              {gettext("Close")}
+            </DialogButton>
+          </DialogActions>
+        </Dialog>
+      );
+    }
+  };
+
+  const ineditableDialog = () => {
+    if (question?.is_editable == false) {
+      const body = (
+        <Typography use="body1" tag="p">
+          {gettext(
+            "This question cannot be edited, but you can make an editable copy.",
+          )}
+        </Typography>
+      );
+
+      return (
+        <Dialog open={ineditableDialogOpen} onClose={toggleIneditableDialog}>
+          <DialogTitle>{gettext("Question not editable")}</DialogTitle>
+          <DialogContent>{body}</DialogContent>
+          <DialogActions>
+            {copy()}
+            <DialogButton action="accept" isDefaultAction>
+              {gettext("Close")}
+            </DialogButton>
+          </DialogActions>
+        </Dialog>
+      );
+    }
+  };
+
+  return (
+    <div>
+      {flagReasonsDialog()}
+      {ineditableDialog()}
+      <Card className="question" style={{ position: "relative" }}>
+        <Ratings
+          gettext={gettext}
+          question={question}
+          handleToggleDialog={handleToggleDialog}
+        />
+        <div style={{ paddingRight: 40 }}>
+          <QuestionCardHeader gettext={gettext} question={question} />
+          <QuestionCardBody question={question} />
+        </div>
+        <CardActions>
+          <QuestionCardActionButtons gettext={gettext} question={question} />
+          <CardActionIcons>
+            {[
+              {
+                include: true,
+                label: question.is_not_flagged
+                  ? gettext("Unflagged")
+                  : gettext("Flagged"),
+                onClick: toggleFlaggedDialog,
+                passes: question.is_not_flagged,
+                title: question.is_not_flagged
+                  ? gettext("This question has not been flagged")
+                  : gettext(
+                      "This question has been flagged by a fellow member of the SALTISE community. Flags are reviewed by SALTISE administrators and removed once the issue has been resolved.",
+                    ),
+              },
+              {
+                include: question.type == "PI",
+                label: gettext("Answer choices"),
+                onClick: () => {
+                  if (question.urls) {
+                    if (question.is_editable) {
+                      const tab = window.open(
+                        question.urls.add_answer_choices,
+                        "_blank",
+                        "noopener,noreferrer",
+                      );
+                      if (tab) tab.focus();
+                    } else {
+                      toggleIneditableDialog();
+                    }
+                  }
+                },
+                passes: question.is_not_missing_answer_choices,
+                title: question.is_not_missing_answer_choices
+                  ? gettext("This question has enough answer choices")
+                  : gettext(
+                      "This question is missing answer choices. Click to add more.",
+                    ),
+              },
+              {
+                include: true,
+                label: gettext("Expert rationale"),
+                onClick: () => {
+                  if (question.urls) {
+                    const tab = window.open(
+                      question.is_not_missing_answer_choices
+                        ? question.urls.add_expert_rationales
+                        : question.urls.add_answer_choices,
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
+                    if (tab) tab.focus();
+                  }
+                },
+                passes:
+                  question.is_not_missing_expert_rationale &&
+                  question.is_not_missing_answer_choices,
+                title: question.is_not_missing_expert_rationale
+                  ? gettext(
+                      "This question has an expert rationale associated with all correct answer choices.",
+                    )
+                  : gettext(
+                      "This question does not have an expert rationale for all correct answer choices.",
+                    ),
+              },
+              {
+                include: question.type == "PI",
+                label: gettext("Sample answers"),
+                onClick: () => {
+                  if (question.urls) {
+                    const tab = window.open(
+                      question.is_not_missing_answer_choices
+                        ? question.urls.add_sample_answers
+                        : question.urls.add_answer_choices,
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
+                    if (tab) tab.focus();
+                  }
+                },
+                passes: question.is_not_missing_sample_answers,
+                title: question.is_not_missing_sample_answers
+                  ? gettext("This question has enough sample answers")
+                  : gettext(
+                      "This question does not have enough sample answers.  Click to add more.",
+                    ),
+              },
+            ].map((el, i) => {
+              if (el.include) {
+                return (
+                  <ValidityCheck
+                    gettext={gettext}
+                    key={i}
+                    label={el.label}
+                    onClick={el.onClick}
+                    passes={el.passes}
+                    pk={question.pk}
+                    title={el.title}
+                  />
+                );
+              }
+            })}
           </CardActionIcons>
         </CardActions>
       </Card>

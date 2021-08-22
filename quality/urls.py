@@ -1,4 +1,8 @@
+from csp.decorators import csp_replace
 from django.urls import path
+from django.views.decorators.clickjacking import xframe_options_exempt
+
+from peerinst.middleware import lti_access_allowed
 
 from . import views
 
@@ -30,7 +34,16 @@ def edit_patterns():
 def validation_patterns():
     return [
         path(
-            "validate/", views.validation.validate_rationale, name="validate",
+            # Called from myDalite question - Must allow to be framed
+            "validate/",
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(
+                        views.validation.validate_rationale,
+                    )
+                )
+            ),
+            name="validate",
         )
     ]
 
@@ -38,7 +51,9 @@ def validation_patterns():
 def evaluation_patterns():
     return [
         path(
-            "evaluate/", views.evaluation.evaluate_rationale, name="evaluate",
+            "evaluate/",
+            views.evaluation.evaluate_rationale,
+            name="evaluate",
         )
     ]
 

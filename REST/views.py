@@ -1,9 +1,11 @@
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext_lazy as _
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from peerinst.models import (
@@ -71,17 +73,26 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Read-only endpoint for questions.
 
-    TODO: Remove list option to reduce db load.
+    Override default list method to only return questions in querystring
     """
 
     permission_classes = [IsAuthenticated, IsNotStudent]
     queryset = Question.objects.all()
     renderer_classes = [JSONRenderer]
+    serializer_class = QuestionSerializer
 
-    def get_serializer(self, *args, **kwargs):
-        return QuestionSerializer(
-            fields=["answerchoice_set", "pk", "text", "title"], *args, **kwargs
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+            pk__in=request.GET.getlist("q")
         )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class QuestionListViewSet(viewsets.ModelViewSet):
@@ -211,36 +222,61 @@ class StudentFeedbackList(generics.ListAPIView):
 
 class TeacherView(generics.RetrieveUpdateAPIView):
     """
-    RU operations for teacher favourites
+    RU operations for teacher
+    - list assignments and questions
+    - list/update favourites, questions, deleted, archived
     """
 
     http_method_names = ["get", "put"]
     permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
-    serializer_class = TeacherSerializer
 
     def get_queryset(self):
         return Teacher.objects.filter(user=self.request.user)
 
-    def update(self, request, *args, **kwargs):
-        current_favorites = (
-            Teacher.objects.get(user=request.user)
-            .favourite_questions.all()
-            .values_list("pk", flat=True)
+    def get_serializer(self, *args, **kwargs):
+        """
+        Allow for partial updating
+        """
+        kwargs["context"] = self.get_serializer_context()
+        if kwargs["context"].get("request").method == "GET":
+            return TeacherSerializer(
+                *args,
+                **kwargs,
+            )
+
+        kwargs.pop("partial")
+
+        return TeacherSerializer(
+            partial=True,
+            *args,
+            **kwargs,
         )
-        new_favorites = request.data["favourite_questions"]
 
-        if len(current_favorites) - len(new_favorites) > 0:
-            q_pk = list(set(current_favorites) - set(new_favorites))[0]
-            message = f"#{q_pk} removed from favourites"
-        else:
-            q_pk = list(set(new_favorites) - set(current_favorites))[0]
-            message = f"#{q_pk} added to favourites"
+    def update(self, request, *args, **kwargs):
+        snackbar_message = ""
 
-        snackbar_message = {"snackbar_message": message}
+        if "favourite_questions" in request.data:
+            current_favorites = (
+                Teacher.objects.get(user=request.user)
+                .favourite_questions.all()
+                .values_list("pk", flat=True)
+            )
+            new_favorites = request.data["favourite_questions"]
+
+            if len(current_favorites) - len(new_favorites) > 0:
+                q_pk = list(set(current_favorites) - set(new_favorites))[0]
+                message = _("removed from favourites")
+            else:
+                q_pk = list(set(new_favorites) - set(current_favorites))[0]
+                message = _("added to favourites")
+
+            snackbar_message = {"snackbar_message": f"#{q_pk} {message}"}
 
         response = super(TeacherView, self).update(request, *args, **kwargs)
-        response.data.update(snackbar_message)
+
+        if snackbar_message:
+            response.data.update(snackbar_message)
 
         return response
 

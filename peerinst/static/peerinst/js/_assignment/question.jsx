@@ -111,7 +111,7 @@ export class QuestionCard extends Component {
               (window.location = this.props.editURL + this.props.question.pk);
           } else {
             mode = "file_copy";
-            title = this.props.gettext("Copy and edit this question");
+            title = this.props.gettext("Copy and edit this question.");
             onclick = () =>
               (window.location = this.props.cloneURL + this.props.question.pk);
           }
@@ -135,7 +135,7 @@ export class QuestionCard extends Component {
           icon="cancel"
           onClick={() => this.props.handleQuestionDelete(this.props.rank)}
           title={this.props.gettext(
-            "Remove this question from this assignment",
+            "Remove this question from this assignment.",
           )}
           theme="primary"
         />
@@ -147,7 +147,7 @@ export class QuestionCard extends Component {
         onClick={() =>
           this.props.handleQuestionAdd(this.props.question.pk, this.props.rank)
         }
-        title={this.props.gettext("Add this question to this assignment")}
+        title={this.props.gettext("Add this question to this assignment.")}
         theme="primary"
       />
     );
@@ -173,7 +173,7 @@ export class QuestionCard extends Component {
           }}
           style={{ color: colours[this.getDifficultyLabel()] }}
           title={this.props.gettext(
-            "Difficulty level based on past student answers",
+            "Difficulty level based on past student answers.",
           )}
         />
         <div
@@ -204,7 +204,7 @@ export class QuestionCard extends Component {
               icon="favorite_border"
               theme="primary"
               title={this.props.gettext(
-                "Select or remove this question as one of your favourites",
+                "Select or remove this question as one of your favourites.",
               )}
             />
           );

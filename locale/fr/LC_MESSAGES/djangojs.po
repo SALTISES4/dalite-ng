@@ -3,12 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: peerinst/static/peerinst/js/student.min.js:1
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-30 19:33-0400\n"
+"POT-Creation-Date: 2021-08-20 17:11-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,12 +19,659 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: peerinst/static/peerinst/js/_question/start.js:60
-#: static/peerinst/js/_question/start.js:60
+#: peerinst/static/peerinst/js/_question/start.js:63
+#: peerinst/static/peerinst/js/question.min.js:1
 msgid "An answer choice is required."
 msgstr "Un choix de réponse est nécessaire."
 
-#: peerinst/static/peerinst/js/_question/start.js:62
-#: static/peerinst/js/_question/start.js:62
+#: peerinst/static/peerinst/js/_question/start.js:65
+#: peerinst/static/peerinst/js/question.min.js:1
 msgid "A rationale is required."
 msgstr "Une explication est nécessaire."
+
+#: peerinst/static/peerinst/js/account.min.js:1179
+#: peerinst/static/peerinst/js/account.min.js:1294
+#: peerinst/static/peerinst/js/group.min.js:222
+#: peerinst/static/peerinst/js/group.min.js:336
+#: peerinst/static/peerinst/js/preview.min.js:1062
+#: peerinst/static/peerinst/js/preview.min.js:1176
+#: peerinst/static/peerinst/js/search_beta.min.js:1062
+#: peerinst/static/peerinst/js/search_beta.min.js:1176
+#: peerinst/static/peerinst/js/student.min.js:160
+#: peerinst/static/peerinst/js/student.min.js:274
+msgid "initialFocus"
+msgstr ""
+
+#: peerinst/static/peerinst/js/account.min.js:1179
+#: peerinst/static/peerinst/js/account.min.js:1294
+#: peerinst/static/peerinst/js/group.min.js:222
+#: peerinst/static/peerinst/js/group.min.js:336
+#: peerinst/static/peerinst/js/preview.min.js:1062
+#: peerinst/static/peerinst/js/preview.min.js:1176
+#: peerinst/static/peerinst/js/search_beta.min.js:1062
+#: peerinst/static/peerinst/js/search_beta.min.js:1176
+#: peerinst/static/peerinst/js/student.min.js:160
+#: peerinst/static/peerinst/js/student.min.js:274
+msgid "fallbackFocus"
+msgstr ""
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Copied to clipboard."
+msgstr "Copié dans le presse-papiers"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+#: peerinst/static/peerinst/js/assignment.min.js:4043
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid "An error occurred."
+msgstr "Une erreur est survenue."
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Copy to clipboard."
+msgstr "Copier dans le presse-papiers"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Unarchive this assignment."
+msgstr "Désarchiver cet exercice."
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Archive this assignment to hide it."
+msgstr "Archiver cet exercice."
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Unfollow this assignment."
+msgstr "Ne plus suivre cet exercice."
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Edit this assignment to make changes."
+msgstr "Modifier cet exercice."
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Copy this assignment to make changes."
+msgstr "Copier cet exercice afin de la modifier."
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Distribute this assignment to one of your groups."
+msgstr "Distribuer cet exercice à l'un de vos groupes."
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "questions"
+msgstr "questions"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "There is a problem with this assignment."
+msgstr "Il y a un problème avec cet exercice."
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid ""
+"Use the following information to configure the LTI tool in your Learning "
+"Management System (e.g. Moodle, OpenEdx):"
+msgstr ""
+"Utiliser les informations suivantes pour configurer l'outil LTI dans votre "
+"système de gestion de l'apprentissage (par exemple Moodle, OpenEdx) :"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "LTI Launch URL"
+msgstr ""
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "LTI Consumer Key"
+msgstr ""
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "LTI Shared Secret"
+msgstr ""
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid ""
+"To import assignment questions, copy and paste the text below the question "
+"title into the Custom Parameters box of your LTI tool:"
+msgstr ""
+"Afin d'importer ces questions, copier et coller le texte sous le titre de la "
+"question dans la zone « paramètres personnalisés » de votre outil LTI :"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Ok"
+msgstr "Ok"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Distribute via LMS (e.g. Moodle)"
+msgstr "Distribuer via SGA (p.ex. Moodle)"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Distribute via myDALITE"
+msgstr "Distribuer via myDALITE"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Manage archived"
+msgstr "Gérer les archivés"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Index"
+msgstr "Indice"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Generate report"
+msgstr "Générer un rapport"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Return to list"
+msgstr "Retour à la liste"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Create new"
+msgstr "Créer un nouveau"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Assignments"
+msgstr "Exercices"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Manage deleted"
+msgstr "Gérer les supprimés"
+
+#: peerinst/static/peerinst/js/account.min.js:4044
+msgid "Questions"
+msgstr "Questions"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/preview.min.js:1
+#: peerinst/static/peerinst/js/search_beta.min.js:1
+msgid "Right > Right"
+msgstr "Correcte > Correcte"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/preview.min.js:1
+#: peerinst/static/peerinst/js/search_beta.min.js:1
+msgid "Easy"
+msgstr "Facile"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/preview.min.js:1
+#: peerinst/static/peerinst/js/search_beta.min.js:1
+msgid "Wrong > Wrong"
+msgstr "Incorrecte > Incorrecte"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/preview.min.js:1
+#: peerinst/static/peerinst/js/search_beta.min.js:1
+msgid "Hard"
+msgstr "Difficile"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/preview.min.js:1
+#: peerinst/static/peerinst/js/search_beta.min.js:1
+msgid "Wrong > Right"
+msgstr "Incorrecte > Correcte"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/preview.min.js:1
+#: peerinst/static/peerinst/js/search_beta.min.js:1
+msgid "Peer"
+msgstr "Pair"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/preview.min.js:1
+#: peerinst/static/peerinst/js/search_beta.min.js:1
+msgid "Right > Wrong"
+msgstr "Correcte > Incorrecte"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/preview.min.js:1
+#: peerinst/static/peerinst/js/search_beta.min.js:1
+msgid "Tricky"
+msgstr "Épineuse"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/preview.min.js:3785
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Uncategorized"
+msgstr "Non classé"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "Edit"
+msgstr "Modifier"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "Copy and edit this question."
+msgstr "Copier et modifier cette question."
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "Remove this question from this assignment."
+msgstr "Supprimer cette question de cet exercice."
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "Add this question to this assignment."
+msgstr "Ajouter cette question à cet exercice."
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "Difficulty level based on past student answers."
+msgstr "Niveau de difficulté basé sur les réponses précédentes."
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "Select or remove this question as one of your favourites."
+msgstr "Sélectionner ou supprimer cette question comme l'une de vos favorites."
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "by"
+msgstr "par"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/preview.min.js:3785
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Discipline"
+msgstr "Discipline"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "None"
+msgstr "Aucune"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/preview.min.js:3785
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid "Categories"
+msgstr "Catégories"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/preview.min.js:3785
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Student answers"
+msgstr "Réponses"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+#: peerinst/static/peerinst/js/group.min.js:2365
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+#: peerinst/static/peerinst/js/student.min.js:899
+msgid "Done"
+msgstr "Terminé"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "Reorder questions?"
+msgstr "Réorganiser les questions ?"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "Click to enable question reordering"
+msgstr "Cliquer afin de réorganiser les questions"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "Show images"
+msgstr "Afficher les images"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "Click to show question images"
+msgstr "Cliquer afin d'afficher les images"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "Show choices"
+msgstr "Montrer les choix"
+
+#: peerinst/static/peerinst/js/assignment.min.js:1417
+msgid "Click to show answer choices"
+msgstr "Cliquer afin d'afficher les choix de réponses"
+
+#: peerinst/static/peerinst/js/assignment.min.js:4043
+msgid "Type search terms"
+msgstr "Tapez..."
+
+#: peerinst/static/peerinst/js/assignment.min.js:4043
+msgid ""
+"The quick add search engine checks question meta data for the complete "
+"phrase only.  You can also search on username to find all content from a "
+"certain contributor.  Search results are filtered to remove questions "
+"already part of this assignment."
+msgstr ""
+"Le moteur de recherche rapide vérifie les métadonnées des questions pour la "
+"phrase complète seulement. Vous pouvez également rechercher par le nom "
+"d'utilisateur afin de trouver tout le contenu d'un certain contributeur. Les "
+"résultats de la recherche sont filtrés pour supprimer les questions qui font "
+"déjà partie de cet exercice."
+
+#: peerinst/static/peerinst/js/assignment.min.js:4043
+#: peerinst/static/peerinst/js/group.min.js:2041
+#: peerinst/static/peerinst/js/group.min.js:2365
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+#: peerinst/static/peerinst/js/student.min.js:899
+msgid "An error occurred.  Try refreshing this page."
+msgstr "Une erreur est survenue.  Essayer d'actualiser cette page."
+
+#: peerinst/static/peerinst/js/assignment.min.js:4043
+msgid "Could not load favourites.  Try refreshing this page."
+msgstr "Impossible de charger les favoris. Essayer d'actualiser cette page."
+
+#: peerinst/static/peerinst/js/assignment.min.js:4043
+msgid "Item removed."
+msgstr "Supprimé."
+
+#: peerinst/static/peerinst/js/assignment.min.js:4043
+msgid "Changes saved."
+msgstr "Changements sauvegardés."
+
+#: peerinst/static/peerinst/js/assignment.min.js:4043
+msgid ""
+"There are currently no questions in this assignment.  You can search for "
+"questions to add below."
+msgstr ""
+"Actuellement, il n'y a aucune question dans cet exercice. Vous pouvez "
+"rechercher des questions à ajouter ci-dessous."
+
+#: peerinst/static/peerinst/js/assignment.min.js:4043
+msgid "No questions match query."
+msgstr "Aucune question ne correspond à la requête."
+
+#: peerinst/static/peerinst/js/assignment.min.js:4043
+msgid "Item added."
+msgstr "Ajouté."
+
+#: peerinst/static/peerinst/js/assignment.min.js:4043
+msgid "Search results will only include questions in the selected discipline."
+msgstr ""
+"Les résultats de la recherche n'incluront que les questions de la discipline "
+"sélectionnée."
+
+#: peerinst/static/peerinst/js/group.min.js:2041
+#: peerinst/static/peerinst/js/student.min.js:899
+msgid "Not convincing"
+msgstr "Pas convaincant"
+
+#: peerinst/static/peerinst/js/group.min.js:2041
+#: peerinst/static/peerinst/js/student.min.js:899
+msgid "Somewhat convincing"
+msgstr "Un peu convaincant"
+
+#: peerinst/static/peerinst/js/group.min.js:2041
+#: peerinst/static/peerinst/js/student.min.js:899
+msgid "Very convincing"
+msgstr "Très convaincant"
+
+#: peerinst/static/peerinst/js/group.min.js:2041
+msgid "Saved"
+msgstr "Sauvegardé"
+
+#: peerinst/static/peerinst/js/group.min.js:2041
+msgid "Saving..."
+msgstr "Sauvegarde..."
+
+#: peerinst/static/peerinst/js/group.min.js:2041
+msgid " characters left"
+msgstr " caractères restants"
+
+#: peerinst/static/peerinst/js/group.min.js:2041
+msgid "Comments"
+msgstr "Commentaires"
+
+#: peerinst/static/peerinst/js/group.min.js:2041
+msgid "Never show"
+msgstr "N'afficher jamais"
+
+#: peerinst/static/peerinst/js/group.min.js:2365
+msgid "Student"
+msgstr "Étudiant"
+
+#: peerinst/static/peerinst/js/group.min.js:2365
+msgid "1st"
+msgstr "1re"
+
+#: peerinst/static/peerinst/js/group.min.js:2365
+msgid "Rationale"
+msgstr "Explication"
+
+#: peerinst/static/peerinst/js/group.min.js:2365
+msgid "2nd"
+msgstr "2e"
+
+#: peerinst/static/peerinst/js/group.min.js:2365
+msgid "Chosen rationale"
+msgstr "Explication choisie"
+
+#: peerinst/static/peerinst/js/group.min.js:2365
+msgid "Feedback"
+msgstr "Rétroaction"
+
+#: peerinst/static/peerinst/js/group.min.js:2365
+msgid "Add teachers to group"
+msgstr "Ajouter des enseignants au groupe"
+
+#: peerinst/static/peerinst/js/group.min.js:2365
+msgid ""
+"Type another teacher's username to add them to this group.  Note: this "
+"cannot be undone without contacting an administrator."
+msgstr ""
+"Saisir le nom d'utilisateur d'un autre enseignant pour l'ajouter à ce "
+"groupe. Remarque : cette opération ne peut pas être annulée sans contacter "
+"un administrateur."
+
+#: peerinst/static/peerinst/js/preview.min.js:3785
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Unlabelled"
+msgstr "Non étiqueté"
+
+#: peerinst/static/peerinst/js/preview.min.js:3785
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Shown: "
+msgstr "Montrée : "
+
+#: peerinst/static/peerinst/js/preview.min.js:3785
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Chosen: "
+msgstr "Choisie : "
+
+#: peerinst/static/peerinst/js/preview.min.js:3785
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Rate: "
+msgstr "Taux : "
+
+#: peerinst/static/peerinst/js/preview.min.js:3785
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid ""
+"This question is part of featured content curated by SALTISE.  Click to open "
+"the associated collection: "
+msgstr ""
+"Cette question fait partie du contenu vedette organisé par SALTISE. Cliquer "
+"pour ouvrir la collection associée : "
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "This identifier has already been used."
+msgstr "Cet identifiant a déjà été utilisé."
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Back"
+msgstr "Retour"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid ""
+"You have no editable assignments to which this question can be added, but "
+"you can create a new one below.  The question will be added to the new "
+"assignment automatically."
+msgstr ""
+"Vous n'avez pas d'exercices modifiables auxquels cette question peut être "
+"ajoutée, mais vous pouvez en créer un nouveau ci-dessous. La question sera "
+"ajoutée automatiquement au nouvel exercice."
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid ""
+"You can add this question to an existing assignment (if it is editable) or "
+"use this question to start a new assignment."
+msgstr ""
+"Vous pouvez ajouter cette question à un exercice existant (s'il est "
+"modifiable) ou utilisez cette question pour commencer un nouvel exercice."
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Assignment title"
+msgstr "Titre de l'exercice"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Assignment identifier"
+msgstr "Indentifiant de l'exercice"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Assignment description (optional)"
+msgstr "Description de l'exercice (facultatif)"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Assignment introduction (optional)"
+msgstr "Introduction de l'exercice (facultatif)"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Assignment conclusion (optional)"
+msgstr "Conclusions de l'exercice (facultatif)"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Create assignment"
+msgstr "Créer un exercice"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Cancel"
+msgstr "Annuler"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Submit"
+msgstr "Soumettre"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid ""
+"The distribution of first and second choices along with the statistics for "
+"each possible outcome are shown in the figure below.  The most convincing "
+"rationales submitted by students (i.e. most selected be peers) are also "
+"listed for each answer choice."
+msgstr ""
+"La distribution des premier et deuxième choix ainsi que les statistiques "
+"pour chaque résultat possible sont présentées dans la figure ci-dessous. Les "
+"explications les plus convaincantes soumises par les étudiants (c'est-à-dire "
+"les plus sélectionnées par les pairs) sont également énumérées pour chaque "
+"choix de réponse."
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Distribution of answer choices"
+msgstr "Distribution de choix de réponses"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid ""
+"You can flag this question as problematic using the form below. This will "
+"immediately remove it from search results pending review.  It will not "
+"remove it from assignments."
+msgstr ""
+"Vous pouvez signaler cette question comme problématique en utilisant le "
+"formulaire ci-dessous. Cela la supprimera immédiatement des résultats de "
+"recherche en attente de vérification. Il ne la supprimera pas des exercices."
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Please select the reason for flagging this question."
+msgstr ""
+"Veuillez sélectionner la raison pour laquelle vous avez signalé cette "
+"question."
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Select or remove this question as one of your favourites"
+msgstr "Sélectionner ou supprimer cette question comme l'une de vos favorites."
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Flag question for removal"
+msgstr "Signaler la question"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Add question to an assignment"
+msgstr "Ajouter cette question à un exercice."
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "EXPERT"
+msgstr "EXPERT"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Click!"
+msgstr "Cliquer !"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Difficulty"
+msgstr "Difficulté"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3785
+msgid "Peer impact"
+msgstr "Impact de pair"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid "Added to "
+msgstr "Ajouté à "
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid "assignments"
+msgstr "exercices"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid "Difficulty levels"
+msgstr "Niveaux de difficulté"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid "Disciplines"
+msgstr "Disciplines"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid "Peer impact levels"
+msgstr "Niveaux d'impact des pairs"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid "No search results"
+msgstr "Aucun résultats"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid ""
+"Ugh... doesn't look like there are any questions that match your query.  May "
+"we suggest:"
+msgstr ""
+"Ouf... il ne semble pas qu'il y ait de questions correspondant à votre "
+"requête. Pouvons-nous suggérer :"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid "Try the search again, but with different keywords and/or fewer filters;"
+msgstr ""
+"Essayez à nouveau la recherche, mais avec des mots-clés différents et/ou "
+"moins de filtres ;"
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid ""
+"Create the question you are looking for by selecting 'Create question' from "
+"the menu."
+msgstr ""
+"Créez la question que vous recherchez en sélectionnant « Créer une question "
+"» dans le menu."
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid "Error.  Try refreshing this page."
+msgstr "Erreur. Essayer d'actualiser cette page."
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid "Type something..."
+msgstr "Tapez quelque chose..."
+
+#: peerinst/static/peerinst/js/search_beta.min.js:3908
+msgid ""
+"You can search for keywords in question and answer texts, by username, by "
+"question id, by category, and by discipline."
+msgstr ""
+"Vous pouvez rechercher des mots-clés dans les textes de questions et choix "
+"de réponses, par nom d'utilisateur, par identifiant de question, par "
+"catégorie et par discipline."
+
+#: peerinst/static/peerinst/js/student.min.js:1
+msgid "See teacher feedback"
+msgstr "Voir les commentaires du professeur"
+
+#: peerinst/static/peerinst/js/student.min.js:899
+msgid "Unacceptable"
+msgstr "Inacceptable"
+
+#: peerinst/static/peerinst/js/student.min.js:899
+msgid "Your teacher commented:"
+msgstr "Votre professeur a commenté :"
+
+#: peerinst/static/peerinst/js/student.min.js:899
+msgid "because"
+msgstr "parce que"
+
+#: peerinst/static/peerinst/js/student.min.js:899
+msgid "Your rationale is: "
+msgstr "Votre explication est :"
+
+#: peerinst/static/peerinst/js/student.min.js:899
+msgid "You thought:"
+msgstr "Vous avez pensé :"

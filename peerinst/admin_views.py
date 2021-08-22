@@ -1,18 +1,18 @@
 import collections
 import itertools
-import urllib.request
-import urllib.parse
-import urllib.error
 import re
+import urllib.error
+import urllib.parse
+import urllib.request
 
 from django import forms
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.urls import reverse
-from django.db.models import F
+from django.db.models import Count, F, Q
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
+from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
@@ -430,11 +430,11 @@ class AssignmentResultsViewBase(TemplateView):
             _("Total number of answers recorded:"),
             _("Total number of participating students:"),
             _("Correct answer choices – first attempt:"),
-            _("↳ Percentage of total answers:"),
+            _(" > Percentage of total answers:"),
             _("Correct answer choices – second attempt:"),
-            _("↳ Percentage of total answers:"),
+            _(" > Percentage of total answers:"),
             _("Number of answer choice switches:"),
-            _("↳ Percentage of total answers:"),
+            _(" > Percentage of total answers:"),
         ]
         for choice_index in switch_columns:
             labels.append(
@@ -593,13 +593,64 @@ class QuestionPreviewViewBase(
         assignment_form = AssignmentMultiselectForm(
             self.request.user, self.question
         )
+
+        choices = (
+            self.question.answer_set.exclude(expert=True)
+            .values("first_answer_choice")
+            .annotate(
+                student_answer_count=Count(
+                    "first_answer_choice", filter=~Q(user_token="")
+                )
+            )
+            .annotate(
+                sample_answer_count=Count(
+                    "first_answer_choice", filter=Q(user_token="")
+                )
+            )
+        )
+
+        sample_answers = []
+        for c in choices.order_by("first_answer_choice").all():
+            if c["sample_answer_count"] > 0:
+                for s in (
+                    self.question.answer_set.exclude(expert=True)
+                    .filter(first_answer_choice=c["first_answer_choice"])
+                    .filter(user_token="")
+                ):
+                    sample_answers.append(
+                        {
+                            "first_answer_choice_label": s.first_answer_choice_label(),  # noqa E501
+                            "text": s.rationale,
+                        }
+                    )
+            elif c["student_answer_count"] > 0:
+                queryset = (
+                    self.question.answer_set.exclude(expert=True)
+                    .filter(first_answer_choice=c["first_answer_choice"])
+                    .filter(~Q(user_token=""))
+                )
+                count = queryset.count()
+                label = queryset.first().first_answer_choice_label()
+                sample_answers.append(
+                    {
+                        "first_answer_choice_label": label,
+                        "text": f"{count} {_('student answer(s)')}",
+                    }
+                )
+
         context.update(
-            question=self.question,
             answer_choices=self.answer_choices,
             assignment_form=assignment_form,
             assignment_count=assignment_form.queryset.count(),
+            question=self.question,
+            sample_answers=sample_answers,
             save_allowed=save_allowed,
         )
+
+        # Reset session variable that may have been set in Quality Control /
+        # research_discipline_question_index view
+        self.request.session["assignment_id"] = None
+
         return context
 
     def form_valid(self, form):
@@ -681,7 +732,7 @@ class QuestionExpertRationaleView(QuestionPreviewViewBase):
             ]
         )
         assignment_id = self.request.session.get("assignment_id")
-        question_id = self.request.session.get("question_id")
+        question_id = context["question"].pk
         context.update(
             expert_rationales=expert_rationales,
             save_allowed=save_allowed,
@@ -936,8 +987,11 @@ class StudentGroupAssignmentManagement(StaffMemberRequiredMixin, TemplateView):
                 group_assignment = form.cleaned_data["group_assignment"]
                 group = group_assignment.group
                 student_list = models.Student.objects.filter(groups=group)
-                student_assignment_list = models.StudentAssignment.objects.filter(  # noqa
-                    student__in=student_list, group_assignment=group_assignment
+                student_assignment_list = (
+                    models.StudentAssignment.objects.filter(  # noqa
+                        student__in=student_list,
+                        group_assignment=group_assignment,
+                    )
                 )
 
         context.update(form=form)

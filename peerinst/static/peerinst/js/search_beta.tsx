@@ -40,7 +40,7 @@ type ChipProps = {
 function Chip({ onClick, selected, text }: ChipProps) {
   return (
     <div
-      class={selected ? "selected chips" : "chips"}
+      className={selected ? "selected chips" : "chips"}
       onClick={() => onClick(text)}
     >
       {text}
@@ -51,9 +51,9 @@ function Chip({ onClick, selected, text }: ChipProps) {
 type SearchData = {
   meta: {
     categories: string[];
-    difficulties: string[];
+    difficulties: [number, string][];
     disciplines: string[];
-    impacts: string[];
+    impacts: [number, string][];
   };
   results: Question[];
 };
@@ -67,6 +67,7 @@ type SearchAppProps = {
   questionFlagURLs: string[];
   staticURL: string;
   url: string;
+  teacherFavouritesURL: string;
   teacherURL: string;
   featuredIconURL: string[];
 };
@@ -81,18 +82,19 @@ type SearchAppState = {
   categories: string[];
   dialogOpen: boolean;
   dialogQuestion: Question;
-  difficulties: string[];
+  difficulties: [number, string][];
   disciplines: string[];
   favourites: number[];
+  favouritesLoading: boolean;
   flagDialogOpen: boolean;
   flagDialogQuestion: { title: string; pk: number };
-  impacts: string[];
+  impacts: [number, string][];
   lastKeyStroke: number;
   searching: boolean;
   selectedCategories: string[];
-  selectedDifficulty: string;
+  selectedDifficulty: number;
   selectedDiscipline: string;
-  selectedImpact: string;
+  selectedImpact: number;
   snackbarIsOpen: boolean;
   snackbarMessage: string;
   timeoutID: number;
@@ -112,15 +114,16 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
     difficulties: [],
     disciplines: [],
     favourites: [],
+    favouritesLoading: false,
     flagDialogOpen: false,
     flagDialogQuestion: {} as { title: string; pk: number },
     impacts: [],
     lastKeyStroke: 0,
     searching: false,
     selectedCategories: [],
-    selectedDifficulty: "",
+    selectedDifficulty: 0,
     selectedDiscipline: "",
-    selectedImpact: "",
+    selectedImpact: 0,
     snackbarIsOpen: false,
     snackbarMessage: "",
     timeoutID: 0,
@@ -149,9 +152,8 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
     open = true,
   ): void => {
     console.debug(
-      `Toggle flag for question: ${
-        question ? question.pk + question.title : ""
-      }`,
+      "Toggle flag for question: " +
+        (question ? question.pk + question.title : ""),
     );
     this.setState({
       flagDialogOpen: open,
@@ -204,10 +206,9 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
             },
             () =>
               console.debug(
-                `Search time: ${(
-                  (performance.now() - startTime) /
-                  1000
-                ).toExponential(3)}s`,
+                "Search time: " +
+                  ((performance.now() - startTime) / 1000).toExponential(3) +
+                  "s",
               ),
           );
         } catch (error) {
@@ -227,9 +228,9 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
           disciplines: [],
           impacts: [],
           selectedCategories: [],
-          selectedDifficulty: "",
+          selectedDifficulty: 0,
           selectedDiscipline: "",
-          selectedImpact: "",
+          selectedImpact: 0,
         });
       }
     } else {
@@ -292,7 +293,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
     if (added.length == 1) {
       message += added[0];
     } else {
-      message += `${added.length} ${this.props.gettext("assignments")}`;
+      message += added.length + " " + this.props.gettext("assignments");
     }
     console.debug(message);
     this.setState(
@@ -306,32 +307,37 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
   };
 
   handleToggleFavourite = async (questionPK: number): Promise<void> => {
-    const currentFavourites: number[] = Array.from(this.state.favourites);
-    const _favourites: number[] = Array.from(this.state.favourites);
+    if (!this.state.favouritesLoading) {
+      const currentFavourites: number[] = Array.from(this.state.favourites);
+      const _favourites: number[] = Array.from(this.state.favourites);
 
-    if (_favourites.includes(questionPK)) {
-      _favourites.splice(_favourites.indexOf(questionPK), 1);
-    } else {
-      _favourites.push(questionPK);
-    }
+      if (_favourites.includes(questionPK)) {
+        _favourites.splice(_favourites.indexOf(questionPK), 1);
+      } else {
+        _favourites.push(questionPK);
+      }
 
-    try {
-      const data = await submitData(
-        this.props.teacherURL,
-        { favourite_questions: _favourites },
-        "PUT",
-      );
-      this.setState({
-        favourites: data["favourite_questions"],
-        snackbarIsOpen: true,
-        snackbarMessage: data["snackbar_message"],
-      });
-    } catch (error) {
-      this.setState({
-        favourites: currentFavourites,
-        snackbarIsOpen: true,
-        snackbarMessage: this.props.gettext("An error occurred."),
-      });
+      try {
+        this.setState({ favouritesLoading: true });
+        const data = await submitData(
+          this.props.teacherFavouritesURL,
+          { favourite_questions: _favourites },
+          "PUT",
+        );
+        this.setState({
+          favourites: data["favourite_questions"],
+          favouritesLoading: false,
+          snackbarIsOpen: true,
+          snackbarMessage: data["snackbar_message"],
+        });
+      } catch (error) {
+        this.setState({
+          favourites: currentFavourites,
+          favouritesLoading: false,
+          snackbarIsOpen: true,
+          snackbarMessage: this.props.gettext("An error occurred."),
+        });
+      }
     }
     return;
   };
@@ -339,7 +345,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
   categoryChips = (): JSX.Element => {
     if (this.state.categories.length > 0) {
       return (
-        <div class="chip-container">
+        <div className="chip-container">
           <Typography
             use="caption"
             tag="div"
@@ -369,12 +375,15 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
                     this.setState(
                       {
                         selectedCategories: sc,
-                        query: `${sc
-                          .map(
-                            (_c: string) =>
-                              `category__title::${_c.replaceAll(" ", "_")}`,
-                          )
-                          .join(" ")} ${_query}`,
+                        query:
+                          sc
+                            .map(
+                              (_c: string) =>
+                                "category__title::" + _c.replaceAll(" ", "_"),
+                            )
+                            .join(" ") +
+                          " " +
+                          _query,
                       },
                       this.handleSubmit,
                     );
@@ -424,48 +433,44 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
           >
             {this.props.gettext("Difficulty levels")}
           </Typography>
-          {this.state.difficulties.map((d: string, i) => {
-            if (d.length > 0) {
-              return (
-                <Chip
-                  selected={this.state.selectedDifficulty == d}
-                  text={d}
-                  key={i}
-                  onClick={() => {
-                    if (this.state.selectedDifficulty) {
-                      this.setState(
-                        {
-                          selectedDifficulty: "",
-                          query: this.state.query
-                            .replace(/difficulty.label::\S+/gi, "")
-                            .replace(/\s+/g, " ")
-                            .trim(),
-                        },
-                        this.handleSubmit,
-                      );
-                    } else {
-                      this.setState(
-                        {
-                          selectedDifficulty: d,
-                          query: `difficulty.label::${d.replaceAll(
-                            " ",
-                            "_",
-                          )} ${this.state.query}`,
-                        },
-                        this.handleSubmit,
-                      );
-                    }
-                  }}
-                />
-              );
-            }
+          {this.state.difficulties.map((d: [number, string], i) => {
+            return (
+              <Chip
+                selected={this.state.selectedDifficulty == d[0]}
+                text={d[0] + ": " + d[1]}
+                key={i}
+                onClick={() => {
+                  if (this.state.selectedDifficulty) {
+                    this.setState(
+                      {
+                        selectedDifficulty: 0,
+                        query: this.state.query
+                          .replace(/difficulty.label::\S+/gi, "")
+                          .replace(/\s+/g, " ")
+                          .trim(),
+                      },
+                      this.handleSubmit,
+                    );
+                  } else {
+                    this.setState(
+                      {
+                        selectedDifficulty: d[0],
+                        query:
+                          "difficulty.label::" + d[0] + " " + this.state.query,
+                      },
+                      this.handleSubmit,
+                    );
+                  }
+                }}
+              />
+            );
           })}
           <i
             class="material-icons"
             onClick={() => {
               this.setState(
                 {
-                  selectedDifficulty: "",
+                  selectedDifficulty: 0,
                   query: this.state.query
                     .replace(/difficulty.label::\S+/gi, "")
                     .replace(/\s+/g, " ")
@@ -523,10 +528,11 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
                       this.setState(
                         {
                           selectedDiscipline: d,
-                          query: `discipline.title::${d.replaceAll(
-                            " ",
-                            "_",
-                          )} ${this.state.query}`,
+                          query:
+                            "discipline.title::" +
+                            d.replaceAll(" ", "_") +
+                            " " +
+                            this.state.query,
                         },
                         this.handleSubmit,
                       );
@@ -576,18 +582,18 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
           >
             {this.props.gettext("Peer impact levels")}
           </Typography>
-          {this.state.impacts.map((d: string, i) => {
+          {this.state.impacts.map((d: [number, string], i) => {
             if (d.length > 0) {
               return (
                 <Chip
-                  selected={this.state.selectedImpact == d}
-                  text={d}
+                  selected={this.state.selectedImpact == d[0]}
+                  text={d[0] + ": " + d[1]}
                   key={i}
                   onClick={() => {
                     if (this.state.selectedImpact) {
                       this.setState(
                         {
-                          selectedImpact: "",
+                          selectedImpact: 0,
                           query: this.state.query
                             .replace(/peer_impact.label::\S+/gi, "")
                             .replace(/\s+/g, " ")
@@ -598,11 +604,12 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
                     } else {
                       this.setState(
                         {
-                          selectedImpact: d,
-                          query: `peer_impact.label::${d.replaceAll(
-                            " ",
-                            "_",
-                          )} ${this.state.query}`,
+                          selectedImpact: d[0],
+                          query:
+                            "peer_impact.label::" +
+                            d[0] +
+                            " " +
+                            this.state.query,
                         },
                         this.handleSubmit,
                       );
@@ -617,7 +624,7 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
             onClick={() => {
               this.setState(
                 {
-                  selectedImpact: "",
+                  selectedImpact: 0,
                   query: this.state.query
                     .replace(/peer_impact.label::\S+/gi, "")
                     .replace(/\s+/g, " ")
@@ -783,9 +790,9 @@ export class SearchApp extends Component<SearchAppProps, SearchAppState> {
                     disciplines: [],
                     impacts: [],
                     selectedCategories: [],
-                    selectedDifficulty: "",
+                    selectedDifficulty: 0,
                     selectedDiscipline: "",
-                    selectedImpact: "",
+                    selectedImpact: 0,
                   })
                 }
               />

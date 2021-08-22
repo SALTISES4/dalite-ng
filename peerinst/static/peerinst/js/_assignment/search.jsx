@@ -192,6 +192,8 @@ export class SearchDbApp extends Component {
       );
       this.setState({
         favourites: data["favourite_questions"],
+        snackbarIsOpen: true,
+        snackbarMessage: data["snackbar_message"],
       });
     } catch (error) {
       this.setState({

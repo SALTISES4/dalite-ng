@@ -37,6 +37,7 @@
         "spaced-comment": "off",
         "object-curly-spacing": ["error", "always"],
         "prettier/prettier": "error",
+        "prefer-template": "off",
         "@typescript-eslint/ban-ts-comment": "warn"
       }
     }
@@ -52,6 +53,7 @@
     "radix": "off",
     "spaced-comment": "off",
     "object-curly-spacing": ["error", "always"],
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "prefer-template": "off"
   }
 }

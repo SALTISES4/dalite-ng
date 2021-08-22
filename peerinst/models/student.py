@@ -24,12 +24,11 @@ logger = logging.getLogger("peerinst-models")
 
 class Student(models.Model):
     student = models.OneToOneField(User, on_delete=models.CASCADE)
-    groups = models.ManyToManyField(StudentGroup, blank=True)
-    student_groups = models.ManyToManyField(
+    groups = models.ManyToManyField(
         StudentGroup,
         blank=True,
         through="StudentGroupMembership",
-        related_name="groups_new",
+        related_name="students",
     )
     send_reminder_email_every_day = models.BooleanField(default=False)
     send_reminder_email_day_before = models.BooleanField(default=True)
@@ -224,17 +223,14 @@ class Student(models.Model):
                 group.pk,
             )
 
-        for assignment in StudentGroupAssignment.objects.filter(
-            group=group, distribution_date__isnull=False
-        ):
-            self.add_assignment(assignment, send_email=False)
+        if group.mode_created == group.STANDALONE:
+            for assignment in StudentGroupAssignment.objects.filter(
+                group=group, distribution_date__isnull=False
+            ):
+                self.add_assignment(assignment, send_email=False)
 
         if mail_type is not None:
             self.send_email(mail_type, group=group, request=request)
-
-        # TODO to remove eventually when groups are fully integrated in
-        # group membership
-        self.groups.add(group)
 
     def leave_group(self, group):
         try:
@@ -324,7 +320,6 @@ class Student(models.Model):
 
     @property
     def current_groups(self):
-        # TODO add lti_student groups
         return [
             g.group
             for g in StudentGroupMembership.objects.filter(
@@ -334,7 +329,6 @@ class Student(models.Model):
 
     @property
     def old_groups(self):
-        # TODO add lti_student groups
         return [
             g.group
             for g in StudentGroupMembership.objects.filter(
@@ -387,6 +381,11 @@ class StudentGroupMembership(models.Model):
     current_member = models.BooleanField(default=True)
     send_emails = models.BooleanField(default=True)
     student_school_id = models.TextField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.group.mode_created == self.group.LTI:
+            self.send_emails = False
+        super().save(*args, **kwargs)
 
     class Meta:
         unique_together = ("student", "group")
@@ -455,7 +454,10 @@ class StudentAssignment(models.Model):
                     host = _url.hostname
 
                 signin_link = "{}://{}{}?token={}".format(
-                    protocol, host, reverse("student-page"), token,
+                    protocol,
+                    host,
+                    reverse("student-page"),
+                    token,
                 )
 
                 assignment_link = "{}://{}{}".format(

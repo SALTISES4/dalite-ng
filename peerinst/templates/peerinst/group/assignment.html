@@ -180,7 +180,7 @@
       <div class="foldable--body">
         <ul id="student-list" class="mdc-list mdc-list--two-line mdc-list--non-interactive">
 
-          {% for student in group.students %}
+          {% for student in group.students.all %}
 
           <li class="mdc-list-item">
             <span class="mdc-list-item__graphic mdc-theme--primary">
@@ -256,7 +256,7 @@
             feedbackURL: "{% url 'REST:teacher-feedback-list' %}",
             gettext: gettext,
             listener: () => render(false, el),
-            questionURL: "{% url 'REST:question-list' %}" + pk + "/",
+            questionURL: "{% url 'REST:question-list' %}" + pk + "/?field=answerchoice_set&field=pk&field=text&field=title",
             readURL: "{% url 'REST:student-group-assigment-answers' %}{{ assignment.pk }}/" + pk + "/",
           });
       }

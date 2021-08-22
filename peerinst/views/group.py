@@ -394,7 +394,14 @@ class StudentGroupUpdateView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
 
     model = StudentGroup
     template_name = "peerinst/group/studentgroup_edit.html"
-    fields = ["title", "student_id_needed", "semester", "year", "discipline"]
+    fields = [
+        "title",
+        "student_id_needed",
+        "semester",
+        "year",
+        "discipline",
+        "institution",
+    ]
 
     def dispatch(self, *args, **kwargs):
         # Check object permissions

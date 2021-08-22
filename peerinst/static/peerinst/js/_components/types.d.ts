@@ -29,14 +29,23 @@ export type Question = {
   category: { title: string }[];
   collections?: { title: string; url: string }[];
   deleted: boolean;
-  difficulty: { score: number; label: string };
+  difficulty: { score?: number | null; label: string };
   discipline: { title: string };
   featured: boolean;
+  flag_reasons?: { flag_reason__count: number; flag_reason__title: string }[]; // eslint-disable-line camelcase
   frequency: {
     first_choice: Record<string, number>; // eslint-disable-line camelcase
     second_choice: Record<string, number>; // eslint-disable-line camelcase
   };
+  image: string;
   image_alt_text: string; // eslint-disable-line camelcase
+  is_editable?: boolean; // eslint-disable-line camelcase
+  is_not_flagged?: boolean; // eslint-disable-line camelcase
+  is_not_missing_answer_choices?: boolean; // eslint-disable-line camelcase
+  is_not_missing_expert_rationale?: boolean; // eslint-disable-line camelcase
+  is_not_missing_sample_answers?: boolean; // eslint-disable-line camelcase
+  is_owner?: boolean; // eslint-disable-line camelcase
+  is_valid: boolean; // eslint-disable-line camelcase
   matrix: { easy: number; hard: number; tricky: number; peer: number };
   // eslint-disable-next-line camelcase
   most_convincing_rationales: {
@@ -51,12 +60,19 @@ export type Question = {
     }[];
     text: string;
   };
-  peer_impact: { score: number; label: string }; // eslint-disable-line camelcase
+  peer_impact: { score?: number | null; label: string }; // eslint-disable-line camelcase
   pk: number;
   text: string;
   title: string;
   type: string;
-  user: { username: string; saltise: boolean; expert: boolean };
-  valid: boolean;
+  urls?: {
+    add_answer_choices: string; // eslint-disable-line camelcase
+    add_expert_rationales: string; // eslint-disable-line camelcase
+    add_new_question: string; // eslint-disable-line camelcase
+    add_sample_answers: string; // eslint-disable-line camelcase
+    copy_question: string; // eslint-disable-line camelcase
+    fix: string;
+  };
+  user?: { username: string; saltise: boolean; expert: boolean };
   video_url: string; // eslint-disable-line camelcase
 };

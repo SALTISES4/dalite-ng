@@ -36,7 +36,7 @@ def update_assignment_question_list(req, teacher):
     # Check object permissions (to be refactored using mixin)
     if req.user in assignment.owner.all() or req.user.is_staff:
         # Check for student answers
-        if assignment.answer_set.exclude(user_token__exact="").count() > 0:
+        if not assignment.editable:
             raise PermissionDenied
     else:
         raise PermissionDenied

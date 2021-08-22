@@ -86,7 +86,7 @@ class QuestionDocument(Document):
     difficulty = ObjectField(
         properties={
             "score": FloatField(index=False),
-            "label": TextField(analyzer=full_term),
+            "label": IntegerField(),
         }
     )
     discipline = ObjectField(
@@ -113,7 +113,7 @@ class QuestionDocument(Document):
     peer_impact = ObjectField(
         properties={
             "score": FloatField(index=False),
-            "label": TextField(analyzer=full_term),
+            "label": IntegerField(),
         }
     )
     pk = KeywordField()
@@ -178,7 +178,7 @@ class QuestionDocument(Document):
 
     def prepare_difficulty(self, instance):
         d = instance.get_difficulty()
-        return {"score": d[0], "label": str(d[1])}
+        return {"score": d[0], "label": d[1]}
 
     def prepare_discipline(self, instance):
         """Bleach"""
@@ -215,7 +215,7 @@ class QuestionDocument(Document):
 
     def prepare_peer_impact(self, instance):
         pi = instance.get_peer_impact()
-        return {"score": pi[0], "label": str(pi[1])}
+        return {"score": pi[0], "label": pi[1]}
 
     def prepare_pk(self, instance):
         return instance.pk
@@ -252,7 +252,9 @@ class QuestionDocument(Document):
         }
 
     def prepare_valid(self, instance):
-        return instance.is_valid
+        return (
+            instance.is_not_flagged and instance.is_not_missing_answer_choices
+        )
 
     def get_queryset(self):
         return super().get_queryset().select_related("discipline", "user")

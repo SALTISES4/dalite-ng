@@ -36,6 +36,7 @@
     "@rollup/plugin-node-resolve": "^13.0.2",
     "@rollup/plugin-replace": "^2.4.2",
     "@rollup/plugin-strip": "^2.0.1",
+    "@types/d3": "^7.0.0",
     "@types/jquery": "^3.5.6",
     "@typescript-eslint/eslint-plugin": "^4.28.3",
     "@typescript-eslint/parser": "^4.28.3",
@@ -102,6 +103,7 @@
     "plugins": [
       "@babel/plugin-proposal-class-properties",
       "@babel/plugin-proposal-optional-chaining",
+      "@babel/plugin-transform-template-literals",
       [
         "@babel/plugin-transform-react-jsx",
         {

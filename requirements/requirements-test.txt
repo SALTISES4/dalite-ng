@@ -141,11 +141,12 @@ django==2.2.24
     #   django-classy-tags
     #   django-cookie-law
     #   django-csp
+    #   django-decorator-include
     #   django-inlinecss
     #   django-lti-tool-provider
     #   django-model-utils
-    #   django-security-headers
-    #   django-sslserver
+    #   django-permissions-policy
+    #   django-referrer-policy
     #   django-timezone-field
     #   djangorestframework
     #   jsonfield
@@ -174,15 +175,12 @@ django-compressor==2.4
     #   saltise-course-flow
 django-cookie-law==2.0.3
     # via -r requirements/requirements-base.txt
-django-cookies-samesite-fork==0.2.1
-    # via
-    #   -r requirements/requirements-base.txt
-    #   django-security-headers
 django-csp==3.6
     # via
     #   -r requirements/requirements-base.txt
-    #   django-security-headers
     #   saltise-course-flow
+django-decorator-include==3.0
+    # via -r requirements/requirements-base.txt
 django-elasticsearch-dsl==7.2.0
     # via -r requirements/requirements-base.txt
 django-grappelli==2.14.1
@@ -199,14 +197,12 @@ django-model-utils==4.1.1
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
+django-permissions-policy==4.1.0
+    # via -r requirements/requirements-base.txt
+django-referrer-policy==1.0
+    # via -r requirements/requirements-base.txt
 django-samesite-none==0.0.2
     # via -r requirements/requirements-base.txt
-django-security-headers==0.3.1
-    # via -r requirements/requirements-base.txt
-django-sslserver==0.22
-    # via
-    #   -r requirements/requirements-base.txt
-    #   django-security-headers
 django-timezone-field==4.0
     # via
     #   -r requirements/requirements-base.txt

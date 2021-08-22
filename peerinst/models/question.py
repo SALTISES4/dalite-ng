@@ -13,7 +13,7 @@ from django.core import exceptions
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, Q
+from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.utils.html import escape, strip_tags
 from django.utils.translation import gettext_lazy as _
 
@@ -191,6 +191,20 @@ class Question(models.Model):
     objects = QuestionManager()
     flagged_objects = FlaggedQuestionManager()
     unflagged_objects = UnflaggedQuestionManager()
+
+    DIFFICULTY_LABELS = (
+        (1, _("Easy")),
+        (2, _("Avg")),
+        (3, _("Hard")),
+        (4, _("Not enough data")),
+    )
+
+    PEER_IMPACT_LABELS = (
+        (1, _("Low")),
+        (2, _("Med")),
+        (3, _("High")),
+        (4, _("Not enough data")),
+    )
 
     id = models.AutoField(
         primary_key=True,
@@ -399,6 +413,155 @@ class Question(models.Model):
             60,
         )
 
+    @classmethod
+    def is_missing_answer_choices(cls, queryset):
+        if not isinstance(queryset, models.query.EmptyQuerySet):
+            if isinstance(queryset, models.query.QuerySet):
+                if queryset.model is cls:
+                    return (
+                        queryset.filter(type="PI")
+                        .annotate(answer_choice_count=Count("answerchoice"))
+                        .annotate(
+                            correct_answer_choice_count=Count(
+                                "answerchoice",
+                                filter=Q(answerchoice__correct=True),
+                            )
+                        )
+                        .filter(
+                            Q(answer_choice_count__lte=1)
+                            | Q(correct_answer_choice_count=0)
+                        )
+                        .exists()
+                    )
+                raise TypeError("Queryset must be of type Question")
+            else:
+                raise TypeError(
+                    f"Method only implemented for querysets.  Passed {type(queryset)}"  # noqa E501
+                )
+        return False
+
+    @classmethod
+    def is_missing_expert_rationale(cls, queryset):
+        if not isinstance(queryset, models.query.EmptyQuerySet):
+            if isinstance(queryset, models.query.QuerySet):
+                if queryset.model is cls:
+                    Answer = apps.get_model(
+                        app_label="peerinst", model_name="answer"
+                    )
+                    expert_answers = Answer.objects.filter(expert=True).filter(
+                        question=OuterRef("pk")
+                    )
+
+                    return (
+                        queryset.filter(type="PI")
+                        .values("answerchoice", "answerchoice__correct")
+                        .annotate(
+                            rank=Subquery(
+                                cls.objects.filter(pk=OuterRef("pk"))
+                                .values("answerchoice")
+                                .filter(
+                                    answerchoice__lte=OuterRef("answerchoice")
+                                )
+                                .annotate(count=Count("answerchoice"))
+                                .values("count")[:1],
+                                output_field=models.IntegerField(),
+                            ),
+                        )
+                        .annotate(correct=F("answerchoice__correct"))
+                        .annotate(
+                            expert_answers_for_choice=Subquery(
+                                expert_answers.filter(
+                                    first_answer_choice=OuterRef("rank")
+                                )
+                                .values("pk")
+                                .annotate(count=Count("pk"))
+                                .values("count")[:1],
+                                output_field=models.IntegerField(),
+                            )
+                        )
+                        .filter(
+                            Q(correct=True)
+                            & Q(expert_answers_for_choice__isnull=True)
+                        )
+                        .exists()
+                    )
+                raise TypeError("Queryset must be of type Question")
+            else:
+                raise TypeError(
+                    f"Method only implemented for querysets.  Passed {type(queryset)}"  # noqa E501
+                )
+        return False
+
+    @classmethod
+    def is_missing_sample_answers(cls, queryset):
+        if not isinstance(queryset, models.query.EmptyQuerySet):
+            if isinstance(queryset, models.query.QuerySet):
+                if queryset.model is cls:
+                    Answer = apps.get_model(
+                        app_label="peerinst", model_name="answer"
+                    )
+                    sample_answers = Answer.objects.filter(
+                        expert=False
+                    ).filter(question=OuterRef("pk"))
+
+                    return (
+                        queryset.filter(type="PI")
+                        .values("answerchoice")
+                        .annotate(
+                            rank=Subquery(
+                                cls.objects.filter(pk=OuterRef("pk"))
+                                .values("answerchoice")
+                                .filter(
+                                    answerchoice__lte=OuterRef("answerchoice")
+                                )
+                                .annotate(count=Count("answerchoice"))
+                                .values("count")[:1],
+                                output_field=models.IntegerField(),
+                            ),
+                        )
+                        .annotate(
+                            sample_answers_for_choice=Subquery(
+                                sample_answers.filter(
+                                    first_answer_choice=OuterRef("rank")
+                                )
+                                .values("pk")
+                                .annotate(count=Count("pk"))
+                                .values("count")[:1],
+                                output_field=models.IntegerField(),
+                            )
+                        )
+                        .filter(sample_answers_for_choice__isnull=True)
+                        .exists()
+                    )
+                raise TypeError("Queryset must be of type Question")
+            else:
+                raise TypeError(
+                    f"Method only implemented for querysets.  Passed {type(queryset)}"  # noqa E501
+                )
+        return False
+
+    @classmethod
+    def is_flagged(cls, queryset):
+        if not isinstance(queryset, models.query.EmptyQuerySet):
+            if isinstance(queryset, models.query.QuerySet):
+                if queryset.model is cls:
+                    return (
+                        queryset.annotate(
+                            flagged=Count(
+                                "questionflag",
+                                filter=Q(questionflag__flag=True),
+                            )
+                        )
+                        .filter(flagged__gt=0)
+                        .exists()
+                    )
+                raise TypeError("Queryset must be of type Question")
+            else:
+                raise TypeError(
+                    f"Method only implemented for querysets.  Passed {type(queryset)}"  # noqa E501
+                )
+        return False
+
     @property
     def answer_count(self):
         return self.get_student_answers().count()
@@ -422,11 +585,53 @@ class Question(models.Model):
         return self.id in Collection.featured_questions()
 
     @property
+    def is_editable(self):
+        return (
+            self.answer_set.filter(expert=False)
+            .exclude(user_token__exact="")
+            .count()
+            == 0
+        )
+
+    @property
+    def is_not_flagged(self):
+        self_as_queryset = Question.objects.filter(pk=self.pk)
+        return not Question.is_flagged(self_as_queryset)
+
+    @property
+    def is_not_missing_answer_choices(self):
+        self_as_queryset = Question.objects.filter(pk=self.pk)
+        return not Question.is_missing_answer_choices(self_as_queryset)
+
+    @property
+    def is_not_missing_expert_rationale(self):
+        self_as_queryset = Question.objects.filter(pk=self.pk)
+        return not Question.is_missing_expert_rationale(self_as_queryset)
+
+    @property
+    def is_not_missing_sample_answers(self):
+        self_as_queryset = Question.objects.filter(pk=self.pk)
+        return not Question.is_missing_sample_answers(self_as_queryset)
+
+    @property
     def is_valid(self):
-        """
-        TODO: Need to add a check that there are enough sample answers!
-        """
-        return self.answerchoice_set.count() > 0 or self.type == "RO"
+        self_as_queryset = Question.objects.filter(pk=self.pk)
+        return not any(
+            [
+                Question.is_missing_answer_choices(self_as_queryset),
+                Question.is_missing_expert_rationale(self_as_queryset),
+                Question.is_missing_sample_answers(self_as_queryset),
+                Question.is_flagged(self_as_queryset),
+            ]
+        )
+
+    @property
+    def flag_reasons(self):
+        return (
+            QuestionFlag.objects.filter(question=self, flag=True)
+            .values("flag_reason__title")
+            .annotate(Count("flag_reason"))
+        )
 
     def get_start_form_class(self):
         from ..forms import FirstAnswerForm
@@ -587,15 +792,15 @@ class Question(models.Model):
         if N > MIN_ANSWERS:
             difficulty = self.get_answers_by_type(answer_type="*W").count() / N
             if difficulty >= UPPER_BOUND:
-                difficulty_str = _("Hard")
+                difficulty_label = self.DIFFICULTY_LABELS[2]
             elif difficulty < LOWER_BOUND:
-                difficulty_str = _("Easy")
+                difficulty_label = self.DIFFICULTY_LABELS[0]
             else:
-                difficulty_str = _("Avg")
+                difficulty_label = self.DIFFICULTY_LABELS[1]
         else:
             difficulty = None
-            difficulty_str = _("Not enough data")
-        return (difficulty, difficulty_str)
+            difficulty_label = self.DIFFICULTY_LABELS[3]
+        return (difficulty, *difficulty_label)
 
     def get_peer_impact(self):
         MIN_ANSWERS = 30
@@ -609,15 +814,15 @@ class Question(models.Model):
                 + self.get_answers_by_type(answer_type="WR").count()
             ) / N
             if peer_impact >= UPPER_BOUND:
-                peer_impact_str = _("High")
+                peer_impact_label = self.PEER_IMPACT_LABELS[2]
             elif peer_impact < LOWER_BOUND:
-                peer_impact_str = _("Low")
+                peer_impact_label = self.PEER_IMPACT_LABELS[0]
             else:
-                peer_impact_str = _("Med")
+                peer_impact_label = self.PEER_IMPACT_LABELS[1]
         else:
             peer_impact = None
-            peer_impact_str = _("Not enough data")
-        return (peer_impact, peer_impact_str)
+            peer_impact_label = self.PEER_IMPACT_LABELS[3]
+        return (peer_impact, *peer_impact_label)
 
     def get_matrix(self):
         matrix = {}
@@ -877,12 +1082,38 @@ class Question(models.Model):
 
 
 class QuestionFlagReason(models.Model):
+
+    CHOICES = (
+        (
+            "Clarification needed",
+            _("The question, or one of the answer choices, is unclear."),
+        ),
+        (
+            "Potential copyright issues",
+            _(
+                """
+                Some part of the question, perhaps the image or \
+                attached video, may come from a copyrighted source.
+                """
+            ),
+        ),
+        (
+            "Wrong answer marked as correct",
+            _(
+                """
+                Wrong answer marked as correct
+                """
+            ),
+        ),
+    )
+
     title = models.CharField(
         _("Reason for flagging a question"),
         unique=True,
         max_length=100,
         help_text=_("Reason for flagging a question."),
-        validators=[no_hyphens],
+        choices=CHOICES,
+        default=CHOICES[0][0],
     )
 
     def __str__(self):

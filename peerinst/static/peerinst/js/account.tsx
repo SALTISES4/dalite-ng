@@ -1,9 +1,4 @@
-import { Component, h } from "preact";
+import { TeacherAccountQuestionApp } from "./_account/questions";
+import { TeacherAccountAssignmentApp } from "./_account/assignments";
 
-import QuestionList from "./_components/lists.js";
-
-export default class TeacherAccountApp extends Component {
-  render() {
-    return <QuestionList />;
-  }
-}
+export { TeacherAccountAssignmentApp, TeacherAccountQuestionApp };

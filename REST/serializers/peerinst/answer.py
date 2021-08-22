@@ -143,7 +143,8 @@ class StudentGroupAssignmentAnswerSerializer(serializers.ModelSerializer):
         answers = (
             Answer.objects.filter(
                 user_token__in=[
-                    student.student.username for student in obj.group.students
+                    student.student.username
+                    for student in obj.group.students.all()
                 ]
             )
             .filter(assignment=obj.assignment)

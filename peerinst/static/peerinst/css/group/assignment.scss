@@ -8,6 +8,7 @@
   & button {
     border-radius: 20px;
     box-shadow: none;
+    vertical-align: middle;
     width: max-content;
   }
   & button:disabled {
@@ -23,6 +24,7 @@
     line-height: 1rem;
     overflow-wrap: break-word;
     padding-left: 10px;
+    vertical-align: middle;
     white-space: normal;
     width: calc(100% - 200px);
   }
