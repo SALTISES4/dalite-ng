@@ -210,8 +210,6 @@ class Student(models.Model):
                 student=self, group=group
             )
             membership.current_member = True
-            if not mail_type:
-                membership.send_emails = False
             membership.save()
             logger.info(
                 "Student %d added back to group %d.", self.pk, group.pk
@@ -226,10 +224,7 @@ class Student(models.Model):
                 group.pk,
             )
 
-        StudentGroup = apps.get_model(
-            app_label="peerinst", model_name="StudentGroup"
-        )
-        if group.mode_created == StudentGroup.STANDALONE:
+        if group.mode_created == group.STANDALONE:
             for assignment in StudentGroupAssignment.objects.filter(
                 group=group, distribution_date__isnull=False
             ):
