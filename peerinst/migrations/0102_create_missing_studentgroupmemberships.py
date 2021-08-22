@@ -31,6 +31,7 @@ def forwards_func(apps, scheme_editor):
                         student=student,
                         group = group,
                         current_member = True,
+                        send_emails = False,
                     )
                     student_lti_event = LtiUserData.objects.filter(user=student.student).first()
                     # collect LtiUserData objects linked to the students in this group
