@@ -2,10 +2,11 @@ import logging
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods, require_safe
 from django.views.generic import ListView
@@ -301,11 +302,18 @@ class StudentGroupAssignmentCreateView(
     def get_form(self):
         form = super(StudentGroupAssignmentCreateView, self).get_form()
         teacher = get_object_or_404(Teacher, user=self.request.user)
-        form.fields["group"].queryset = teacher.current_groups.all()
+        form.fields["group"].queryset = teacher.current_groups.filter(
+            mode_created=StudentGroup.STANDALONE
+        )
 
         return form
 
     def form_valid(self, form):
+        # Check teacher owns group
+        teacher = get_object_or_404(Teacher, user=self.request.user)
+        if teacher not in form.instance.group.teacher.all():
+            raise PermissionDenied
+
         # Attach assignment and save
         form.instance.assignment = get_object_or_404(
             Assignment, pk=self.kwargs["assignment_id"]
