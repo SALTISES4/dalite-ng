@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.db import IntegrityError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -283,7 +284,7 @@ class TeacherView(generics.RetrieveUpdateAPIView):
 
 class TeacherFeedbackList(generics.ListCreateAPIView):
     """
-    endpoint to list authenticated user's feedback given
+    Endpoint to list authenticated user's feedback given
     (AnswerAnnotation objects where they are annotator),
     or create new one
     """
@@ -297,7 +298,10 @@ class TeacherFeedbackList(generics.ListCreateAPIView):
         )
 
     def perform_create(self, serializer):
-        serializer.save(annotator=self.request.user)
+        try:
+            serializer.save(annotator=self.request.user)
+        except IntegrityError:
+            pass
 
 
 class TeacherFeedbackDetail(generics.RetrieveUpdateAPIView):
