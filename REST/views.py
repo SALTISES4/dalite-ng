@@ -1,9 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.db import IntegrityError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
-from rest_framework import generics, viewsets
+from rest_framework import generics, serializers, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -298,10 +297,12 @@ class TeacherFeedbackList(generics.ListCreateAPIView):
         )
 
     def perform_create(self, serializer):
-        try:
-            serializer.save(annotator=self.request.user)
-        except IntegrityError:
-            pass
+        if AnswerAnnotation.objects.filter(
+            answer=serializer.validated_data["answer"],
+            annotator=self.request.user,
+        ).exists():
+            raise serializers.ValidationError(_("Unique constraint violation"))
+        serializer.save(annotator=self.request.user)
 
 
 class TeacherFeedbackDetail(generics.RetrieveUpdateAPIView):
