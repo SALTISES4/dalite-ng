@@ -21,8 +21,9 @@ class Command(BaseCommand):
 
         count = 0
         for q in Question.objects.filter(type="RO"):
-            q.second_answer_needed = False
-            q.save()
-            count += 1
+            if q.second_answer_needed is True:
+                q.second_answer_needed = False
+                q.save()
+                count += 1
 
         print(f"{count} RO questions fixed.")
