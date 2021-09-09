@@ -384,6 +384,13 @@ class Question(models.Model):
             styles=[],
             strip=True,
         ).strip()
+
+        if self.type == "PI":
+            self.second_answer_needed = True
+
+        if self.type == "RO":
+            self.second_answer_needed = False
+
         super().save(*args, **kwargs)
 
     @classmethod

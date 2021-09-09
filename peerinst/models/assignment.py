@@ -476,6 +476,7 @@ class StudentGroupAssignment(models.Model):
             student_assignment.detailed_results
             for student_assignment in self.studentassignment_set.all()
         ]
+
         return [
             {
                 "question_id": question.id,
