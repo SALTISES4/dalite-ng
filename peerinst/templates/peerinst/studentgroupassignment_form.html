@@ -60,6 +60,9 @@
                   <div class="mdc-select__bottom-line"></div>
                 </div>
               </div>
+              <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
+                {{ form.group.help_text|safe }}
+              </p>
               {{ form.group.errors }}
             </div>
           </div>

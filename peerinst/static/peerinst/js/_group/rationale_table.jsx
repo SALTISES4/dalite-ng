@@ -138,47 +138,49 @@ class AnswerFeedback extends Component {
   };
 
   save = async (score) => {
-    this.setState({ saving: true });
-    let data;
-    try {
-      if (!this.state.create) {
-        // Object exists, so PATCH
-        data = await submitData(
-          `${this.props.feedbackURL}through_answer/${this.props.pk}/`,
-          { note: this.state.note, score },
-          "PATCH",
+    if (!this.state.saving) {
+      this.setState({ saving: true });
+      let data;
+      try {
+        if (!this.state.create) {
+          // Object exists, so PATCH
+          data = await submitData(
+            `${this.props.feedbackURL}through_answer/${this.props.pk}/`,
+            { note: this.state.note, score },
+            "PATCH",
+          );
+          console.info(data);
+        } else {
+          // Object doesn't exist, so POST
+          data = await submitData(
+            this.props.feedbackURL,
+            {
+              answer: this.props.pk,
+              note: this.state.note,
+              score,
+            },
+            "POST",
+          );
+          console.info(data);
+        }
+        this.setState({
+          changed: false,
+          create: false,
+          saving: false,
+          score: data["score"],
+          score_hover: null,
+        });
+        this.props.setSnackbar(true, this.props.gettext("Saved"));
+      } catch (error) {
+        console.error(error);
+        this.props.setSnackbar(
+          true,
+          this.props.gettext("An error occurred.  Try refreshing this page."),
         );
-        console.info(data);
-      } else {
-        // Object doesn't exist, so POST
-        data = await submitData(
-          this.props.feedbackURL,
-          {
-            answer: this.props.pk,
-            note: this.state.note,
-            score,
-          },
-          "POST",
-        );
-        console.info(data);
+        this.setState({
+          saving: false,
+        });
       }
-      this.setState({
-        changed: false,
-        create: false,
-        saving: false,
-        score: data["score"],
-        score_hover: null,
-      });
-      this.props.setSnackbar(true, this.props.gettext("Saved"));
-    } catch (error) {
-      console.error(error);
-      this.props.setSnackbar(
-        true,
-        this.props.gettext("An error occurred.  Try refreshing this page."),
-      );
-      this.setState({
-        saving: false,
-      });
     }
   };
 

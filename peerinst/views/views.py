@@ -1099,10 +1099,15 @@ class QuestionFormView(QuestionMixin, FormView):
                 if group not in self.request.user.student.groups.all():
                     self.request.user.student.join_group(group=group)
 
-            sga, created = StudentGroupAssignment.objects.get_or_create(
+            # Create StudentGroupAssignment instance, if none exist
+            if not StudentGroupAssignment.objects.filter(
                 group=group,
                 assignment=self.assignment,
-            )
+            ).exists():
+                StudentGroupAssignment.objects.create(
+                    group=group,
+                    assignment=self.assignment,
+                )
 
             # If teacher_id specified, add teacher to group
             teacher_hash = self.lti_data.edx_lti_parameters.get(
