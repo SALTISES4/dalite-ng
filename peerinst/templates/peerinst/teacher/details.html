@@ -59,14 +59,16 @@
               </span>
             </span>
             <span class="mdc-list-item__meta">
+              {% if g.mode_created == "STANDALONE" %}
+              <a href="{% url 'group-share' pk=teacher.id group_hash=g.hash %}">
+              <i class="material-icons md-24 mdc-ripple-surface icon-list">share</i>
+              </a>
+              {% endif %}
               <button class="gradebook-button" data-group="{{ g.pk }}">
                 <i class="material-icons md-24 mdc-ripple-surface icon-list">
                   bar_chart
                 </i>
               </button>
-              <a href="{% url 'group-share' pk=teacher.id group_hash=g.hash %}">
-              <i class="material-icons md-24 mdc-ripple-surface icon-list">share</i>
-              </a>
             </span>
           </li>
           {% endfor %}

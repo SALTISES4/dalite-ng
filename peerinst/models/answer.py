@@ -284,6 +284,7 @@ class RationaleOnlyQuestion(Question):
         proxy = True
 
     def save(self, *args, **kwargs):
+        # TODO: Remove
         self.question.second_answer_needed = False
         self.question.save()
         super(RationaleOnlyQuestion, self).save(*args, **kwargs)
