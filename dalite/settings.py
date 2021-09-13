@@ -317,6 +317,8 @@ CSP_OBJECT_SRC = [
     "*.youtube.com",
     "*.vimeo.com",
     "docs.google.com",
+    "openstax.org",
+    "geogebra.org",
 ]
 
 ELASTICSEARCH_DSL = {
