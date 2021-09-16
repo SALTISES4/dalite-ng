@@ -470,7 +470,7 @@ sacremoses==0.0.45
     # via
     #   -r requirements/requirements-base.txt
     #   transformers
-saltise-course-flow==0.4.2
+saltise-course-flow==0.4.3
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==0.1.2
     # via
