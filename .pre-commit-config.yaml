@@ -1,6 +1,16 @@
 exclude: "/tinymce/"
 fail_fast: false
 repos:
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.2.1
+    hooks:
+      - id: python-safety-dependencies-check
+        name: safety
+        always_run: true
+        exclude: ".*"
+        verbose: true
+        args: ["requirements/requirements-prod-aws.txt"]
+
   - repo: https://github.com/pycqa/isort
     rev: 5.8.0
     hooks:
@@ -63,12 +73,6 @@ repos:
 
   - repo: local
     hooks:
-      - id: safety
-        name: safety
-        entry: safety check
-        language: system
-        always_run: true
-        exclude: ".*"
       - id: npm-audit
         name: npm-audit
         language: system
