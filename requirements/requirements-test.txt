@@ -348,7 +348,7 @@ pbr==5.4.4
     # via
     #   -r requirements/requirements-base.txt
     #   stevedore
-pillow==8.3.1
+pillow==8.3.2
     # via -r requirements/requirements-base.txt
 pluggy==0.13.1
     # via pytest
@@ -470,7 +470,7 @@ sacremoses==0.0.45
     # via
     #   -r requirements/requirements-base.txt
     #   transformers
-saltise-course-flow==0.4.5
+saltise-course-flow==0.4.7
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==0.1.2
     # via
@@ -517,7 +517,7 @@ spacy-legacy==3.0.8
     # via
     #   -r requirements/requirements-base.txt
     #   spacy
-sqlparse==0.3.1
+sqlparse==0.4.2
     # via
     #   -r requirements/requirements-base.txt
     #   django

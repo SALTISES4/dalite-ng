@@ -512,7 +512,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==8.3.1
+pillow==8.3.2
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -697,7 +697,7 @@ sacremoses==0.0.45
     #   transformers
 safety==1.8.5
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.4.5
+saltise-course-flow==0.4.7
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -759,7 +759,7 @@ spacy-legacy==3.0.8
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   spacy
-sqlparse==0.3.1
+sqlparse==0.4.2
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
