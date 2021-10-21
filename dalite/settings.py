@@ -27,7 +27,7 @@ DEFAULT_SCHEME_HOST_PORT = "http://localhost:8000"
 # Application definition
 INSTALLED_APPS = (
     "user_feedback",
-    "course_flow",
+    "course_flow.apps.CourseFlowConfig",
     "rest_framework",
     "analytics",
     "reputation",
@@ -251,6 +251,9 @@ PASSWORD_GENERATOR_NONCE = os.environ.get("PASSWORD_GENERATOR_NONCE", None)
 HEARTBEAT_REQUIRED_FREE_SPACE_PERCENTAGE = 20
 
 PINAX_FORUMS_EDIT_TIMEOUT = dict(days=120)
+
+# CourseFlow settings
+COURSE_FLOW_RETURN_URL = {"name": "welcome", "title": "myDalite"}
 
 # NB: Object level permissions are checked for certain models, including
 # Question
