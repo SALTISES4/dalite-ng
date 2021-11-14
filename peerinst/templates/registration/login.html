@@ -2,96 +2,32 @@
 
 {% load add_class i18n %}
 
-{% block stylesheets %}
-<style nonce="{{ request.csp_nonce }}">
-  h2 {
-    margin-bottom:0px;
-  }
-</style>
-{% endblock %}
-
 {% block body %}
 <main>
-<section>
-  <h1 class="mdc-typography--display3">{% trans 'Login' %}
-    <svg class="underline" width=150 height=4></svg>
-  </h1>
+  <section>
+    <h1 class="mdc-typography--display3">{% trans 'Login' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
 
-  <div class="admin-link">
-    <a href="{% url 'password_reset' %}">{% trans 'Forgot password' %}</a>
-    <span class="links-divider">|</span><a href="{% url 'sign_up' %}">{% trans 'Sign up' %}</a>
-  </div>
+    <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Students' %}
+      <span class="material-icons">arrow_forward_ios</span>
+      <a href="{% url 'student-login' %}">
+        <button class="mdc-button mdc-button--raised">
+          {% trans 'Login via email' %}
+        </button>
+      </a>
+    </h2>
 
-
-  <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Student access' %}</h2>
-  <a href="{% url 'student-login' %}">
-  <button class="mdc-button mdc-button--raised padded-top">
-    {% trans 'Login' %}
-  </button>
-  </a>
-
-  <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Teacher and guest access' %}</h2>
-
-  {% if form.errors %}
-    <p>
-      {% trans "Your username and password didn't match or your account has not yet been activated. Please try again." %}
-    </p>
-  {% endif %}
-
-  {% if next %}
-    {% if user.is_authenticated %}
-      <p>
-        {% trans "Your account doesn't have access to this page. To proceed, please login with an account that has access." %}
-      </p>
-    {% else %}
-      <p>{% trans 'Please login to access this page.' %}</p>
-    {% endif %}
-  {% endif %}
-
-  <form method="post">
-    {% csrf_token %}
-
-    <div class="mdc-text-field mdc-text-field--outlined" data-mdc-auto-init="MDCTextField">
-      {{ form.username|add_class:"mdc-text-field__input" }}
-      {{ form.username.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-      <div class="mdc-notched-outline">
-        <svg>
-          <path class="mdc-notched-outline__path"/>
-        </svg>
-      </div>
-      <div class="mdc-notched-outline__idle"></div>
-    </div>
-    <br>
-    <div class="mdc-text-field mdc-text-field--outlined" data-mdc-auto-init="MDCTextField">
-      {{ form.password|add_class:"mdc-text-field__input" }}
-      {{ form.password.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-      <div class="mdc-notched-outline">
-        <svg>
-          <path class="mdc-notched-outline__path"/>
-        </svg>
-      </div>
-      <div class="mdc-notched-outline__idle"></div>
-    </div>
-
-    <div class='padded-top'>
-      <input type="hidden" name="next" value="{{ next }}"/>
-      <input id="submit-btn" class="mdc-button mdc-button--raised" type="submit" value="{% trans 'Submit' %}"/>
-    </div>
-  </form>
-</section>
+    <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Teachers' %}
+      <span class="material-icons">arrow_forward_ios</span>
+      {% with next=request.GET.next %}
+      <a href="{% url 'saltise:login' %}{% if next %}?next={{ next }}{% endif %}">
+        <button class="mdc-button mdc-button--raised">
+          {% trans 'Login via SALTISE' %}
+        </button>
+      </a>
+      {% endwith %}
+    </h2>
+  </section>
 </main>
-{% endblock %}
-
-{% block scripts %}
-{{ block.super }}
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-    document.getElementById("submit-btn").addEventListener("click", function() {
-      this.form.submit();
-      if (this.form.reportValidity()) {
-        this.disabled=true;
-      }
-    })
-  })
-</script>
 {% endblock %}

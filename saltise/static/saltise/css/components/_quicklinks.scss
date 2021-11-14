@@ -1,0 +1,68 @@
+.quicklinks {
+
+  &-wrap {
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 24px;
+      text-transform: uppercase;
+    }
+  }
+
+  &__block {
+    align-items: center;
+    background-color: $color-gray-lightest;
+    color: currentColor;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding: 10px 16px;
+
+    &:not(:last-child) {
+      margin-bottom: 10px;
+    }
+
+    span {
+      align-items: center;
+      background-color: $color-cta-blue;
+      border-radius: 50%;
+      color: $color-white;
+      display: inline-flex;
+      flex-shrink: 0;
+      height: 40px;
+      justify-content: center;
+      margin-right: 20px;
+      transition: all 0.3s ease;
+      width: 40px;
+    }
+
+    svg {
+      fill: currentColor;
+      width: 20px;
+    }
+
+    img {
+      height: 20px;
+      width: 20px;
+    }
+
+    h4 {
+      color: currentColor;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    &:hover {
+      background-color: $color-cta-blue;
+      color: $color-white;
+
+      span {
+        background-color: $color-white;
+        color: $color-cta-blue;
+      }
+    }
+  }
+}

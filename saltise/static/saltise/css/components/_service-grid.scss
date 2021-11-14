@@ -1,0 +1,53 @@
+.service-grid {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 1fr;
+
+  @include from($break-mobile) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @include from($break-tablet-xl) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+
+  &__block {
+    background-color: $color-gray-lightest;
+    color: $color-body-text;
+
+    &:hover {
+      background-color: $color-body-bg;
+      color: $color-body-text;
+    }
+  }
+
+  &__image {
+    align-items: center;
+    background-color: $color-body-bg;
+    display: flex;
+    height: 130px;
+    justify-content: center;
+
+    img {
+      max-height: 80%;
+      max-width: 80%;
+    }
+  }
+
+  &__text {
+    padding: 10px 16px 32px;
+
+    h4 {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.5;
+      margin: 0 0 10px;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 1.7;
+      margin: 0;
+    }
+  }
+}

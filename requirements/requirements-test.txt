@@ -54,7 +54,7 @@ billiard==3.6.3.0
     # via
     #   -r requirements/requirements-base.txt
     #   celery
-bleach==3.1.4
+bleach==4.1.0
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
@@ -334,6 +334,7 @@ oauthlib==3.1.0
 packaging==21.0
     # via
     #   -r requirements/requirements-base.txt
+    #   bleach
     #   huggingface-hub
     #   pytest
     #   spacy
