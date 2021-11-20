@@ -307,7 +307,7 @@ djangorestframework==3.12.2
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
     #   saltise-user-feedback
-dparse==0.4.1
+dparse==0.5.1
     # via safety
 editdistance==0.5.3
     # via
@@ -696,9 +696,9 @@ sacremoses==0.0.45
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   transformers
-safety==1.8.5
+safety==1.10.3
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.4.9
+saltise-course-flow==0.5.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -727,7 +727,6 @@ six==1.15.0
     #   django-elasticsearch-dsl
     #   django-grappelli
     #   django-lti-tool-provider
-    #   dparse
     #   elasticsearch-dsl
     #   faker
     #   html5lib
@@ -794,6 +793,7 @@ tokenizers==0.10.3
 toml==0.10.2
     # via
     #   black
+    #   dparse
     #   pre-commit
 torch==1.9.0
     # via
