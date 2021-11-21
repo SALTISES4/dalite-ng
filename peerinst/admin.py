@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.models import DELETION, LogEntry
@@ -167,9 +169,24 @@ class QuestionAdmin(admin.ModelAdmin):
         "difficulty",
     ]
     inlines = [AnswerChoiceInline, AnswerInline]
-    list_display = ["title", "discipline", "difficulty"]
-    list_filter = ["category", "discipline"]
-    ordering = ["discipline"]
+
+    def answer_count(self):
+        return self.answer_set.all().count()
+
+    def created_on_date(self):
+        return datetime.strftime(self.created_on, "%Y-%m-%d")
+
+    list_display = [
+        created_on_date,
+        "discipline",
+        "type",
+        "user",
+        "title",
+        answer_count,
+    ]
+    list_display_links = ("title",)
+    list_filter = ["type", "discipline"]
+    ordering = ["-created_on"]
     search_fields = ["title", "text", "category__title"]
 
     def difficulty(self, obj):

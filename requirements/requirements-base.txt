@@ -48,7 +48,7 @@ beautifulsoup4==4.8.2
     #   pynliner
 billiard==3.6.3.0
     # via celery
-bleach==3.1.4
+bleach==4.1.0
     # via
     #   -r requirements/requirements-base.in
     #   saltise-course-flow
@@ -265,6 +265,7 @@ oauthlib==3.1.0
 packaging==21.0
     # via
     #   -r requirements/requirements-base.in
+    #   bleach
     #   huggingface-hub
     #   spacy
     #   transformers
@@ -355,7 +356,7 @@ rjsmin==1.1.0
     # via django-compressor
 sacremoses==0.0.45
     # via transformers
-saltise-course-flow==0.4.9
+saltise-course-flow==0.5.1
     # via -r requirements/requirements-base.in
 saltise-user-feedback==0.1.2
     # via
