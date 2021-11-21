@@ -35,6 +35,7 @@ INSTALLED_APPS = (
     "tos",
     "peerinst",
     "blink",
+    "saltise",
     # "channels",
     "REST",
     "django_elasticsearch_dsl",

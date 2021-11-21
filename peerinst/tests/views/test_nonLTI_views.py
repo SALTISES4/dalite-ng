@@ -133,7 +133,7 @@ class TeacherTest(TestCase):
     def test_login_and_access_to_accounts(self):
         # Login
         response = self.client.post(
-            reverse("login"),
+            reverse("saltise:login"),
             {
                 "username": self.validated_teacher.username,
                 "password": self.validated_teacher.text_pwd,
@@ -141,7 +141,7 @@ class TeacherTest(TestCase):
             follow=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "peerinst/teacher/dashboard.html")
+        self.assertTemplateUsed(response, "saltise/lobby.html")
 
         # Test access to other
         response = self.client.get(reverse("teacher", kwargs={"pk": 2}))
@@ -187,7 +187,7 @@ class TeacherTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
         response = self.client.get(reverse("welcome"))
-        self.assertRedirects(response, reverse("teacher-dashboard"))
+        self.assertRedirects(response, reverse("saltise:lobby"))
         self.assertIn(self.group, self.validated_teacher.groups.all())
 
         response = self.client.get(reverse("question-create"))
