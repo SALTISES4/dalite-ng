@@ -1,6 +1,6 @@
 {% extends 'peerinst/base.html' %}
 
-{% load static compress i18n %}
+{% load bleach_html compress i18n static %}
 
 {% block stylesheets %}
 {{ block.super }}
@@ -45,11 +45,11 @@
     {% for g in object.blinkassignmentquestion_set.all %}
     <div class="mdc-card" id={{g.blinkquestion.question.id|slugify}}>
       <div class="mdc-typography--title bold">
-        {{g.blinkquestion.question.title|safe}}
+        {{g.blinkquestion.question.title|bleach_html|safe}}
       </div>
 
       <div class="mdc-typography--body1 m-top-5">
-        {{g.blinkquestion.question.text|safe}}
+        {{g.blinkquestion.question.text|bleach_html|safe}}
       </div>
 
       {% if g.blinkquestion.question.image %}
@@ -59,7 +59,7 @@
       <div class="question-answers hidden">
         <ul>
           {% for label, choice in g.blinkquestion.question.get_choices %}
-          <li class="mdc-typography--body1">{{ label }}. {{ choice|safe }}</li>
+          <li class="mdc-typography--body1">{{ label }}. {{ choice|bleach_html|safe }}</li>
           {% endfor %}
         </ul>
       </div>
@@ -73,7 +73,7 @@
             <div>
               {% trans 'Categories' %}:
               {% for c in g.blinkquestion.question.category.all %}
-              {{ c.title|safe }}{% if not forloop.last %}, {% endif %}
+              {{ c.title|bleach_html|safe }}{% if not forloop.last %}, {% endif %}
               {% empty %}
               {% trans 'Uncategorized' %}
               {% endfor %}
@@ -143,11 +143,11 @@
 
         <div class="mdc-card searchable" id={{g.question.id|slugify}}>
           <div class="mdc-typography--title bold">
-            {{g.question.title|safe}}
+            {{g.question.title|bleach_html|safe}}
           </div>
 
           <div class="mdc-typography--body1 m-top-5">
-            {{g.question.text|safe}}
+            {{g.question.text|bleach_html|safe}}
           </div>
 
           {% if g.question.image %}
@@ -157,7 +157,7 @@
           <div class="question-answers hidden">
             <ul>
             {% for label, choice in g.question.get_choices %}
-            <li class="mdc-typography--body1">{{ label }}. {{ choice|safe }}</li>
+            <li class="mdc-typography--body1">{{ label }}. {{ choice|bleach_html|safe }}</li>
             {% endfor %}
             <ul>
           </div>
@@ -172,7 +172,7 @@
                 <div>
                   {% trans 'Categories' %}:
                   {% for c in g.question.category.all %}
-                  {{ c.title|safe }}{% if not forloop.last %}, {% endif %}
+                  {{ c.title|bleach_html|safe }}{% if not forloop.last %}, {% endif %}
                   {% empty %}
                   {% trans 'Uncategorized' %}
                   {% endfor %}
