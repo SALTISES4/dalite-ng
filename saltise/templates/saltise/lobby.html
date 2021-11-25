@@ -25,10 +25,10 @@
               <a href="{% url 'teacher-dashboard' %}" class="quicklinks__block">
                 <span>
                   <svg class="inline-svg">
-                    <use href="#questions" />
+                    <use href="#template" />
                   </svg>
                 </span>
-                <h4>{% trans 'My welcome page' %}</h4>
+                <h4>{% trans 'My dashboard' %}</h4>
               </a>
               <a href="{% url 'teacher' request.user.teacher.pk %}" class="quicklinks__block">
                 <span>
@@ -41,7 +41,7 @@
               <a href="{% url 'browse-database' %}" class="quicklinks__block">
                 <span>
                   <svg class="inline-svg">
-                    <use href="#collections" />
+                    <use href="#search" />
                   </svg>
                 </span>
                 <h4>{% trans 'Browse database' %}</h4>
@@ -97,7 +97,7 @@
             <h2 class="card__title">{% trans 'Explore SALTISE' %}</h2>
           </header>
           <div class="service-grid">
-            <a href="https://www.saltise.ca/news/events-category/" class="service-grid__block">
+            <a href="https://www.saltise.ca/events/webinars-and-talks/" class="service-grid__block">
               <div class="service-grid__image">
                 <img src="{% static '/saltise/img/img-webinars.svg' %}" alt="{% trans 'SALTISE webinars' %}">
               </div>
@@ -115,7 +115,7 @@
                 <p>{% trans 'Get expert guidance and practical experience with active learning tools and techniques.' %}</p>
               </div>
             </a>
-            <a href="https://www.saltise.ca/community/learning-communities/" class="service-grid__block">
+            <a href="https://www.saltise.ca/events/drop-in-sessions/" class="service-grid__block">
               <div class="service-grid__image">
                 <img src="{% static '/saltise/img/img-communities.svg' %}" alt="{% trans 'Communities of practice' %}">
               </div>
@@ -124,7 +124,7 @@
                 <p>{% trans 'Engage with fellow educators and peers to explore specific topics and discipline-based challenges related to implementing student-centered instruction.' %}</p>
               </div>
             </a>
-            <a href="https://www.saltise.ca/community/saltise-innovators/" class="service-grid__block">
+            <a href="https://www.saltise.ca/events/drop-in-sessions/request-a-mentor/" class="service-grid__block">
               <div class="service-grid__image">
                 <img src="{% static '/saltise/img/img-mentorship.svg' %}" alt="{% trans 'Peer mentorship' %}">
               </div>
