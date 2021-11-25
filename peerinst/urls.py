@@ -145,6 +145,11 @@ def old_patterns():
             name="question-search",
         ),
         path(
+            "question-search-legacy/",
+            views.question_search,
+            name="question-search-legacy",
+        ),
+        path(
             "collection-search/",
             views.collection_search,
             name="collection-search",
