@@ -1,0 +1,142 @@
+{% extends 'saltise/layout/base.html' %}
+
+{% load i18n static %}
+
+{% block head_title %}
+<title>SALTISE | {% trans 'Welcome' %}</title>
+{% endblock %}
+
+{% block content %}
+  <main class="site-content" role="main">
+    <div class="container-fluid">
+
+      <div class="card-grid">
+        <div class="card">
+          <header class="card__header">
+            <svg class="inline-svg">
+              <use href="#myDALITE" />
+            </svg>
+            <h2 class="card__title">myDALITE</h2>
+            <p>{% trans 'Use the same questions in class in polling mode or assign questions as out-of-class homework through a learning management system or via the platform.' %}</p>
+          </header>
+          <div class="quicklinks-wrap">
+            <h3>{% trans 'Quick links' %}</h3>
+            <div class="quicklinks">
+              <a href="{% url 'teacher-dashboard' %}" class="quicklinks__block">
+                <span>
+                  <svg class="inline-svg">
+                    <use href="#template" />
+                  </svg>
+                </span>
+                <h4>{% trans 'My dashboard' %}</h4>
+              </a>
+              <a href="{% url 'teacher' request.user.teacher.pk %}" class="quicklinks__block">
+                <span>
+                  <svg class="inline-svg">
+                    <use href="#assignments" />
+                  </svg>
+                </span>
+                <h4>{% trans 'My account' %}</h4>
+              </a>
+              <a href="{% url 'browse-database' %}" class="quicklinks__block">
+                <span>
+                  <svg class="inline-svg">
+                    <use href="#search" />
+                  </svg>
+                </span>
+                <h4>{% trans 'Browse database' %}</h4>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <header class="card__header">
+            <svg class="inline-svg">
+              <use href="#courseflow" />
+            </svg>
+            <h2 class="card__title">CourseFlow</h2>
+            <p>{% trans 'CourseFlow is an application that allows for an interactive and dynamic instructional design at the activity, course and program levels.' %}</p>
+          </header>
+          <div class="quicklinks-wrap">
+            <h3>{% trans 'Quick links' %}</h3>
+            <div class="quicklinks">
+              <a href="{% url 'course_flow:my-projects' %}" class="quicklinks__block">
+                <span>
+                  <svg class="inline-svg">
+                    <use href="#questions" />
+                  </svg>
+                </span>
+                <h4>{% trans 'My projects' %}</h4>
+              </a>
+              <a href="{% url 'course_flow:my-templates' %}" class="quicklinks__block">
+                <span>
+                  <svg class="inline-svg">
+                    <use href="#template" />
+                  </svg>
+                </span>
+                <h4>{% trans 'My templates' %}</h4>
+              </a>
+              <a href="{% url 'course_flow:my-favourites' %}" class="quicklinks__block">
+                <span>
+                  <svg class="inline-svg">
+                    <use href="#heart" />
+                  </svg>
+                </span>
+                <h4>{% trans 'My favourites' %}</h4>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <header class="card__header">
+            <svg class="inline-svg">
+              <use href="#explore" />
+            </svg>
+            <h2 class="card__title">{% trans 'Explore SALTISE' %}</h2>
+          </header>
+          <div class="service-grid">
+            <a href="https://www.saltise.ca/events/webinars-and-talks/" class="service-grid__block">
+              <div class="service-grid__image">
+                <img src="{% static '/saltise/img/img-webinars.svg' %}" alt="{% trans 'SALTISE webinars' %}">
+              </div>
+              <div class="service-grid__text">
+                <h4>{% trans 'SALTISE webinars'%}</h4>
+                <p>{% trans 'Discover fundamentals and best practices of active learning to improve student engagement, collaboration, and performance.' %}</p>
+              </div>
+            </a>
+            <a href="https://www.saltise.ca/news/events-category/saltise-workshops/" class="service-grid__block">
+              <div class="service-grid__image">
+                <img src="{% static '/saltise/img/img-workshops.svg' %}" alt="{% trans 'Hands-on workshops' %}">
+              </div>
+              <div class="service-grid__text">
+                <h4>{% trans 'Hands-on workshops' %}</h4>
+                <p>{% trans 'Get expert guidance and practical experience with active learning tools and techniques.' %}</p>
+              </div>
+            </a>
+            <a href="https://www.saltise.ca/events/drop-in-sessions/" class="service-grid__block">
+              <div class="service-grid__image">
+                <img src="{% static '/saltise/img/img-communities.svg' %}" alt="{% trans 'Communities of practice' %}">
+              </div>
+              <div class="service-grid__text">
+                <h4>{% trans 'Communities of practice' %}</h4>
+                <p>{% trans 'Engage with fellow educators and peers to explore specific topics and discipline-based challenges related to implementing student-centered instruction.' %}</p>
+              </div>
+            </a>
+            <a href="https://www.saltise.ca/events/drop-in-sessions/request-a-mentor/" class="service-grid__block">
+              <div class="service-grid__image">
+                <img src="{% static '/saltise/img/img-mentorship.svg' %}" alt="{% trans 'Peer mentorship' %}">
+              </div>
+              <div class="service-grid__text">
+                <h4>{% trans 'Peer mentorship' %}</h4>
+                <p>{% trans 'Work with an experienced AL educator to boost your confidence and improve your skills in the classroom.' %}</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+{% endblock %}

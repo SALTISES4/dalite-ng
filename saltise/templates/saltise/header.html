@@ -1,0 +1,22 @@
+<header class="site-header" role="banner">
+  <nav class="nav">
+    <ul>
+      {% comment %}
+      <li>
+        <a href="index.html" class="nav__link">
+          <svg class="inline-svg">
+            <use href="#help" />
+          </svg>
+        </a>
+      </li>
+      {% endcomment %}
+      <li>
+        <a href="{% url 'logout' %}" class="nav__link">
+          <svg class="inline-svg">
+            <use href="#logout" />
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>

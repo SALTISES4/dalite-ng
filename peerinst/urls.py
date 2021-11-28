@@ -3,6 +3,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import user_passes_test
 from django.urls import path
+from django.views.generic.base import TemplateView
 
 from peerinst.middleware import lti_access_allowed
 
@@ -144,6 +145,11 @@ def old_patterns():
             name="question-search",
         ),
         path(
+            "question-search-legacy/",
+            views.question_search,
+            name="question-search-legacy",
+        ),
+        path(
             "collection-search/",
             views.collection_search,
             name="collection-search",
@@ -237,7 +243,9 @@ def old_patterns():
         path(
             "login/",
             user_passes_test(not_authenticated, login_url="/welcome/")(
-                auth_views.LoginView.as_view()
+                TemplateView.as_view(
+                    template_name="registration/login.html",
+                ),
             ),
             name="login",
         ),

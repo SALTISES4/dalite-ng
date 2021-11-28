@@ -1,0 +1,40 @@
+{% load i18n static %}
+
+{% get_current_language as LANGUAGE_CODE %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    {% include 'saltise/head.html' %}
+    {% block head_meta %}{% endblock %}
+    {% block head_title %}
+    <title>SALTISE</title>
+    {% endblock %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="{% static 'saltise/img/saltise.svg' %}" rel="icon">
+    <link href="{% static 'saltise/img/saltise.svg' %}" rel="apple-touch-icon">
+    <link rel="stylesheet" href={% static "/saltise/css/saltise.css" %}>
+    {% block css %}{% endblock %}
+
+    <style nonce="{{ request.csp_nonce }}">
+      .svg-sprite {
+        height: 0px;
+        position: absolute;
+        width: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'saltise/svg/sprite.svg' %}
+
+    {% block header %}
+      {% include 'saltise/header.html' %}
+    {% endblock %}
+
+    {% block content %}{% endblock %}
+
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
