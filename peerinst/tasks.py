@@ -43,7 +43,7 @@ def update_question_meta_search_difficulty():
         )
 
 
-@app.task
+@shared_task
 def elasticsearch_reindex():
     logger.info("start rebuild elasticsearch index")
     call_command("search_index", "--rebuild", "-f")

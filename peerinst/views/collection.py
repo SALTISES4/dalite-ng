@@ -100,6 +100,7 @@ def assignment_data(assignment):
     return q_sums
 
 
+@login_required
 def collection_paginate(request):
 
     if not Teacher.objects.filter(user=request.user).exists():
