@@ -74,6 +74,7 @@ celery[redis]==5.2.3
     # via
     #   -r requirements/requirements-base.txt
     #   django-celery-beat
+    #   pytest-celery
     #   saltise-course-flow
 certifi==2019.11.28
     # via
@@ -444,6 +445,8 @@ pytest==5.3.5
     #   -r requirements/requirements-test.in
     #   pytest-cov
     #   pytest-django
+pytest-celery==0.0.0
+    # via -r requirements/requirements-test.in
 pytest-cov==2.8.1
     # via -r requirements/requirements-test.in
 pytest-django==3.8.0
