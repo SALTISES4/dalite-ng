@@ -250,7 +250,7 @@ django-axes==5.3.4
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
-django-celery-beat==2.0.0
+django-celery-beat==2.2.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -317,7 +317,7 @@ django-samesite-none==0.0.2
     #   -r requirements/requirements-test.txt
 django-sslserver==0.22
     # via -r requirements/requirements-dev.in
-django-timezone-field==4.0
+django-timezone-field==4.2.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt

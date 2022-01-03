@@ -181,7 +181,7 @@ django-appconf==1.0.3
     #   pinax-forums
 django-axes==5.3.4
     # via -r requirements/requirements-base.txt
-django-celery-beat==2.0.0
+django-celery-beat==2.2.1
     # via -r requirements/requirements-base.txt
 django-classy-tags==1.0.0
     # via
@@ -221,7 +221,7 @@ django-referrer-policy==1.0
     # via -r requirements/requirements-base.txt
 django-samesite-none==0.0.2
     # via -r requirements/requirements-base.txt
-django-timezone-field==4.0
+django-timezone-field==4.2.1
     # via
     #   -r requirements/requirements-base.txt
     #   django-celery-beat
