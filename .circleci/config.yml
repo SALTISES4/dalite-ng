@@ -43,7 +43,7 @@ jobs:
           name: Safety
           command: |
             . .venv/bin/activate
-            pip install safety
+            pip install safety --ignore=43313
             safety check
       - run:
           name: Setup local_settings.py
