@@ -34,9 +34,14 @@ def images(instance, filename):
     hash = hashlib.sha256(
         "{}-{}".format(datetime.now(), filename).encode("utf-8")
     ).hexdigest()[:8]
-    path = "images/{0}/{1}/{2}_{3}".format(
-        instance.user.username, datetime.now().month, hash, filename
-    )
+    if instance.user:
+        path = "images/{0}/{1}/{2}_{3}".format(
+            instance.user.username, datetime.now().month, hash, filename
+        )
+    else:
+        path = "images/{0}/{1}/{2}_{3}".format(
+            "unknown", datetime.now().month, hash, filename
+        )
     return path
 
 

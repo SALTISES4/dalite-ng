@@ -25,7 +25,7 @@ aioredis==1.3.1
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   channels-redis
-amqp==2.5.2
+amqp==5.0.9
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -77,7 +77,7 @@ beautifulsoup4==4.8.2
     #   django-htmlmin
     #   httpobs
     #   pynliner
-billiard==3.6.3.0
+billiard==3.6.4.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -96,19 +96,21 @@ blis==0.7.4
     #   -r requirements/requirements-test.txt
     #   spacy
     #   thinc
-catalogue==2.0.4
+catalogue==2.0.6
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   spacy
     #   srsly
     #   thinc
-celery[redis]==4.4.0
+celery[redis]==5.2.3
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   django-celery-beat
     #   httpobs
+    #   pytest-celery
+    #   saltise-course-flow
 certifi==2019.11.28
     # via
     #   -r requirements/requirements-base.txt
@@ -136,14 +138,33 @@ chardet==3.0.4
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   requests
-click==7.1.2
+click==8.0.3
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   black
+    #   celery
+    #   click-didyoumean
+    #   click-plugins
+    #   click-repl
     #   sacremoses
     #   safety
     #   typer
+click-didyoumean==0.3.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   celery
+click-plugins==1.1.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   celery
+click-repl==0.2.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   celery
 constantly==15.1.0
     # via
     #   -r requirements/requirements-base.txt
@@ -189,7 +210,7 @@ decorator==4.4.2
     #   traitlets
 distlib==0.3.2
     # via virtualenv
-django==2.2.24
+django==2.2.25
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -229,7 +250,7 @@ django-axes==5.3.4
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
-django-celery-beat==2.0.0
+django-celery-beat==2.2.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -296,7 +317,7 @@ django-samesite-none==0.0.2
     #   -r requirements/requirements-test.txt
 django-sslserver==0.22
     # via -r requirements/requirements-dev.in
-django-timezone-field==4.0
+django-timezone-field==4.2.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -326,6 +347,11 @@ elasticsearch-dsl==7.3.0
     #   django-elasticsearch-dsl
 entrypoints==0.3
     # via flake8
+et-xmlfile==1.1.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   openpyxl
 factory-boy==3.2.0
     # via -r requirements/requirements-test.txt
 faker==0.9.1
@@ -361,6 +387,11 @@ hiredis==1.1.0
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   aioredis
+html2text==2020.1.16
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   saltise-course-flow
 html5lib==1.0.1
     # via
     #   -r requirements/requirements-base.txt
@@ -414,17 +445,22 @@ jsonfield==3.1.0
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   django-lti-tool-provider
-kombu==4.6.7
+kombu==5.2.3
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   celery
+langcodes==3.3.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   spacy
 lti==0.9.4
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   django-lti-tool-provider
-lxml==4.6.3
+lxml==4.7.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -480,6 +516,11 @@ oauthlib==3.1.0
     #   django-lti-tool-provider
     #   lti
     #   requests-oauthlib
+openpyxl==3.0.9
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   saltise-course-flow
 packaging==21.0
     # via
     #   -r requirements/requirements-base.txt
@@ -491,10 +532,11 @@ packaging==21.0
     #   safety
     #   spacy
     #   transformers
-pandas==1.0.2
+pandas==1.3.5
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
+    #   saltise-course-flow
 parso==0.6.2
     # via jedi
 pathspec==0.8.1
@@ -529,8 +571,12 @@ preshed==3.0.5
     #   -r requirements/requirements-test.txt
     #   spacy
     #   thinc
-prompt-toolkit==3.0.3
-    # via ipython
+prompt-toolkit==3.0.24
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   click-repl
+    #   ipython
 ptyprocess==0.6.0
     # via pexpect
 publicsuffixlist==0.6.12
@@ -604,6 +650,8 @@ pytest==5.3.5
     #   pytest-django
     #   pytest-mock
     #   pytest-rerunfailures
+pytest-celery==0.0.0
+    # via -r requirements/requirements-test.txt
 pytest-cov==2.8.1
     # via
     #   -r requirements/requirements-dev.in
@@ -638,7 +686,7 @@ python-memcached==1.59
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
-pytz==2020.1
+pytz==2021.3
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -698,7 +746,7 @@ sacremoses==0.0.45
     #   transformers
 safety==1.10.3
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.5.1
+saltise-course-flow==0.6.2
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -721,6 +769,7 @@ six==1.15.0
     #   automat
     #   bandit
     #   bleach
+    #   click-repl
     #   django-appconf
     #   django-classy-tags
     #   django-compressor
@@ -749,12 +798,17 @@ soupsieve==2.0
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   beautifulsoup4
-spacy==3.1.0
+spacy==3.2.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   contextualspellcheck
 spacy-legacy==3.0.8
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   spacy
+spacy-loggers==1.0.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -780,7 +834,7 @@ text-unidecode==1.2
     # via
     #   -r requirements/requirements-test.txt
     #   faker
-thinc==8.0.7
+thinc==8.0.13
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -825,7 +879,7 @@ txaio==21.2.1
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   autobahn
-typer==0.3.2
+typer==0.4.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -844,12 +898,13 @@ urllib3==1.25.10
     #   -r requirements/requirements-test.txt
     #   elasticsearch
     #   requests
-vine==1.3.0
+vine==5.0.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   amqp
     #   celery
+    #   kombu
 virtualenv==20.4.7
     # via pre-commit
 wasabi==0.8.2
@@ -857,9 +912,11 @@ wasabi==0.8.2
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   spacy
+    #   spacy-loggers
     #   thinc
-wcwidth==0.1.8
+wcwidth==0.2.5
     # via
+    #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   prompt-toolkit
     #   pytest
