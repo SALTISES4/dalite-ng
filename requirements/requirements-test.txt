@@ -148,7 +148,7 @@ daphne==3.0.1
     #   channels
 ddt==1.2.2
     # via -r requirements/requirements-test.in
-django==2.2.25
+django==2.2.27
     # via
     #   -r requirements/requirements-base.txt
     #   channels
@@ -513,7 +513,7 @@ sacremoses==0.0.45
     # via
     #   -r requirements/requirements-base.txt
     #   transformers
-saltise-course-flow==0.6.3
+saltise-course-flow==0.6.4
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==0.1.2
     # via
@@ -622,7 +622,7 @@ typing-extensions==3.10.0.0
     #   huggingface-hub
     #   pydantic
     #   torch
-urllib3==1.25.10
+urllib3==1.25.11
     # via
     #   -r requirements/requirements-base.txt
     #   elasticsearch

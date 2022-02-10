@@ -210,7 +210,7 @@ decorator==4.4.2
     #   traitlets
 distlib==0.3.2
     # via virtualenv
-django==2.2.25
+django==2.2.27
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -746,7 +746,7 @@ sacremoses==0.0.45
     #   transformers
 safety==1.10.3
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.6.3
+saltise-course-flow==0.6.4
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -892,7 +892,7 @@ typing-extensions==3.10.0.0
     #   huggingface-hub
     #   pydantic
     #   torch
-urllib3==1.25.10
+urllib3==1.25.11
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
