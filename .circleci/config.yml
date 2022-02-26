@@ -39,12 +39,12 @@ jobs:
             python -m spacy download en_core_web_sm
             npm install
             ./node_modules/gulp/bin/gulp.js build
-      - run:
-          name: Safety
-          command: |
-            . .venv/bin/activate
-            pip install safety
-            safety check --ignore=43313
+#      - run:
+#          name: Safety
+#          command: |
+#            . .venv/bin/activate
+#            pip install safety
+#            safety check --ignore=43313
       - run:
           name: Setup local_settings.py
           command: |
