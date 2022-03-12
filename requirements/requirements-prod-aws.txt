@@ -26,6 +26,7 @@ asgiref==3.2.10
     #   channels
     #   channels-redis
     #   daphne
+    #   saltise-course-flow
 async-timeout==3.0.1
     # via
     #   -r requirements/requirements-base.txt
@@ -97,8 +98,11 @@ channels==3.0.3
     # via
     #   -r requirements/requirements-base.txt
     #   channels-redis
+    #   saltise-course-flow
 channels-redis==3.2.0
-    # via -r requirements/requirements-base.txt
+    # via
+    #   -r requirements/requirements-base.txt
+    #   saltise-course-flow
 chardet==3.0.4
     # via
     #   -r requirements/requirements-base.txt
@@ -166,6 +170,7 @@ django==2.2.27
     #   django-lti-tool-provider
     #   django-model-utils
     #   django-permissions-policy
+    #   django-redis
     #   django-referrer-policy
     #   django-ses
     #   django-storages
@@ -221,6 +226,10 @@ django-model-utils==4.1.1
     #   saltise-course-flow
 django-permissions-policy==4.1.0
     # via -r requirements/requirements-base.txt
+django-redis==5.2.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   saltise-course-flow
 django-referrer-policy==1.0
     # via -r requirements/requirements-base.txt
 django-samesite-none==0.0.2
@@ -476,6 +485,7 @@ redis==3.4.1
     # via
     #   -r requirements/requirements-base.txt
     #   celery
+    #   django-redis
 regex==2021.7.6
     # via
     #   -r requirements/requirements-base.txt
@@ -502,7 +512,7 @@ sacremoses==0.0.45
     # via
     #   -r requirements/requirements-base.txt
     #   transformers
-saltise-course-flow==0.6.4
+saltise-course-flow==0.7.0
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==0.1.2
     # via
@@ -638,6 +648,10 @@ webencodings==0.5.1
     #   -r requirements/requirements-base.txt
     #   bleach
     #   html5lib
+xlrd==2.0.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   saltise-course-flow
 zope.interface==5.1.0
     # via
     #   -r requirements/requirements-base.txt

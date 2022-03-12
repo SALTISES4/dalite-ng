@@ -43,6 +43,7 @@ asgiref==3.2.10
     #   channels
     #   channels-redis
     #   daphne
+    #   saltise-course-flow
 async-timeout==3.0.1
     # via
     #   -r requirements/requirements-base.txt
@@ -129,10 +130,12 @@ channels==3.0.3
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   channels-redis
+    #   saltise-course-flow
 channels-redis==3.2.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
+    #   saltise-course-flow
 chardet==3.0.4
     # via
     #   -r requirements/requirements-base.txt
@@ -227,6 +230,7 @@ django==2.2.27
     #   django-lti-tool-provider
     #   django-model-utils
     #   django-permissions-policy
+    #   django-redis
     #   django-referrer-policy
     #   django-sslserver
     #   django-timezone-field
@@ -307,6 +311,11 @@ django-permissions-policy==4.1.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
+django-redis==5.2.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   saltise-course-flow
 django-referrer-policy==1.0
     # via
     #   -r requirements/requirements-base.txt
@@ -712,6 +721,7 @@ redis==3.4.1
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   celery
+    #   django-redis
 regex==2021.7.6
     # via
     #   -r requirements/requirements-base.txt
@@ -746,7 +756,7 @@ sacremoses==0.0.45
     #   transformers
 safety==1.10.3
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.6.4
+saltise-course-flow==0.7.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -926,6 +936,11 @@ webencodings==0.5.1
     #   -r requirements/requirements-test.txt
     #   bleach
     #   html5lib
+xlrd==2.0.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   saltise-course-flow
 zope.interface==5.1.0
     # via
     #   -r requirements/requirements-base.txt
