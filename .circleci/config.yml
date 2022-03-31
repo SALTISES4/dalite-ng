@@ -77,7 +77,7 @@ jobs:
           path: /home/circleci/repo/static
       - aws-s3/sync:
           from: /home/circleci/repo/static
-          to: 's3://staging-mydalite-static'
+          to: 's3://staging-courseflow-static'
       - run:
           name: Tests
           command: |
