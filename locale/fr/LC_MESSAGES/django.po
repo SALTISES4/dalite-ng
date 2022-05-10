@@ -5009,7 +5009,7 @@ msgstr "Hourra!"
 
 #: peerinst/templates/registration/sign_up_done.html:8
 msgid "Processing Request"
-msgstr "Votre demande à été reçu."
+msgstr "Votre demande a été reçue"
 
 #: peerinst/templates/registration/sign_up_done.html:16
 msgid ""
