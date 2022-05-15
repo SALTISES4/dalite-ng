@@ -32,7 +32,7 @@ pytz
 requests
 urllib3 > 1.25.8  # Reqd by safety
 
-SALTISE_course_flow == 0.6.5
+SALTISE_course_flow < 0.7
 SALTISE_user_feedback > 0.1.1
 
 -e git+https://github.com/SALTISES4/django-lti-tool-provider@dev#egg=django_lti_tool_provider

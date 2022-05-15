@@ -63,12 +63,12 @@ blis==0.7.4
     #   -r requirements/requirements-base.txt
     #   spacy
     #   thinc
-boto3==1.12.11
+boto3==1.23.0
     # via
     #   -r requirements/requirements-prod-aws.in
     #   django-ses
     #   watchtower
-botocore==1.15.11
+botocore==1.26.0
     # via
     #   boto3
     #   s3transfer
@@ -99,7 +99,7 @@ channels==3.0.3
     #   channels-redis
 channels-redis==3.2.0
     # via -r requirements/requirements-base.txt
-chardet==3.0.4
+charset-normalizer==2.0.12
     # via
     #   -r requirements/requirements-base.txt
     #   requests
@@ -238,8 +238,6 @@ djangorestframework==3.12.2
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
     #   saltise-user-feedback
-docutils==0.15.2
-    # via botocore
 editdistance==0.5.3
     # via
     #   -r requirements/requirements-base.txt
@@ -299,7 +297,7 @@ idna==2.10
     #   hyperlink
     #   requests
     #   twisted
-incremental==17.5.0
+incremental==21.3.0
     # via
     #   -r requirements/requirements-base.txt
     #   twisted
@@ -417,10 +415,6 @@ pydantic==1.8.2
     #   -r requirements/requirements-base.txt
     #   spacy
     #   thinc
-pyhamcrest==2.0.2
-    # via
-    #   -r requirements/requirements-base.txt
-    #   twisted
 pyjwt==1.7.1
     # via -r requirements/requirements-base.txt
 pymongo==3.10.1
@@ -481,7 +475,7 @@ regex==2021.7.6
     #   -r requirements/requirements-base.txt
     #   sacremoses
     #   transformers
-requests==2.23.0
+requests==2.27.1
     # via
     #   -r requirements/requirements-base.txt
     #   huggingface-hub
@@ -496,13 +490,13 @@ rjsmin==1.1.0
     # via
     #   -r requirements/requirements-base.txt
     #   django-compressor
-s3transfer==0.3.3
+s3transfer==0.5.2
     # via boto3
 sacremoses==0.0.45
     # via
     #   -r requirements/requirements-base.txt
     #   transformers
-saltise_course_flow==0.6.5
+saltise-course-flow==0.6.6
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==0.1.2
     # via
@@ -589,7 +583,7 @@ transformers==4.8.2
     # via
     #   -r requirements/requirements-base.txt
     #   contextualspellcheck
-twisted[tls]==20.3.0
+twisted[tls]==22.4.0
     # via
     #   -r requirements/requirements-base.txt
     #   daphne
@@ -602,13 +596,14 @@ typer==0.4.0
     #   -r requirements/requirements-base.txt
     #   pathy
     #   spacy
-typing-extensions==3.10.0.0
+typing-extensions==4.2.0
     # via
     #   -r requirements/requirements-base.txt
     #   huggingface-hub
     #   pydantic
     #   torch
-urllib3==1.25.11
+    #   twisted
+urllib3==1.26.9
     # via
     #   -r requirements/requirements-base.txt
     #   botocore
@@ -638,7 +633,7 @@ webencodings==0.5.1
     #   -r requirements/requirements-base.txt
     #   bleach
     #   html5lib
-zope.interface==5.1.0
+zope-interface==5.1.0
     # via
     #   -r requirements/requirements-base.txt
     #   twisted

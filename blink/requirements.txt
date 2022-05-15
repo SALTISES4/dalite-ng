@@ -54,7 +54,7 @@ idna==2.10
     # via
     #   hyperlink
     #   twisted
-incremental==17.5.0
+incremental==21.3.0
     # via twisted
 msgpack==1.0.0
     # via channels-redis
@@ -66,8 +66,6 @@ pyasn1-modules==0.2.8
     # via service-identity
 pycparser==2.20
     # via cffi
-pyhamcrest==2.0.2
-    # via twisted
 pyopenssl==19.1.0
     # via twisted
 pytz==2021.3
@@ -80,11 +78,13 @@ six==1.15.0
     #   pyopenssl
 sqlparse==0.4.2
     # via django
-twisted[tls]==20.3.0
+twisted[tls]==22.4.0
     # via daphne
 txaio==21.2.1
     # via autobahn
-zope.interface==5.1.0
+typing-extensions==4.2.0
+    # via twisted
+zope-interface==5.1.0
     # via twisted
 
 # The following packages are considered to be unsafe in a requirements file:
