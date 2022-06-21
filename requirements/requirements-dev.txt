@@ -136,7 +136,7 @@ channels-redis==3.2.0
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-chardet==3.0.4
+charset-normalizer==2.0.12
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -213,7 +213,7 @@ decorator==4.4.2
     #   traitlets
 distlib==0.3.2
     # via virtualenv
-django==2.2.27
+django==2.2.28
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -426,7 +426,7 @@ idna==2.10
     #   hyperlink
     #   requests
     #   twisted
-incremental==17.5.0
+incremental==21.3.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -509,7 +509,7 @@ mysqlclient==1.4.6
     #   -r requirements/requirements-test.txt
 nodeenv==1.3.5
     # via pre-commit
-numpy==1.18.1
+numpy==1.22.4
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -564,7 +564,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==8.3.2
+pillow==9.1.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -622,11 +622,6 @@ pyflakes==2.1.1
     # via flake8
 pygments==2.5.2
     # via ipython
-pyhamcrest==2.0.2
-    # via
-    #   -r requirements/requirements-base.txt
-    #   -r requirements/requirements-test.txt
-    #   twisted
 pyjwt==1.7.1
     # via
     #   -r requirements/requirements-base.txt
@@ -729,7 +724,7 @@ regex==2021.7.6
     #   black
     #   sacremoses
     #   transformers
-requests==2.23.0
+requests==2.28.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -756,7 +751,7 @@ sacremoses==0.0.45
     #   transformers
 safety==1.10.3
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.7.0
+saltise-course-flow==0.7.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -879,7 +874,7 @@ transformers==4.8.2
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   contextualspellcheck
-twisted[tls]==20.3.0
+twisted[tls]==22.4.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -895,14 +890,15 @@ typer==0.4.0
     #   -r requirements/requirements-test.txt
     #   pathy
     #   spacy
-typing-extensions==3.10.0.0
+typing-extensions==4.2.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   huggingface-hub
     #   pydantic
     #   torch
-urllib3==1.25.11
+    #   twisted
+urllib3==1.26.9
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -941,7 +937,7 @@ xlrd==2.0.1
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-zope.interface==5.1.0
+zope-interface==5.1.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt

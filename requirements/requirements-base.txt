@@ -85,7 +85,7 @@ channels-redis==3.2.0
     # via
     #   -r requirements/../blink/requirements.txt
     #   saltise-course-flow
-chardet==3.0.4
+charset-normalizer==2.0.12
     # via requests
 click==8.0.3
     # via
@@ -124,7 +124,7 @@ daphne==3.0.1
     # via
     #   -r requirements/../blink/requirements.txt
     #   channels
-django==2.2.27
+django==2.2.28
     # via
     #   -r requirements/../blink/requirements.txt
     #   -r requirements/requirements-base.in
@@ -241,7 +241,7 @@ idna==2.10
     #   hyperlink
     #   requests
     #   twisted
-incremental==17.5.0
+incremental==21.3.0
     # via
     #   -r requirements/../blink/requirements.txt
     #   twisted
@@ -274,7 +274,7 @@ murmurhash==1.0.5
     #   thinc
 mysqlclient==1.4.6
     # via -r requirements/requirements-base.in
-numpy==1.18.1
+numpy==1.22.4
     # via
     #   blis
     #   pandas
@@ -303,7 +303,7 @@ pathy==0.6.0
     # via spacy
 pbr==5.4.4
     # via stevedore
-pillow==8.3.2
+pillow==9.1.1
     # via -r requirements/requirements-base.in
 preshed==3.0.5
     # via
@@ -328,10 +328,6 @@ pydantic==1.8.2
     # via
     #   spacy
     #   thinc
-pyhamcrest==2.0.2
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   twisted
 pyjwt==1.7.1
     # via -r requirements/requirements-base.in
 pymongo==3.10.1
@@ -375,7 +371,7 @@ regex==2021.7.6
     # via
     #   sacremoses
     #   transformers
-requests==2.23.0
+requests==2.28.0
     # via
     #   -r requirements/requirements-base.in
     #   huggingface-hub
@@ -388,7 +384,7 @@ rjsmin==1.1.0
     # via django-compressor
 sacremoses==0.0.45
     # via transformers
-saltise-course-flow==0.7.0
+saltise-course-flow==0.7.1
     # via -r requirements/requirements-base.in
 saltise-user-feedback==0.1.2
     # via
@@ -451,7 +447,7 @@ tqdm==4.61.2
     #   transformers
 transformers==4.8.2
     # via contextualspellcheck
-twisted[tls]==20.3.0
+twisted[tls]==22.4.0
     # via
     #   -r requirements/../blink/requirements.txt
     #   daphne
@@ -463,12 +459,14 @@ typer==0.4.0
     # via
     #   pathy
     #   spacy
-typing-extensions==3.10.0.0
+typing-extensions==4.2.0
     # via
+    #   -r requirements/../blink/requirements.txt
     #   huggingface-hub
     #   pydantic
     #   torch
-urllib3==1.25.11
+    #   twisted
+urllib3==1.26.9
     # via
     #   -r requirements/requirements-base.in
     #   elasticsearch
@@ -491,7 +489,7 @@ webencodings==0.5.1
     #   html5lib
 xlrd==2.0.1
     # via saltise-course-flow
-zope.interface==5.1.0
+zope-interface==5.1.0
     # via
     #   -r requirements/../blink/requirements.txt
     #   twisted
