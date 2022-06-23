@@ -64,12 +64,12 @@ blis==0.7.4
     #   -r requirements/requirements-base.txt
     #   spacy
     #   thinc
-boto3==1.23.0
+boto3==1.24.13
     # via
     #   -r requirements/requirements-prod-aws.in
     #   django-ses
     #   watchtower
-botocore==1.26.0
+botocore==1.27.13
     # via
     #   boto3
     #   s3transfer
@@ -358,7 +358,7 @@ murmurhash==1.0.5
     #   thinc
 mysqlclient==1.4.6
     # via -r requirements/requirements-base.txt
-numpy==1.22.3
+numpy==1.22.4
     # via
     #   -r requirements/requirements-base.txt
     #   blis
@@ -485,7 +485,7 @@ regex==2021.7.6
     #   -r requirements/requirements-base.txt
     #   sacremoses
     #   transformers
-requests==2.27.1
+requests==2.28.0
     # via
     #   -r requirements/requirements-base.txt
     #   huggingface-hub
@@ -500,7 +500,7 @@ rjsmin==1.1.0
     # via
     #   -r requirements/requirements-base.txt
     #   django-compressor
-s3transfer==0.5.2
+s3transfer==0.6.0
     # via boto3
 sacremoses==0.0.45
     # via
@@ -512,7 +512,7 @@ saltise-user-feedback==0.1.2
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
-sentry-sdk==0.14.2
+sentry-sdk==1.5.8
     # via -r requirements/requirements-prod-aws.in
 service-identity==18.1.0
     # via

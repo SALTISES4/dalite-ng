@@ -274,7 +274,7 @@ murmurhash==1.0.5
     #   thinc
 mysqlclient==1.4.6
     # via -r requirements/requirements-base.in
-numpy==1.22.3
+numpy==1.22.4
     # via
     #   blis
     #   pandas
@@ -371,7 +371,7 @@ regex==2021.7.6
     # via
     #   sacremoses
     #   transformers
-requests==2.27.1
+requests==2.28.0
     # via
     #   -r requirements/requirements-base.in
     #   huggingface-hub

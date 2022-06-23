@@ -36,7 +36,7 @@ INSTALLED_APPS = (
     "peerinst",
     "blink",
     "saltise",
-    # "channels",
+    "channels",
     "REST",
     "django_elasticsearch_dsl",
     "cookielaw",
@@ -282,10 +282,11 @@ CELERY_RESULT_BACKEND = os.environ.get(
 )
 
 # CSP
-CSP_DEFAULT_SRC = ["'self'", "*.mydalite.org"]
+CSP_DEFAULT_SRC = ["'self'", "*.mydalite.org", "*.courseflow.ca",]
 CSP_SCRIPT_SRC = [
     "'self'",
     "*.mydalite.org",
+    "*.courseflow.ca",
     "d3js.org",
     "ajax.googleapis.com",
     "cdn.polyfill.io",
@@ -300,6 +301,7 @@ CSP_SCRIPT_SRC = [
 CSP_STYLE_SRC = [
     "'self'",
     "*.mydalite.org",
+    "*.courseflow.ca",
     "fonts.googleapis.com",
     "ajax.googleapis.com",
     "unpkg.com",
@@ -311,12 +313,14 @@ CSP_STYLE_SRC = [
 CSP_FONT_SRC = [
     "'self'",
     "*.mydalite.org",
+    "*.courseflow.ca",
     "fonts.googleapis.com",
     "fonts.gstatic.com",
     "unpkg.com",
 ]
 CSP_OBJECT_SRC = [
     "*.mydalite.org",
+    "*.courseflow.ca",
     "phet.colorado.edu",
     "*.youtube.com",
     "*.vimeo.com",
