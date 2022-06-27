@@ -282,7 +282,7 @@ CELERY_RESULT_BACKEND = os.environ.get(
 )
 
 # CSP
-CSP_DEFAULT_SRC = ["'self'", "*.mydalite.org", "*.courseflow.ca",]
+CSP_DEFAULT_SRC = ["'self'", "*.mydalite.org", "*.courseflow.ca", "ws:", "wss:"]
 CSP_SCRIPT_SRC = [
     "'self'",
     "*.mydalite.org",
