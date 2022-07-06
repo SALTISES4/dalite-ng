@@ -34,8 +34,6 @@ appdirs==1.4.3
     # via
     #   black
     #   virtualenv
-appnope==0.1.2
-    # via ipython
 asgiref==3.2.10
     # via
     #   -r requirements/requirements-base.txt
@@ -751,7 +749,7 @@ sacremoses==0.0.45
     #   transformers
 safety==1.10.3
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.7.1
+saltise-course-flow==0.7.1.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
