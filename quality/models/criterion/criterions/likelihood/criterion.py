@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import hashlib
 import json
 from functools import reduce
@@ -164,7 +161,7 @@ class LikelihoodCriterionRules(CriterionRules):
     )
 
     def __str__(self):
-        return "Rules {} for criterion likelihood".format(self.pk)
+        return f"Rules {self.pk} for criterion likelihood"
 
     @staticmethod
     def get_or_create(

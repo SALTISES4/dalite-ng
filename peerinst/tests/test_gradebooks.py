@@ -252,7 +252,7 @@ def test_convert_gradebook_to_csv__group():
         "results": [
             {
                 "school_id": None,
-                "email": "test{}@test.com".format(i),
+                "email": f"test{i}@test.com",
                 "assignments": [
                     {"n_completed": j * 10 + i, "grade": j * 10 + i % 10}
                     for j in range(n_assignments)
@@ -266,7 +266,7 @@ def test_convert_gradebook_to_csv__group():
     assert header == (
         "Student Email,"
         + ",".join(
-            "grade - assignment_{},n_completed - assignment_{}".format(i, i)
+            f"grade - assignment_{i},n_completed - assignment_{i}"
             for i in range(n_assignments)
         )
         + "\r\n"
@@ -275,10 +275,9 @@ def test_convert_gradebook_to_csv__group():
         line = next(csv_gen)
         assert (
             line
-            == "test{}@test.com,".format(i)
+            == f"test{i}@test.com,"
             + ",".join(
-                "{},{}".format(j * 10 + i % 10, j * 10 + i)
-                for j in range(n_assignments)
+                f"{j * 10 + i % 10},{j * 10 + i}" for j in range(n_assignments)
             )
             + "\r\n"
         )
@@ -296,7 +295,7 @@ def test_convert_gradebook_to_csv__group__school_id():
         "results": [
             {
                 "school_id": str(i),
-                "email": "test{}@test.com".format(i),
+                "email": f"test{i}@test.com",
                 "assignments": [
                     {"n_completed": j * 10 + i, "grade": j * 10 + i % 10}
                     for j in range(n_assignments)
@@ -310,7 +309,7 @@ def test_convert_gradebook_to_csv__group__school_id():
     assert header == (
         "Student ID,Student Email,"
         + ",".join(
-            "grade - assignment_{},n_completed - assignment_{}".format(i, i)
+            f"grade - assignment_{i},n_completed - assignment_{i}"
             for i in range(n_assignments)
         )
         + "\r\n"
@@ -319,10 +318,9 @@ def test_convert_gradebook_to_csv__group__school_id():
         line = next(csv_gen)
         assert (
             line
-            == "{},test{}@test.com,".format(i, i)
+            == f"{i},test{i}@test.com,"
             + ",".join(
-                "{},{}".format(j * 10 + i % 10, j * 10 + i)
-                for j in range(n_assignments)
+                f"{j * 10 + i % 10},{j * 10 + i}" for j in range(n_assignments)
             )
             + "\r\n"
         )
@@ -341,7 +339,7 @@ def test_convert_gradebook_to_csv__assignment():
         "results": [
             {
                 "school_id": None,
-                "email": "test{}@test.com".format(i),
+                "email": f"test{i}@test.com",
                 "questions": [j % 2 for j in range(n_assignments)],
             }
             for i in range(n_students)
@@ -351,14 +349,14 @@ def test_convert_gradebook_to_csv__assignment():
     header = next(csv_gen)
     assert header == (
         "Student Email,"
-        + ",".join("question_{}".format(i, i) for i in range(n_assignments))
+        + ",".join(f"question_{i}" for i in range(n_assignments))
         + "\r\n"
     )
     for i in range(n_students):
         line = next(csv_gen)
         assert (
             line
-            == "test{}@test.com,".format(i)
+            == f"test{i}@test.com,"
             + ",".join(str(j % 2) for j in range(n_assignments))
             + "\r\n"
         )
@@ -377,7 +375,7 @@ def test_convert_gradebook_to_csv__assignment__school_id():
         "results": [
             {
                 "school_id": str(i),
-                "email": "test{}@test.com".format(i),
+                "email": f"test{i}@test.com",
                 "questions": [j % 2 for j in range(n_assignments)],
             }
             for i in range(n_students)
@@ -387,14 +385,14 @@ def test_convert_gradebook_to_csv__assignment__school_id():
     header = next(csv_gen)
     assert header == (
         "Student ID,Student Email,"
-        + ",".join("question_{}".format(i, i) for i in range(n_assignments))
+        + ",".join(f"question_{i}" for i in range(n_assignments))
         + "\r\n"
     )
     for i in range(n_students):
         line = next(csv_gen)
         assert (
             line
-            == "{},test{}@test.com,".format(i, i)
+            == f"{i},test{i}@test.com,"
             + ",".join(str(j % 2) for j in range(n_assignments))
             + "\r\n"
         )

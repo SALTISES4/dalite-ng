@@ -257,10 +257,10 @@ def test_student_progress__no_questions_done(
 ):
     progress = student_group_assignment.student_progress
 
-    assert not set(map(itemgetter("question_title"), progress)) - set(
-        (q.title for q in questions)
-    )
-    assert not set((q.title for q in questions)) - set(
+    assert not set(map(itemgetter("question_title"), progress)) - {
+        q.title for q in questions
+    }
+    assert not {q.title for q in questions} - set(
         map(itemgetter("question_title"), progress)
     )
 
@@ -299,10 +299,10 @@ def test_student_progress__some_first_answers_done(
 
     progress = student_group_assignment.student_progress
 
-    assert not set(map(itemgetter("question_title"), progress)) - set(
-        (q.title for q in questions)
-    )
-    assert not set((q.title for q in questions)) - set(
+    assert not set(map(itemgetter("question_title"), progress)) - {
+        q.title for q in questions
+    }
+    assert not {q.title for q in questions} - set(
         map(itemgetter("question_title"), progress)
     )
 
@@ -339,10 +339,10 @@ def test_student_progress__all_first_answers_done(
 
     progress = student_group_assignment.student_progress
 
-    assert not set(map(itemgetter("question_title"), progress)) - set(
-        (q.title for q in questions)
-    )
-    assert not set((q.title for q in questions)) - set(
+    assert not set(map(itemgetter("question_title"), progress)) - {
+        q.title for q in questions
+    }
+    assert not {q.title for q in questions} - set(
         map(itemgetter("question_title"), progress)
     )
 
@@ -419,10 +419,10 @@ def test_student_progress__some_second_answers_done(
 
     progress = student_group_assignment.student_progress
 
-    assert not set(map(itemgetter("question_title"), progress)) - set(
-        (q.title for q in questions)
-    )
-    assert not set((q.title for q in questions)) - set(
+    assert not set(map(itemgetter("question_title"), progress)) - {
+        q.title for q in questions
+    }
+    assert not {q.title for q in questions} - set(
         map(itemgetter("question_title"), progress)
     )
 
@@ -466,10 +466,10 @@ def test_student_progress__all_second_answers_done(
 
     progress = student_group_assignment.student_progress
 
-    assert not set(map(itemgetter("question_title"), progress)) - set(
-        (q.title for q in questions)
-    )
-    assert not set((q.title for q in questions)) - set(
+    assert not set(map(itemgetter("question_title"), progress)) - {
+        q.title for q in questions
+    }
+    assert not {q.title for q in questions} - set(
         map(itemgetter("question_title"), progress)
     )
 
@@ -490,10 +490,10 @@ def test_student_progress__all_answers_correct_no_questions_all_answers_correct_
 ):
     progress = student_group_assignment_all_answers_correct.student_progress
 
-    assert not set(map(itemgetter("question_title"), progress)) - set(
-        (q.title for q in questions_all_answers_correct)
-    )
-    assert not set((q.title for q in questions_all_answers_correct)) - set(
+    assert not set(map(itemgetter("question_title"), progress)) - {
+        q.title for q in questions_all_answers_correct
+    }
+    assert not {q.title for q in questions_all_answers_correct} - set(
         map(itemgetter("question_title"), progress)
     )
 
@@ -541,10 +541,10 @@ def test_student_progress__all_answers_correct_some_first_answers_done(
 
     progress = student_group_assignment_all_answers_correct.student_progress
 
-    assert not set(map(itemgetter("question_title"), progress)) - set(
-        (q.title for q in questions_all_answers_correct)
-    )
-    assert not set((q.title for q in questions_all_answers_correct)) - set(
+    assert not set(map(itemgetter("question_title"), progress)) - {
+        q.title for q in questions_all_answers_correct
+    }
+    assert not {q.title for q in questions_all_answers_correct} - set(
         map(itemgetter("question_title"), progress)
     )
 
@@ -591,10 +591,10 @@ def test_student_progress__all_answers_correct_all_first_answers_done(
 
     progress = student_group_assignment_all_answers_correct.student_progress
 
-    assert not set(map(itemgetter("question_title"), progress)) - set(
-        (q.title for q in questions_all_answers_correct)
-    )
-    assert not set((q.title for q in questions_all_answers_correct)) - set(
+    assert not set(map(itemgetter("question_title"), progress)) - {
+        q.title for q in questions_all_answers_correct
+    }
+    assert not {q.title for q in questions_all_answers_correct} - set(
         map(itemgetter("question_title"), progress)
     )
 
@@ -680,10 +680,10 @@ def test_student_progress__all_answers_correct_some_second_answers_done(
 
     progress = student_group_assignment_all_answers_correct.student_progress
 
-    assert not set(map(itemgetter("question_title"), progress)) - set(
-        (q.title for q in questions_all_answers_correct)
-    )
-    assert not set((q.title for q in questions_all_answers_correct)) - set(
+    assert not set(map(itemgetter("question_title"), progress)) - {
+        q.title for q in questions_all_answers_correct
+    }
+    assert not {q.title for q in questions_all_answers_correct} - set(
         map(itemgetter("question_title"), progress)
     )
 
@@ -741,10 +741,10 @@ def test_student_progress__all_answers_correct_all_second_answers_done(
 
     progress = student_group_assignment_all_answers_correct.student_progress
 
-    assert not set(map(itemgetter("question_title"), progress)) - set(
-        (q.title for q in questions_all_answers_correct)
-    )
-    assert not set((q.title for q in questions_all_answers_correct)) - set(
+    assert not set(map(itemgetter("question_title"), progress)) - {
+        q.title for q in questions_all_answers_correct
+    }
+    assert not {q.title for q in questions_all_answers_correct} - set(
         map(itemgetter("question_title"), progress)
     )
 

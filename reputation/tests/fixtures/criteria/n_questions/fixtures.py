@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import pytest
 
 from reputation.models import NQuestionsCriterion, ReputationType

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.http import HttpResponse, JsonResponse
 from django.utils.translation import ugettext_lazy as _
 
@@ -26,9 +23,7 @@ def teacher_reputation(req):
         return response_400(
             req,
             msg=_("This teacher doesn't exist."),
-            logger_msg=(
-                "Tried to obtain teacher with pk {}".format(teacher_id)
-            ),
+            logger_msg=(f"Tried to obtain teacher with pk {teacher_id}"),
             log=logger.warning,
         )
 

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models
 
 from reputation.logger import logger
@@ -41,17 +38,15 @@ class NAnswersCriterion(Criterion):
         TypeError
             If `instance` isn't of type Question or Student
         """
-        super(NAnswersCriterion, self).evaluate(instance)
+        super().evaluate(instance)
         if instance.__class__.__name__ == "Question":
             return instance.answer_set.count(), {}
         elif instance.__class__.__name__ == "Student":
             return instance.answers.count(), {}
         else:
             msg = "`question` has to be of type Question."
-            logger.error("TypeError: {}".format(msg))
+            logger.error(f"TypeError: {msg}")
             raise TypeError(msg)
 
     def info(self):
-        return super(NAnswersCriterion, self).info(
-            NAnswersCriterion.general_info()
-        )
+        return super().info(NAnswersCriterion.general_info())

@@ -38,4 +38,4 @@ class Command(BaseCommand):
             )
 
         LOGGER.info("Completed populating datetime_start for Answer objects")
-        LOGGER.info("Took {:.2f} seconds".format(time.time() - start))
+        LOGGER.info(f"Took {time.time() - start:.2f} seconds")

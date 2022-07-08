@@ -18,7 +18,7 @@ class BlinkQuestion(models.Model):
     def save(self, *args, **kwargs):
         self.question.second_answer_needed = False
         self.question.save()
-        super(BlinkQuestion, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class BlinkRound(models.Model):
@@ -47,7 +47,7 @@ class BlinkAssignment(models.Model):
         return "{} < {} >".format(
             self.title,
             " ; ".join(
-                "rank {} - {}".format(q.rank, q.blinkquestion.question.title)
+                f"rank {q.rank} - {q.blinkquestion.question.title}"
                 for q in self.blinkassignmentquestion_set.all()
             ),
         )

@@ -112,7 +112,7 @@ class ReviewAnswerForm(forms.Form):
                 for id_, rationale in rationales
             ]
 
-            field_name = "{}_{}".format(self.RATIONALE_CHOICE, i)
+            field_name = f"{self.RATIONALE_CHOICE}_{i}"
             self.fields[field_name] = forms.ChoiceField(
                 label="",
                 required=False,
@@ -210,7 +210,7 @@ class AssignmentCreateForm(forms.ModelForm):
 
 class AssignmentMultiselectForm(forms.Form):
     def __init__(self, user=None, question=None, *args, **kwargs):
-        super(AssignmentMultiselectForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if user:
             # Remove assignments with question and assignments with student
             # answers

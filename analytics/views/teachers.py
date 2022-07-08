@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import logging
 
 from django.http import HttpResponse, JsonResponse
@@ -69,7 +66,7 @@ def get_teacher_information(req):
         return response_400(
             req,
             msg=translate("There is no teacher with that id"),
-            logger_msg=("Teacher with pk {} couldn't be found.".format(id_)),
+            logger_msg=(f"Teacher with pk {id_} couldn't be found."),
             log=logger.warning,
         )
 

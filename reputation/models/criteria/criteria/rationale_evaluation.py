@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models
 
 from reputation.logger import logger
@@ -43,7 +40,7 @@ class RationaleEvaluationCriterion(Criterion):
         TypeError
             If `instance` isn't of type Teacher
         """
-        super(RationaleEvaluationCriterion, self).evaluate(teacher)
+        super().evaluate(teacher)
         if teacher.__class__.__name__ == "Teacher":
             return (
                 teacher.user.answerannotation_set.filter(
@@ -53,10 +50,8 @@ class RationaleEvaluationCriterion(Criterion):
             )
         else:
             msg = "`question` has to be of type Teacher."
-            logger.error("TypeError: {}".format(msg))
+            logger.error(f"TypeError: {msg}")
             raise TypeError(msg)
 
     def info(self):
-        return super(RationaleEvaluationCriterion, self).info(
-            RationaleEvaluationCriterion.general_info()
-        )
+        return super().info(RationaleEvaluationCriterion.general_info())

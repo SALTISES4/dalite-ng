@@ -1,6 +1,6 @@
 import json
+from unittest import mock
 
-import mock
 from django.urls import reverse
 
 from peerinst.tests.fixtures import *  # noqa

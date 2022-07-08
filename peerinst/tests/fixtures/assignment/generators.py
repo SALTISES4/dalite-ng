@@ -14,8 +14,8 @@ def new_assignments(n, questions, min_questions=1):
         while True:
             i += 1
             yield {
-                "identifier": "assignment{}".format(i),
-                "title": "assignment{}".format(i),
+                "identifier": f"assignment{i}",
+                "title": f"assignment{i}",
                 "questions": random.sample(
                     questions, k=random.randint(min_questions, len(questions))
                 ),

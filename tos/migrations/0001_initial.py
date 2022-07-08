@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-
-
-from django.db import migrations, models
-from django.conf import settings
 import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -139,9 +136,9 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name="tos",
-            unique_together=set([("role", "hash"), ("role", "version")]),
+            unique_together={("role", "hash"), ("role", "version")},
         ),
         migrations.AlterUniqueTogether(
-            name="emailtype", unique_together=set([("role", "type")]),
+            name="emailtype", unique_together={("role", "type")},
         ),
     ]

@@ -1,6 +1,6 @@
 import json
+from unittest import mock
 
-import mock
 from django.urls import reverse
 
 from peerinst.models import RunningTask
@@ -13,7 +13,7 @@ def test_get_tasks(client, teacher):
 
     for i in range(1, 11):
         RunningTask.objects.create(
-            id=i, description="test{}".format(i), teacher=teacher
+            id=i, description=f"test{i}", teacher=teacher
         )
 
     with mock.patch("peerinst.views.teacher.AsyncResult") as AsyncResult:
@@ -27,5 +27,5 @@ def test_get_tasks(client, teacher):
     data = json.loads(resp.content.decode())
     for task, i in zip(data["tasks"], reversed(list(range(1, 11)))):
         assert task["id"] == str(i)
-        assert task["description"] == "test{}".format(i)
+        assert task["description"] == f"test{i}"
         assert task["completed"] == (i % 2 == 0)

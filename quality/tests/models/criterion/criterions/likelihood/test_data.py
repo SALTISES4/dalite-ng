@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from quality.models.criterion.criterions.likelihood.data import read_data
 
 
@@ -19,8 +16,8 @@ def test_read_data__english():
     assert 2 in data["n_grams"]
     assert 3 in data["n_grams"]
     assert len(data["n_grams"][1]) == 26
-    assert len(data["n_grams"][2]) == 26 ** 2
-    assert len(data["n_grams"][3]) == 26 ** 3
+    assert len(data["n_grams"][2]) == 26**2
+    assert len(data["n_grams"][3]) == 26**3
     assert abs(1 - sum(data["n_grams"][1].values())) < 1e-5
     assert abs(1 - sum(data["n_grams"][2].values())) < 1e-5
     assert abs(1 - sum(data["n_grams"][3].values())) < 1e-5
@@ -42,8 +39,8 @@ def test_read_data__french():
     assert 2 in data["n_grams"]
     assert 3 in data["n_grams"]
     assert len(data["n_grams"][1]) == 42
-    assert len(data["n_grams"][2]) == 42 ** 2
-    assert len(data["n_grams"][3]) == 42 ** 3
+    assert len(data["n_grams"][2]) == 42**2
+    assert len(data["n_grams"][3]) == 42**3
     assert abs(1 - sum(data["n_grams"][1].values())) < 1e-5
     assert abs(1 - sum(data["n_grams"][2].values())) < 1e-5
     assert abs(1 - sum(data["n_grams"][3].values())) < 1e-5

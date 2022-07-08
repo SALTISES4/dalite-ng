@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
@@ -17,7 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import UpdateView
 
-from ..mixins import student_check, LoginRequiredMixin, NoStudentsMixin
+from ..mixins import LoginRequiredMixin, NoStudentsMixin, student_check
 from ..models import (
     Answer,
     AnswerAnnotation,
@@ -85,14 +82,12 @@ def get_question_annotation_counts(discipline_title, annotator, assignment_id):
         elif q in flagged_questions:
             d1["flag_color_code"] = "goldenrod"
             d1["flagged_reasons"] = "; ".join(
-                (
-                    [
-                        " - ".join(e)
-                        for e in QuestionFlag.objects.filter(
-                            flag=True, question=q
-                        ).values_list("user__username", "flag_reason__title")
-                    ]
-                )
+                [
+                    " - ".join(e)
+                    for e in QuestionFlag.objects.filter(
+                        flag=True, question=q
+                    ).values_list("user__username", "flag_reason__title")
+                ]
             )
         else:
             d1["flag_color_code"] = None
@@ -183,7 +178,8 @@ def research_question_answer_list(
     )
     for a in answer_qs:
         annotation, created = AnswerAnnotation.objects.get_or_create(
-            answer=a, annotator=annotator,
+            answer=a,
+            annotator=annotator,
         )
 
     # only need two expert scores per rationale,
@@ -380,9 +376,7 @@ class AnswerExpertUpdateView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
     template_name = "peerinst/research/answer-expert-update.html"
 
     def get_context_data(self, **kwargs):
-        context = super(AnswerExpertUpdateView, self).get_context_data(
-            **kwargs
-        )
+        context = super().get_context_data(**kwargs)
         context["teacher"] = self.request.user.teacher
         context["question"] = Question.objects.get(pk=self.object.question_id)
         return context

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import json
 import logging
 
@@ -48,9 +45,7 @@ def evaluate_rationale(req):
         return response_400(
             req,
             msg=_("Some of the parameters were wrong."),
-            logger_msg=(
-                "There isn't any answer with key {}.".format(answer_pk)
-            ),
+            logger_msg=(f"There isn't any answer with key {answer_pk}."),
             log=logger.warning,
         )
 
@@ -62,8 +57,6 @@ def evaluate_rationale(req):
         return response_400(
             req,
             msg=_("Some of the parameters were wrong."),
-            logger_msg=(
-                "There isn't any quality with key {}.".format(quality_pk)
-            ),
+            logger_msg=(f"There isn't any quality with key {quality_pk}."),
             log=logger.warning,
         )

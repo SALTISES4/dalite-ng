@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import base64
 import hashlib
 import logging
@@ -135,9 +132,7 @@ def get_student_username_and_password(email, max_username_length=30):
     key = settings.SECRET_KEY
 
     username = hashlib.md5(email.encode()).hexdigest()[:max_username_length]
-    password = hashlib.md5(
-        ("{}:{}".format(username, key)).encode()
-    ).hexdigest()
+    password = hashlib.md5((f"{username}:{key}").encode()).hexdigest()
 
     return username, password
 

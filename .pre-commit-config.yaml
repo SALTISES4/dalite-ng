@@ -1,8 +1,19 @@
+default_language_version:
+  python: python3.8
+
 exclude: "/tinymce/"
+
 fail_fast: false
+
 repos:
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.34.0
+    hooks:
+      - id: pyupgrade
+        args: [--py38-plus]
+
   - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-    rev: v1.2.1
+    rev: v1.2.2
     hooks:
       - id: python-safety-dependencies-check
         name: safety
@@ -18,7 +29,7 @@ repos:
         args: ["--profile", "black"]
 
   - repo: https://github.com/ambv/black
-    rev: 21.6b0
+    rev: 22.6.0
     hooks:
       - id: black
         exclude: "^.*/migrations/.*.py$"

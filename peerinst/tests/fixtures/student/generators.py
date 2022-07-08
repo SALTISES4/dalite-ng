@@ -10,7 +10,7 @@ def new_students(n):
         i = 0
         while True:
             i += 1
-            yield {"email": "test{}@test.com".format(i)}
+            yield {"email": f"test{i}@test.com"}
 
     gen = generator()
     return [next(gen) for _ in range(n)]
@@ -27,7 +27,7 @@ def new_student_assignments(n, group_assignments, students):
     def generator(combinations):
         while True:
             choice = random.choice(list(combinations))
-            combinations = combinations - set([choice])
+            combinations = combinations - {choice}
             add_to_group(choice[0], choice[1].group)
             yield {"student": choice[0], "group_assignment": choice[1]}
 

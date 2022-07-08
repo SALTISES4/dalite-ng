@@ -1,8 +1,29 @@
-from django.http import JsonResponse, HttpResponse
+import collections
+
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core import serializers
-from django.views.generic.edit import CreateView
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Q
 from django.forms import ModelForm
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404
+from django.template.response import TemplateResponse
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.http import require_POST
+from django.views.generic import DeleteView, DetailView, ListView, UpdateView
+from django.views.generic.edit import CreateView
+
+from dalite.views.utils import get_json_params
+from peerinst.admin_views import get_assignment_aggregates
+
+from ..mixins import (
+    LoginRequiredMixin,
+    NoStudentsMixin,
+    TOSAcceptanceRequiredMixin,
+    student_check,
+)
 from ..models import (
     Assignment,
     Collection,
@@ -10,25 +31,7 @@ from ..models import (
     StudentGroupAssignment,
     Teacher,
 )
-from ..mixins import (
-    LoginRequiredMixin,
-    NoStudentsMixin,
-    student_check,
-    TOSAcceptanceRequiredMixin,
-)
-from django.shortcuts import get_object_or_404
-from django.urls import reverse
-from peerinst.admin_views import get_assignment_aggregates
-import collections
-from dalite.views.utils import get_json_params
 from .decorators import teacher_required
-from django.views.decorators.http import require_POST
-from django.core.exceptions import PermissionDenied
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Q
-from django.template.response import TemplateResponse
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.utils.translation import ugettext_lazy as _
 
 
 class CollectionForm(ModelForm):
@@ -45,7 +48,7 @@ class CollectionForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         teacher = kwargs.pop("teacher")
-        super(CollectionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["private"].initial = True
         self.fields["discipline"].queryset = teacher.disciplines.all()
 
@@ -61,14 +64,14 @@ class CollectionCreateView(
         return reverse("collection-update", kwargs={"pk": self.object.pk})
 
     def get_form_kwargs(self):
-        kwargs = super(CollectionCreateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["teacher"] = Teacher.objects.get(user=self.request.user)
         return kwargs
 
     def form_valid(self, form):
         teacher = get_object_or_404(Teacher, user=self.request.user)
         form.instance.owner = teacher
-        return super(CollectionCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class CollectionDetailView(LoginRequiredMixin, NoStudentsMixin, DetailView):
@@ -81,7 +84,7 @@ class CollectionDetailView(LoginRequiredMixin, NoStudentsMixin, DetailView):
             teacher == self.get_object().owner
             or self.get_object().private is False
         ):
-            return super(CollectionDetailView, self).dispatch(*args, **kwargs)
+            return super().dispatch(*args, **kwargs)
         else:
             raise PermissionDenied
 
@@ -178,7 +181,7 @@ class CollectionUpdateView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
     def dispatch(self, *args, **kwargs):
         teacher = get_object_or_404(Teacher, user=self.request.user)
         if teacher == self.get_object().owner or self.request.user.is_staff:
-            return super(CollectionUpdateView, self).dispatch(*args, **kwargs)
+            return super().dispatch(*args, **kwargs)
         else:
             raise PermissionDenied
 
@@ -211,7 +214,7 @@ class CollectionDeleteView(LoginRequiredMixin, NoStudentsMixin, DeleteView):
     def dispatch(self, *args, **kwargs):
         teacher = get_object_or_404(Teacher, user=self.request.user)
         if teacher == self.get_object().owner or self.request.user.is_staff:
-            return super(CollectionDeleteView, self).dispatch(*args, **kwargs)
+            return super().dispatch(*args, **kwargs)
         else:
             raise PermissionDenied
 
@@ -306,9 +309,7 @@ class CollectionDistributeDetailView(
             teacher == self.get_object().owner
             or self.get_object().private is False
         ):
-            return super(CollectionDistributeDetailView, self).dispatch(
-                *args, **kwargs
-            )
+            return super().dispatch(*args, **kwargs)
         else:
             raise PermissionDenied
 

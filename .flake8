@@ -8,3 +8,6 @@ ignore = D100 \  # missing docstring in module
          W503 \  # linebreak before binary operator
          W504 \  # linebreak after binary operator
          F841 \  # local variable 'instances' is assigned to but never used
+per-file-ignores =
+    peerinst/backends.py: E501, E722
+    quality/models/criterion/criterions/likelihood/criterion.py:E741

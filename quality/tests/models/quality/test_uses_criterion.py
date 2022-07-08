@@ -1,4 +1,4 @@
-import mock
+from unittest import mock
 
 from quality.models import UsesCriterion
 from quality.tests.fixtures import *  # noqa

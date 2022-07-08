@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from peerinst.tests.fixtures import *  # noqa
 from quality.models import QualityCache
 from quality.tests.fixtures import *  # noqa

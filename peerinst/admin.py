@@ -476,9 +476,9 @@ class LogEntryAdmin(admin.ModelAdmin):
             link = escape(obj.object_repr)
         else:
             ct = obj.content_type
-            link = '<a href="%s">%s</a>' % (
+            link = '<a href="{}">{}</a>'.format(
                 reverse(
-                    "admin:%s_%s_change" % (ct.app_label, ct.model),
+                    f"admin:{ct.app_label}_{ct.model}_change",
                     args=[obj.object_id],
                 ),
                 escape(obj.object_repr),
@@ -490,16 +490,12 @@ class LogEntryAdmin(admin.ModelAdmin):
     object_link.short_description = "object"
 
     def queryset(self, request):
-        return (
-            super(LogEntryAdmin, self)
-            .queryset(request)
-            .prefetch_related("content_type")
-        )
+        return super().queryset(request).prefetch_related("content_type")
 
 
 class MessageAdmin(admin.ModelAdmin):
     def save_related(self, req, form, *args, **kwargs):
-        super(MessageAdmin, self).save_related(req, form, *args, **kwargs)
+        super().save_related(req, form, *args, **kwargs)
         for_users = [t.type for t in form.instance.for_users.all()]
         if "teacher" in for_users:
             for teacher in Teacher.objects.all():

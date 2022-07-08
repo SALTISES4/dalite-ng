@@ -18,9 +18,7 @@ def logged_in_non_student_required(fct):
             return response_403(
                 req,
                 msg=_("You don't have access to this resource."),
-                logger_msg=(
-                    "Access to {} from student {}.".format(req.path, req.user)
-                ),
+                logger_msg=(f"Access to {req.path} from student {req.user}."),
                 log=logger.warning,
             )
         return fct(req, *args, **kwargs)

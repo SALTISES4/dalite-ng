@@ -13,7 +13,7 @@ class ProbabilityField(models.FloatField):
     }
 
     def to_python(self, val):
-        val = super(ProbabilityField, self).to_python(val)
+        val = super().to_python(val)
         if not 0 <= val <= 1:
             raise exceptions.ValidationError(
                 self.error_messages["invalid"],
@@ -45,7 +45,7 @@ class CommaSepField(models.TextField):
         self.distinct = distinct
         self.separator = separator
         self.allowed = allowed
-        super(CommaSepField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_python(self, val):
         if not val:
@@ -76,12 +76,12 @@ class CommaSepField(models.TextField):
         defaults = kwargs
         if defaults["widget"] == AdminTextareaWidget:
             defaults["widget"] = AdminCommaSepFieldWidget
-        return super(CommaSepField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class AdminCommaSepFieldWidget(AdminTextareaWidget):
     def format_value(self, val):
-        val = super(AdminCommaSepFieldWidget, self).format_value(val)
+        val = super().format_value(val)
         if val is None:
             return ""
         else:

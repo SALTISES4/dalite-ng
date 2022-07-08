@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -95,7 +92,7 @@ class NegWordsCriterionRules(CriterionRules):
     )
 
     def __str__(self):
-        return "Rules {} for criterion neg_words".format(self.pk)
+        return f"Rules {self.pk} for criterion neg_words"
 
     @staticmethod
     def get_or_create(threshold=1, neg_words=[]):

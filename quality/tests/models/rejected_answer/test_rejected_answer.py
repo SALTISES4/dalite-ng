@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from quality.models import RejectedAnswer
 from quality.tests.fixtures import *  # noqa
 

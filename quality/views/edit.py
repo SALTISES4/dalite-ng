@@ -3,18 +3,19 @@ import logging
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_POST, require_safe
+
 from dalite.views.errors import response_400, response_403
 from peerinst.models import StudentGroup, StudentGroupAssignment, Teacher
 
 from ..models import Quality, QualityType, QualityUseType, UsesCriterion
-from .decorators import logged_in_non_student_required
 from ..utils import LazyEncoder
+from .decorators import logged_in_non_student_required
 
 logger = logging.getLogger("quality")
 
@@ -82,8 +83,8 @@ def verify_assignment(req, type_, assignment_pk):
             req,
             msg=_("Some parameters are wrong"),
             logger_msg=(
-                "An access to {} was tried with the wrong ".format(req.path)
-                + "assignment primary key {}.".format(assignment_pk)
+                f"An access to {req.path} was tried with the wrong "
+                + f"assignment primary key {assignment_pk}."
             ),
             log=logger.warning,
         )
@@ -94,9 +95,7 @@ def verify_assignment(req, type_, assignment_pk):
         return response_403(
             req,
             msg=_("You don't have access to this resource."),
-            logger_msg=(
-                "Access to {} from user {}.".format(req.path, req.user.pk)
-            ),
+            logger_msg=(f"Access to {req.path} from user {req.user.pk}."),
             log=logger.warning,
         )
 
@@ -104,9 +103,7 @@ def verify_assignment(req, type_, assignment_pk):
         return response_403(
             req,
             msg=_("You don't have access to this resource."),
-            logger_msg=(
-                "Access to {} from user {}.".format(req.path, req.user.pk)
-            ),
+            logger_msg=(f"Access to {req.path} from user {req.user.pk}."),
             log=logger.warning,
         )
 
@@ -122,7 +119,7 @@ def verify_assignment(req, type_, assignment_pk):
                     "An access to {} was tried with the wrong ".format(
                         req.path
                     )
-                    + "quality use type{}.".format(type_)
+                    + f"quality use type{type_}."
                 ),
                 log=logger.warning,
             )
@@ -164,8 +161,8 @@ def verify_group(req, type_, group_pk):
             req,
             msg=_("Some parameters are wrong"),
             logger_msg=(
-                "An access to {} was tried with the wrong ".format(req.path)
-                + "group primary key {}.".format(group_pk)
+                f"An access to {req.path} was tried with the wrong "
+                + f"group primary key {group_pk}."
             ),
             log=logger.warning,
         )
@@ -176,9 +173,7 @@ def verify_group(req, type_, group_pk):
         return response_403(
             req,
             msg=_("You don't have access to this resource."),
-            logger_msg=(
-                "Access to {} from user {}.".format(req.path, req.user.pk)
-            ),
+            logger_msg=(f"Access to {req.path} from user {req.user.pk}."),
             log=logger.warning,
         )
 
@@ -186,9 +181,7 @@ def verify_group(req, type_, group_pk):
         return response_403(
             req,
             msg=_("You don't have access to this resource."),
-            logger_msg=(
-                "Access to {} from user {}.".format(req.path, req.user.pk)
-            ),
+            logger_msg=(f"Access to {req.path} from user {req.user.pk}."),
             log=logger.warning,
         )
 
@@ -204,7 +197,7 @@ def verify_group(req, type_, group_pk):
                     "An access to {} was tried with the wrong ".format(
                         req.path
                     )
-                    + "quality use type{}.".format(type_)
+                    + f"quality use type{type_}."
                 ),
                 log=logger.warning,
             )
@@ -266,7 +259,7 @@ def verify_teacher(req, type_):
                     "An access to {} was tried with the wrong ".format(
                         req.path
                     )
-                    + "quality use type{}.".format(type_)
+                    + f"quality use type{type_}."
                 ),
                 log=logger.warning,
             )
@@ -305,7 +298,7 @@ def index(req):
             req,
             msg=_("Some parameters are missing"),
             logger_msg=(
-                "An access to {} was tried without a ".format(req.path)
+                f"An access to {req.path} was tried without a "
                 + "primary key in the query string indicating what the "
                 "quality is for."
             ),
@@ -331,7 +324,7 @@ def index(req):
             req,
             msg=_("Some parameters are missing"),
             logger_msg=(
-                "An access to {} was tried without a ".format(req.path)
+                f"An access to {req.path} was tried without a "
                 + "primary key in the query string indicating what the "
                 "quality is for."
             ),
@@ -406,9 +399,7 @@ def add_criterion(req):
         return response_400(
             req,
             msg=_("Some of the parameters were wrong."),
-            logger_msg=(
-                "There isn't any quality with key {}.".format(quality_pk)
-            ),
+            logger_msg=(f"There isn't any quality with key {quality_pk}."),
             log=logger.warning,
         )
 
@@ -418,9 +409,7 @@ def add_criterion(req):
         return response_400(
             req,
             msg=_("Some of the parameters were wrong."),
-            logger_msg=(
-                "There isn't any quality with key {}.".format(quality_pk)
-            ),
+            logger_msg=(f"There isn't any quality with key {quality_pk}."),
             log=logger.warning,
         )
 
@@ -480,9 +469,7 @@ def update_criterion(req):
         return response_400(
             req,
             msg=_("Some of the parameters were wrong."),
-            logger_msg=(
-                "There isn't any quality with key {}.".format(quality_pk)
-            ),
+            logger_msg=(f"There isn't any quality with key {quality_pk}."),
             log=logger.warning,
         )
 
@@ -554,9 +541,7 @@ def remove_criterion(req):
         return response_400(
             req,
             msg=_("Some of the parameters were wrong."),
-            logger_msg=(
-                "There isn't any quality with key {}.".format(quality_pk)
-            ),
+            logger_msg=(f"There isn't any quality with key {quality_pk}."),
             log=logger.warning,
         )
 

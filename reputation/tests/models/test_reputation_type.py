@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
+from unittest import mock
 
-
-import mock
 import pytest
 
 from peerinst.tests.fixtures import *  # noqa
@@ -76,7 +74,7 @@ def test_evaluate(question_reputation):
     for i in range(3):
         UsesCriterion.objects.create(
             reputation_type=question_reputation.reputation_type,
-            name="fake_{}".format(i + 1),
+            name=f"fake_{i + 1}",
             version=1,
         )
 
@@ -105,7 +103,7 @@ def test_evaluate__single_criterion(question_reputation):
     for i in range(3):
         UsesCriterion.objects.create(
             reputation_type=question_reputation.reputation_type,
-            name="fake_{}".format(i + 1),
+            name=f"fake_{i + 1}",
             version=1,
         )
 

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import logging
 from datetime import datetime
 from itertools import chain, islice
@@ -62,15 +59,15 @@ class Command(BaseCommand):
                 progress = progress + float(len(likelihoods)) / n * 100
                 if discipline is None:
                     print(
-                        "{} - ({:>6.2f}%) -".format(datetime.now(), progress)
+                        f"{datetime.now()} - ({progress:>6.2f}%) -"
                         + " Computing likelihood for all answers in "
-                        + "{}...".format(language.language)
+                        + f"{language.language}..."
                     )
                 else:
                     print(
-                        "{} - ({:>6.2f}%) -".format(datetime.now(), progress)
+                        f"{datetime.now()} - ({progress:>6.2f}%) -"
                         + " Computing likelihood for answers in "
-                        + "discipline {} in {}...".format(discipline, language)
+                        + f"discipline {discipline} in {language}..."
                     )
 
 

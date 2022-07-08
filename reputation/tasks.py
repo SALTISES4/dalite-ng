@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from dalite.celery import app
 
 

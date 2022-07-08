@@ -111,7 +111,7 @@ class Student(models.Model):
             Error message if there is any
         """
         if group is None and "group" in mail_type:
-            msg = "A group is needed for the `mail_type` {}.".format(mail_type)
+            msg = f"A group is needed for the `mail_type` {mail_type}."
             logger.error(msg)
             raise ValueError(msg)
 
@@ -404,7 +404,7 @@ class StudentAssignment(models.Model):
         unique_together = ("student", "group_assignment")
 
     def __str__(self):
-        return "{} for {}".format(self.group_assignment, self.student)
+        return f"{self.group_assignment} for {self.student}"
 
     def send_email(self, mail_type, request=None):
         """
@@ -757,7 +757,7 @@ class StudentNotification(models.Model):
     expiration = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return "{} for {}".format(self.notification, self.student)
+        return f"{self.notification} for {self.student}"
 
     @staticmethod
     def create(type_, student, assignment=None, expiration=None):
@@ -788,14 +788,14 @@ class StudentNotification(models.Model):
         except StudentNotificationType.DoesNotExist:
             logger.error(
                 "A notification wasn't created for "
-                + "student {} ".format(student.pk)
-                + "because {} wasn't a valid notification type.".format(type_)
+                + f"student {student.pk} "
+                + f"because {type_} wasn't a valid notification type."
             )
 
         else:
 
             if assignment is None and "assignment" in type_:
-                msg = "An assignment is needed for type {}.".format(type_)
+                msg = f"An assignment is needed for type {type_}."
                 logger.error(msg)
                 raise ValueError(msg)
 

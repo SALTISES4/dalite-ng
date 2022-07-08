@@ -46,7 +46,7 @@ def search(browser, assert_, realistic_questions):
 
     # Favourite a question
     fav_btn = browser.find_element_by_id(
-        "favourite-btn-{}".format(realistic_questions[0].id)
+        f"favourite-btn-{realistic_questions[0].id}"
     )
     ActionChains(browser).move_to_element(fav_btn).click(fav_btn).perform()
 
@@ -71,7 +71,7 @@ def search(browser, assert_, realistic_questions):
     # Check category filter
     category = realistic_questions[0].category.first()
     filter = browser.find_element_by_css_selector(
-        ".mdc-chip[c*='{}']".format(category)
+        f".mdc-chip[c*='{category}']"
     ).click()
     recount = 0
     for card in browser.find_elements_by_class_name("mdc-card"):
@@ -120,7 +120,7 @@ def check_favourites(browser, teacher, question, assignment):
     go_to_account(browser)
     browser.find_element_by_id("assignment-section").click()
     browser.find_element_by_id(
-        "edit-assignment-{}".format(assignment.identifier)
+        f"edit-assignment-{assignment.identifier}"
     ).click()
 
     assert (

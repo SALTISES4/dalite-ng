@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models
 
 from reputation.logger import logger
@@ -104,7 +101,7 @@ class QuestionLikedCriterion(Criterion):
         TypeError
             If `instance` isn't of type Question or Teacher
         """
-        super(QuestionLikedCriterion, self).evaluate(instance)
+        super().evaluate(instance)
         if instance.__class__.__name__ == "Question":
             return self._evaluate_question(instance)
         elif instance.__class__.__name__ == "Teacher":
@@ -126,10 +123,8 @@ class QuestionLikedCriterion(Criterion):
             )
         else:
             msg = "`question` has to be of type Question."
-            logger.error("TypeError: {}".format(msg))
+            logger.error(f"TypeError: {msg}")
             raise TypeError(msg)
 
     def info(self):
-        return super(QuestionLikedCriterion, self).info(
-            QuestionLikedCriterion.general_info()
-        )
+        return super().info(QuestionLikedCriterion.general_info())

@@ -16,7 +16,7 @@ class AnswerMayShowManager(models.Manager):
     def get_queryset(self):
 
         return (
-            super(AnswerMayShowManager, self)
+            super()
             .get_queryset()
             .prefetch_related("answerannotation_set")
             .exclude(answerannotation__score=0)
@@ -272,9 +272,7 @@ class RationaleOnlyManager(models.Manager):
         return self.get(title=title)
 
     def get_queryset(self):
-        return (
-            super(RationaleOnlyManager, self).get_queryset().filter(type="RO")
-        )
+        return super().get_queryset().filter(type="RO")
 
 
 class RationaleOnlyQuestion(Question):
@@ -287,7 +285,7 @@ class RationaleOnlyQuestion(Question):
         # TODO: Remove
         self.question.second_answer_needed = False
         self.question.save()
-        super(RationaleOnlyQuestion, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def start_form_valid(request, view, form):
         rationale = form.cleaned_data["rationale"]
@@ -353,7 +351,7 @@ class AnswerAnnotation(models.Model):
     note = models.CharField(max_length=2000, null=True, blank=True)
 
     def __str__(self):
-        return "{}: {} by {}".format(self.answer, self.score, self.annotator)
+        return f"{self.answer}: {self.score} by {self.annotator}"
 
     class Meta:
         unique_together = ["answer", "annotator"]

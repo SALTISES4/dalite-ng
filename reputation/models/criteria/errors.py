@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 class CriterionDoesNotExistError(Exception):
     def __init__(self, msg="", *args, **kwargs):
         if not msg:

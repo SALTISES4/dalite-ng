@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import json
 
 from peerinst.tests.fixtures import *  # noqa

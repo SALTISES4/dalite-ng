@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import json
 import logging
 from operator import itemgetter
@@ -83,9 +80,7 @@ def validate_rationale(req):
             return response_400(
                 req,
                 msg=_("Some of the parameters were wrong."),
-                logger_msg=(
-                    "There isn't any quality with key {}.".format(quality_pk)
-                ),
+                logger_msg=(f"There isn't any quality with key {quality_pk}."),
                 log=logger.warning,
             )
 

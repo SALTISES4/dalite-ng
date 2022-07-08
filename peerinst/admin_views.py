@@ -31,10 +31,10 @@ from .mixins import (
 from .util import make_percent_function, student_list_from_student_groups
 
 
-class StaffMemberRequiredMixin(object):
+class StaffMemberRequiredMixin:
     @classmethod
     def as_view(cls, **initkwargs):
-        view = super(StaffMemberRequiredMixin, cls).as_view(**initkwargs)
+        view = super().as_view(**initkwargs)
         return staff_member_required(view)
 
 
@@ -573,14 +573,12 @@ class QuestionPreviewViewBase(
             models.Question, pk=self.kwargs["question_id"]
         )
         self.answer_choices = self.question.get_choices()
-        kwargs = super(QuestionPreviewViewBase, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update(answer_choices=self.answer_choices)
         return kwargs
 
     def get_context_data(self, **kwargs):
-        context = super(QuestionPreviewViewBase, self).get_context_data(
-            **kwargs
-        )
+        context = super().get_context_data(**kwargs)
         if self.question.get_frequency(all_rationales=True)["first_choice"]:
             save_allowed = 0 not in list(
                 self.question.get_frequency(all_rationales=True)[
@@ -669,7 +667,7 @@ class QuestionPreviewViewBase(
         messages.add_message(
             self.request, messages.INFO, _("Sample answer saved.")
         )
-        return super(QuestionPreviewViewBase, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse(
@@ -700,7 +698,7 @@ class QuestionExpertRationaleView(QuestionPreviewViewBase):
         """
         add question to form kwargs
         """
-        kwargs = super(QuestionExpertRationaleView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update(question=self.question)
         return kwargs
 
@@ -711,9 +709,7 @@ class QuestionExpertRationaleView(QuestionPreviewViewBase):
         for each correct answerchoice.
         """
 
-        context = super(QuestionExpertRationaleView, self).get_context_data(
-            **kwargs
-        )
+        context = super().get_context_data(**kwargs)
         answerchoice_correct = self.question.answerchoice_set.values_list(
             "correct", flat=True
         )
@@ -785,7 +781,7 @@ class StringListForm(forms.Form):
         forms.Form.__init__(self, initial=initial, *args, **kwargs)
 
     def clean(self):
-        cleaned_data = super(StringListForm, self).clean()
+        cleaned_data = super().clean()
         strings = []
         for s in cleaned_data["strings"].splitlines():
             s = s.strip()
@@ -807,7 +803,7 @@ class StringListView(StaffMemberRequiredMixin, FormView):
         return {"strings": self.initial_strings}
 
     def get_context_data(self, **kwargs):
-        context = super(StringListView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update(
             model_name_plural=self.model_class._meta.verbose_name_plural
         )
@@ -831,7 +827,7 @@ class StringListView(StaffMemberRequiredMixin, FormView):
                 model_name=self.model_class._meta.verbose_name_plural
             ),
         )
-        return super(StringListView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse("admin-index")

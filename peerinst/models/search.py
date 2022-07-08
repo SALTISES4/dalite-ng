@@ -20,7 +20,7 @@ class MetaFeature(models.Model):
         return self.value
 
     def __str__(self):
-        return "{} = {}".format(self.key, self.get_value)
+        return f"{self.key} = {self.get_value}"
 
     class Meta:
         unique_together = (("key", "type", "value"),)
@@ -35,7 +35,7 @@ class MetaSearch(models.Model):
 
     def save(self, *args, **kwargs):
         # Enforce uniqueness on feature key for instance
-        super(MetaSearch, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         meta_search_list = self.content_object.meta_search.exclude(pk=self.pk)
         if self.meta_feature.key in [
             s.meta_feature.key for s in meta_search_list
@@ -45,4 +45,4 @@ class MetaSearch(models.Model):
                     obj.delete()
 
     def __str__(self):
-        return "{}: {}".format(self.content_object, self.meta_feature)
+        return f"{self.content_object}: {self.meta_feature}"

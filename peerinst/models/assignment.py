@@ -213,7 +213,7 @@ class StudentGroupAssignment(models.Model):
         return assignment
 
     def __str__(self):
-        return "{} for {}".format(self.assignment, self.group)
+        return f"{self.assignment} for {self.group}"
 
     def _verify_order(self, order):
         n = len(self.assignment.questions.all())
@@ -268,7 +268,7 @@ class StudentGroupAssignment(models.Model):
         else:
             self.save()
             logger.info(
-                "Student group assignment {}".format(self.pk)
+                f"Student group assignment {self.pk}"
                 + " due date updated to {} from {}.".format(
                     self.due_date, prev_due_date
                 )
@@ -295,7 +295,7 @@ class StudentGroupAssignment(models.Model):
             self.order = order
             self.save()
             logger.info(
-                "Student group assignment {}".format(self.pk)
+                f"Student group assignment {self.pk}"
                 + " order updated to {} from {}.".format(
                     self.order, prev_order
                 )
@@ -449,7 +449,7 @@ class StudentGroupAssignment(models.Model):
                     ),
                 )
             )
-        super(StudentGroupAssignment, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     @property
     def student_progress(self):

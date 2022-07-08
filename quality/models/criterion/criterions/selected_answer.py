@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models
 
 from dalite.models.custom_fields import ProbabilityField
@@ -73,7 +70,7 @@ class SelectedAnswerCriterionRules(CriterionRules):
     )
 
     def __str__(self):
-        return "Rules {} for criterion selected_answer".format(self.pk)
+        return f"Rules {self.pk} for criterion selected_answer"
 
     @staticmethod
     def get_or_create(threshold=1, default_if_never_shown=0):

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from itertools import chain
 
 from django.core.exceptions import ValidationError
@@ -86,7 +83,7 @@ class Criterion(models.Model):
         )
 
     def __str__(self):
-        return "{}: version {}".format(self.name, self.version)
+        return f"{self.name}: version {self.version}"
 
     def evaluate(self, model):
         """
@@ -138,14 +135,14 @@ class Criterion(models.Model):
                     "as `Thresholds` or one more."
                 )
             )
-        super(Criterion, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def info(self, info):
         point_description = " The points are awarded as "
         if not self.thresholds:
             point_description = (
                 point_description
-                + "{} for each of these.".format(self.points_per_threshold[0])
+                + f"{self.points_per_threshold[0]} for each of these."
             )
         else:
             point_description = "{}{}".format(

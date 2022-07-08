@@ -169,7 +169,7 @@ def new_student_assignments(n, group_assignments, students):
     def generator(combinations):
         while True:
             choice = random.choice(list(combinations))
-            combinations = combinations - set([choice])
+            combinations = combinations - {choice}
             yield {"student": choice[0], "group_assignment": choice[1]}
 
     combinations = [

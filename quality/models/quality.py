@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import hashlib
 import json
 import logging
@@ -29,11 +26,7 @@ class Quality(models.Model):
             return "{} for {}: {} and use type {}".format(
                 self.pk,
                 self.quality_type,
-                str(
-                    getattr(
-                        self, "{}_set".format(self.quality_type.type)
-                    ).first()
-                ),
+                str(getattr(self, f"{self.quality_type.type}_set").first()),
                 self.quality_use_type,
             )
 
@@ -49,7 +42,7 @@ class Quality(models.Model):
             *(
                 iter(dict(criterion).items())
                 for criterion in self.criterions.all()
-            )
+            ),
         )
 
     def evaluate(self, answer, cache=False):
@@ -256,7 +249,7 @@ class Quality(models.Model):
             criterion = UsesCriterion.objects.get(quality=self, name=name)
         except UsesCriterion.DoesNotExist:
             raise UsesCriterion.DoesNotExist(
-                "There is no criterion with name {}.".format(name)
+                f"There is no criterion with name {name}."
             )
 
         if field in ("version", "weight"):
@@ -333,7 +326,7 @@ class UsesCriterion(models.Model):
         return ((field, value) for field, value in list(data.items()))
 
     def __str__(self):
-        return "{} for quality {}".format(self.name, str(self.quality))
+        return f"{self.name} for quality {str(self.quality)}"
 
 
 class QualityCache(models.Model):

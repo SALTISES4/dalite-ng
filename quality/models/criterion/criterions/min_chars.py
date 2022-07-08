@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models
 
 from quality.models.quality_type import QualityType, QualityUseType
@@ -84,7 +81,7 @@ class MinCharsCriterionRules(CriterionRules):
     )
 
     def __str__(self):
-        return "Rules {} for criterion min_chars".format(self.pk)
+        return f"Rules {self.pk} for criterion min_chars"
 
     @staticmethod
     def get_or_create(threshold=1, min_chars=0):

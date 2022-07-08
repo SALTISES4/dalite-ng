@@ -15,18 +15,18 @@ django-elasticsearch-dsl
 django-grappelli
 django-htmlmin
 django-inlinecss
-django-ipware==2.1.0  # Temporary pin awaiting django-axes fix
+django-ipware == 2.1.0  # Temporary pin awaiting django-axes fix
 django-permissions-policy
 django-referrer-policy
 django-samesite-none
-django<3.0.0
+django < 3.0.0
 djangorestframework>=3.11.2  # Reqd by safety
 lxml >= 4.6.2  # Reqd by safety
 mysqlclient
 packaging
 pandas
-pillow>8.2.0  # Reqd by safety
-pyjwt>=2.4  # Reqd by safety
+pillow > 8.2.0  # Reqd by safety
+pyjwt >= 2.4  # Reqd by safety
 python-memcached==1.59
 pytz
 requests

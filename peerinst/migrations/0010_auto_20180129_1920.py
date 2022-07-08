@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-
-
-from django.db import migrations, models
-import peerinst.models
-from django.conf import settings
 import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
+
+import peerinst.models
 
 
 class Migration(migrations.Migration):

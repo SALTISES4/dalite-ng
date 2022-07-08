@@ -6,7 +6,7 @@ def new_groups(n):
         i = 0
         while True:
             i += 1
-            yield {"name": "group{}".format(i), "title": "group{}".format(i)}
+            yield {"name": f"group{i}", "title": f"group{i}"}
 
     gen = generator()
     return [next(gen) for _ in range(n)]

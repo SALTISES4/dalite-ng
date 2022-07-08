@@ -5,9 +5,10 @@ from quality.tests.fixtures import *  # noqa
 
 
 def test_str(right_answer_rules):
-    assert str(
-        right_answer_rules
-    ) == "Rules {} for criterion right_answer".format(right_answer_rules.pk)
+    assert (
+        str(right_answer_rules)
+        == f"Rules {right_answer_rules.pk} for criterion right_answer"
+    )
 
 
 def test_get_or_create__create():

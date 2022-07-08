@@ -22,7 +22,7 @@ def new_threads(n, forum, teachers, n_messages):
             i += 1
 
             yield {
-                "title": "test{}".format(i),
+                "title": f"test{i}",
                 "author": random.choice(teachers).user,
                 "content": "test",
                 "content_html": "test",

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models
 
 from reputation.logger import logger
@@ -49,12 +46,12 @@ class StudentRationaleEvaluationCriterion(Criterion):
         TypeError
             If `instance` isn't of type Question or Student
         """
-        super(StudentRationaleEvaluationCriterion, self).evaluate(student)
+        super().evaluate(student)
 
         if student.__class__.__name__ == "Student":
             return (
                 sum(
-                    getattr(self, "points_score_{}".format(evaluation.score))
+                    getattr(self, f"points_score_{evaluation.score}")
                     for answer in student.answers.all()
                     for evaluation in answer.answerannotation_set.filter(
                         score__isnull=False
@@ -64,10 +61,8 @@ class StudentRationaleEvaluationCriterion(Criterion):
             )
         else:
             msg = "`question` has to be of type Student."
-            logger.error("TypeError: {}".format(msg))
+            logger.error(f"TypeError: {msg}")
             raise TypeError(msg)
 
     def info(self):
-        return super(StudentRationaleEvaluationCriterion, self).info(
-            StudentRationaleEvaluationCriterion.general_info()
-        )
+        return super().info(StudentRationaleEvaluationCriterion.general_info())

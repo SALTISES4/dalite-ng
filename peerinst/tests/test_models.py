@@ -1,19 +1,17 @@
-# -*- coding: utf-8 -*-
-
 from django.test import TestCase
 
-from . import factories
 from ..models import GradingScheme
+from . import factories
 
 
-class SelectedChoice(object):
+class SelectedChoice:
     CORRECT = 1
     INCORRECT = 2
 
 
 class AnswerModelTestCase(TestCase):
     def setUp(self):
-        super(AnswerModelTestCase, self).setUp()
+        super().setUp()
         # Create question with two choices (correct/incorrect):
         self.question = factories.QuestionFactory(
             choices=2, choices__correct=[1]

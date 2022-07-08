@@ -1,5 +1,5 @@
-from datetime import datetime
 import random
+from datetime import datetime
 
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -383,7 +383,7 @@ class BlinkAssignmentCreate(LoginRequiredMixin, CreateView):
             key = random.randrange(10000000, 99999999)
         form.instance.key = key
         form.instance.teacher = Teacher.objects.get(user=self.request.user)
-        return super(BlinkAssignmentCreate, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         if Teacher.objects.filter(user=self.request.user).exists():
@@ -520,14 +520,10 @@ class BlinkQuestionDetailView(DetailView):
             except Exception:
                 pass
 
-        return super(BlinkQuestionDetailView, self).get(
-            request, *args, **kwargs
-        )
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(BlinkQuestionDetailView, self).get_context_data(
-            **kwargs
-        )
+        context = super().get_context_data(**kwargs)
 
         # Check if user is a Teacher
         if (
@@ -687,17 +683,17 @@ class BlinkQuestionFormView(SingleObjectMixin, FormView):
                     },
                 )
 
-        return super(BlinkQuestionFormView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_form_kwargs(self):
         self.object = self.get_object()
-        kwargs = super(BlinkQuestionFormView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update(answer_choices=self.object.question.get_choices())
         return kwargs
 
     def get_context_data(self, **kwargs):
         self.object = self.get_object()
-        context = super(BlinkQuestionFormView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["object"] = self.object
 
         return context

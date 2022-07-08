@@ -415,7 +415,7 @@ hyperlink==21.0.0
     #   -r requirements/requirements-test.txt
     #   autobahn
     #   twisted
-identify==1.4.11
+identify==2.5.1
     # via pre-commit
 idna==2.10
     # via
@@ -574,7 +574,7 @@ pluggy==0.13.1
     # via
     #   -r requirements/requirements-test.txt
     #   pytest
-pre-commit==2.13.0
+pre-commit==2.19.0
     # via -r requirements/requirements-dev.in
 preshed==3.0.5
     # via

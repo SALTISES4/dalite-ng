@@ -68,6 +68,6 @@ def get_criterion(criterion):
     try:
         return criterions[criterion]
     except KeyError:
-        msg = "There is not criterion with the name {}.".format(criterion)
+        msg = f"There is not criterion with the name {criterion}."
         logger.error(msg)
         raise CriterionDoesNotExistError(msg)

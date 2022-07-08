@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.http import HttpResponse, JsonResponse
 from django.utils.translation import ugettext_lazy as _
 
@@ -38,9 +35,7 @@ def student_reputation(req):
         return response_400(
             req,
             msg=_("This student doesn't exist."),
-            logger_msg=(
-                "Tried to obtain student with pk {}".format(student_id)
-            ),
+            logger_msg=(f"Tried to obtain student with pk {student_id}"),
             log=logger.warning,
         )
 

@@ -58,11 +58,11 @@ def browser(live_server):
 
         print(" > Requesting browser from hub")
         driver = webdriver.Remote(
-            command_executor="http://{}/wd/hub".format(selenium_hub),
+            command_executor=f"http://{selenium_hub}/wd/hub",
             desired_capabilities=DesiredCapabilities.CHROME,
             options=options,
         )
-        print(" > Received browser {}".format(driver))
+        print(f" > Received browser {driver}")
     else:
         if hasattr(settings, "TESTING_BROWSER"):
             browser = settings.TESTING_BROWSER.lower()
@@ -111,9 +111,9 @@ def browser(live_server):
         logs = driver.get_log("browser")
 
         if isinstance(result, WebElement):
-            print(("Logs checked after: " + fct.func.__name__))
+            print("Logs checked after: " + fct.func.__name__)
         else:
-            print(("Logs checked after: " + fct.__name__))
+            print("Logs checked after: " + fct.__name__)
 
         take_screenshot(driver)
 

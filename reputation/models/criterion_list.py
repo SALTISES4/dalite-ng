@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import importlib
 
 from ..logger import logger
@@ -44,6 +41,6 @@ def get_criterion(criterion):
             criteria[criterion],
         )
     except (KeyError, AttributeError):
-        msg = "There is not criterion with the name {}.".format(criterion)
+        msg = f"There is not criterion with the name {criterion}."
         logger.error(msg)
         raise CriterionDoesNotExistError(msg)

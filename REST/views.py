@@ -111,9 +111,7 @@ class QuestionListViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         if self.get_object().assignment.editable:
-            return super(QuestionListViewSet, self).destroy(
-                request, *args, **kwargs
-            )
+            return super().destroy(request, *args, **kwargs)
 
         raise PermissionDenied
 
@@ -273,7 +271,7 @@ class TeacherView(generics.RetrieveUpdateAPIView):
 
             snackbar_message = {"snackbar_message": f"#{q_pk} {message}"}
 
-        response = super(TeacherView, self).update(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
 
         if snackbar_message:
             response.data.update(snackbar_message)

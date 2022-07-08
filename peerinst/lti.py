@@ -12,7 +12,7 @@ from peerinst.auth import authenticate_student
 logger = logging.getLogger(__name__)
 
 
-class LTIRoles(object):
+class LTIRoles:
     """
     Non-comprehensive list of roles commonly used in LTI applications
     """

@@ -18,10 +18,10 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = User
         django_get_or_create = ["username", "email"]
 
-    username = factory.Sequence("robot{0}".format)
-    email = factory.Sequence("robot+test+{0}@edx.org".format)
+    username = factory.Sequence("robot{}".format)
+    email = factory.Sequence("robot+test+{}@edx.org".format)
     password = factory.PostGenerationMethodCall("set_password", "test")
-    first_name = factory.Sequence("Robot{0}".format)
+    first_name = factory.Sequence("Robot{}".format)
     last_name = "Test"
     is_staff = False
     is_active = True

@@ -1,5 +1,5 @@
 import random
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 
 from peerinst.models import Answer, AnswerChoice, ShownRationale
 
@@ -11,7 +11,7 @@ def new_answer_choice(n, question):
             i += 1
             yield {
                 "question": question,
-                "text": "choice{}".format(i),
+                "text": f"choice{i}",
                 "correct": i == 1,
             }
 
@@ -39,7 +39,7 @@ def new_first_answers_no_shown(
                 "question": question,
                 "assignment": assignment,
                 "first_answer_choice": ((i - 1) % len(answer_choices)) + 1,
-                "rationale": "rationale{}".format(i),
+                "rationale": f"rationale{i}",
                 "user_token": students[
                     (i - 1) // (len(answer_choices))
                 ].student.username,
@@ -104,7 +104,7 @@ def new_answers_rationale_only(
                 "question": question_rationale_only,
                 "assignment": assignment,
                 "first_answer_choice": 0,
-                "rationale": "rationale{}".format(i),
+                "rationale": f"rationale{i}",
                 "user_token": student.student.username,
             }
 

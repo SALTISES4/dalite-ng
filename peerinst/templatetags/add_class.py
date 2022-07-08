@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.template import Library
 from django.template.defaultfilters import stringfilter
 from django.utils.html import conditional_escape
@@ -46,7 +43,7 @@ def add_class(html, css_class, autoescape=True):
                             self.new_tag + " " + key + '="' + value + '" '
                         )
                 else:
-                    self.new_tag = "{} {} ".format(self.new_tag, key)
+                    self.new_tag = f"{self.new_tag} {key} "
 
             if not self.class_added:
                 self.new_tag = self.new_tag + 'class="' + css_class + '" '

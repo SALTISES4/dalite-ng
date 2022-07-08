@@ -115,25 +115,25 @@ def landing_page(request):
 
     disciplines = {}
 
-    disciplines[str("All")] = {}
-    disciplines[str("All")][str("questions")] = Question.objects.count()
-    disciplines[str("All")][str("rationales")] = Answer.objects.count()
-    disciplines[str("All")][str("students")] = Student.objects.count()
-    disciplines[str("All")][str("teachers")] = Teacher.objects.count()
+    disciplines["All"] = {}
+    disciplines["All"]["questions"] = Question.objects.count()
+    disciplines["All"]["rationales"] = Answer.objects.count()
+    disciplines["All"]["students"] = Student.objects.count()
+    disciplines["All"]["teachers"] = Teacher.objects.count()
 
     for d in Discipline.objects.annotate(num_q=Count("question")).order_by(
         "-num_q"
     )[:3]:
         disciplines[str(d.title)] = {}
-        disciplines[str(d.title)][str("questions")] = Question.objects.filter(
+        disciplines[str(d.title)]["questions"] = Question.objects.filter(
             discipline=d
         ).count()
-        disciplines[str(d.title)][str("rationales")] = Answer.objects.filter(
+        disciplines[str(d.title)]["rationales"] = Answer.objects.filter(
             question__discipline=d
         ).count()
 
         question_list = d.question_set.values_list("id", flat=True)
-        disciplines[str(d.title)][str("students")] = len(
+        disciplines[str(d.title)]["students"] = len(
             set(
                 Answer.objects.filter(question_id__in=question_list)
                 .exclude(user_token="")
@@ -149,11 +149,11 @@ def landing_page(request):
     disciplines_array = []
 
     d2 = {}
-    d2[str("name")] = str("All")
-    d2[str("questions")] = Question.objects.count()
-    d2[str("rationales")] = Answer.objects.count()
-    d2[str("students")] = Student.objects.count()
-    d2[str("teachers")] = Teacher.objects.count()
+    d2["name"] = "All"
+    d2["questions"] = Question.objects.count()
+    d2["rationales"] = Answer.objects.count()
+    d2["students"] = Student.objects.count()
+    d2["teachers"] = Teacher.objects.count()
 
     disciplines_array.append(d2)
 
@@ -161,14 +161,14 @@ def landing_page(request):
         "-num_q"
     )[:3]:
         d2 = {}
-        d2[str("name")] = str(d.title)
-        d2[str("questions")] = Question.objects.filter(discipline=d).count()
-        d2[str("rationales")] = Answer.objects.filter(
+        d2["name"] = str(d.title)
+        d2["questions"] = Question.objects.filter(discipline=d).count()
+        d2["rationales"] = Answer.objects.filter(
             question__discipline=d
         ).count()
 
         question_list = d.question_set.values_list("id", flat=True)
-        disciplines[str(d.title)][str("students")] = len(
+        disciplines[str(d.title)]["students"] = len(
             set(
                 Answer.objects.filter(question_id__in=question_list)
                 .exclude(user_token="")
@@ -176,7 +176,7 @@ def landing_page(request):
             )
         )
 
-        d2[str("teachers")] = d.teacher_set.count()
+        d2["teachers"] = d.teacher_set.count()
 
         disciplines_array.append(d2)
 
@@ -323,7 +323,7 @@ class AssignmentCreateView(LoginRequiredMixin, NoStudentsMixin, CreateView):
     form_class = forms.AssignmentCreateForm
 
     def get_context_data(self, **kwargs):
-        context = super(AssignmentCreateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         teacher = get_object_or_404(models.Teacher, user=self.request.user)
         context["teacher"] = teacher
         context["help_text"] = _(
@@ -341,7 +341,7 @@ class AssignmentCreateView(LoginRequiredMixin, NoStudentsMixin, CreateView):
         form.instance.save()
         teacher.assignments.add(self.object)
         teacher.save()
-        return super(AssignmentCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse(
@@ -353,7 +353,7 @@ class AssignmentCopyView(AssignmentCreateView):
     """View to create an assignment from existing."""
 
     def get_initial(self, *args, **kwargs):
-        super(AssignmentCopyView, self).get_initial(*args, **kwargs)
+        super().get_initial(*args, **kwargs)
         assignment = get_object_or_404(
             models.Assignment, pk=self.kwargs["assignment_id"]
         )
@@ -366,7 +366,7 @@ class AssignmentCopyView(AssignmentCreateView):
         return initial
 
     def get_context_data(self, **kwargs):
-        context = super(AssignmentCopyView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["help_text"] = _(
             "Assignments cannot be modified once they \
         contain student answers.  After providing a unique identifier below \
@@ -392,7 +392,7 @@ class AssignmentCopyView(AssignmentCreateView):
         form.instance.parent = assignment
         form.instance.save()
 
-        return super(AssignmentCopyView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class AssignmentUpdateView(LoginRequiredMixin, NoStudentsMixin, DetailView):
@@ -415,14 +415,12 @@ class AssignmentUpdateView(LoginRequiredMixin, NoStudentsMixin, DetailView):
             if not self.get_object().editable:
                 raise PermissionDenied
             else:
-                return super(AssignmentUpdateView, self).dispatch(
-                    *args, **kwargs
-                )
+                return super().dispatch(*args, **kwargs)
         else:
             raise PermissionDenied
 
     def get_context_data(self, **kwargs):
-        context = super(AssignmentUpdateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         teacher = get_object_or_404(models.Teacher, user=self.request.user)
         context["teacher"] = teacher
         return context
@@ -452,14 +450,12 @@ class AssignmentEditView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
             if not self.get_object().editable:
                 raise PermissionDenied
             else:
-                return super(AssignmentEditView, self).dispatch(
-                    *args, **kwargs
-                )
+                return super().dispatch(*args, **kwargs)
         else:
             raise PermissionDenied
 
     def get_context_data(self, **kwargs):
-        context = super(AssignmentEditView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         teacher = get_object_or_404(models.Teacher, user=self.request.user)
         context["teacher"] = teacher
         return context
@@ -522,7 +518,7 @@ class QuestionCreateView(
     # Custom save is needed to attach user to question
     def form_valid(self, form):
         form.instance.user = self.request.user
-        return super(QuestionCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         if self.object.type == "RO":
@@ -541,7 +537,7 @@ class QuestionCloneView(QuestionCreateView):
     template_name = "peerinst/question/form.html"
 
     def get_initial(self, *args, **kwargs):
-        super(QuestionCloneView, self).get_initial(*args, **kwargs)
+        super().get_initial(*args, **kwargs)
         question = get_object_or_404(models.Question, pk=self.kwargs["pk"])
         initial = {
             "text": question.text,
@@ -570,10 +566,10 @@ class QuestionCloneView(QuestionCreateView):
         )
         if form.instance.type == "RO":
             form.instance.second_answer_needed = False
-        return super(QuestionCloneView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        context = super(QuestionCloneView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update(
             parent=get_object_or_404(models.Question, pk=self.kwargs["pk"])
         )
@@ -600,7 +596,7 @@ class AssignmentFixView(
             self.object.questions.all()
         )
 
-        context = super(AssignmentFixView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update(
             assignment=True,
             broken_by_flags=broken_by_flags,
@@ -618,7 +614,7 @@ class QuestionFixView(
     template_name = "peerinst/question/fix.html"
 
     def get_context_data(self, **kwargs):
-        context = super(QuestionFixView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update(
             load_url=f"{reverse('REST:question-list')}?q={self.object.pk}",
             teacher=self.request.user.teacher,
@@ -661,16 +657,14 @@ class QuestionUpdateView(
         if not self.object.is_editable:
             return None
         else:
-            return super(QuestionUpdateView, self).get_form(form_class)
+            return super().get_form(form_class)
 
     def post(self, request, *args, **kwargs):
         # Check if student answers exist
         if not self.get_object().is_editable:
             raise PermissionDenied
         else:
-            return super(QuestionUpdateView, self).post(
-                request, *args, **kwargs
-            )
+            return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         # Only owner can update collaborators
@@ -678,10 +672,10 @@ class QuestionUpdateView(
             form.cleaned_data[
                 "collaborators"
             ] = self.object.collaborators.all()
-        return super(QuestionUpdateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        context = super(QuestionUpdateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update(parent=self.object.parent)
         return context
 
@@ -878,9 +872,9 @@ def category_select_form(request, pk=None):
     )
 
 
-class QuestionMixin(object):
+class QuestionMixin:
     def get_context_data(self, **kwargs):
-        context = super(QuestionMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update(
             assignment=self.assignment,
             question=self.question,
@@ -968,7 +962,7 @@ class QuestionFormView(QuestionMixin, FormView):
                     + self.request.path
                 )
             else:
-                return super(QuestionFormView, self).dispatch(*args, **kwargs)
+                return super().dispatch(*args, **kwargs)
 
     def emit_event(self, name, **data):
         """
@@ -987,7 +981,7 @@ class QuestionFormView(QuestionMixin, FormView):
                 edx_org = None
 
             grade_handler_re = re.compile(
-                "https?://[^/]+/courses/{}".format(re.escape(course_id))
+                f"https?://[^/]+/courses/{re.escape(course_id)}"
                 + "/xblock/(?P<usage_key>[^/]+)/"
             )
             usage_key = None
@@ -1162,7 +1156,7 @@ class QuestionStartView(QuestionFormView):
         return self.question.get_start_form_class()
 
     def get_form_kwargs(self):
-        kwargs = super(QuestionStartView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update(answer_choices=self.answer_choices)
         if self.request.method == "GET":
             # Log when the page is first shown, mainly for the timestamp.
@@ -1172,7 +1166,7 @@ class QuestionStartView(QuestionFormView):
     def form_valid(self, form):
         self.question.start_form_valid(self, form)
 
-        return super(QuestionStartView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class QuestionReviewBaseView(QuestionFormView):
@@ -1242,7 +1236,7 @@ class QuestionReviewBaseView(QuestionFormView):
         self.stage_data.update(fake_attributions=fake_attributions)
 
     def get_form_kwargs(self):
-        kwargs = super(QuestionReviewBaseView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         self.first_answer_choice = self.stage_data.get("first_answer_choice")
         self.rationale = self.stage_data.get("rationale")
         self.datetime_start = datetime.strptime(
@@ -1254,9 +1248,7 @@ class QuestionReviewBaseView(QuestionFormView):
         return kwargs
 
     def get_context_data(self, **kwargs):
-        context = super(QuestionReviewBaseView, self).get_context_data(
-            **kwargs
-        )
+        context = super().get_context_data(**kwargs)
         context.update(
             first_choice_label=self.question.get_choice_label(
                 self.first_answer_choice
@@ -1305,9 +1297,7 @@ class QuestionSequentialReviewView(QuestionReviewBaseView):
         )
 
     def get_context_data(self, **kwargs):
-        context = super(QuestionSequentialReviewView, self).get_context_data(
-            **kwargs
-        )
+        context = super().get_context_data(**kwargs)
         self.select_next_rationale()
         context.update(current_rationale=self.current_rationale)
         return context
@@ -1325,7 +1315,7 @@ class QuestionSequentialReviewView(QuestionReviewBaseView):
         if rationale_index == len(rationale_sequence):
             # We've shown all rationales – mark the stage as finished.
             self.stage_data.update(completed_stage="sequential-review")
-        return super(QuestionSequentialReviewView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class QuestionReviewView(QuestionReviewBaseView):
@@ -1338,7 +1328,7 @@ class QuestionReviewView(QuestionReviewBaseView):
     form_class = forms.ReviewAnswerForm
 
     def get_form_kwargs(self):
-        kwargs = super(QuestionReviewView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         self.determine_rationale_choices()
         kwargs.update(rationale_choices=self.rationale_choices)
         return kwargs
@@ -1356,7 +1346,7 @@ class QuestionReviewView(QuestionReviewBaseView):
         self.stage_data.clear()
         self.send_grade()
         self.save_shown_rationales(form.shown_rationales)
-        return super(QuestionReviewView, self).form_valid(form)
+        return super().form_valid(form)
 
     def emit_check_events(self):
         grade = self.answer.grade
@@ -1503,7 +1493,7 @@ class QuestionSummaryView(QuestionMixin, TemplateView):
     template_name = "peerinst/question/summary.html"
 
     def get_context_data(self, **kwargs):
-        context = super(QuestionSummaryView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update(
             first_choice_label=self.answer.first_answer_choice_label(),
             second_choice_label=self.answer.second_answer_choice_label(),
@@ -1528,9 +1518,7 @@ class RationaleOnlyQuestionSummaryView(QuestionMixin, TemplateView):
     template_name = "peerinst/question/summary.html"
 
     def get_context_data(self, **kwargs):
-        context = super(
-            RationaleOnlyQuestionSummaryView, self
-        ).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update(rationale=self.answer.rationale)
         self.send_grade()
         return context
@@ -1551,7 +1539,7 @@ class AnswerSummaryChartView(View):
     def __init__(self, *args, **kwargs):
         """Save the initialization arguments for later use."""
         self.kwargs = kwargs
-        super(AnswerSummaryChartView, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get(self, request):
         """
@@ -1572,8 +1560,8 @@ class AnswerSummaryChartView(View):
         # were available on a given question.
         to_columns = [
             (
-                "to_{}".format(question.get_choice_label(i)),
-                "To {}".format(question.get_choice_label(i)),
+                f"to_{question.get_choice_label(i)}",
+                f"To {question.get_choice_label(i)}",
             )
             for i in range(1, question.answerchoice_set.count() + 1)
         ]
@@ -1808,7 +1796,7 @@ class TeacherBase(LoginRequiredMixin, NoStudentsMixin, View):
                         + reverse("teacher", args=(kwargs["pk"],))
                     )
                 else:
-                    return super(TeacherBase, self).dispatch(*args, **kwargs)
+                    return super().dispatch(*args, **kwargs)
         else:
             raise PermissionDenied
 
@@ -1835,7 +1823,7 @@ class TeacherGroupShare(TeacherBase, DetailView):
             return response_400(self.request)
 
     def get_context_data(self, **kwargs):
-        context = super(TeacherGroupShare, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["teacher"] = self.teacher
 
         return context
@@ -1848,7 +1836,7 @@ class TeacherDetailView(TeacherBase, DetailView):
     template_name = "peerinst/teacher/details.html"
 
     def get_context_data(self, **kwargs):
-        context = super(TeacherDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         # provides collection data to collection foldable
         context["owned_collections"] = Collection.objects.filter(
             owner=self.request.user.teacher
@@ -1946,7 +1934,7 @@ class TeacherAssignments(TeacherBase, ListView):
         )
 
     def get_context_data(self, **kwargs):
-        context = super(TeacherAssignments, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["teacher"] = self.teacher
         context["form"] = forms.TeacherAssignmentsForm()
 
@@ -1979,7 +1967,7 @@ class TeacherGroups(TeacherBase, ListView):
         return self.teacher.studentgroup_set.all()
 
     def get_context_data(self, **kwargs):
-        context = super(TeacherGroups, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["teacher"] = self.teacher
         context["form"] = forms.TeacherGroupsForm()
         context["create_form"] = forms.StudentGroupCreateForm()
@@ -2289,13 +2277,13 @@ def question_search_beta(request):
                     _c.append(a["title"])
             categories = list(sorted(set(_c)))
             difficulties = list(
-                sorted(set(r["difficulty"]["label"] for r in results))
+                sorted({r["difficulty"]["label"] for r in results})
             )
             disciplines = list(
-                sorted(set(r["discipline"]["title"] for r in results))
+                sorted({r["discipline"]["title"] for r in results})
             )
             impacts = list(
-                sorted(set(r["peer_impact"]["label"] for r in results))
+                sorted({r["peer_impact"]["label"] for r in results})
             )
             meta = {
                 "categories": categories,

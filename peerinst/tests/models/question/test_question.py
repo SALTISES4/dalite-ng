@@ -61,7 +61,7 @@ class QuestionTestCase(TestCase):
                     ),
                     rationale=factory.Faker("sentence", nb_words=10),
                 )
-            print(("{}%".format(float(i) / self.N_questions * 100)))
+            print(f"{float(i) / self.N_questions * 100}%")
 
             assert (
                 models.Answer.objects.filter(question=q).count()
@@ -77,7 +77,7 @@ class QuestionMethodTests(QuestionTestCase):
     N_correct = 2
 
     def setUp(self):
-        super(QuestionMethodTests, self).setUp()
+        super().setUp()
 
     @pytest.mark.skip(reason="Performance test; not needed for CI.")
     def test_get_matrix(self):
@@ -94,12 +94,9 @@ class QuestionMethodTests(QuestionTestCase):
             matrices.append(q.get_matrix())
         end = timer()
 
-        print(("Total time = " + str(end - start)))
+        print("Total time = " + str(end - start))
         print(
-            (
-                "Avg time per question = "
-                + str((end - start) / self.N_questions)
-            )
+            "Avg time per question = " + str((end - start) / self.N_questions)
         )
 
         """
@@ -110,10 +107,10 @@ class QuestionMethodTests(QuestionTestCase):
         prob = float(self.N_correct) / self.N_choices
 
         for m in matrices:
-            print((m["easy"]))
-            print((m["hard"]))
-            print((m["tricky"]))
-            print((m["peer"]))
+            print(m["easy"])
+            print(m["hard"])
+            print(m["tricky"])
+            print(m["peer"])
             self.assertTrue(
                 abs(1 - m["easy"] - m["hard"] - m["tricky"] - m["peer"])
                 <= 0.01

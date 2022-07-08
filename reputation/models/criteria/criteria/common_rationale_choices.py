@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models
 
 from reputation.logger import logger
@@ -42,15 +39,13 @@ class CommonRationaleChoicesCriterion(Criterion):
         TypeError
             If `instance` isn't of type Student
         """
-        super(CommonRationaleChoicesCriterion, self).evaluate(instance)
+        super().evaluate(instance)
         if instance.__class__.__name__ == "Student":
             return (instance.answers_also_chosen_by_others.count(), {})
         else:
             msg = "`instance` has to be of type Student."
-            logger.error("TypeError: {}".format(msg))
+            logger.error(f"TypeError: {msg}")
             raise TypeError(msg)
 
     def info(self):
-        return super(CommonRationaleChoicesCriterion, self).info(
-            CommonRationaleChoicesCriterion.general_info()
-        )
+        return super().info(CommonRationaleChoicesCriterion.general_info())

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import logging
 
 from django.contrib.auth.models import User
@@ -17,9 +14,7 @@ def staff_required(fct):
             return response_403(
                 req,
                 msg=_("You don't have access to this resource."),
-                logger_msg=(
-                    "Access to {} from a non teacher user.".format(req.path)
-                ),
+                logger_msg=(f"Access to {req.path} from a non teacher user."),
                 log=logger.warning,
             )
         if req.user.is_staff:
@@ -28,9 +23,7 @@ def staff_required(fct):
             return response_403(
                 req,
                 msg=_("You don't have access to this resource."),
-                logger_msg=(
-                    "Access to {} from a non teacher user.".format(req.path)
-                ),
+                logger_msg=(f"Access to {req.path} from a non teacher user."),
                 log=logger.warning,
             )
 

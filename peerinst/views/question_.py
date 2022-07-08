@@ -51,7 +51,7 @@ def flag_question(req, teacher):
             req,
             msg=translate("The flag reason couldn't be found."),
             logger_msg=(
-                "The question flag reason with title {} ".format(reason)
+                f"The question flag reason with title {reason} "
                 + "couldn't be found."
             ),
             log=logger.warning,

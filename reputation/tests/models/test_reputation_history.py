@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-
-
 import json
+from unittest import mock
 
-import mock
 import pytest
 
 from peerinst.tests.fixtures import *  # noqa

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models
 
 from quality.models.quality_type import QualityType, QualityUseType
@@ -73,7 +70,7 @@ class RightAnswerCriterionRules(CriterionRules):
     )
 
     def __str__(self):
-        return "Rules {} for criterion right_answer".format(self.pk)
+        return f"Rules {self.pk} for criterion right_answer"
 
     @staticmethod
     def get_or_create(threshold=1, only_last=False):

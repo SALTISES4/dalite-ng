@@ -46,8 +46,7 @@ def email_consent_update(req, role):
         {
             "user": req.user,
             "email_type": email_type,
-            "accepted": req.POST.get("{}-consent".format(email_type.type), "")
-            == "on",
+            "accepted": req.POST.get(f"{email_type.type}-consent", "") == "on",
         }
         for email_type in EmailType.objects.filter(role=role_)
     ]
@@ -97,9 +96,7 @@ def _get_username_and_role(req, role):
                 req,
                 "400.html",
                 context={
-                    "message": _(
-                        'The user "{}" doesn\'t exist.'.format(username)
-                    )
+                    "message": _(f'The user "{username}" doesn\'t exist.')
                 },
                 status=400,
             ),
@@ -114,9 +111,7 @@ def _get_username_and_role(req, role):
                 req,
                 "400.html",
                 context={
-                    "message": _(
-                        "The role {} doesn't seem to exist.".format(role)
-                    )
+                    "message": _(f"The role {role} doesn't seem to exist.")
                 },
                 status=400,
             ),

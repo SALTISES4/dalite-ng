@@ -1,9 +1,9 @@
 import json
 import random
 
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import Client
+from django.urls import reverse
 
 from ..generators import (
     add_roles,
@@ -238,7 +238,7 @@ class TestTosConsentUpdateView(TestCase):
                 },
                 {
                     "accepted": True,
-                    "redirect_to": "/tos/tos/{}/".format(self.roles[1].role),
+                    "redirect_to": f"/tos/tos/{self.roles[1].role}/",
                 },
             )
         ]
@@ -250,7 +250,7 @@ class TestTosConsentUpdateView(TestCase):
             self.assertEqual(resp.status_code, 302)
             self.assertRedirects(
                 resp,
-                "/tos/tos/{}/".format(self.roles[1].role),
+                f"/tos/tos/{self.roles[1].role}/",
                 target_status_code=302,
             )
 
