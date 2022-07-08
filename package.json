@@ -134,7 +134,7 @@
     }
   },
   "browserslist": [
-    "last 3 versions and > 0.1%",
+    "last 5 versions and > 0.1%",
     "not IE 11",
     "not IE_Mob 11",
     "not dead"

@@ -266,7 +266,7 @@ django-compressor==2.4
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-django-cookie-law==2.0.3
+django-cookie-law==2.2.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -624,7 +624,7 @@ pyflakes==2.1.1
     # via flake8
 pygments==2.5.2
     # via ipython
-pyjwt==1.7.1
+pyjwt==2.4.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -670,11 +670,6 @@ pytest-mock==2.0.0
     # via -r requirements/requirements-dev.in
 pytest-rerunfailures==8.0
     # via -r requirements/requirements-dev.in
-pytest-runner==5.2
-    # via
-    #   -r requirements/requirements-base.txt
-    #   -r requirements/requirements-test.txt
-    #   django-cookie-law
 python-crontab==2.4.0
     # via
     #   -r requirements/requirements-base.txt

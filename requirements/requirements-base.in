@@ -26,7 +26,7 @@ mysqlclient
 packaging
 pandas
 pillow>8.2.0  # Reqd by safety
-pyjwt
+pyjwt>=2.4  # Reqd by safety
 python-memcached==1.59
 pytz
 requests

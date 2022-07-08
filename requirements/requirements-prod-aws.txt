@@ -200,7 +200,7 @@ django-compressor==2.4
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
-django-cookie-law==2.0.3
+django-cookie-law==2.2.0
     # via -r requirements/requirements-base.txt
 django-csp==3.6
     # via
@@ -424,7 +424,7 @@ pydantic==1.8.2
     #   -r requirements/requirements-base.txt
     #   spacy
     #   thinc
-pyjwt==1.7.1
+pyjwt==2.4.0
     # via -r requirements/requirements-base.txt
 pymongo==3.10.1
     # via
@@ -442,10 +442,6 @@ pyparsing==2.4.6
     # via
     #   -r requirements/requirements-base.txt
     #   packaging
-pytest-runner==5.2
-    # via
-    #   -r requirements/requirements-base.txt
-    #   django-cookie-law
 python-crontab==2.4.0
     # via
     #   -r requirements/requirements-base.txt

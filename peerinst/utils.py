@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
-
 import base64
+import math
 from datetime import datetime, timedelta
 from itertools import chain, islice
 
-import math
 import jwt
 import pytz
 from django.conf import settings
@@ -25,7 +22,7 @@ def create_token(payload, exp=timedelta(weeks=16)):
     )
 
     return base64.urlsafe_b64encode(
-        jwt.encode(payload_, key, algorithm="HS256")
+        jwt.encode(payload_, key, algorithm="HS256").encode()
     ).decode()
 
 
@@ -76,26 +73,14 @@ def format_time(seconds):
 
     text = ""
     if days:
-        text = "{} {}".format(
-            text, days, translate("day" if days == 1 else "days")
-        )
+        text = f'{text}{days} {translate("day" if days == 1 else "days")}'
     if hours:
-        text = "{}{} {}".format(
-            "{}, ".format(text) if text else "",
-            hours,
-            translate("hour" if hours == 1 else "hours"),
-        )
+        text = f'{f"{text}, " if text else ""}{hours} {translate("hour" if hours == 1 else "hours")}'  # noqa E501
+
     if minutes:
-        text = "{}{} {}".format(
-            "{}, ".format(text) if text else "",
-            minutes,
-            translate("minute" if minutes == 1 else "minutes"),
-        )
+        text = f'{f"{text}, " if text else ""}{minutes} {translate("minute" if minutes == 1 else "minutes")}'  # noqa E501
+
     if seconds:
-        text = "{}{} {}".format(
-            "{}, ".format(text) if text else "",
-            seconds,
-            translate("second" if seconds == 1 else "seconds"),
-        )
+        text = f'{f"{text}, " if text else ""}{seconds} {translate("second" if seconds == 1 else "seconds")}'  # noqa E501
 
     return text.strip()
