@@ -1,8 +1,10 @@
-from peerinst.scheduled import verify_assignment_due_dates
-from datetime import datetime, timedelta
-from django.core import mail
-import pytz
 import time
+from datetime import datetime, timedelta
+
+import pytz
+from django.core import mail
+
+from peerinst.scheduled import verify_assignment_due_dates
 
 from .fixtures import *  # noqa F403
 

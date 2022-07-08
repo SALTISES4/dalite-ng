@@ -974,14 +974,15 @@ def report_data_by_question(assignment_list, student_groups):
     return gradebook_question
 
 
-def filter_ltievents(
-    start_date, stop_date=datetime.datetime.now(), username=None
-):
+def filter_ltievents(start_date, stop_date=None, username=None):
     """
     given a start date and stop date (as datetime objects), and optional
     username return all LtiEvents that match the criteria
     """
     from peerinst.models import LtiEvent
+
+    if not stop_date:
+        stop_date = datetime.datetime.now()
 
     events = LtiEvent.objects.filter(
         timestamp__gte=start_date, timestamp__lte=stop_date

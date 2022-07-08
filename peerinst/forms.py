@@ -144,9 +144,9 @@ class ReviewAnswerForm(forms.Form):
         shown_rationales = []
         if cleaned_data is not None:
             for (
-                answer_choice,
-                rationale_choice_field,
-                show_more_counter,
+                _answer_choice,
+                _rationale_choice_field,
+                _show_more_counter,
                 label,
                 rationale_ids,
             ) in self.rationale_groups:

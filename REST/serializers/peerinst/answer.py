@@ -150,7 +150,7 @@ class StudentGroupAssignmentAnswerSerializer(serializers.ModelSerializer):
             .filter(assignment=obj.assignment)
             .filter(question__id=self.context["question_pk"])
         )
-        answers_serialized = list(
+        answers_serialized = [
             AnswerSerializer(
                 a,
                 fields=(
@@ -164,7 +164,7 @@ class StudentGroupAssignmentAnswerSerializer(serializers.ModelSerializer):
                 ),
             ).data
             for a in answers
-        )
+        ]
         for a in answers_serialized:
             a.update(
                 {

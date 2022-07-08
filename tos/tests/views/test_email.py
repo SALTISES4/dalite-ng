@@ -1,8 +1,8 @@
 import random
 
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import Client
+from django.urls import reverse
 
 from ..generators import (
     add_email_types,

@@ -195,10 +195,10 @@ class TopRationalesTestCase(TestCase):
         admin_user.save()
 
         self.client.login(username=admin_user.username, password="test")
-        kwargs = dict(
-            assignment_id=self.assignment.identifier,
-            question_id=self.question.id,
-        )
+        kwargs = {
+            "assignment_id": self.assignment.identifier,
+            "question_id": self.question.id,
+        }
         url = reverse("question-rationales", kwargs=kwargs)
         if perpage:
             url = "?".join([url, f"perpage={perpage}"])

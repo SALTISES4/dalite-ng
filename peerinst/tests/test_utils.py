@@ -1,8 +1,9 @@
-from datetime import timedelta
 import random
 import string
-from django.test import TestCase
 import time
+from datetime import timedelta
+
+from django.test import TestCase
 
 from peerinst.utils import create_token, verify_token
 

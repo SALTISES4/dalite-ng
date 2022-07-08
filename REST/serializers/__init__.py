@@ -11,15 +11,15 @@ __all__ = [
     "TeacherSerializer",
 ]
 
-from .peerinst import (
-    AssignmentSerializer,
+from .peerinst import (  # noqa
     AnswerSerializer,
+    AssignmentSerializer,
     DisciplineSerializer,
-    FeedbackWriteSerialzer,
     FeedbackReadSerialzer,
+    FeedbackWriteSerialzer,
     QuestionSerializer,
     RankSerializer,
-    StudentGroupSerializer,
     StudentGroupAssignmentAnswerSerializer,
+    StudentGroupSerializer,
     TeacherSerializer,
-)  # noqa
+)

@@ -8,8 +8,10 @@ import pytz
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as translate
 
+DELTA = timedelta(weeks=16)
 
-def create_token(payload, exp=timedelta(weeks=16)):
+
+def create_token(payload, exp=DELTA):
     key = settings.SECRET_KEY
 
     payload_ = payload.copy()

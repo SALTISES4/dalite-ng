@@ -1,8 +1,6 @@
 import pytest
-
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-
 from pinax.forums.models import ForumReply, ForumThread
 
 from ..tos import consent_to_tos, tos_teacher  # noqa

@@ -208,12 +208,12 @@ def sign_up(request):
             )
 
             # Notify managers
-            email_context = dict(
-                date=timezone.now(),
-                email=form.cleaned_data["email"],
-                url=form.cleaned_data["url"],
-                site_name="myDALITE",
-            )
+            email_context = {
+                "date": timezone.now(),
+                "email": form.cleaned_data["email"],
+                "url": form.cleaned_data["url"],
+                "site_name": "myDALITE",
+            }
             mail_managers_async(
                 "New user request",
                 "Dear administrator,"
@@ -1016,24 +1016,24 @@ class QuestionFormView(QuestionMixin, FormView):
 
         # Build event dictionary
         META = self.request.META
-        event = dict(
-            accept_language=META.get("HTTP_ACCEPT_LANGUAGE"),
-            agent=META.get("HTTP_USER_AGENT"),
-            context=dict(
-                course_id=course_id,
-                module=dict(usage_key=usage_key),
-                username=self.user_token,
-            ),
-            course_id=course_id,
-            event=data,
-            event_source="server",
-            event_type=name,
-            host=META.get("SERVER_NAME"),
-            ip=META.get("HTTP_X_REAL_IP", META.get("REMOTE_ADDR")),
-            referer=META.get("HTTP_REFERER"),
-            time=datetime.now().isoformat(),
-            username=self.user_token,
-        )
+        event = {
+            "accept_language": META.get("HTTP_ACCEPT_LANGUAGE"),
+            "agent": META.get("HTTP_USER_AGENT"),
+            "context": {
+                "course_id": course_id,
+                "module": {"usage_key": usage_key},
+                "username": self.user_token,
+            },
+            "course_id": course_id,
+            "event": data,
+            "event_source": "server",
+            "event_type": name,
+            "host": META.get("SERVER_NAME"),
+            "ip": META.get("HTTP_X_REAL_IP", META.get("REMOTE_ADDR")),
+            "referer": META.get("HTTP_REFERER"),
+            "time": datetime.now().isoformat(),
+            "username": self.user_token,
+        }
 
         if edx_org is not None:
             event["context"]["org_id"] = edx_org
@@ -1205,7 +1205,7 @@ class QuestionReviewBaseView(QuestionFormView):
             processor = escape
         else:
             processor = mark_safe
-        for choice, label, rationales in self.rationale_choices:
+        for _choice, _label, rationales in self.rationale_choices:
             rationales[:] = [(id, processor(text)) for id, text in rationales]
 
     def add_fake_attributions(self, rng):
@@ -1218,7 +1218,7 @@ class QuestionReviewBaseView(QuestionFormView):
             self.mark_rationales_safe(escape_html=True)
             return
         fake_attributions = {}
-        for choice, label, rationales in self.rationale_choices:
+        for _choice, _label, rationales in self.rationale_choices:
             attributed_rationales = []
             for id, text in rationales:
                 if id is None:
@@ -1350,24 +1350,24 @@ class QuestionReviewView(QuestionReviewBaseView):
 
     def emit_check_events(self):
         grade = self.answer.grade
-        event_data = dict(
-            second_answer_choice=self.second_answer_choice,
-            switch=self.first_answer_choice != self.second_answer_choice,
-            rationale_algorithm=dict(
-                name=self.question.rationale_selection_algorithm,
-                version=self.choose_rationales.version,
-                description=str(self.choose_rationales.description),
-            ),
-            rationales=[
+        event_data = {
+            "second_answer_choice": self.second_answer_choice,
+            "switch": self.first_answer_choice != self.second_answer_choice,
+            "rationale_algorithm": {
+                "name": self.question.rationale_selection_algorithm,
+                "version": self.choose_rationales.version,
+                "description": str(self.choose_rationales.description),
+            },
+            "rationales": [
                 {"id": id, "text": rationale}
                 for choice, label, rationales in self.rationale_choices
                 for id, rationale in rationales
                 if id is not None
             ],
-            chosen_rationale_id=self.chosen_rationale_id,
-            success="correct" if grade == 1.0 else "incorrect",
-            grade=grade,
-        )
+            "chosen_rationale_id": self.chosen_rationale_id,
+            "success": "correct" if grade == 1.0 else "incorrect",
+            "grade": grade,
+        }
         self.emit_event("problem_check", **event_data)
         self.emit_event("save_problem_success", **event_data)
 
@@ -1658,7 +1658,7 @@ def redirect_to_login_or_show_cookie_help(request):
         # third-party cookies disabled, so we show help on enabling cookies for
         # this site.
         return render(
-            request, "peerinst/cookie_help.html", dict(host=request.get_host())
+            request, "peerinst/cookie_help.html", {"host": request.get_host()}
         )
     return redirect_to_login(request.get_full_path())
 
@@ -1680,26 +1680,26 @@ def question(request, assignment_id, question_id):
     if question.type == "RO":
         question = get_object_or_404(RationaleOnlyQuestion, pk=question_id)
 
-    custom_key = str(assignment.pk) + ":" + str(question.pk)
+    custom_key = f"{str(assignment.pk)}:{str(question.pk)}"
     stage_data = SessionStageData(request.session, custom_key)
     user_token = request.user.username
-    view_data = dict(
-        request=request,
-        assignment=assignment,
-        question=question,
-        user_token=user_token,
-        answer_choices=question.get_choices(),
-        custom_key=custom_key,
-        stage_data=stage_data,
-        lti_data=get_object_or_none(
+    view_data = {
+        "request": request,
+        "assignment": assignment,
+        "question": question,
+        "user_token": user_token,
+        "answer_choices": question.get_choices(),
+        "custom_key": custom_key,
+        "stage_data": stage_data,
+        "lti_data": get_object_or_none(
             LtiUserData, user=request.user, custom_key=custom_key
         ),
-        answer=models.Answer.objects.filter(
+        "answer": models.Answer.objects.filter(
             assignment=assignment,
             question=question,
             user_token=user_token,
         ).last(),
-    )
+    }
 
     # Determine stage and view class
     if request.GET.get("show_results_view") == "true":
@@ -2269,22 +2269,15 @@ def question_search_beta(request):
         # Add metadata
         if results:
             _c = []
-            for c in map(
-                lambda x: x["category"] if "category" in x else [],
-                results,
+            for c in (
+                x["category"] if "category" in x else [] for x in results
             ):
                 for a in c:
                     _c.append(a["title"])
-            categories = list(sorted(set(_c)))
-            difficulties = list(
-                sorted({r["difficulty"]["label"] for r in results})
-            )
-            disciplines = list(
-                sorted({r["discipline"]["title"] for r in results})
-            )
-            impacts = list(
-                sorted({r["peer_impact"]["label"] for r in results})
-            )
+            categories = sorted(set(_c))
+            difficulties = sorted({r["difficulty"]["label"] for r in results})
+            disciplines = sorted({r["discipline"]["title"] for r in results})
+            impacts = sorted({r["peer_impact"]["label"] for r in results})
             meta = {
                 "categories": categories,
                 "difficulties": [

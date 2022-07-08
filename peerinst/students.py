@@ -12,9 +12,10 @@ from django.utils.translation import ugettext_lazy as _
 from .utils import create_token, verify_token
 
 logger = logging.getLogger("peerinst-auth")
+DELTA = timedelta(weeks=16)
 
 
-def create_student_token(username, email, exp=timedelta(weeks=16)):
+def create_student_token(username, email, exp=DELTA):
     payload = {"username": username, "email": email}
     return create_token(payload, exp=exp)
 

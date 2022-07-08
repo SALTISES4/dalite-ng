@@ -11,17 +11,17 @@ __all__ = [
     "TeacherSerializer",
 ]
 
-from .assignment import (
-    AssignmentSerializer,
-    DisciplineSerializer,
-    QuestionSerializer,
-    RankSerializer,
-)  # noqa
-from .answer import (
+from .answer import (  # noqa
     AnswerSerializer,
     FeedbackReadSerialzer,
     FeedbackWriteSerialzer,
     StudentGroupAssignmentAnswerSerializer,
-)  # noqa
+)
+from .assignment import (  # noqa
+    AssignmentSerializer,
+    DisciplineSerializer,
+    QuestionSerializer,
+    RankSerializer,
+)
 from .student_group import StudentGroupSerializer
 from .teacher import TeacherSerializer

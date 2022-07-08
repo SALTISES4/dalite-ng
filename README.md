@@ -421,5 +421,3 @@ ElasticSearch
       "default": {"hosts": "<username>:<password>@localhost:9200"},
   }`
 ```
-
-TEST

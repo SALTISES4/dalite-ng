@@ -300,7 +300,7 @@ def blink_latest_results(request, pk):
     )
 
     c = 1
-    for label, text in blinkquestion.question.get_choices():
+    for label, _text in blinkquestion.question.get_choices():
         results[label] = (
             BlinkAnswer.objects.filter(question=blinkquestion)
             .filter(voting_round=blinkround)

@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
 
 from peerinst.models import ShownRationale
 from peerinst.tests.fixtures import *  # noqa

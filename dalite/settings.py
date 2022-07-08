@@ -251,7 +251,7 @@ PASSWORD_GENERATOR_NONCE = os.environ.get("PASSWORD_GENERATOR_NONCE", None)
 # this url for file contents.
 HEARTBEAT_REQUIRED_FREE_SPACE_PERCENTAGE = 20
 
-PINAX_FORUMS_EDIT_TIMEOUT = dict(days=120)
+PINAX_FORUMS_EDIT_TIMEOUT = {"days": 120}
 
 # CourseFlow settings
 COURSE_FLOW_RETURN_URL = {"name": "welcome", "title": "myDalite"}
@@ -282,7 +282,13 @@ CELERY_RESULT_BACKEND = os.environ.get(
 )
 
 # CSP
-CSP_DEFAULT_SRC = ["'self'", "*.mydalite.org", "*.courseflow.ca", "ws:", "wss:"]
+CSP_DEFAULT_SRC = [
+    "'self'",
+    "*.mydalite.org",
+    "*.courseflow.ca",
+    "ws:",
+    "wss:",
+]
 CSP_SCRIPT_SRC = [
     "'self'",
     "*.mydalite.org",

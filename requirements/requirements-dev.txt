@@ -433,7 +433,7 @@ ipython==7.13.0
     # via -r requirements/requirements-dev.in
 ipython-genutils==0.2.0
     # via traitlets
-isort==5.7.0
+isort==5.10.1
     # via -r requirements/requirements-dev.in
 jedi==0.16.0
     # via ipython

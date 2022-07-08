@@ -257,7 +257,7 @@ def research_all_annotations_for_question(
     }
 
     all_annotations = []
-    for label, answerchoice_text in question.get_choices():
+    for label, _answerchoice_text in question.get_choices():
         d1 = {}
         d1["answerchoice"] = label
         d1["annotations"] = []
