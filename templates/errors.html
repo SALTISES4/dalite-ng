@@ -3,38 +3,38 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <!-- Meta -->
-  <title>{% trans 'Error' %}</title>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="myDALITE">
+  <head>
+    <!-- Meta -->
+    <title>{% trans 'Error' %}</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="myDALITE">
 
-  <link href="{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" rel="icon">
+    <link href="{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" rel="icon">
 
-  <link href="https://fonts.googleapis.com/css?family=Montserrat:300,700" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-  {% compress css file errors %}
-  <link href="{% static 'peerinst/css/error.min.css' %}" rel="stylesheet">
-  {% endcompress %}
-</head>
+    {% compress css file errors %}
+      <link href="{% static 'peerinst/css/error.min.css' %}" rel="stylesheet">
+    {% endcompress %}
+  </head>
 
-<body>
-  {% block body %}{% endblock %}
+  <body>
+    {% block body %}{% endblock %}
 
-  {% if message %}
-  <p>
-    {% autoescape off %}
-    {{ message }}
-    {% endautoescape %}
-  </p>
-  {% endif %}
+    {% if message %}
+      <p>
+        {% autoescape off %}
+          {{ message }}
+        {% endautoescape %}
+      </p>
+    {% endif %}
 
-  <div class="corner_graphic" id="outer"></div>
-  <div class="corner_graphic" id="mid"></div>
-  <div class="corner_graphic" id="inner"></div>
-  <div class="corner_graphic" id="corner"></div>
-</body>
+    <div class="corner_graphic" id="outer"></div>
+    <div class="corner_graphic" id="mid"></div>
+    <div class="corner_graphic" id="inner"></div>
+    <div class="corner_graphic" id="corner"></div>
+  </body>
 </html>

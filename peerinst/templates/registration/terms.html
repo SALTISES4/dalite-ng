@@ -4,17 +4,17 @@
 
 {% block body %}
 
-<main>
-<section>
-  <h1 class="mdc-typography--display3">{% trans 'Terms of Service' %}
-    <svg class="underline" width=150 height=4></svg>
-  </h1>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Terms of Service' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-  <div class="admin-link">
-    <a href="{% url 'sign_up' %}">{% trans 'Back to sign up' %}</a>
-  </div>
+      <div class="admin-link">
+        <a href="{% url 'sign_up' %}">{% trans 'Back to sign up' %}</a>
+      </div>
 
-  {{ tos.text|safe }}
-</section>
-</main>
+      {{ tos.text|safe }}
+    </section>
+  </main>
 {% endblock %}

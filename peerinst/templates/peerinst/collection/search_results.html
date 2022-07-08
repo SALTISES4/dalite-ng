@@ -8,19 +8,19 @@
       <div>{% trans 'No search results' %}</div>
     {% else %}
       <div class="pagination">
-          <span>
-              {% if paginator.has_previous %}
-                  <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
-              {% endif %}
+        <span>
+          {% if paginator.has_previous %}
+            <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
+          {% endif %}
 
-              <span class="current">
-                  {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
-              </span>
-
-              {% if paginator.has_next %}
-                  <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
-              {% endif %}
+          <span class="current">
+            {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
           </span>
+
+          {% if paginator.has_next %}
+            <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
+          {% endif %}
+        </span>
       </div>
     {% endif %}
   {% endif %}
@@ -28,67 +28,67 @@
 
 {% for search_results_term in search_results|dictsortreversed:"term" %}
   {% if search_results_term.count > 0 %}
-  <div class="search-set">
-    <h3 class="mdc-theme--secondary-bg">
-      "{{ search_results_term.term }}"
-      <i class="icon ion-ios-arrow-forward"></i>
-      <span class="filter-count">{{ search_results_term.count }}</span>/<span class="filter-count-total">{{ search_results_term.count }}</span> {% trans 'results' %}
-    </h3>
+    <div class="search-set">
+      <h3 class="mdc-theme--secondary-bg">
+        "{{ search_results_term.term }}"
+        <i class="icon ion-ios-arrow-forward"></i>
+        <span class="filter-count">{{ search_results_term.count }}</span>/<span class="filter-count-total">{{ search_results_term.count }}</span> {% trans 'results' %}
+      </h3>
 
-    {% for obj in search_results_term.collections  %}
+      {% for obj in search_results_term.collections  %}
 
-    <div class="mdc-card" id="card{% if obj.featured == True %}-featured{% endif %}">
-      <div class="clickable detail-view" id="{{ obj.pk|safe }}">
-      <div class="mdc-typography--title bold">
-        {% if obj.image %}
-        <img id="thumbnail"
-             src="{{ obj.image.url }}">
-             &nbsp;&nbsp;{% endif %}{{ obj.title|bleach_html|safe }}
-      </div>
-    <div class="mdc-typography--caption">
-      {% trans 'Created by' %} {{ obj.owner.user.username }}
-    </div>
-    <div class="mdc-typography--body1">
-      {{ obj.description|bleach_html|safe }}
-    </div>
-    </div>
-    <div class="mdc-card__actions">
-      <div class="mdc-card__action-buttons">
-        <div class="mdc-typography--caption caption">
-          <div>
-            {% trans 'Discipline' %}: {{ obj.discipline|bleach_html|safe }}
+        <div class="mdc-card" id="card{% if obj.featured == True %}-featured{% endif %}">
+          <div class="clickable detail-view" id="{{ obj.pk|safe }}">
+            <div class="mdc-typography--title bold">
+              {% if obj.image %}
+                <img id="thumbnail"
+                  src="{{ obj.image.url }}">
+                &nbsp;&nbsp;{% endif %}{{ obj.title|bleach_html|safe }}
+            </div>
+            <div class="mdc-typography--caption">
+              {% trans 'Created by' %} {{ obj.owner.user.username }}
+            </div>
+            <div class="mdc-typography--body1">
+              {{ obj.description|bleach_html|safe }}
+            </div>
           </div>
-          <div class="followers-number"
-               id="follower-count-{{ obj.pk }}"
-               data-count="{{ obj.followers.count }}">{% trans 'Followers' %}: {{ obj.followers.count }}</div>
-          <div>
-            {% trans 'Published on' %} {{ obj.created_on }}
+          <div class="mdc-card__actions">
+            <div class="mdc-card__action-buttons">
+              <div class="mdc-typography--caption caption">
+                <div>
+                  {% trans 'Discipline' %}: {{ obj.discipline|bleach_html|safe }}
+                </div>
+                <div class="followers-number"
+                  id="follower-count-{{ obj.pk }}"
+                  data-count="{{ obj.followers.count }}">{% trans 'Followers' %}: {{ obj.followers.count }}</div>
+                <div>
+                  {% trans 'Published on' %} {{ obj.created_on }}
+                </div>
+              </div>
+            </div>
+            <div class="mdc-card__action-icons">
+              <i class="mdc-icon-toggle material-icons mdc-theme--primary follower-btn"
+                role="button"
+                aria-pressed="false"
+                aria-label="Add to favorites" tabindex="0"
+                {% if user.teacher in obj.followers.all %}
+                  data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
+                  data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+                {% else %}
+                  data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
+                  data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
+                {% endif %}
+                pk="{{ obj.pk|safe }}"
+                data-count="{{ obj.followers.count }}">
+                favorite_border
+              </i>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="mdc-card__action-icons">
-          <i class="mdc-icon-toggle material-icons mdc-theme--primary follower-btn"
-            role="button"
-            aria-pressed="false"
-            aria-label="Add to favorites" tabindex="0"
-            {% if user.teacher in obj.followers.all %}
-            data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
-            data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
-            {% else %}
-            data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
-            data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
-            {% endif %}
-            pk="{{ obj.pk|safe }}"
-            data-count="{{ obj.followers.count }}">
-            favorite_border
-          </i>
-        </div>
-      </div>
+
+      {% endfor %}
+
     </div>
-
-    {% endfor %}
-
-  </div>
   {% endif %}
 {% endfor %}
 
@@ -96,19 +96,19 @@
   {% if forloop.first %}
     {% if r.count > 0 %}
       <div class="pagination">
-          <span>
-            {% if paginator.has_previous %}
-                <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
-            {% endif %}
+        <span>
+          {% if paginator.has_previous %}
+            <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
+          {% endif %}
 
-            <span class="current">
-                {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
-            </span>
-
-            {% if paginator.has_next %}
-                <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
-            {% endif %}
+          <span class="current">
+            {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
           </span>
+
+          {% if paginator.has_next %}
+            <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
+          {% endif %}
+        </span>
       </div>
     {% endif %}
   {% endif %}

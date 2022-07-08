@@ -1,33 +1,33 @@
 <h1>Answer Analysis - {{ question.title }}</h1>
 <h2>Analytics</h2>
 <div class="meta-container">
-    <table class="width-100">
-        <thead>
-            <tr>
-                {% for column in columns %}
-                    <th>{{ column.label }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for answer in answer_rows %}
-                <tr>
-                    {% for column in answer %}
-                        <td>{{ column }}</td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <table class="width-100">
+    <thead>
+      <tr>
+        {% for column in columns %}
+          <th>{{ column.label }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for answer in answer_rows %}
+        <tr>
+          {% for column in answer %}
+            <td>{{ column }}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 <h2>Top Rationales by Answer</h2>
 <div class="meta-container">
-    {% for answer_option in answer_rationales %}
-        {% if answer_option.rationales %}
-            <h3>{{ answer_option.label}}</h3>
-            {% for rationale in answer_option.rationales %}
-                <ol>{{ rationale.count }} - {{ rationale.text }}</ol>
-            {% endfor %}
-        {% endif %}
-    {% endfor %}
+  {% for answer_option in answer_rationales %}
+    {% if answer_option.rationales %}
+      <h3>{{ answer_option.label}}</h3>
+      {% for rationale in answer_option.rationales %}
+        <ol>{{ rationale.count }} - {{ rationale.text }}</ol>
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
 </div>

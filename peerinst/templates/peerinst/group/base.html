@@ -3,18 +3,18 @@
 {% load static compress i18n %}
 
 {% block stylesheets %}
-{{ block.super }}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-{% compress css %}
-<link href="{% static 'peerinst/css/group.min.css' %}" rel="stylesheet">
-{% endcompress %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  {% compress css %}
+    <link href="{% static 'peerinst/css/group.min.css' %}" rel="stylesheet">
+  {% endcompress %}
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-{% compress js %}
-<script src="{% static 'peerinst/js/group.min.js' %}"></script>
-{% endcompress %}
-{% block init-scripts %}{% endblock %}
+  {{ block.super }}
+  {% compress js %}
+    <script src="{% static 'peerinst/js/group.min.js' %}"></script>
+  {% endcompress %}
+  {% block init-scripts %}{% endblock %}
 {% endblock %}

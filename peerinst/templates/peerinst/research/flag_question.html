@@ -3,91 +3,91 @@
 {% load add_class static compress i18n %}
 
 {% block stylesheets %}
-{{ block.super }}
-<style nonce="{{ request.csp_nonce }}">
-  .sticky-header {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0px;
-  }
-  .padded-bottom {
-    margin-bottom: 20px;
-  }
-  td {
-    border: 1px solid rgb(190,190,190);
-    padding: 10px;
-  }
-  .mdc-text-field__input {
-    width: 500px;
-  }
-</style>
+  {{ block.super }}
+  <style nonce="{{ request.csp_nonce }}">
+    .sticky-header {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0px;
+    }
+    .padded-bottom {
+      margin-bottom: 20px;
+    }
+    td {
+      border: 1px solid rgb(190,190,190);
+      padding: 10px;
+    }
+    .mdc-text-field__input {
+      width: 500px;
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
-<main>
-  <section>
+  <main>
+    <section>
 
-    <div class="sticky-header mdc-theme--background">
-      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Flag Question' %}: {{ question.title|safe }}</h2>
+      <div class="sticky-header mdc-theme--background">
+        <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Flag Question' %}: {{ question.title|safe }}</h2>
 
-      <div class="admin-link">
-        {% if discipline_title %}
-          <a href="{% url 'research-discipline-question-index-by-discipline' discipline_title=discipline_title %}#{{ question.pk }}">{% trans 'Back to Question List' %}</a>
-        {% elif assignment_id %}
-          <a href="{% url 'research-assignment-question-index-by-assignment' assignment_id=assignment_id %}#{{ question.pk }}">{% trans 'Back to Question List' %}</a>
-          <span class="links-divider">|</span><a href="{% url 'question-list' assignment_id=assignment_id %}">{% trans 'Back to Assignment' %}</a>
-        {% endif %}
-      </div>
+        <div class="admin-link">
+          {% if discipline_title %}
+            <a href="{% url 'research-discipline-question-index-by-discipline' discipline_title=discipline_title %}#{{ question.pk }}">{% trans 'Back to Question List' %}</a>
+          {% elif assignment_id %}
+            <a href="{% url 'research-assignment-question-index-by-assignment' assignment_id=assignment_id %}#{{ question.pk }}">{% trans 'Back to Question List' %}</a>
+            <span class="links-divider">|</span><a href="{% url 'question-list' assignment_id=assignment_id %}">{% trans 'Back to Assignment' %}</a>
+          {% endif %}
+        </div>
 
-      <div class="content">
-        <form id="flag-form" action="" method="post">
-          {% csrf_token %}
+        <div class="content">
+          <form id="flag-form" action="" method="post">
+            {% csrf_token %}
 
-          <div class="mdc-form-field">
-            <label for="id_flag">{{ form.flag.label }}: </label>
-            <div class="mdc-checkbox">
-              <input type="checkbox"
-                     name="flag"
-                     id="id_flag"
-                     class="mdc-checkbox__native-control"
-                     {% if form.flag.value %}checked{% endif %}/>
-              <div class="mdc-checkbox__background">
-                <svg class="mdc-checkbox__checkmark"
-                     viewBox="0 0 24 24">
-                  <path class="mdc-checkbox__checkmark-path"
-                        fill="none"
-                        stroke="white"
-                        d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
-                </svg>
-                <div class="mdc-checkbox__mixedmark"></div>
+            <div class="mdc-form-field">
+              <label for="id_flag">{{ form.flag.label }}: </label>
+              <div class="mdc-checkbox">
+                <input type="checkbox"
+                  name="flag"
+                  id="id_flag"
+                  class="mdc-checkbox__native-control"
+                  {% if form.flag.value %}checked{% endif %}/>
+                <div class="mdc-checkbox__background">
+                  <svg class="mdc-checkbox__checkmark"
+                    viewBox="0 0 24 24">
+                    <path class="mdc-checkbox__checkmark-path"
+                      fill="none"
+                      stroke="white"
+                      d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                  </svg>
+                  <div class="mdc-checkbox__mixedmark"></div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class='mdc-form-field'>
-            <label for='id_flag_reason'>{{ form.flag_reason.label }}:</label>
-            <div class="m-left-10">
-              {{ form.flag_reason|add_class:'multiple-select mdc-theme--background' }}
+            <div class='mdc-form-field'>
+              <label for='id_flag_reason'>{{ form.flag_reason.label }}:</label>
+              <div class="m-left-10">
+                {{ form.flag_reason|add_class:'multiple-select mdc-theme--background' }}
+              </div>
             </div>
-          </div>
 
-          <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
-            {{ form.comment|add_class:"mdc-text-field__input" }}
-            {{ form.comment.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-            <div class="mdc-notched-outline">
-              <svg>
-                <path class="mdc-notched-outline__path"/>
-              </svg>
+            <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+              {{ form.comment|add_class:"mdc-text-field__input" }}
+              {{ form.comment.label_tag|add_class:"mdc-floating-label"|cut:":" }}
+              <div class="mdc-notched-outline">
+                <svg>
+                  <path class="mdc-notched-outline__path"/>
+                </svg>
+              </div>
+              <div class="mdc-notched-outline__idle"></div>
             </div>
-            <div class="mdc-notched-outline__idle"></div>
-          </div>
 
-        </form>
-      </div>
+          </form>
+        </div>
 
-      <input type="submit" form="flag-form" class="mdc-button mdc-button--raised padded-bottom" value="{% trans 'Save' %}">
+        <input type="submit" form="flag-form" class="mdc-button mdc-button--raised padded-bottom" value="{% trans 'Save' %}">
 
-      <i class="mdc-icon-toggle material-icons mdc-theme--primary icon-list"
+        <i class="mdc-icon-toggle material-icons mdc-theme--primary icon-list"
           id="hide"
           role="button"
           title="{% trans 'Show/Hide' %}"
@@ -96,45 +96,45 @@
           data-toggle-on='{"label": "{% trans 'Show' %}", "content": "unfold_more"}'
           data-toggle-off='{"label": "{% trans 'Hide' %}", "content": "unfold_less"}'>
           unfold_less
-      </i>
+        </i>
 
-      <i id="activate-dialog" class="mdc-theme--primary material-icons md-24 mdc-ripple-surface icon-list">help</i>
+        <i id="activate-dialog" class="mdc-theme--primary material-icons md-24 mdc-ripple-surface icon-list">help</i>
 
         {% if message %}
-        <div class="message-box">
-          <div class="message">{{ message }}</div>
-          <i id="clear" class="clear mdc-theme--secondary material-icons md-24 mdc-ripple-surface icon-list">
+          <div class="message-box">
+            <div class="message">{{ message }}</div>
+            <i id="clear" class="clear mdc-theme--secondary material-icons md-24 mdc-ripple-surface icon-list">
               clear
-          </i>
-        </div>
+            </i>
+          </div>
         {% endif %}
 
-      <aside id="dialog"
-        class="mdc-dialog"
-        role="alertdialog"
-        aria-labelledby="assignment-parameters-label"
-        aria-describedby="assignment-parameters-description">
-        <div class="mdc-dialog__surface">
-          <header class="mdc-dialog__header">
-            <h2 id="assignment-parameters-label" class="mdc-dialog__header__title">
-              {% trans 'Flagging questions' %}
-            </h2>
-          </header>
-          <section id="assignment-parameters-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
-            <p class="mdc-typography--body1">
-              {% blocktrans %}Please use this page to flag a question you believe should be reviewed by a myDALITE moderator, and maybe taken out of the database.<br><br>
-              This may be because the answer is incorrect, the image is infringing on copyright, or the content is inappropriate.<br><br>
-              As a subject matter expert, and a member of the myDALITE community, your input will help maintain the quality of the database of questions.<br><br>
-              Thank you for your time!<br><br>
-              - The SALTISE/S4 Team{% endblocktrans %}
-            </p>
-          </section>
-          <footer class="mdc-dialog__footer">
-            <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
-          </footer>
-        </div>
-        <div class="mdc-dialog__backdrop"></div>
-      </aside>
+        <aside id="dialog"
+          class="mdc-dialog"
+          role="alertdialog"
+          aria-labelledby="assignment-parameters-label"
+          aria-describedby="assignment-parameters-description">
+          <div class="mdc-dialog__surface">
+            <header class="mdc-dialog__header">
+              <h2 id="assignment-parameters-label" class="mdc-dialog__header__title">
+                {% trans 'Flagging questions' %}
+              </h2>
+            </header>
+            <section id="assignment-parameters-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
+              <p class="mdc-typography--body1">
+                {% blocktrans %}Please use this page to flag a question you believe should be reviewed by a myDALITE moderator, and maybe taken out of the database.<br><br>
+                  This may be because the answer is incorrect, the image is infringing on copyright, or the content is inappropriate.<br><br>
+                  As a subject matter expert, and a member of the myDALITE community, your input will help maintain the quality of the database of questions.<br><br>
+                  Thank you for your time!<br><br>
+                  - The SALTISE/S4 Team{% endblocktrans %}
+              </p>
+            </section>
+            <footer class="mdc-dialog__footer">
+              <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
+            </footer>
+          </div>
+          <div class="mdc-dialog__backdrop"></div>
+        </aside>
 
         <div class="mdc-card">
           <div class="mdc-typography--body1">
@@ -144,73 +144,73 @@
           <div class="hidable">
 
             {% if question.image %}
-            <img class="question-image" src="{{ question.image.url }}" height="{{ question.image.height }}"
-                 width="{{ question.image.width }}" alt="question.image_alt_text">
+              <img class="question-image" src="{{ question.image.url }}" height="{{ question.image.height }}"
+                width="{{ question.image.width }}" alt="question.image_alt_text">
             {% endif %}
             {% if question.video_url %}
-            <div id="question-video">
-              <object class="question-image" width="640" height="390" data="{{ question.video_url }}"></object>
-            </div>
+              <div id="question-video">
+                <object class="question-image" width="640" height="390" data="{{ question.video_url }}"></object>
+              </div>
             {% endif %}
 
             <ul id="answer-choices">
               {% for label, choice in question.get_choices %}
                 <li class="dense-list">{{ label }}. {{ choice|safe }}
-                {% for c in question.answerchoice_set.all %}
-                  {% if forloop.counter == forloop.parentloop.counter %}
-                    {% if c.correct %}
-                      <i id="check" class="material-icons check-12">check</i>
+                  {% for c in question.answerchoice_set.all %}
+                    {% if forloop.counter == forloop.parentloop.counter %}
+                      {% if c.correct %}
+                        <i id="check" class="material-icons check-12">check</i>
+                      {% endif %}
                     {% endif %}
-                  {% endif %}
-                {% endfor %}
+                  {% endfor %}
                 </li>
               {% endfor %}
             </ul>
           </div>
 
         </div>
-      <h3>{% trans 'Expert rationales for the correct answer to this question' %}</h3>
-      {% if expert_answers %}
-      <div>
-        <ul>
-        {% for a in expert_answers %}
-        <li>
-          <a href="{% url 'research-rationale-update-expert' pk=a.id %}">
-          <i class="material-icons md-24 mdc-ripple-surface icon-list">check_circle_outline</i>
-          </a>
-          <span class='mdc-theme--primary bold'>{{ a.first_answer_choice_label }}</span>: {{ a.rationale|safe|striptags }}.
-        </li>
-        {% endfor %}
-        </ul>
+        <h3>{% trans 'Expert rationales for the correct answer to this question' %}</h3>
+        {% if expert_answers %}
+          <div>
+            <ul>
+              {% for a in expert_answers %}
+                <li>
+                  <a href="{% url 'research-rationale-update-expert' pk=a.id %}">
+                    <i class="material-icons md-24 mdc-ripple-surface icon-list">check_circle_outline</i>
+                  </a>
+                  <span class='mdc-theme--primary bold'>{{ a.first_answer_choice_label }}</span>: {{ a.rationale|safe|striptags }}.
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% else %}
+          <p>
+            {% trans 'Sorry, there are no rationales that have been marked as expert for this question.' %}
+          </p>
+        {% endif %}
+
       </div>
-      {% else %}
-      <p>
-        {% trans 'Sorry, there are no rationales that have been marked as expert for this question.' %}
-      </p>
-      {% endif %}
 
-    </div>
-
-  </section>
-</main>
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script nonce="{{ request.csp_nonce }}">
-  var show = localStorage.getItem('collapse') === 'true';
-  $('.hidable').toggle(show);
-  $(".mdc-icon-toggle").each(function() {
-    var el = bundle.iconToggle.MDCIconToggle.attachTo(this);
-    el.on = !show;
-  });
-  bundle.addDialog();
-  document.getElementById("hide").addEventListener("click", function() {
-    $('.hidable').toggle();
-    localStorage.setItem('collapse', $('.hidable').css('display')=='none' ? false : true);
-  })
-  document.getElementById("clear").addEventListener("click", function() {
-    $(this).parent().remove();
-  })
-</script>
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    var show = localStorage.getItem('collapse') === 'true';
+    $('.hidable').toggle(show);
+    $(".mdc-icon-toggle").each(function() {
+      var el = bundle.iconToggle.MDCIconToggle.attachTo(this);
+      el.on = !show;
+    });
+    bundle.addDialog();
+    document.getElementById("hide").addEventListener("click", function() {
+      $('.hidable').toggle();
+      localStorage.setItem('collapse', $('.hidable').css('display')=='none' ? false : true);
+    })
+    document.getElementById("clear").addEventListener("click", function() {
+      $(this).parent().remove();
+    })
+  </script>
 {% endblock %}

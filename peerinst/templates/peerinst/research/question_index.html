@@ -3,149 +3,149 @@
 {% load static compress i18n %}
 
 {% block stylesheets %}
-{{ block.super }}
-<style nonce="{{ request.csp_nonce }}">
-  .question-list {
-    position: relative;
-  }
-  .action-list {
-    display: inline-block;
-    position: absolute;
-    right: 0px;
-    width: 200px;
-  }
-</style>
+  {{ block.super }}
+  <style nonce="{{ request.csp_nonce }}">
+    .question-list {
+      position: relative;
+    }
+    .action-list {
+      display: inline-block;
+      position: absolute;
+      right: 0px;
+      width: 200px;
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
-<main>
-  <section>
+  <main>
+    <section>
 
-    <h1 id="title" class="mdc-typography--display3">
-      {% trans 'Quality Control' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+      <h1 id="title" class="mdc-typography--display3">
+        {% trans 'Quality Control' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="admin-link">
-      <a href="{% url 'research-index' %}">{% trans 'Back to List of Disciplines' %}</a>
-      {% if assignment_id %}<span class="links-divider">|</span><a href="{% url 'question-list' assignment_id=assignment_id %}">{% trans 'Back to Assignment' %}</a>{% endif %}
-      <span class="links-divider">|</span>{% blocktrans %}Number of rationales scored by {{ annotator }}: {{ annotations_count }}{% endblocktrans %}
-    </div>
-
-    <h2 class="mdc-typography--display1 mdc-theme--secondary">
-      {% if discipline_title %}{{ discipline_title|safe }}{% elif assignment_id %}{{ assignment_id }}{% endif %}
-    </h2>
-
-    <div class='field-container'>
-      <div class='number-box'><span class='number'>?</span></div>
-      <div class='field'>
-        <small>
-          <p>
-            {% trans 'Below is a list of questions and their answer choices. The numbers in the brackets are meant to give you an idea of the state of the database as it stands right now.  The numbers are, in order:' %}
-          </p>
-
-          <ul>
-            <li>Total number of rationales that there are for this question</li>
-            <li>Total number of rationales that have been scored by all teachers, including yourself</li>
-            <li>Total number of rationales that have been scored by you for this question</li>
-          </ul>
-
-          <p>
-            {% trans 'These numbers are then broken down by answer choice below the Question ID. Click on the Answer Choice to add or update your scoring of the rationales.' %}
-          </p>
-          <br>
-          <p>{% trans 'The icons to the left allow you to: ' %}</p>
-          <ul>
-            <li><i class="mdc-theme--primary material-icons md-24">group</i>See All the scores given by other teachers to the rationales for a question.</li>
-            <li><i class="mdc-theme--primary material-icons md-24">report</i>Flag a question as being problematic. (Red means you have flagged the question, yellow means this question has been flagged by someone else, blue means that the question has not yet been flagged.)</li>
-            <li><i class="mdc-theme--primary material-icons md-24">add_comment</i>Add/edit expert rationales for the correct answer choice(s).</li>
-            <li><i class="mdc-theme--primary material-icons md-24">check_circle</i>See the current list of current expert rationales for that question.</li>
-          </ul>
-        </small>
-      </div>
-    </div>
-    <br>
-    <hr class="simple-hr">
-    {% for item in questions %}
-      <div class="question-list" id="{{ item.question.pk }}">
-        <span>
-          {{ item.question.title }} - ({{ item.question.answer_set.count }}/{{ item.total_annotations }}/{{ item.total_annotations_by_user }})
-
-          {% if not item.enough_sample_answers %}
-          <a href="{% url 'sample-answer-form' question_id=item.question.pk %}">
-            <i class="material-icons md-24 mdc-ripple-surface icon-list red" title="{% trans 'Not enough sample answers' %}">
-              error
-            </i>
-          </a>
-          {% endif %}
-
-        </span>
-        <div class='action-list'>
-          {% if discipline_title %}
-            <a href="{% url 'research-all-annotations-for-question-by-discipline' discipline_title=discipline_title question_pk=item.question.pk %}"><i class="mdc-theme--primary material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'See all scores' %}">group</i></a>
-
-            <a href="{% url 'research-flag-question-by-discipline' discipline_title=discipline_title question_pk=item.question.pk %}"><i class="{% if item.flag_color_code %} {{ item.flag_color_code }} {% else %} gray {% endif %} material-icons md-24 mdc-ripple-surface icon-list" title="{% if item.flagged_reasons %}{{ item.flagged_reasons }}{% else %}{% trans 'Flag question as problematic' %}{% endif %}">report</i></a>
-          {% elif assignment_id %}
-            <a href="{% url 'research-all-annotations-for-question-by-assignment' assignment_id=assignment_id question_pk=item.question.pk %}"><i class="mdc-theme--primary material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'See all scores' %}">group</i></a>
-
-            <a href="{% url 'research-flag-question-by-assignment' assignment_id=assignment_id question_pk=item.question.pk %}"><i class="{% if item.flag_color_code %} {{ item.flag_color_code }} {% else %} gray {% endif %} material-icons md-24 mdc-ripple-surface icon-list" title="{% if item.flagged_reasons %}{{ item.flagged_reasons }}{% else %}{% trans 'Flag question as problematic' %}{% endif %}">report</i></a>
-          {% endif %}
-
-        <a href="{% url 'research-fix-expert-rationale' question_id=item.question.pk %}"><i class="mdc-theme--primary material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'Add/edit expert rationales' %}">add_comment</i></a>
-
-        {% if item.question_expert_answers|length > 0 %}
-          <i id="activate-dialog-expert-{{ item.question.pk }}" class="material-icons md-24 mdc-ripple-surface icon-list green" title="{% trans 'Show expert rationales ' %}({{ item.question_expert_answers|length }})">check_circle</i>
-          <aside id="dialog-expert-{{ item.question.pk }}"
-          class="mdc-dialog"
-          role="alertdialog"
-          aria-labelledby="label"
-          aria-describedby="description">
-          <div class="mdc-dialog__surface">
-            <header class="mdc-dialog__header">
-              <h2 id="label" class="mdc-dialog__header__title">
-              {% trans 'Expert Rationales' %}
-              </h2>
-            </header>
-            <section id="description" class="mdc-dialog__body mdc-dialog__body--scrollable">
-
-              {% for a in item.question_expert_answers %}
-                <p name="expert" class="items-for-question">{{a.first_answer_choice_label}} : {{ a.rationale|safe|striptags }}</p>
-              {% endfor %}
-
-            </section>
-            <footer class="mdc-dialog__footer">
-              <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
-            </footer>
-          </div>
-          <div class="mdc-dialog__backdrop"></div>
-
-          </aside>
-        {% else %}
-          <a href="{% url 'research-fix-expert-rationale' question_id=item.question.pk %}"><i class="material-icons md-24 mdc-ripple-surface icon-list red" title="{% trans 'No expert rationales' %}">warning</i></a>
-        {% endif %}
-
-
+      <div class="admin-link">
+        <a href="{% url 'research-index' %}">{% trans 'Back to List of Disciplines' %}</a>
+        {% if assignment_id %}<span class="links-divider">|</span><a href="{% url 'question-list' assignment_id=assignment_id %}">{% trans 'Back to Assignment' %}</a>{% endif %}
+        <span class="links-divider">|</span>{% blocktrans %}Number of rationales scored by {{ annotator }}: {{ annotations_count }}{% endblocktrans %}
       </div>
 
-      <ul class="m-top-4">
-        {% for answerchoice in item.answerchoices|dictsort:"answer_label" %}
-          {% if discipline_title %}
-            <li><a href="{% url 'research-question-answer-list-by-discipline' discipline_title=discipline_title question_pk=item.question.pk answerchoice_value=answerchoice.answer_label|make_list|first %}">({{ answerchoice.frequency }}/{{ answerchoice.annotation_count }}/{{ answerchoice.annotation_count_by_user }}) - {{ answerchoice.answer_label|safe }}</a></li>
-          {% elif assignment_id %}
-            <li><a href="{% url 'research-question-answer-list-by-assignment' assignment_id=assignment_id question_pk=item.question.pk answerchoice_value=answerchoice.answer_label|make_list|first %}">({{ answerchoice.frequency }}/{{ answerchoice.annotation_count }}/{{ answerchoice.annotation_count_by_user }}) - {{ answerchoice.answer_label|safe }}</a></li>
-          {% endif %}
-        {% endfor %}
-        </ul>
+      <h2 class="mdc-typography--display1 mdc-theme--secondary">
+        {% if discipline_title %}{{ discipline_title|safe }}{% elif assignment_id %}{{ assignment_id }}{% endif %}
+      </h2>
 
+      <div class='field-container'>
+        <div class='number-box'><span class='number'>?</span></div>
+        <div class='field'>
+          <small>
+            <p>
+              {% trans 'Below is a list of questions and their answer choices. The numbers in the brackets are meant to give you an idea of the state of the database as it stands right now.  The numbers are, in order:' %}
+            </p>
+
+            <ul>
+              <li>Total number of rationales that there are for this question</li>
+              <li>Total number of rationales that have been scored by all teachers, including yourself</li>
+              <li>Total number of rationales that have been scored by you for this question</li>
+            </ul>
+
+            <p>
+              {% trans 'These numbers are then broken down by answer choice below the Question ID. Click on the Answer Choice to add or update your scoring of the rationales.' %}
+            </p>
+            <br>
+            <p>{% trans 'The icons to the left allow you to: ' %}</p>
+            <ul>
+              <li><i class="mdc-theme--primary material-icons md-24">group</i>See All the scores given by other teachers to the rationales for a question.</li>
+              <li><i class="mdc-theme--primary material-icons md-24">report</i>Flag a question as being problematic. (Red means you have flagged the question, yellow means this question has been flagged by someone else, blue means that the question has not yet been flagged.)</li>
+              <li><i class="mdc-theme--primary material-icons md-24">add_comment</i>Add/edit expert rationales for the correct answer choice(s).</li>
+              <li><i class="mdc-theme--primary material-icons md-24">check_circle</i>See the current list of current expert rationales for that question.</li>
+            </ul>
+          </small>
+        </div>
       </div>
+      <br>
       <hr class="simple-hr">
-    {% endfor %}
-  </section>
-</main>
+      {% for item in questions %}
+        <div class="question-list" id="{{ item.question.pk }}">
+          <span>
+            {{ item.question.title }} - ({{ item.question.answer_set.count }}/{{ item.total_annotations }}/{{ item.total_annotations_by_user }})
+
+            {% if not item.enough_sample_answers %}
+              <a href="{% url 'sample-answer-form' question_id=item.question.pk %}">
+                <i class="material-icons md-24 mdc-ripple-surface icon-list red" title="{% trans 'Not enough sample answers' %}">
+                  error
+                </i>
+              </a>
+            {% endif %}
+
+          </span>
+          <div class='action-list'>
+            {% if discipline_title %}
+              <a href="{% url 'research-all-annotations-for-question-by-discipline' discipline_title=discipline_title question_pk=item.question.pk %}"><i class="mdc-theme--primary material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'See all scores' %}">group</i></a>
+
+              <a href="{% url 'research-flag-question-by-discipline' discipline_title=discipline_title question_pk=item.question.pk %}"><i class="{% if item.flag_color_code %} {{ item.flag_color_code }} {% else %} gray {% endif %} material-icons md-24 mdc-ripple-surface icon-list" title="{% if item.flagged_reasons %}{{ item.flagged_reasons }}{% else %}{% trans 'Flag question as problematic' %}{% endif %}">report</i></a>
+            {% elif assignment_id %}
+              <a href="{% url 'research-all-annotations-for-question-by-assignment' assignment_id=assignment_id question_pk=item.question.pk %}"><i class="mdc-theme--primary material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'See all scores' %}">group</i></a>
+
+              <a href="{% url 'research-flag-question-by-assignment' assignment_id=assignment_id question_pk=item.question.pk %}"><i class="{% if item.flag_color_code %} {{ item.flag_color_code }} {% else %} gray {% endif %} material-icons md-24 mdc-ripple-surface icon-list" title="{% if item.flagged_reasons %}{{ item.flagged_reasons }}{% else %}{% trans 'Flag question as problematic' %}{% endif %}">report</i></a>
+            {% endif %}
+
+            <a href="{% url 'research-fix-expert-rationale' question_id=item.question.pk %}"><i class="mdc-theme--primary material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'Add/edit expert rationales' %}">add_comment</i></a>
+
+            {% if item.question_expert_answers|length > 0 %}
+              <i id="activate-dialog-expert-{{ item.question.pk }}" class="material-icons md-24 mdc-ripple-surface icon-list green" title="{% trans 'Show expert rationales ' %}({{ item.question_expert_answers|length }})">check_circle</i>
+              <aside id="dialog-expert-{{ item.question.pk }}"
+                class="mdc-dialog"
+                role="alertdialog"
+                aria-labelledby="label"
+                aria-describedby="description">
+                <div class="mdc-dialog__surface">
+                  <header class="mdc-dialog__header">
+                    <h2 id="label" class="mdc-dialog__header__title">
+                      {% trans 'Expert Rationales' %}
+                    </h2>
+                  </header>
+                  <section id="description" class="mdc-dialog__body mdc-dialog__body--scrollable">
+
+                    {% for a in item.question_expert_answers %}
+                      <p name="expert" class="items-for-question">{{a.first_answer_choice_label}} : {{ a.rationale|safe|striptags }}</p>
+                    {% endfor %}
+
+                  </section>
+                  <footer class="mdc-dialog__footer">
+                    <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
+                  </footer>
+                </div>
+                <div class="mdc-dialog__backdrop"></div>
+
+              </aside>
+            {% else %}
+              <a href="{% url 'research-fix-expert-rationale' question_id=item.question.pk %}"><i class="material-icons md-24 mdc-ripple-surface icon-list red" title="{% trans 'No expert rationales' %}">warning</i></a>
+            {% endif %}
+
+
+          </div>
+
+          <ul class="m-top-4">
+            {% for answerchoice in item.answerchoices|dictsort:"answer_label" %}
+              {% if discipline_title %}
+                <li><a href="{% url 'research-question-answer-list-by-discipline' discipline_title=discipline_title question_pk=item.question.pk answerchoice_value=answerchoice.answer_label|make_list|first %}">({{ answerchoice.frequency }}/{{ answerchoice.annotation_count }}/{{ answerchoice.annotation_count_by_user }}) - {{ answerchoice.answer_label|safe }}</a></li>
+              {% elif assignment_id %}
+                <li><a href="{% url 'research-question-answer-list-by-assignment' assignment_id=assignment_id question_pk=item.question.pk answerchoice_value=answerchoice.answer_label|make_list|first %}">({{ answerchoice.frequency }}/{{ answerchoice.annotation_count }}/{{ answerchoice.annotation_count_by_user }}) - {{ answerchoice.answer_label|safe }}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+
+        </div>
+        <hr class="simple-hr">
+      {% endfor %}
+    </section>
+  </main>
 {% endblock %}
 {% block scripts %}
-{{ block.super }}
-<script nonce="{{ request.csp_nonce }}">
-  bundle.addDialog();
-</script>
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    bundle.addDialog();
+  </script>
 {% endblock %}

@@ -4,65 +4,65 @@
 {% block title %}{% trans 'New user approval' %} | myDalite{% endblock %}
 
 {% block extrastyle %}
-<link href="{% static 'peerinst/css/admin.min.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'peerinst/css/admin.min.css' %}" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block extrahead %}
-{{ block.super }}
-<script src="{% static 'peerinst/js/admin.min.js' %}"></script>
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", () => {
-    admin.initNewUserApproval({
-      urls: {
-        verify: "{% url 'saltise-admin:verify-user' %}"
-      }
+  {{ block.super }}
+  <script src="{% static 'peerinst/js/admin.min.js' %}"></script>
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", () => {
+      admin.initNewUserApproval({
+        urls: {
+          verify: "{% url 'saltise-admin:verify-user' %}"
+        }
+      });
     });
-  });
-</script>
+  </script>
 {% endblock %}
 
 {% block breadcrumbs %}
-<ul>
-  <li><a href="{% url 'saltise-admin:index' %}">{% trans 'Home' %}</a></li>
-  <li>{% trans 'New user approval' %}</li>
-</ul>
+  <ul>
+    <li><a href="{% url 'saltise-admin:index' %}">{% trans 'Home' %}</a></li>
+    <li>{% trans 'New user approval' %}</li>
+  </ul>
 {% endblock %}
 
 {% block content_title %}
-<h1>{% trans 'New user approval' %}</h1>
+  <h1>{% trans 'New user approval' %}</h1>
 {% endblock %}
 
 {% block content %}
   {% csrf_token %}
   <div id="new-user-approval" class="g-d-c-fluid">
     <ul>
-    {% for user in new_users %}
-      <li class="user--{{ user.type }}">
-        <span class="user__username">{{ user.username }}</span>
-        <span class="user__date-joined">{{ user.date_joined }}</span>
-        <span class="user__email">{{ user.email }}</span>
-        <span class="user__url">
-          <a target="_blank"
-             rel="noopener noreferrer"
-             href="{{ user.url }}">
-            {{ user.url }}
-          </a>
-        </span>
-        <span class="user__type">{{ user.type }}</span>
-        <button class="user__approve" title="Approve user">
-          <svg>
-            <use xlink:href="#check"></use>
-          </svg>
-        </button>
-        <button class="user__refuse" title="Deny user">
-          <svg>
-            <use xlink:href="#close"></use>
-          </svg>
-        </button>
-      </li>
-    {% empty %}
-      <li>{% trans 'No users to add.' %}</li>
-    {% endfor %}
+      {% for user in new_users %}
+        <li class="user--{{ user.type }}">
+          <span class="user__username">{{ user.username }}</span>
+          <span class="user__date-joined">{{ user.date_joined }}</span>
+          <span class="user__email">{{ user.email }}</span>
+          <span class="user__url">
+            <a target="_blank"
+              rel="noopener noreferrer"
+              href="{{ user.url }}">
+              {{ user.url }}
+            </a>
+          </span>
+          <span class="user__type">{{ user.type }}</span>
+          <button class="user__approve" title="Approve user">
+            <svg>
+              <use xlink:href="#check"></use>
+            </svg>
+          </button>
+          <button class="user__refuse" title="Deny user">
+            <svg>
+              <use xlink:href="#close"></use>
+            </svg>
+          </button>
+        </li>
+      {% empty %}
+        <li>{% trans 'No users to add.' %}</li>
+      {% endfor %}
     </ul>
   </div>
   {% include 'icons.svg' %}

@@ -3,66 +3,66 @@
 {% load i18n add_class compress static %}
 
 {% block body %}
-<main>
-  <section>
-    <h1 class="mdc-typography--display3">{% trans 'Homework List' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
-    <div class="admin-link">
-      <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
-    </div>
-
-    {% if not object_list %}
-    <p>{% blocktrans %}You currently have no assigned homework.{% endblocktrans %}</p>
-    {% else %}
-    <div class='field-container'>
-      <div class='number-box'><span class='number'>?</span></div>
-      <div class='field'>
-        <p><small>
-          {% blocktrans %}
-          The list below shows all assignments for all your groups.  You can edit the assigment through the edit button, or access the group by clicking the heading.
-          {% endblocktrans %}
-        </small></p>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Homework List' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
+      <div class="admin-link">
+        <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
       </div>
-    </div>
-    {% endif %}
 
-    {% regroup object_list.all by group as group_list %}
+      {% if not object_list %}
+        <p>{% blocktrans %}You currently have no assigned homework.{% endblocktrans %}</p>
+      {% else %}
+        <div class='field-container'>
+          <div class='number-box'><span class='number'>?</span></div>
+          <div class='field'>
+            <p><small>
+              {% blocktrans %}
+                The list below shows all assignments for all your groups.  You can edit the assigment through the edit button, or access the group by clicking the heading.
+              {% endblocktrans %}
+            </small></p>
+          </div>
+        </div>
+      {% endif %}
 
-    {% for group in group_list|dictsort:"grouper.title" %}
-    {% if group.grouper in teacher.current_groups.all %}
+      {% regroup object_list.all by group as group_list %}
 
-    <a href="{% url 'group-details' group.grouper.hash %}"><h2 class="mdc-typography--display1 mdc-theme--secondary">{{ group.grouper }}</h2></a>
+      {% for group in group_list|dictsort:"grouper.title" %}
+        {% if group.grouper in teacher.current_groups.all %}
 
-    <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-      {% for g in group.list|dictsort:"due_date" %}
-      <li role="separator" class="mdc-list-divider"></li>
-      <li class="mdc-list-item">
-        <span class="mdc-list-item__graphic mdc-theme--primary">
-          <i class="mdc-theme--primary material-icons md-48">work</i>
-        </span>
-        <span class="mdc-list-item__text mdc-theme--secondary bold">
-          {{ g.assignment.title }}
-          <span class="mdc-list-item__secondary-text">
-            {% trans "Distributed: " %}{{ g.distribution_date }}
-          </span>
-          <span class="mdc-list-item__secondary-text">
-            {% trans "Due date: " %}{{ g.due_date }}
-          </span>
-        </span>
-        <span class="mdc-list-item__meta">
-          <a href="{% url 'group-assignment' g.hash %}">
-          <i class="material-icons md-24 mdc-ripple-surface icon-list">edit</i>
-          </a>
-        </span>
-      </li>
+          <a href="{% url 'group-details' group.grouper.hash %}"><h2 class="mdc-typography--display1 mdc-theme--secondary">{{ group.grouper }}</h2></a>
+
+          <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
+            {% for g in group.list|dictsort:"due_date" %}
+              <li role="separator" class="mdc-list-divider"></li>
+              <li class="mdc-list-item">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">work</i>
+                </span>
+                <span class="mdc-list-item__text mdc-theme--secondary bold">
+                  {{ g.assignment.title }}
+                  <span class="mdc-list-item__secondary-text">
+                    {% trans "Distributed: " %}{{ g.distribution_date }}
+                  </span>
+                  <span class="mdc-list-item__secondary-text">
+                    {% trans "Due date: " %}{{ g.due_date }}
+                  </span>
+                </span>
+                <span class="mdc-list-item__meta">
+                  <a href="{% url 'group-assignment' g.hash %}">
+                    <i class="material-icons md-24 mdc-ripple-surface icon-list">edit</i>
+                  </a>
+                </span>
+              </li>
+            {% endfor %}
+            <li role="separator" class="mdc-list-divider"></li>
+          </ul>
+
+        {% endif %}
       {% endfor %}
-      <li role="separator" class="mdc-list-divider"></li>
-    </ul>
 
-    {% endif %}
-    {% endfor %}
-
-  </section>
-</main>
+    </section>
+  </main>
 {% endblock %}

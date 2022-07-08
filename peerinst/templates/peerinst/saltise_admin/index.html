@@ -4,72 +4,72 @@
 {% block title %}{% trans 'myDalite administration' %}{% endblock %}
 
 {% block content %}
-<h1>{% trans 'myDalite administration' %}</h1>
-<div class="g-d-c">
-  <div class="g-d-12">
-    <div class="grp-module">
-      <h2>{% trans 'Management' %}</h2>
-      <div class="grp-row">
-        <p><a href="{% url 'saltise-admin:group-assignment-management' %}">
+  <h1>{% trans 'myDalite administration' %}</h1>
+  <div class="g-d-c">
+    <div class="g-d-12">
+      <div class="grp-module">
+        <h2>{% trans 'Management' %}</h2>
+        <div class="grp-row">
+          <p><a href="{% url 'saltise-admin:group-assignment-management' %}">
             {% trans 'Manage group assignments' %}
-        </a></p>
-      </div>
-      <div class="grp-row">
-        <p><a href="{% url 'saltise-admin:new-user-approval' %}">
+          </a></p>
+        </div>
+        <div class="grp-row">
+          <p><a href="{% url 'saltise-admin:new-user-approval' %}">
             {% trans 'Approve new users' %}
-        </a></p>
-      </div>
-      <div class="grp-row">
-        <p><a href="{% url 'admin:peerinst_message_changelist' %}">
+          </a></p>
+        </div>
+        <div class="grp-row">
+          <p><a href="{% url 'admin:peerinst_message_changelist' %}">
             {% trans 'Manage messages' %}
-        </a></p>
-      </div>
-      <div class="grp-row">
-        <p><a href="{% url 'admin:peerinst_questionflag_changelist' %}">
+          </a></p>
+        </div>
+        <div class="grp-row">
+          <p><a href="{% url 'admin:peerinst_questionflag_changelist' %}">
             {% trans 'Flagged questions' %}
-        </a></p>
-      </div>
-      <div class="grp-row">
-        <p><a href="{% url 'admin:peerinst_questionflagreason_changelist' %}">
+          </a></p>
+        </div>
+        <div class="grp-row">
+          <p><a href="{% url 'admin:peerinst_questionflagreason_changelist' %}">
             {% trans 'Reasons for flagged questions' %}
-        </a></p>
-      </div>
-      <div class="grp-row">
-        <p><a href="{% url 'admin:peerinst_collection_changelist' %}">
+          </a></p>
+        </div>
+        <div class="grp-row">
+          <p><a href="{% url 'admin:peerinst_collection_changelist' %}">
             {% trans 'Collections' %}
-        </a></p>
-      </div>
-      <div class="grp-row">
-        <p><a href="{% url 'admin:peerinst_discipline_changelist' %}">
+          </a></p>
+        </div>
+        <div class="grp-row">
+          <p><a href="{% url 'admin:peerinst_discipline_changelist' %}">
             {% trans 'Disciplines' %}
-        </a></p>
-      </div>
-      <div class="grp-row">
-        <p><a href="{% url 'admin:peerinst_subject_changelist' %}">
+          </a></p>
+        </div>
+        <div class="grp-row">
+          <p><a href="{% url 'admin:peerinst_subject_changelist' %}">
             {% trans 'Subjects' %}
-        </a></p>
-      </div>
-      <div class="grp-row">
-        <p><a href="{% url 'saltise-admin:flagged-rationales' %}">
+          </a></p>
+        </div>
+        <div class="grp-row">
+          <p><a href="{% url 'saltise-admin:flagged-rationales' %}">
             {% trans 'Flagged rationales' %}
-        </a></p>
-      </div>
-      <div class="grp-row">
-        <p><a href="{% url 'admin:quality_negwordscriterionrules_change' 1 %}">
+          </a></p>
+        </div>
+        <div class="grp-row">
+          <p><a href="{% url 'admin:quality_negwordscriterionrules_change' 1 %}">
             {% trans 'Manage toxic words' %}
-        </a></p>
-      </div>
-      <div class="grp-row">
-        <p><a href="{% url 'admin:peerinst_studentgroup_changelist' %}">
+          </a></p>
+        </div>
+        <div class="grp-row">
+          <p><a href="{% url 'admin:peerinst_studentgroup_changelist' %}">
             {% trans 'Overview of Groups using myDALITE' %}
-        </a></p>
-      </div>
-      <div class="grp-row">
-        <p><a href="{% url 'admin:user_feedback_feedback_changelist' %}">
+          </a></p>
+        </div>
+        <div class="grp-row">
+          <p><a href="{% url 'admin:user_feedback_feedback_changelist' %}">
             {% trans 'User Feedback' %}
-        </a></p>
+          </a></p>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

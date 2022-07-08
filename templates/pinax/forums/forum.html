@@ -3,58 +3,58 @@
 {% load i18n %}
 
 {% block heading %}
-{{ forum }}
+  {{ forum }}
 {% endblock %}
 
 {% block breadcrumbs %}
-<span class="links-divider">|</span><a href="{% url 'pinax_forums:forums' %}">{% trans 'Back to Forums' %}</a>
+  <span class="links-divider">|</span><a href="{% url 'pinax_forums:forums' %}">{% trans 'Back to Forums' %}</a>
 {% endblock %}
 
 {% block content %}
-<h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Posts' %}</h2>
+  <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Posts' %}</h2>
 
-{% if can_create_thread %}
-<div class="admin-link">
-  <a href="{% url 'pinax_forums:post_create' forum.id %}">{% trans 'Create a new post' %}</a>
-</div>
-{% endif %}
+  {% if can_create_thread %}
+    <div class="admin-link">
+      <a href="{% url 'pinax_forums:post_create' forum.id %}">{% trans 'Create a new post' %}</a>
+    </div>
+  {% endif %}
 
-{% if not threads %}
-<p class='mdc-typography--body1'>{% blocktrans %}There are no posts in this forum.{% endblocktrans %}</p>
-{% endif %}
-<ul class="mdc-list mdc-list--two-line">
-  {% for t in threads %}
-  <li role="separator" class="mdc-list-divider"></li>
-  <li class="mdc-list-item pointer thread-link">
-    <span class="mdc-list-item__graphic mdc-theme--primary">
-      <i class="mdc-theme--primary material-icons md-48">message</i>
-    </span>
-    <span class="mdc-list-item__text mdc-theme--secondary bold">
-      {{ t.title }}
-      <span class="mdc-list-item__secondary-text">
-        {% trans "Latest reply: " %} {{ t.last_modified  }}
-      </span>
-      <span class="mdc-list-item__secondary-text">
-        {{ t.view_count }} {% trans "views" %}, {{ t.reply_count }} {% trans "replies" %}, {{ t.subscriber_count }} {% trans "following" %}
-      </span>
-    </span>
-  </li>
-  {% endfor %}
-  <li role="separator" class="mdc-list-divider"></li>
-</ul>
+  {% if not threads %}
+    <p class='mdc-typography--body1'>{% blocktrans %}There are no posts in this forum.{% endblocktrans %}</p>
+  {% endif %}
+  <ul class="mdc-list mdc-list--two-line">
+    {% for t in threads %}
+      <li role="separator" class="mdc-list-divider"></li>
+      <li class="mdc-list-item pointer thread-link">
+        <span class="mdc-list-item__graphic mdc-theme--primary">
+          <i class="mdc-theme--primary material-icons md-48">message</i>
+        </span>
+        <span class="mdc-list-item__text mdc-theme--secondary bold">
+          {{ t.title }}
+          <span class="mdc-list-item__secondary-text">
+            {% trans "Latest reply: " %} {{ t.last_modified  }}
+          </span>
+          <span class="mdc-list-item__secondary-text">
+            {{ t.view_count }} {% trans "views" %}, {{ t.reply_count }} {% trans "replies" %}, {{ t.subscriber_count }} {% trans "following" %}
+          </span>
+        </span>
+      </li>
+    {% endfor %}
+    <li role="separator" class="mdc-list-divider"></li>
+  </ul>
 
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-    const links = document.getElementsByClassName("thread-link")
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      const links = document.getElementsByClassName("thread-link")
       {% for t in threads %}
         links[{{ forloop.counter0 }}].addEventListener("click", function() {
           window.location.href='{% url 'pinax_forums:thread' t.pk %}';
         });
       {% endfor %}
-  });
-</script>
+    });
+  </script>
 {% endblock %}

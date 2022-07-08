@@ -3,24 +3,24 @@
 {% autoescape off %}
 
 
-<p>
-  Dear {{ username }},
-</p>
-<p>
-  {% blocktrans %}
-  Your account has been recently activated. Please visit the following link to
-  verify your email address and to set your password:
-  {% endblocktrans %}
-  <br>
-  <a href="{{ link }}">
-    {{ link }}
-  </a>
-</p>
-<p>
- Cheers,
- <br>
- The myDalite Team
-</p>
+  <p>
+    Dear {{ username }},
+  </p>
+  <p>
+    {% blocktrans %}
+      Your account has been recently activated. Please visit the following link to
+      verify your email address and to set your password:
+    {% endblocktrans %}
+    <br>
+    <a href="{{ link }}">
+      {{ link }}
+    </a>
+  </p>
+  <p>
+    Cheers,
+    <br>
+    The myDalite Team
+  </p>
 
 
 {% endautoescape %}

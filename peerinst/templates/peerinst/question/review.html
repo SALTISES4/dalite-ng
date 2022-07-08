@@ -3,79 +3,79 @@
 {% load add_class bleach_html compress i18n static %}
 
 {% block answers %}
-{{ block.super }}
-<p class="mdc-typography--body1">
-  {% if sequential_review %}
-  {% blocktrans %}
-  Consider the problem again, and select the most convincing rationale.
-  {% endblocktrans %}
-  {% else %}
-  {% blocktrans %}
-  Consider the problem again, noting the rationales below that have been provided by other
-  students.  They may, or may not, cause you to reconsider your answer.  Read them and select your
-  final answer.
-  {% endblocktrans %}
-  {% endif %}
-</p>
+  {{ block.super }}
+  <p class="mdc-typography--body1">
+    {% if sequential_review %}
+      {% blocktrans %}
+        Consider the problem again, and select the most convincing rationale.
+      {% endblocktrans %}
+    {% else %}
+      {% blocktrans %}
+        Consider the problem again, noting the rationales below that have been provided by other
+        students.  They may, or may not, cause you to reconsider your answer.  Read them and select your
+        final answer.
+      {% endblocktrans %}
+    {% endif %}
+  </p>
 {% endblock %}
 
 {% block inner_form %}
-{{ form.non_field_errors }}
-<div class="rationales mdc-typography--body1">
-  {% for second_answer_choice, rationale_choice, show_more_counters, label, rationale_ids in form.rationale_groups %}
-  <div class="rationale" id="rationales-{{ forloop.counter0 }}">
-    <div class="rationale-choice">{{ second_answer_choice }}.</div>
-    <div class="rationale-text-container">{{ rationale_choice.errors }}
-      <ul>
-      {% for r in rationale_choice %}
-        <li {% if forloop.counter > 2 %}class="hidden-{{ forloop.parentloop.counter }}" hidden{% endif %}>
-          <div class="mdc-form-field">
-            <div class="mdc-radio" data-mdc-auto-init="MDCRadio">
-              {{ r.tag|add_class:"mdc-radio__native-control" }}
-              <div class="mdc-radio__background">
-                <div class="mdc-radio__outer-circle"></div>
-                <div class="mdc-radio__inner-circle"></div>
-              </div>
-            </div>
-            {% with label=r.choice_label.strip|bleach_html|safe|capfirst %}
-              <label class="mdc-typography--body1" for="{{ choice.id_for_label }}">{{ label }}{% if label|last not in "?!." %}.{% endif %}</label>
-            {% endwith %}
-          </div>
-        </li>
-        {% if forloop.counter > 2 and forloop.last %}
-        <input type="{{ show_more_counters.type }}"
-                name="{{ show_more_counters.name }}"
-                id="show-counter-{{ forloop.parentloop.counter }}"
-                value="2" hidden >
-        <div class="expand-button" data-rationale-iterator="{{ forloop.parentloop.counter }}">
-          <i class="material-icons mdc-theme--secondary"
-             role="button"
-             aria-pressed="false"
-             aria-label="{% trans 'Show more rationales' %}"
-             title="{% trans 'Show more rationales' %}">
-             add
-          </i><span>{% trans 'Show more rationales' %}</span>
+  {{ form.non_field_errors }}
+  <div class="rationales mdc-typography--body1">
+    {% for second_answer_choice, rationale_choice, show_more_counters, label, rationale_ids in form.rationale_groups %}
+      <div class="rationale" id="rationales-{{ forloop.counter0 }}">
+        <div class="rationale-choice">{{ second_answer_choice }}.</div>
+        <div class="rationale-text-container">{{ rationale_choice.errors }}
+          <ul>
+            {% for r in rationale_choice %}
+              <li {% if forloop.counter > 2 %}class="hidden-{{ forloop.parentloop.counter }}" hidden{% endif %}>
+                <div class="mdc-form-field">
+                  <div class="mdc-radio" data-mdc-auto-init="MDCRadio">
+                    {{ r.tag|add_class:"mdc-radio__native-control" }}
+                    <div class="mdc-radio__background">
+                      <div class="mdc-radio__outer-circle"></div>
+                      <div class="mdc-radio__inner-circle"></div>
+                    </div>
+                  </div>
+                  {% with label=r.choice_label.strip|bleach_html|safe|capfirst %}
+                    <label class="mdc-typography--body1" for="{{ choice.id_for_label }}">{{ label }}{% if label|last not in "?!." %}.{% endif %}</label>
+                  {% endwith %}
+                </div>
+              </li>
+              {% if forloop.counter > 2 and forloop.last %}
+                <input type="{{ show_more_counters.type }}"
+                  name="{{ show_more_counters.name }}"
+                  id="show-counter-{{ forloop.parentloop.counter }}"
+                  value="2" hidden >
+                <div class="expand-button" data-rationale-iterator="{{ forloop.parentloop.counter }}">
+                  <i class="material-icons mdc-theme--secondary"
+                    role="button"
+                    aria-pressed="false"
+                    aria-label="{% trans 'Show more rationales' %}"
+                    title="{% trans 'Show more rationales' %}">
+                    add
+                  </i><span>{% trans 'Show more rationales' %}</span>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </ul>
         </div>
-        {% endif %}
-      {% endfor %}
-      </ul>
-    </div>
+      </div>
+    {% endfor %}
   </div>
-  {% endfor %}
-</div>
 {% endblock %}
 
 {% block submit_button_fct %}{% endblock %}
 {% block submit_button %}{% trans 'Submit' %}{% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-{% compress js file question__review %}
-  <script src="{% static 'peerinst/js/question_review.js' %}"></script>
-{% endcompress %}
+  {{ block.super }}
+  {% compress js file question__review %}
+    <script src="{% static 'peerinst/js/question_review.js' %}"></script>
+  {% endcompress %}
   <script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-    question.initReview();
-  });
+    window.addEventListener("load", function() {
+      question.initReview();
+    });
   </script>
 {% endblock %}

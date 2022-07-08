@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="{% static 'tos/css/styles.min.css' %}"></link>
   {% endcompress %}
   {% if user.student %}
-  {% compress css %}
-  <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
-  {% endcompress %}
+    {% compress css %}
+      <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
+    {% endcompress %}
   {% endif %}
   <style nonce="{{ request.csp_nonce }}">
     .footnote {
@@ -19,7 +19,7 @@
       font-style: italic;
       font-size: 10px;
     }
-    </style>
+  </style>
 {% endblock %}
 
 {% block body %}
@@ -32,21 +32,21 @@
       <h2 class='mdc-typography--display1'>{% trans 'Welcome!' %}</h2>
 
       {% if role == "student" %}
-      <p class='mdc-typography--body1'>
-        {% blocktrans %}
-        Please carefully read our Terms of Service (ToS) and Privacy Policy in the box below, and either accept or decline at the bottom of the page.
+        <p class='mdc-typography--body1'>
+          {% blocktrans %}
+            Please carefully read our Terms of Service (ToS) and Privacy Policy in the box below, and either accept or decline at the bottom of the page.
 
-        The ToS that follows is an agreement (the "Agreement") between you and the SALTISE research network. By using myDALITE.org, you accept and agree to be legally bound by this Agreement, whether or not you are a registered user. The Privacy Policy describes how your personal data is collected and processed when you use the site.
-        {% endblocktrans %}
-      </p>
+            The ToS that follows is an agreement (the "Agreement") between you and the SALTISE research network. By using myDALITE.org, you accept and agree to be legally bound by this Agreement, whether or not you are a registered user. The Privacy Policy describes how your personal data is collected and processed when you use the site.
+          {% endblocktrans %}
+        </p>
       {% elif role == "teacher" %}
-      <p class='mdc-typography--body1'>
-        {% blocktrans %}
-        Please carefully read our Terms of Service (ToS) and Privacy Policy in the box below, and either accept or decline at the bottom of the page.
+        <p class='mdc-typography--body1'>
+          {% blocktrans %}
+            Please carefully read our Terms of Service (ToS) and Privacy Policy in the box below, and either accept or decline at the bottom of the page.
 
-        The ToS that follows is an agreement (the "Agreement") between you and the SALTISE Research network. By using myDALITE.org, you accept and agree to be legally bound by this Agreement, whether or not you are a registered user. The Privacy Policy describes how your personal data is collected and processed when you use the site.
-        {% endblocktrans %}
-      </p>
+            The ToS that follows is an agreement (the "Agreement") between you and the SALTISE Research network. By using myDALITE.org, you accept and agree to be legally bound by this Agreement, whether or not you are a registered user. The Privacy Policy describes how your personal data is collected and processed when you use the site.
+          {% endblocktrans %}
+        </p>
       {% endif %}
       <div class='mdc-typography--caption footnote'>
         {% blocktrans %} 1. The SALTISE research network reserves the right to modify these ToS at any time without advance notice. Any changes to these ToS will be effective immediately upon posting on this page, with an updated effective date.
@@ -54,7 +54,7 @@
       </div>
       <div class='mdc-typography--caption footnote'>
         {% blocktrans %}
-        2. Any version of these ToS in a language other than English is provided for convenience and you understand and agree that the English language version will control if there is any conflict.
+          2. Any version of these ToS in a language other than English is provided for convenience and you understand and agree that the English language version will control if there is any conflict.
         {% endblocktrans %}
       </div>
 
@@ -64,9 +64,9 @@
         <div id="tos-text">{{ tos_text|safe }}</div>
 
         {% if current %}
-        <div class='mdc-typography--caption' id="tos-version">Version: {{ version }} ({% trans 'current' %})</div>
+          <div class='mdc-typography--caption' id="tos-version">Version: {{ version }} ({% trans 'current' %})</div>
         {% else %}
-        <div class='mdc-typography--caption' id="tos-version">Version: {{ version }}</div>
+          <div class='mdc-typography--caption' id="tos-version">Version: {{ version }}</div>
         {% endif %}
 
         <button type="submit" name="accepted" value="true" id="tos-accept" class="mdc-button mdc-button--raised">
@@ -88,16 +88,16 @@
 
 {% block scripts %}
   {% if user.student %}
-  {% compress js %}
-  <script src="{% static 'peerinst/js/student.min.js' %}"></script>
-  {% endcompress %}
+    {% compress js %}
+      <script src="{% static 'peerinst/js/student.min.js' %}"></script>
+    {% endcompress %}
 
-  <script nonce="{{ request.csp_nonce }}">
-    window.addEventListener("load", function() {
-      student.initStudentHeader(
-        "{% url 'student-get-notifications' %}"
-      )
-    });
-  </script>
+    <script nonce="{{ request.csp_nonce }}">
+      window.addEventListener("load", function() {
+        student.initStudentHeader(
+          "{% url 'student-get-notifications' %}"
+        )
+      });
+    </script>
   {% endif %}
 {% endblock %}

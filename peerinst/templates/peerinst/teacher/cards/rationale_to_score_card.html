@@ -1,89 +1,89 @@
 {% load bleach_html i18n %}
 
 {% for answer in rationales %}
-{% with q=answer.question %}
-<div class="mdc-card" data-id="{{ answer.pk }}">
-  <div class="mdc-typography--title bold">
-    {{ q.title|title|bleach_html|safe }}
-  </div>
+  {% with q=answer.question %}
+    <div class="mdc-card" data-id="{{ answer.pk }}">
+      <div class="mdc-typography--title bold">
+        {{ q.title|title|bleach_html|safe }}
+      </div>
 
-  <div class="mdc-typography--body1 question-text">
-    {{ q.text|bleach_html|safe }}
-  </div>
+      <div class="mdc-typography--body1 question-text">
+        {{ q.text|bleach_html|safe }}
+      </div>
 
-  <div class="question-answers">
-    <ul>
-      {% for label, choice in q.get_choices %}
-        <li class="dense-list">{{ label }}. {{ choice|bleach_html|safe }}
-        {% for c in q.answerchoice_set.all %}
-          {% if forloop.counter == forloop.parentloop.counter %}
-            {% if c.correct %}
-              <i class="check material-icons">check</i>
-            {% endif %}
-          {% endif %}
-        {% endfor %}
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
+      <div class="question-answers">
+        <ul>
+          {% for label, choice in q.get_choices %}
+            <li class="dense-list">{{ label }}. {{ choice|bleach_html|safe }}
+              {% for c in q.answerchoice_set.all %}
+                {% if forloop.counter == forloop.parentloop.counter %}
+                  {% if c.correct %}
+                    <i class="check material-icons">check</i>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
 
-  <div class="mdc-typography--body1 question-text">
-    <blockquote>
-    <strong>{{answer.first_answer_choice_label}}.</strong> {{ answer.rationale }}
-    </blockquote>
-  </div>
+      <div class="mdc-typography--body1 question-text">
+        <blockquote>
+          <strong>{{answer.first_answer_choice_label}}.</strong> {{ answer.rationale }}
+        </blockquote>
+      </div>
 
-  <div class="mdc-card__actions">
+      <div class="mdc-card__actions">
 
-    <div class="mdc-card__action-buttons">
+        <div class="mdc-card__action-buttons">
 
+        </div>
+
+        <div class="mdc-card__action-icons">
+          <i
+            class="mdc-icon-toggle material-icons mdc-theme--primary flag"
+            role="button"
+            aria-pressed="false"
+            aria-label="{% trans 'Flag' %}" tabindex="0"
+            data-rank="0"
+            title="{% trans 'This rationale should NEVER be shown to students' %}">
+            outlined_flag
+          </i>
+          <i
+            class="mdc-icon-toggle material-icons mdc-theme--primary star"
+            role="button"
+            aria-pressed="false"
+            aria-label="{% trans 'Score' %}" tabindex="0"
+            data-rank="1"
+            data-toggle-on='{"content": "star"}'
+            data-toggle-off='{"content": "star_border"}'
+            title="{% trans 'This rationale should RARELY be shown to students' %}">
+            star_border
+          </i>
+          <i
+            class="mdc-icon-toggle material-icons mdc-theme--primary star"
+            role="button"
+            aria-pressed="false"
+            aria-label="{% trans 'Score' %}" tabindex="0"
+            data-rank="2"
+            data-toggle-on='{"content": "star"}'
+            data-toggle-off='{"content": "star_border"}'
+            title="{% trans 'This rationale could be shown SOMETIMES to students' %}">
+            star_border
+          </i>
+          <i
+            class="mdc-icon-toggle material-icons mdc-theme--primary star"
+            role="button"
+            aria-pressed="false"
+            aria-label="{% trans 'Score' %}" tabindex="0"
+            data-rank="3"
+            data-toggle-on='{"content": "star"}'
+            data-toggle-off='{"content": "star_border"}'
+            title="{% trans 'This rationale should be shown OFTEN to students' %}">
+            star_border
+          </i>
+        </div>
+      </div>
     </div>
-
-    <div class="mdc-card__action-icons">
-      <i
-        class="mdc-icon-toggle material-icons mdc-theme--primary flag"
-        role="button"
-        aria-pressed="false"
-        aria-label="{% trans 'Flag' %}" tabindex="0"
-        data-rank="0"
-        title="{% trans 'This rationale should NEVER be shown to students' %}">
-          outlined_flag
-      </i>
-      <i
-        class="mdc-icon-toggle material-icons mdc-theme--primary star"
-        role="button"
-        aria-pressed="false"
-        aria-label="{% trans 'Score' %}" tabindex="0"
-        data-rank="1"
-        data-toggle-on='{"content": "star"}'
-        data-toggle-off='{"content": "star_border"}'
-        title="{% trans 'This rationale should RARELY be shown to students' %}">
-          star_border
-      </i>
-      <i
-        class="mdc-icon-toggle material-icons mdc-theme--primary star"
-        role="button"
-        aria-pressed="false"
-        aria-label="{% trans 'Score' %}" tabindex="0"
-        data-rank="2"
-        data-toggle-on='{"content": "star"}'
-        data-toggle-off='{"content": "star_border"}'
-        title="{% trans 'This rationale could be shown SOMETIMES to students' %}">
-          star_border
-      </i>
-      <i
-        class="mdc-icon-toggle material-icons mdc-theme--primary star"
-        role="button"
-        aria-pressed="false"
-        aria-label="{% trans 'Score' %}" tabindex="0"
-        data-rank="3"
-        data-toggle-on='{"content": "star"}'
-        data-toggle-off='{"content": "star_border"}'
-        title="{% trans 'This rationale should be shown OFTEN to students' %}">
-          star_border
-      </i>
-    </div>
-  </div>
-</div>
-{% endwith %}
+  {% endwith %}
 {% endfor %}

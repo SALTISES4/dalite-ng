@@ -2,42 +2,42 @@
 {% load i18n %}
 
 {% block content %}
-<h1>{% trans 'Dalite NG administration' %}</h1>
-<a href="{% url 'assignment-list' %}">Back to main site</a>
-<div class="g-d-c">
-  <div class="g-d-12 g-d-f">
-   <div class="grp-module">
-     <h2>{% trans 'Student progress by assignment' %}</h2>
-     {% for assignment in assignments %}
-     <div class="grp-row grp-cells">
-       <div class="grp-cell">
-         <p><a href="{% url 'assignment-results' assignment.pk %}">{{ assignment.identifier }}</a></p>
-       </div>
-       <div class="grp-cell">
-         <p><a href="{% url 'assignment-results' assignment.pk %}">{{ assignment.title }}</a></p>
-       </div>
-     </div>
-     {% empty %}
-     <div class="grp-row">
-       <p>{% trans 'No assignments defined.' %}</p>
-     </div>
-     {% endfor %}
-   </div>
-  </div>
-  <div class="g-d-12 g-d-l">
-    <div class="grp-module">
-      <h2>{% trans 'Management' %}</h2>
-      <div class="grp-row">
-        <p><a href="{% url 'attribution-analysis' %}">
-            {% trans 'Attribution bias analysis' %}
-        </a></p>
+  <h1>{% trans 'Dalite NG administration' %}</h1>
+  <a href="{% url 'assignment-list' %}">Back to main site</a>
+  <div class="g-d-c">
+    <div class="g-d-12 g-d-f">
+      <div class="grp-module">
+        <h2>{% trans 'Student progress by assignment' %}</h2>
+        {% for assignment in assignments %}
+          <div class="grp-row grp-cells">
+            <div class="grp-cell">
+              <p><a href="{% url 'assignment-results' assignment.pk %}">{{ assignment.identifier }}</a></p>
+            </div>
+            <div class="grp-cell">
+              <p><a href="{% url 'assignment-results' assignment.pk %}">{{ assignment.title }}</a></p>
+            </div>
+          </div>
+        {% empty %}
+          <div class="grp-row">
+            <p>{% trans 'No assignments defined.' %}</p>
+          </div>
+        {% endfor %}
       </div>
-      <div class="grp-row">
-        <p><a href="{% url 'group-assignment-management' %}">
+    </div>
+    <div class="g-d-12 g-d-l">
+      <div class="grp-module">
+        <h2>{% trans 'Management' %}</h2>
+        <div class="grp-row">
+          <p><a href="{% url 'attribution-analysis' %}">
+            {% trans 'Attribution bias analysis' %}
+          </a></p>
+        </div>
+        <div class="grp-row">
+          <p><a href="{% url 'group-assignment-management' %}">
             {% trans 'Manage group assignments' %}
-        </a></p>
+          </a></p>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

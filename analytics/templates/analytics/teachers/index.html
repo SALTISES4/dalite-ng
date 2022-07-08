@@ -3,58 +3,58 @@
 {% load compress i18n static %}
 
 {% block stylesheets %}
-{{ block.super }}
+  {{ block.super }}
 
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<link rel="stylesheet" href="//cdn.datatables.net/1.10.19/css/dataTables.jqueryui.min.css">
-<link rel="stylesheet" href="//cdn.datatables.net/buttons/1.5.2/css/buttons.jqueryui.min.css">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="//cdn.datatables.net/1.10.19/css/dataTables.jqueryui.min.css">
+  <link rel="stylesheet" href="//cdn.datatables.net/buttons/1.5.2/css/buttons.jqueryui.min.css">
 
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
+  {{ block.super }}
 
-<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.19/js/dataTables.jqueryui.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.jqueryui.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.jqueryui.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.jqueryui.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
 
-{% compress js %}
-<script src="{% static 'analytics/js/teachers.min.js' %}"></script>
-{% endcompress %}
+  {% compress js %}
+    <script src="{% static 'analytics/js/teachers.min.js' %}"></script>
+  {% endcompress %}
 
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-    teachers.initTable(
-      {
-        getCriteria: "{% url 'analytics:teachers--criteria' %}",
-        getTeachers: "{% url 'analytics:teachers--teachers' %}",
-        getTeacherInformation: "{% url 'analytics:teachers--teacher' %}"
-      }
-    );
-  });
-</script>
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      teachers.initTable(
+        {
+          getCriteria: "{% url 'analytics:teachers--criteria' %}",
+          getTeachers: "{% url 'analytics:teachers--teachers' %}",
+          getTeacherInformation: "{% url 'analytics:teachers--teacher' %}"
+        }
+      );
+    });
+  </script>
 
 {% endblock %}
 
 {% block body %}
-<main>
+  <main>
 
-  <h1 class="mdc-typography--display3">{% trans 'Teachers' %}
-    <svg class="underline" width=150 height=4></svg>
-  </h1>
+    <h1 class="mdc-typography--display3">{% trans 'Teachers' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
 
-  <table id="teacher-list" hidden>
-    <thead>
-      <tr>
-        <th>{% trans 'Username' %}</th>
-        <th>{% trans 'Last Login' %}</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+    <table id="teacher-list" hidden>
+      <thead>
+        <tr>
+          <th>{% trans 'Username' %}</th>
+          <th>{% trans 'Last Login' %}</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-</main>
+  </main>
 {% endblock %}

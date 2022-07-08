@@ -4,59 +4,59 @@
 {% block title %}{{ question.title }}: {% blocktrans %}Top {{ perpage }} Rationales{% endblocktrans %}{% endblock %}
 
 {% block extrastyle %}
-<link href="{% static 'peerinst/css/admin.min.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'peerinst/css/admin.min.css' %}" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block breadcrumbs %}
-<ul>
-  <li><a href="{% url 'admin-index' %}">{% trans 'Home' %}</a></li>
-  <li><a href="{% url 'assignment-results' assignment_id=assignment.identifier %}">{{ assignment.identifier }}</a></li>
-  <li><a href="{% url 'question-preview' question_id=question.id %}">{{ question }}</a></li>
-  <li>{% blocktrans %}Top {{ perpage }} rationales {% endblocktrans %}</li>
-</ul>
+  <ul>
+    <li><a href="{% url 'admin-index' %}">{% trans 'Home' %}</a></li>
+    <li><a href="{% url 'assignment-results' assignment_id=assignment.identifier %}">{{ assignment.identifier }}</a></li>
+    <li><a href="{% url 'question-preview' question_id=question.id %}">{{ question }}</a></li>
+    <li>{% blocktrans %}Top {{ perpage }} rationales {% endblocktrans %}</li>
+  </ul>
 {% endblock %}
 
 {% block content_title %}
-<h1>{% blocktrans %}Top {{ perpage }} rationales for answers to {{ question }}{% endblocktrans %}</h1>
+  <h1>{% blocktrans %}Top {{ perpage }} rationales for answers to {{ question }}{% endblocktrans %}</h1>
 {% endblock %}
 
 {% block content %}
-<div class="g-d-c-fluid">
-  <h2>Summary</h2>
-  <table class="results-summary">
-    <tbody>
-      {% for label, item in summary_data %}
-      <tr><th>{{ label }}</th><td>{{ item }}</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-<div class="g-d-c-fluid">
-  {% for data in rationale_data %}
-  <h2>{{ data.heading }}</h2>
-  <table class="results-rationale-data">
-    <thead>
-      <tr>
-        {% for label in data.labels %}
-        <th>{{ label }}</th>
+  <div class="g-d-c-fluid">
+    <h2>Summary</h2>
+    <table class="results-summary">
+      <tbody>
+        {% for label, item in summary_data %}
+          <tr><th>{{ label }}</th><td>{{ item }}</td></tr>
         {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      {% for rationale in data.rows %}
-      <tr class="grp-row-{% cycle 'odd' 'even' %}">
-        {% for item in rationale.data %}
-        <td>{{ item }}</td>
-        {% endfor %}
-        <td>
-        {% if rationale.link_answers %}
-        <a href="{{ rationale.link_answers }}">[{% trans 'answers' %}]</a>
-        {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% endfor %}
-</div>
+      </tbody>
+    </table>
+  </div>
+  <div class="g-d-c-fluid">
+    {% for data in rationale_data %}
+      <h2>{{ data.heading }}</h2>
+      <table class="results-rationale-data">
+        <thead>
+          <tr>
+            {% for label in data.labels %}
+              <th>{{ label }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for rationale in data.rows %}
+            <tr class="grp-row-{% cycle 'odd' 'even' %}">
+              {% for item in rationale.data %}
+                <td>{{ item }}</td>
+              {% endfor %}
+              <td>
+                {% if rationale.link_answers %}
+                  <a href="{{ rationale.link_answers }}">[{% trans 'answers' %}]</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+  </div>
 {% endblock %}

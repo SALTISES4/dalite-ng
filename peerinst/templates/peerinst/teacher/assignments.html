@@ -3,55 +3,55 @@
 {% load i18n add_class compress static %}
 
 {% block stylesheets %}
-{{ block.super }}
-<style nonce="{{ request.csp_nonce }}">
-  .mdc-list-item__text {
-    max-width: unset;
-  }
-</style>
+  {{ block.super }}
+  <style nonce="{{ request.csp_nonce }}">
+    .mdc-list-item__text {
+      max-width: unset;
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
-<main>
-  <section>
-    <h1 class="mdc-typography--display3">{% trans 'Assignment Index' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Assignment Index' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="admin-link">
-      <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
-    </div>
+      <div class="admin-link">
+        <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
+      </div>
 
-    <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Active list' %}</h2>
+      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Active list' %}</h2>
 
-    <p class='mdc-typography--body1'>{% trans 'These are all the assignments in the database that have a minimum number of student answers per question.  You can add one to your account using the plus icon.' %}</p>
+      <p class='mdc-typography--body1'>{% trans 'These are all the assignments in the database that have a minimum number of student answers per question.  You can add one to your account using the plus icon.' %}</p>
 
-    <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-      {% for g in object_list %}
-      <li role="separator" class="mdc-list-divider"></li>
-      <li class="mdc-list-item">
-        <span class="mdc-list-item__graphic mdc-theme--primary">
-          <form method="post">
-            {% csrf_token %}
-            <input class="material-icons small-button mdc-button mdc-button--raised" type="submit" value="add"/>
-            <input type="hidden" name="assignment" value="{{g.pk}}"/>
-          </form>
-        </span>
-        <span class="mdc-list-item__text mdc-theme--secondary bold">
-          {{ g.title }}
-          <span class="mdc-list-item__secondary-text">
-            {{ g.pk }}
-          </span>
-          <span class="mdc-list-item__secondary-text">
-            {{ g.n_questions }} {% trans "questions" %};
-            {{ g.n_answers }} {% trans "answers" %}
-          </span>
-        </span>
-      </li>
-      {% endfor %}
-      <li role="separator" class="mdc-list-divider"></li>
-    </ul>
+      <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
+        {% for g in object_list %}
+          <li role="separator" class="mdc-list-divider"></li>
+          <li class="mdc-list-item">
+            <span class="mdc-list-item__graphic mdc-theme--primary">
+              <form method="post">
+                {% csrf_token %}
+                <input class="material-icons small-button mdc-button mdc-button--raised" type="submit" value="add"/>
+                <input type="hidden" name="assignment" value="{{g.pk}}"/>
+              </form>
+            </span>
+            <span class="mdc-list-item__text mdc-theme--secondary bold">
+              {{ g.title }}
+              <span class="mdc-list-item__secondary-text">
+                {{ g.pk }}
+              </span>
+              <span class="mdc-list-item__secondary-text">
+                {{ g.n_questions }} {% trans "questions" %};
+                {{ g.n_answers }} {% trans "answers" %}
+              </span>
+            </span>
+          </li>
+        {% endfor %}
+        <li role="separator" class="mdc-list-divider"></li>
+      </ul>
 
-  </section>
-</main>
+    </section>
+  </main>
 {% endblock %}

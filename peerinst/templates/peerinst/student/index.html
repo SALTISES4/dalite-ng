@@ -5,168 +5,168 @@
 {% block mdc %}{% endblock %}
 
 {% block stylesheets %}
-{{ block.super }}
-{% compress js file preact %}
-<script src="{% static 'peerinst/js/preact.min.js' %}" defer="true"></script>
-{% endcompress %}
-{% compress css file student %}
-<link href="{% static 'peerinst/js/student.min.css' %}" rel="stylesheet">
-{% endcompress %}
-{% compress css file rmwc %}
-<link href="{% static 'peerinst/css/rmwc.min.css' %}" rel="stylesheet">
-{% endcompress %}
+  {{ block.super }}
+  {% compress js file preact %}
+    <script src="{% static 'peerinst/js/preact.min.js' %}" defer="true"></script>
+  {% endcompress %}
+  {% compress css file student %}
+    <link href="{% static 'peerinst/js/student.min.css' %}" rel="stylesheet">
+  {% endcompress %}
+  {% compress css file rmwc %}
+    <link href="{% static 'peerinst/css/rmwc.min.css' %}" rel="stylesheet">
+  {% endcompress %}
 {% endblock %}
 
 {% block body %}
-<main>
-  <section id="student-page">
+  <main>
+    <section id="student-page">
 
-    <h1 class="mdc-typography--display3">{% trans 'My Account' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+      <h1 class="mdc-typography--display3">{% trans 'My Account' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="foldable foldable__unfolded">
-      <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
-        {% trans 'Identity' %}
-      </h2>
-      <div class="foldable--body">
-        <ul class="mdc-list mdc-list--non-interactive mdc-list--two-line p-bottom-0">
-          <li role="separator" class="mdc-list-divider"></li>
-          <li id="edit-user-btn" class="mdc-list-item">
-            <span class="mdc-list-item__graphic mdc-theme--primary">
-              <i class="material-icons md-48">
-                account_circle
-              </i>
-            </span>
-            <span class="mdc-list-item__text mdc-theme--secondary bold">
-              <span id="student-email"></span>
-              <span class="mdc-list-item__secondary-text">
-                {% trans "Member since: " %}
-                <span id="student-member-since"></span>
+      <div class="foldable foldable__unfolded">
+        <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
+          {% trans 'Identity' %}
+        </h2>
+        <div class="foldable--body">
+          <ul class="mdc-list mdc-list--non-interactive mdc-list--two-line p-bottom-0">
+            <li role="separator" class="mdc-list-divider"></li>
+            <li id="edit-user-btn" class="mdc-list-item">
+              <span class="mdc-list-item__graphic mdc-theme--primary">
+                <i class="material-icons md-48">
+                  account_circle
+                </i>
               </span>
-            </span>
-          </li>
-          <li role="separator" class="mdc-list-divider"></li>
-        </ul>
-        <ul class="mdc-list mdc-list--two-line">
-          <li id="modify-tos-btn" class="mdc-list-item pointer">
-            <span class="mdc-list-item__graphic mdc-theme--primary">
-              <i id="student-tos-sharing--icon"
-                 class="material-icons md-48">
-              </i>
-            </span>
-            <span class="mdc-list-item__text mdc-theme--secondary bold">
-              {% trans 'Terms of service: ' %}
-              <span id="student-tos-sharing--sharing"> </span>
-              <span class="mdc-list-item__secondary-text">
-                {% trans 'Signed: ' %}
-                <span id="student-tos-signed-on"></span>
+              <span class="mdc-list-item__text mdc-theme--secondary bold">
+                <span id="student-email"></span>
+                <span class="mdc-list-item__secondary-text">
+                  {% trans "Member since: " %}
+                  <span id="student-member-since"></span>
+                </span>
               </span>
-            </span>
-            <span class="mdc-list-item__meta">
-              <i class="material-icons md-24">
-                settings
-              </i>
-            </span>
-          </li>
-          <li role="separator" class="mdc-list-divider"></li>
-        </ul>
+            </li>
+            <li role="separator" class="mdc-list-divider"></li>
+          </ul>
+          <ul class="mdc-list mdc-list--two-line">
+            <li id="modify-tos-btn" class="mdc-list-item pointer">
+              <span class="mdc-list-item__graphic mdc-theme--primary">
+                <i id="student-tos-sharing--icon"
+                  class="material-icons md-48">
+                </i>
+              </span>
+              <span class="mdc-list-item__text mdc-theme--secondary bold">
+                {% trans 'Terms of service: ' %}
+                <span id="student-tos-sharing--sharing"> </span>
+                <span class="mdc-list-item__secondary-text">
+                  {% trans 'Signed: ' %}
+                  <span id="student-tos-signed-on"></span>
+                </span>
+              </span>
+              <span class="mdc-list-item__meta">
+                <i class="material-icons md-24">
+                  settings
+                </i>
+              </span>
+            </li>
+            <li role="separator" class="mdc-list-divider"></li>
+          </ul>
+        </div>
       </div>
-    </div>
 
-    <div class="foldable foldable__unfolded">
-      <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
-        {% trans 'Groups' %}
-      </h2>
-      <div class="foldable--body">
-        <div id="student-add-group">
-          <span class="admin-link">
-            {% trans 'Add group' %}
-          </span>
-          <div id="student-add-group--box"
-               class="hidden">
+      <div class="foldable foldable__unfolded">
+        <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
+          {% trans 'Groups' %}
+        </h2>
+        <div class="foldable--body">
+          <div id="student-add-group">
+            <span class="admin-link">
+              {% trans 'Add group' %}
+            </span>
+            <div id="student-add-group--box"
+              class="hidden">
               <div>
                 <h3>{% trans 'Join group' %}</h3>
                 <p>
                   {% blocktrans %}
-                  You may join any of your old groups or a new one by pasting
-                  the link in the box below.
+                    You may join any of your old groups or a new one by pasting
+                    the link in the box below.
                   {% endblocktrans %}
                 </p>
                 <p id="student-add-group__error" hidden></p>
                 <input type="text"
-                       name="new-group"
-                       value=""
-                       placeholder="Url link">
+                  name="new-group"
+                  value=""
+                  placeholder="Url link">
                 <select id="student-old-groups"></select>
                 <button class="mdc-button mdc-button--unelevated"
-                        id="join-group-btn">
+                  id="join-group-btn">
                   {% trans 'Join' %}
                 </button>
                 <button class="mdc-button"
-                        id="cancel-join-group-btn">
+                  id="cancel-join-group-btn">
                   {% trans 'Cancel' %}
                 </button>
               </div>
+            </div>
+          </div>
+          <div id="student-groups" class="foldable--body">
           </div>
         </div>
-        <div id="student-groups" class="foldable--body">
-        </div>
       </div>
-    </div>
 
-    <div id="feedback-app"></div>
-  </section>
-</main>
+      <div id="feedback-app"></div>
+    </section>
+  </main>
 
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-    student.initStudentPage(
-      {{ data|safe }}, "{{ group_student_id_needed }}", callback
-    );
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      student.initStudentPage(
+        {{ data|safe }}, "{{ group_student_id_needed }}", callback
+      );
 
-    // Callback executed after async load of group assignment elements
-    function callback() {
-      const groups = document.querySelectorAll(".student-group--assignments");
-      groups.forEach((group) => {
-        const groupAssignmentList = group.querySelectorAll(".link-to-dialog");
-        groupAssignmentList.forEach((el, i) => {
-          el.addEventListener("click", () => render(true, el));
-          if (i == 1) {
-            // We call a first render to load from db and set the icons
-            render(false, el, init);
-          }
-        });
-      });
-    }
-
-    // Callback to set icons for group
-    function init(set) {
-      const groupAssignmentList = document.querySelectorAll(".link-to-dialog");
-      groupAssignmentList.forEach((el) => {
-        if (set.includes(el.getAttribute('data-id'))) {
-          el.style.visibility = "visible";
-        }
-      });
-    }
-
-    function render(isOpen, el, callback = () => {}) {
-      const pk = el.getAttribute("data-id");
-      const teacherPk = el.getAttribute("data-teacher-id");
-      const feedbackApp = () => {
-        return preact.h(student.FeedbackApp, {
-          assignmentId: pk,
-          callback: callback,
-          dialogIsOpen: isOpen,
-          feedbackURL: "{% url 'REST:student-feedback' %}",
-          gettext: gettext,
-          listener: () => render(false, el),
-          teacherPk: teacherPk.split(",").map((pk) => parseInt(pk, 10)),
+      // Callback executed after async load of group assignment elements
+      function callback() {
+        const groups = document.querySelectorAll(".student-group--assignments");
+        groups.forEach((group) => {
+          const groupAssignmentList = group.querySelectorAll(".link-to-dialog");
+          groupAssignmentList.forEach((el, i) => {
+            el.addEventListener("click", () => render(true, el));
+            if (i == 1) {
+              // We call a first render to load from db and set the icons
+              render(false, el, init);
+            }
+          });
         });
       }
-      preact.render(feedbackApp(), document.getElementById("feedback-app"));
-    }
-  });
-</script>
+
+      // Callback to set icons for group
+      function init(set) {
+        const groupAssignmentList = document.querySelectorAll(".link-to-dialog");
+        groupAssignmentList.forEach((el) => {
+          if (set.includes(el.getAttribute('data-id'))) {
+            el.style.visibility = "visible";
+          }
+        });
+      }
+
+      function render(isOpen, el, callback = () => {}) {
+        const pk = el.getAttribute("data-id");
+        const teacherPk = el.getAttribute("data-teacher-id");
+        const feedbackApp = () => {
+          return preact.h(student.FeedbackApp, {
+            assignmentId: pk,
+            callback: callback,
+            dialogIsOpen: isOpen,
+            feedbackURL: "{% url 'REST:student-feedback' %}",
+            gettext: gettext,
+            listener: () => render(false, el),
+            teacherPk: teacherPk.split(",").map((pk) => parseInt(pk, 10)),
+          });
+        }
+        preact.render(feedbackApp(), document.getElementById("feedback-app"));
+      }
+    });
+  </script>
 
 {% endblock %}

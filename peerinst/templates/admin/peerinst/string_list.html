@@ -3,22 +3,22 @@
 {% load static %}
 
 {% block extrastyle %}
-<link href="{% static 'peerinst/css/admin.min.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'peerinst/css/admin.min.css' %}" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block content %}
-<h1>{% trans 'List of ' %}{{ model_name_plural }}</h1>
-<div class="g-d-c">
-  <form action="" method="post">
-    {% csrf_token %}
-    <fieldset class="grp-module">
-      <div class="grp-row string-list">
-        {{ form.strings }}
-      </div>
-      <div class="grp-row">
-        <input type="submit" value="{% trans 'Submit' %}" />
-      </div>
-    </fieldset>
-  </form>
-</div>
+  <h1>{% trans 'List of ' %}{{ model_name_plural }}</h1>
+  <div class="g-d-c">
+    <form action="" method="post">
+      {% csrf_token %}
+      <fieldset class="grp-module">
+        <div class="grp-row string-list">
+          {{ form.strings }}
+        </div>
+        <div class="grp-row">
+          <input type="submit" value="{% trans 'Submit' %}" />
+        </div>
+      </fieldset>
+    </form>
+  </div>
 {% endblock %}

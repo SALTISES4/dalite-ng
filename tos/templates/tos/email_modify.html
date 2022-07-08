@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="{% static 'tos/css/styles.min.css' %}"></link>
   {% endcompress %}
   {% if user.student %}
-  {% compress css %}
-  <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
-  {% endcompress %}
+    {% compress css %}
+      <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
+    {% endcompress %}
   {% endif %}
 {% endblock %}
 
@@ -22,9 +22,9 @@
       </h1>
 
       {% if user.teacher %}
-      <div class="admin-link">
-        <a href="{% url 'teacher' user.teacher.id %}">{% trans 'Back to My Account' %}</a>
-      </div>
+        <div class="admin-link">
+          <a href="{% url 'teacher' user.teacher.id %}">{% trans 'Back to My Account' %}</a>
+        </div>
       {% endif %}
 
       <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Email address' %}</h2>
@@ -34,7 +34,7 @@
         <div class='field'>
           <p><small>
             {% blocktrans %}
-            You can change the email address associated with your account below.  Your current email address is:
+              You can change the email address associated with your account below.  Your current email address is:
             {% endblocktrans %}<span class="bold">{{ request.user.email }}</span>
           </small></p>
         </div>
@@ -70,7 +70,7 @@
         <div class='field'>
           <p><small>
             {% blocktrans %}
-            Use the toggle buttons below to control which types of emails myDALITE is permitted to send you.  Certain emails will be sent regardless of the settings below (for example a password reset link).
+              Use the toggle buttons below to control which types of emails myDALITE is permitted to send you.  Certain emails will be sent regardless of the settings below (for example a password reset link).
             {% endblocktrans %}
           </small></p>
         </div>
@@ -82,46 +82,46 @@
 
         <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
           {% for email_type in email_types %}
-          <li role="separator" class="mdc-list-divider"></li>
-          <li class="mdc-list-item email-consent">
-            <span class="mdc-list-item__text mdc-theme--secondary bold">
-              {{ email_type.title }}
-              <span class="mdc-list-item__secondary-text">
-                {{ email_type.description }}
+            <li role="separator" class="mdc-list-divider"></li>
+            <li class="mdc-list-item email-consent">
+              <span class="mdc-list-item__text mdc-theme--secondary bold">
+                {{ email_type.title }}
+                <span class="mdc-list-item__secondary-text">
+                  {{ email_type.description }}
+                </span>
               </span>
-            </span>
-            <span class="mdc-list-item__meta">
-              {% if email_type.type == 'all' %}
-              <div id="btn-toggle-all" class="btn-toggle">
-              {% elif all_accepted %}
-              <div class="btn-toggle">
-              {% else %}
-              <div class="btn-toggle btn-toggle--disabled">
-              {% endif %}
-                {% if email_type.accepted %}
-                <input type="checkbox" name="{{ email_type.type }}-consent" checked></input>
-                <div class="btn-toggle--selected">{% trans 'Yes' %}</div>
-                <div >{% trans 'No' %}</div>
+              <span class="mdc-list-item__meta">
+                {% if email_type.type == 'all' %}
+                  <div id="btn-toggle-all" class="btn-toggle">
+                {% elif all_accepted %}
+                  <div class="btn-toggle">
                 {% else %}
-                <input type="checkbox" name="{{ email_type.type }}-consent"></input>
-                <div>{% trans 'Yes' %}</div>
-                <div class="btn-toggle--selected">{% trans 'No' %}</div>
+                  <div class="btn-toggle btn-toggle--disabled">
+                {% endif %}
+                {% if email_type.accepted %}
+                  <input type="checkbox" name="{{ email_type.type }}-consent" checked></input>
+                  <div class="btn-toggle--selected">{% trans 'Yes' %}</div>
+                  <div >{% trans 'No' %}</div>
+                {% else %}
+                  <input type="checkbox" name="{{ email_type.type }}-consent"></input>
+                  <div>{% trans 'Yes' %}</div>
+                  <div class="btn-toggle--selected">{% trans 'No' %}</div>
                 {% endif %}
               </div>
             </span>
-          </li>
+            </li>
           {% endfor %}
           <li role="separator" class="mdc-list-divider"></li>
           <input id="submit-notification-change-btn" type="submit" class="mdc-button mdc-button--raised padded-top" disabled value="{% trans 'Save' %}"></input>
         </form>
 
-    </section>
-  </main>
+      </section>
+    </main>
 {% endblock %}
 
 {% block scripts %}
   {% compress js %}
-  <script src="{% static 'tos/js/email.min.js' %}"></script>
+    <script src="{% static 'tos/js/email.min.js' %}"></script>
   {% endcompress %}
 
   <script nonce="{{ request.csp_nonce }}">
@@ -135,16 +135,16 @@
   </script>
 
   {% if user.student %}
-  {% compress js %}
-  <script src="{% static 'peerinst/js/student.min.js' %}"></script>
-  {% endcompress %}
+    {% compress js %}
+      <script src="{% static 'peerinst/js/student.min.js' %}"></script>
+    {% endcompress %}
 
-  <script nonce="{{ request.csp_nonce }}">
-    window.addEventListener("load", function() {
-      student.initStudentHeader(
-        "{% url 'student-get-notifications' %}"
-      )
-    });
-  </script>
+    <script nonce="{{ request.csp_nonce }}">
+      window.addEventListener("load", function() {
+        student.initStudentHeader(
+          "{% url 'student-get-notifications' %}"
+        )
+      });
+    </script>
   {% endif %}
 {% endblock %}

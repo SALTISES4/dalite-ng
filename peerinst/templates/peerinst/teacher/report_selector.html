@@ -3,83 +3,83 @@
 {% load compress i18n add_class %}
 {% block body %}
 
-<style nonce="{{ request.csp_nonce }}">
-  .mdc-checkbox {
-    vertical-align: middle;
-  }
-</style>
+  <style nonce="{{ request.csp_nonce }}">
+    .mdc-checkbox {
+      vertical-align: middle;
+    }
+  </style>
 
-<main>
-  <section>
+  <main>
+    <section>
 
-    <h1 class="mdc-typography--display3">{% trans 'Custom Reports' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+      <h1 class="mdc-typography--display3">{% trans 'Custom Reports' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="admin-link">
-      <a href="{% url 'teacher' teacher_id %}">{% trans 'Back to My Account' %}</a>
-    </div>
-
-    <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Generate new report' %}</h2>
-
-    <div class='field-container'>
-      <div class='number-box'><span class='number'>?</span></div>
-      <div class='field'>
-        <p><small>
-          {% blocktrans %}
-          This report generator will present results for the intersection between selected groups and selected assignments.
-          {% endblocktrans %}
-        </small></p>
+      <div class="admin-link">
+        <a href="{% url 'teacher' teacher_id %}">{% trans 'Back to My Account' %}</a>
       </div>
-    </div>
 
-    <label for="{{ radio.id_for_label }}">
+      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Generate new report' %}</h2>
+
+      <div class='field-container'>
+        <div class='number-box'><span class='number'>?</span></div>
+        <div class='field'>
+          <p><small>
+            {% blocktrans %}
+              This report generator will present results for the intersection between selected groups and selected assignments.
+            {% endblocktrans %}
+          </small></p>
+        </div>
+      </div>
+
+      <label for="{{ radio.id_for_label }}">
         {{ radio.choice_label }}
         <span class="radio">{{ radio.tag }}</span>
-    </label>
+      </label>
 
-    <h3>{% trans 'Parameters' %}</h3>
+      <h3>{% trans 'Parameters' %}</h3>
 
-    <form action="{% url 'report-custom' %}" method='get'>
-      {% for fields in report_select_form %}
-      <div class='field-container'>
-        <div class='number-box'><span class='number'>{{ forloop.counter }}</span></div>
-        <div class='field'>
-        <span>{{ fields.label }}</span>
-        {% for field in fields %}
-          <div>
-              <label for="{{ field.id_for_label }}"></label>
+      <form action="{% url 'report-custom' %}" method='get'>
+        {% for fields in report_select_form %}
+          <div class='field-container'>
+            <div class='number-box'><span class='number'>{{ forloop.counter }}</span></div>
+            <div class='field'>
+              <span>{{ fields.label }}</span>
+              {% for field in fields %}
+                <div>
+                  <label for="{{ field.id_for_label }}"></label>
                   <div class="mdc-checkbox">
                     {{ field.tag|add_class:'mdc-checkbox__native-control'}}
                     <div class="mdc-checkbox__background">
                       <svg class="mdc-checkbox__checkmark"
-                           viewBox="0 0 24 24">
+                        viewBox="0 0 24 24">
                         <path class="mdc-checkbox__checkmark-path"
-                              fill="none"
-                              stroke="white"
-                              d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                          fill="none"
+                          stroke="white"
+                          d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
                       </svg>
                       <div class="mdc-checkbox__mixedmark"></div>
                     </div>
                   </div>
                   <span class='inline'>{{ field.choice_label }}</span>
-              </label>
+                </label>
+                </div>
+              {% endfor %}
+            </div>
           </div>
         {% endfor %}
-      </div>
-    </div>
-      {% endfor %}
-      <input class="mdc-button mdc-button--raised padded-top" type="submit" value="{% block submit_button %}{% trans 'Generate Report' %}{% endblock %}" />
-    </form>
+        <input class="mdc-button mdc-button--raised padded-top" type="submit" value="{% block submit_button %}{% trans 'Generate Report' %}{% endblock %}" />
+      </form>
 
-  </section>
-</main>
+    </section>
+  </main>
 
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script nonce="{{ request.csp_nonce }}">
-  bundle.bindCheckbox();
-</script>
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    bundle.bindCheckbox();
+  </script>
 {% endblock %}

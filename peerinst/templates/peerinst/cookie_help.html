@@ -5,38 +5,38 @@
 {% block title %}{% trans 'Error' %}{% endblock %}
 
 {% block stylesheets %}
-{{ block.super }}
-<style nonce="{{ request.csp_nonce }}">
-p {
-  margin: 20px 20px;
-}
-</style>
+  {{ block.super }}
+  <style nonce="{{ request.csp_nonce }}">
+    p {
+      margin: 20px 20px;
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
-<main>
-  <section>
+  <main>
+    <section>
 
-    <h1 class="mdc-typography--display3">{% trans 'Problem with Cookie' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+      <h1 class="mdc-typography--display3">{% trans 'Problem with Cookie' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <p class='mdc-typography--body1'>
-      {% blocktrans %}
-      This component cannot be shown either because your browser does not seem to accept third-party cookies or your session has expired.
-      {% endblocktrans %}
-    </p>
-    <p class='mdc-typography--body1'>
-      {% blocktrans %}
-      If you received an access link by email, you should try to login using it.  Otherwise, you should configure your browser to allow all cookies for the site {{ host }} and reload this page.
-      {% endblocktrans %}
-    </p>
-    <p class='mdc-typography--body1'>
-      {% blocktrans %}
-      In Internet Explorer, this can be done by going to Tools → Internet Options → Privacy → Sites,
-      entering {{ host }} in the address field and clicking "Allow".
-      {% endblocktrans %}
-    </p>
-  </section>
-</main>
+      <p class='mdc-typography--body1'>
+        {% blocktrans %}
+          This component cannot be shown either because your browser does not seem to accept third-party cookies or your session has expired.
+        {% endblocktrans %}
+      </p>
+      <p class='mdc-typography--body1'>
+        {% blocktrans %}
+          If you received an access link by email, you should try to login using it.  Otherwise, you should configure your browser to allow all cookies for the site {{ host }} and reload this page.
+        {% endblocktrans %}
+      </p>
+      <p class='mdc-typography--body1'>
+        {% blocktrans %}
+          In Internet Explorer, this can be done by going to Tools → Internet Options → Privacy → Sites,
+          entering {{ host }} in the address field and clicking "Allow".
+        {% endblocktrans %}
+      </p>
+    </section>
+  </main>
 {% endblock %}

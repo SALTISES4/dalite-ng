@@ -3,51 +3,51 @@
 {% load i18n %}
 
 {% block body %}
-<h1>
-  {% trans "New assignment for " %}{{ group }}
-</h1>
+  <h1>
+    {% trans "New assignment for " %}{{ group }}
+  </h1>
 
-<p>
-  {% trans "Use the buttons below to access your assignment or to log in to your dashboard." %}
-</p>
+  <p>
+    {% trans "Use the buttons below to access your assignment or to log in to your dashboard." %}
+  </p>
 
-<table class="btn" role="presentation">
-  <tbody>
-    <tr>
-      <td align="center">
-        <a href="{{ assignment_link }}" rel="noopener noreferrer" target="_blank">{% trans "Assignment" %}</a>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  <table class="btn" role="presentation">
+    <tbody>
+      <tr>
+        <td align="center">
+          <a href="{{ assignment_link }}" rel="noopener noreferrer" target="_blank">{% trans "Assignment" %}</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-<table class="btn" role="presentation">
-  <tbody>
-    <tr>
-      <td align="center">
-        <a href="{{ signin_link }}" rel="noopener noreferrer" target="_blank">{% trans "Dashboard" %}</a>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  <table class="btn" role="presentation">
+    <tbody>
+      <tr>
+        <td align="center">
+          <a href="{{ signin_link }}" rel="noopener noreferrer" target="_blank">{% trans "Dashboard" %}</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-<p>
-  {% trans "If the buttons above don't work, paste one of these links into your web browser:" %}
-</p>
+  <p>
+    {% trans "If the buttons above don't work, paste one of these links into your web browser:" %}
+  </p>
 
-<p>
-  {% trans "Go to assignment:" %}
-</p>
+  <p>
+    {% trans "Go to assignment:" %}
+  </p>
 
-<a class="fine-print" href="{{ assignment_link }}" rel="noopener noreferrer" target="_blank">
-  {{ assignment_link }}
-</a>
+  <a class="fine-print" href="{{ assignment_link }}" rel="noopener noreferrer" target="_blank">
+    {{ assignment_link }}
+  </a>
 
-<p>
-  {% trans "Go to dashboard:" %}
-</p>
+  <p>
+    {% trans "Go to dashboard:" %}
+  </p>
 
-<a class="fine-print" href="{{ signin_link }}" rel="noopener noreferrer" target="_blank">
-  {{ signin_link }}
-</a>
+  <a class="fine-print" href="{{ signin_link }}" rel="noopener noreferrer" target="_blank">
+    {{ signin_link }}
+  </a>
 {% endblock %}

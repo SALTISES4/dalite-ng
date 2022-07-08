@@ -3,154 +3,154 @@
 {% load i18n add_class %}
 
 {% block stylesheets %}
-{{ block.super }}
-<!--
+  {{ block.super }}
+  <!--
 DataTables
 https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
--->
-<link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/dataTables.jqueryui.min.css">
-<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.5.2/css/buttons.jqueryui.min.css">
+  -->
+  <link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/dataTables.jqueryui.min.css">
+  <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.5.2/css/buttons.jqueryui.min.css">
 
-<style nonce="{{ request.csp_nonce }}">
-  .dataTables_wrapper {
-    font-size: smaller;
-  }
-  .dt-button {
-    font-family: inherit;
-  }
-  .small {
-    font-size: smaller;
-  }
-  ul {
-    padding-left:0px;
-  }
-</style>
+  <style nonce="{{ request.csp_nonce }}">
+    .dataTables_wrapper {
+      font-size: smaller;
+    }
+    .dt-button {
+      font-family: inherit;
+    }
+    .small {
+      font-size: smaller;
+    }
+    ul {
+      padding-left:0px;
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
-<main>
-  <section>
-    <h1 class="mdc-typography--display3">{% trans 'Group Details' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Group Details' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="admin-link">
-      <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
-    </div>
+      <div class="admin-link">
+        <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
+      </div>
 
-    <div class="foldable foldable__unfolded" id="characteristics">
-      <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
-        {% trans 'Characteristics' %}
-        <a href="{% url 'group-update' group.hash %}">
-          <i class="material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'Edit group characteristics' %}">edit</i>
-        </a>
-      </h2>
+      <div class="foldable foldable__unfolded" id="characteristics">
+        <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
+          {% trans 'Characteristics' %}
+          <a href="{% url 'group-update' group.hash %}">
+            <i class="material-icons md-24 mdc-ripple-surface icon-list" title="{% trans 'Edit group characteristics' %}">edit</i>
+          </a>
+        </h2>
 
-      <div class="foldable--body">
+        <div class="foldable--body">
 
-        <div data-update-url="{% url 'group-details-update' group.hash %}">
+          <div data-update-url="{% url 'group-details-update' group.hash %}">
 
-          <ul class="mdc-list mdc-list--two-line">
-            <li class="mdc-list-divider" role="separator"></li>
+            <ul class="mdc-list mdc-list--two-line">
+              <li class="mdc-list-divider" role="separator"></li>
 
-            <li class="mdc-list-item">
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">info</i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {% trans 'Name' %}
-                <span name="name" class="mdc-list-item__secondary-text">
-                  {{ group.name }}
+              <li class="mdc-list-item">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">info</i>
                 </span>
-              </span>
-              <!--
+                <span class="mdc-list-item__text mdc-theme--secondary bold">
+                  {% trans 'Name' %}
+                  <span name="name" class="mdc-list-item__secondary-text">
+                    {{ group.name }}
+                  </span>
+                </span>
+                <!--
               <span class="mdc-list-item__meta">
                 <i title="Edit" class="material-icons md-24 mdc-ripple-surface icon-list edit-btn">edit</i>
               </span>
               -->
-            </li>
-            <li class="mdc-list-divider" role="separator"></li>
+              </li>
+              <li class="mdc-list-divider" role="separator"></li>
 
-            <li class="mdc-list-item">
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">title</i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {% trans 'Title' %}
-                <span name="title" class="mdc-list-item__secondary-text">
-                  {{ group.title }}
+              <li class="mdc-list-item">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">title</i>
                 </span>
-              </span>
-              <!--
+                <span class="mdc-list-item__text mdc-theme--secondary bold">
+                  {% trans 'Title' %}
+                  <span name="title" class="mdc-list-item__secondary-text">
+                    {{ group.title }}
+                  </span>
+                </span>
+                <!--
               <span class="mdc-list-item__meta">
                 <i title="Edit" class="material-icons md-24 mdc-ripple-surface icon-list edit-btn">edit</i>
               </span>
               -->
-            </li>
-            <li class="mdc-list-divider" role="separator"></li>
+              </li>
+              <li class="mdc-list-divider" role="separator"></li>
 
-            <li class="mdc-list-item">
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">calendar_today</i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {% trans 'Discipline / Semester' %}
-                <span class="mdc-list-item__secondary-text">
-                   {{ group.discipline.title }} / {{ group.semester }} {{ group.year }}
+              <li class="mdc-list-item">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">calendar_today</i>
                 </span>
-              </span>
-            </li>
-
-            <li class="mdc-list-divider" role="separator"></li>
-
-            <li class="mdc-list-item">
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">share</i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold no-icon">
-                {% trans 'Signup link' %}
-                <span class="mdc-list-item__secondary-text no-icon">
-                  {{ request.scheme }}&colon;//{{ request.get_host }}{% url 'signup-through-link' group_hash=group.hash %}
+                <span class="mdc-list-item__text mdc-theme--secondary bold">
+                  {% trans 'Discipline / Semester' %}
+                  <span class="mdc-list-item__secondary-text">
+                    {{ group.discipline.title }} / {{ group.semester }} {{ group.year }}
+                  </span>
                 </span>
-                <span class="mdc-list-item__secondary-text no-icon">
-                {{ group.students.all.count }} {% trans 'students registered' %}
+              </li>
+
+              <li class="mdc-list-divider" role="separator"></li>
+
+              <li class="mdc-list-item">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">share</i>
                 </span>
-              </span>
-            </li>
-
-            <li class="mdc-list-divider" role="separator"></li>
-
-            <li class="mdc-list-item">
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">account_balance</i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {% trans 'Institution' %}
-                <span class="mdc-list-item__secondary-text">
-                   {{ group.institution.name }}
+                <span class="mdc-list-item__text mdc-theme--secondary bold no-icon">
+                  {% trans 'Signup link' %}
+                  <span class="mdc-list-item__secondary-text no-icon">
+                    {{ request.scheme }}&colon;//{{ request.get_host }}{% url 'signup-through-link' group_hash=group.hash %}
+                  </span>
+                  <span class="mdc-list-item__secondary-text no-icon">
+                    {{ group.students.all.count }} {% trans 'students registered' %}
+                  </span>
                 </span>
-              </span>
-            </li>
+              </li>
 
-            <li class="mdc-list-divider" role="separator"></li>
+              <li class="mdc-list-divider" role="separator"></li>
 
-            <li class="mdc-list-item">
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">
-                  account_balance
-                </i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold no-icon">
-                {% if group.student_id_needed %}
-                  {% trans 'Student ID required' %}
-                {% else %}
-                  {% trans 'Student ID not required' %}
-                {% endif %}
-                <span class="mdc-list-item__secondary-text no-icon">
+              <li class="mdc-list-item">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">account_balance</i>
                 </span>
-              </span>
-              <!--
+                <span class="mdc-list-item__text mdc-theme--secondary bold">
+                  {% trans 'Institution' %}
+                  <span class="mdc-list-item__secondary-text">
+                    {{ group.institution.name }}
+                  </span>
+                </span>
+              </li>
+
+              <li class="mdc-list-divider" role="separator"></li>
+
+              <li class="mdc-list-item">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">
+                    account_balance
+                  </i>
+                </span>
+                <span class="mdc-list-item__text mdc-theme--secondary bold no-icon">
+                  {% if group.student_id_needed %}
+                    {% trans 'Student ID required' %}
+                  {% else %}
+                    {% trans 'Student ID not required' %}
+                  {% endif %}
+                  <span class="mdc-list-item__secondary-text no-icon">
+                  </span>
+                </span>
+                <!--
               <span class="mdc-list-item__meta">
                 <div class="switch-button">
                   {% if group.student_id_needed %}
@@ -168,83 +168,83 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
                 </div>
               </span>
               -->
-            </li>
-            <li class="mdc-list-divider" role="separator"></li>
+              </li>
+              <li class="mdc-list-divider" role="separator"></li>
 
-            <li class="mdc-list-item verified_user">
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">verified_user</i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                <span>{% trans 'Teachers with access' %}</span>
-                <div name="teacher" class="mdc-list-item__secondary-text">
-                  <ul>
-                    {% for t in group.teacher.all %}
-                    <li class="mdc-list-item__secondary-text">
-                      {{ t.user.username }}
-                    </li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              </span>
-              <!--
+              <li class="mdc-list-item verified_user">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">verified_user</i>
+                </span>
+                <span class="mdc-list-item__text mdc-theme--secondary bold">
+                  <span>{% trans 'Teachers with access' %}</span>
+                  <div name="teacher" class="mdc-list-item__secondary-text">
+                    <ul>
+                      {% for t in group.teacher.all %}
+                        <li class="mdc-list-item__secondary-text">
+                          {{ t.user.username }}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </span>
+                <!--
               <span class="mdc-list-item__meta">
                 <i title="Add" class="material-icons md-24 mdc-ripple-surface icon-list edit-btn">add</i>
               </span>
               -->
-            </li>
-            {% comment %} <li class="mdc-list-divider" role="separator"></li> {% endcomment %}
-            {% comment %} <li class="mdc-list-item" {% endcomment %}
-                {% comment %} title="{% trans 'Quality evaluation for allowing rationale submission' %}"> {% endcomment %}
+              </li>
+              {% comment %} <li class="mdc-list-divider" role="separator"></li> {% endcomment %}
+              {% comment %} <li class="mdc-list-item" {% endcomment %}
+              {% comment %} title="{% trans 'Quality evaluation for allowing rationale submission' %}"> {% endcomment %}
               {% comment %} <span class="mdc-list-item__graphic mdc-theme--primary"> {% endcomment %}
-                {% comment %} <i class="mdc-theme--primary material-icons md-48"> {% endcomment %}
-                  {% comment %} assistant {% endcomment %}
-                {% comment %} </i> {% endcomment %}
+              {% comment %} <i class="mdc-theme--primary material-icons md-48"> {% endcomment %}
+              {% comment %} assistant {% endcomment %}
+              {% comment %} </i> {% endcomment %}
               {% comment %} </span> {% endcomment %}
               {% comment %} <span class="mdc-list-item__text mdc-theme--secondary bold"> {% endcomment %}
-                {% comment %} {% trans 'Submission quality' %} {% endcomment %}
-                {% comment %} <div class="mdc-list-item__secondary-text"> {% endcomment %}
-                  {% comment %} {% if group.quality %} {% endcomment %}
-                  {% comment %} <ul class="p-left-0"> {% endcomment %}
-                    {% comment %} {% for criterion in assignment.quality.criterions.all %} {% endcomment %}
-                    {% comment %} <li class="mdc-list-item__secondary-text"> {% endcomment %}
-                      {% comment %} {{ criterion.name }} v{{ criterion.version }} {% endcomment %}
-                    {% comment %} </li> {% endcomment %}
-                    {% comment %} {% endfor %} {% endcomment %}
-                  {% comment %} </ul> {% endcomment %}
-                  {% comment %} {% endif %} {% endcomment %}
-                {% comment %} </div> {% endcomment %}
+              {% comment %} {% trans 'Submission quality' %} {% endcomment %}
+              {% comment %} <div class="mdc-list-item__secondary-text"> {% endcomment %}
+              {% comment %} {% if group.quality %} {% endcomment %}
+              {% comment %} <ul class="p-left-0"> {% endcomment %}
+              {% comment %} {% for criterion in assignment.quality.criterions.all %} {% endcomment %}
+              {% comment %} <li class="mdc-list-item__secondary-text"> {% endcomment %}
+              {% comment %} {{ criterion.name }} v{{ criterion.version }} {% endcomment %}
+              {% comment %} </li> {% endcomment %}
+              {% comment %} {% endfor %} {% endcomment %}
+              {% comment %} </ul> {% endcomment %}
+              {% comment %} {% endif %} {% endcomment %}
+              {% comment %} </div> {% endcomment %}
               {% comment %} </span> {% endcomment %}
               {% comment %} <span class="mdc-list-item__meta"> {% endcomment %}
-                {% comment %} <a href="{% url 'quality:edit' %}?type=validation&group={{ group.pk }}&next={{ request.path }}"> {% endcomment %}
-                  {% comment %} <i class="material-icons md-24 mdc-ripple-surface icon-list"> {% endcomment %}
-                    {% comment %} edit {% endcomment %}
-                  {% comment %} </i> {% endcomment %}
-                {% comment %} </a> {% endcomment %}
+              {% comment %} <a href="{% url 'quality:edit' %}?type=validation&group={{ group.pk }}&next={{ request.path }}"> {% endcomment %}
+              {% comment %} <i class="material-icons md-24 mdc-ripple-surface icon-list"> {% endcomment %}
+              {% comment %} edit {% endcomment %}
+              {% comment %} </i> {% endcomment %}
+              {% comment %} </a> {% endcomment %}
               {% comment %} </span> {% endcomment %}
-            {% comment %} </li> {% endcomment %}
-            <li class="mdc-list-divider" role="separator"></li>
-          </ul>
+              {% comment %} </li> {% endcomment %}
+              <li class="mdc-list-divider" role="separator"></li>
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="foldable">
+      <div class="foldable">
 
-      <h2 id="assignments-title" class="foldable--title mdc-typography--display1 mdc-theme--secondary">
-        {% trans 'Assignments' %}
-      <span>
+        <h2 id="assignments-title" class="foldable--title mdc-typography--display1 mdc-theme--secondary">
+          {% trans 'Assignments' %}
+          <span>
 
-      </span>
-      </h2>
-      <div class="foldable--body">
-        <div id="collection-select"
-                class="admin-link clickable"
-                data-pk="{{ group.pk|safe }}">
-                {% trans 'Add to Collection' %}
-        </div>
+          </span>
+        </h2>
+        <div class="foldable--body">
+          <div id="collection-select"
+            class="admin-link clickable"
+            data-pk="{{ group.pk|safe }}">
+            {% trans 'Add to Collection' %}
+          </div>
 
-        <!--
+          <!--
         <div id="activate-dialog-1"
             class="admin-link clickable"
             data-pk="{{ group.pk|safe }}">
@@ -322,99 +322,99 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
         </aside>
         -->
 
-        <ul id="assignment-list" class="mdc-list mdc-list--two-line">
-          {% for a in assignments %}
-          <li class="mdc-list-divider" role="separator"></li>
-          <li class="mdc-list-item pointer assignment-link">
-            <span class="mdc-list-item__graphic mdc-theme--primary">
-              <i class="mdc-theme--primary material-icons md-48">work</i>
-            </span>
-            <span class="mdc-list-item__text mdc-theme--secondary bold">
-              {{ a.assignment.title }}
-              <span class="mdc-list-item__secondary-text">
-                {% trans "Distributed: " %}{{ a.distribution_date }}
-              </span>
-              <span class="mdc-list-item__secondary-text">
-                {% trans "Due date: " %}{{ a.due_date }}
-              </span>
-            </span>
-            <span class="mdc-list-item__meta">
-              <i class="material-icons md-24 mdc-ripple-surface icon-list delete-btn">
-                delete
-              </i>
-              <a href="{% url 'group-assignment' a.hash %}">
-              <i class="material-icons md-24 mdc-ripple-surface icon-list">edit</i>
-              </a>
-              <button class="gradebook-button"
-                      data-group="{{ group.pk }}"
-                      data-assignment="{{ a.pk }}">
-                <i class="material-icons md-24 mdc-ripple-surface icon-list">
-                  bar_chart
-                </i>
-              </button>
-            </span>
-          </li>
-          {% empty %}
+          <ul id="assignment-list" class="mdc-list mdc-list--two-line">
+            {% for a in assignments %}
+              <li class="mdc-list-divider" role="separator"></li>
+              <li class="mdc-list-item pointer assignment-link">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">work</i>
+                </span>
+                <span class="mdc-list-item__text mdc-theme--secondary bold">
+                  {{ a.assignment.title }}
+                  <span class="mdc-list-item__secondary-text">
+                    {% trans "Distributed: " %}{{ a.distribution_date }}
+                  </span>
+                  <span class="mdc-list-item__secondary-text">
+                    {% trans "Due date: " %}{{ a.due_date }}
+                  </span>
+                </span>
+                <span class="mdc-list-item__meta">
+                  <i class="material-icons md-24 mdc-ripple-surface icon-list delete-btn">
+                    delete
+                  </i>
+                  <a href="{% url 'group-assignment' a.hash %}">
+                    <i class="material-icons md-24 mdc-ripple-surface icon-list">edit</i>
+                  </a>
+                  <button class="gradebook-button"
+                    data-group="{{ group.pk }}"
+                    data-assignment="{{ a.pk }}">
+                    <i class="material-icons md-24 mdc-ripple-surface icon-list">
+                      bar_chart
+                    </i>
+                  </button>
+                </span>
+              </li>
+            {% empty %}
 
-          <p class='mdc-typography--body1'> {% trans "There aren't any assignments for this group yet." %}</p>
-          <p class='mdc-typography--body1'>
-            {% trans 'If you are using myDALITE via LTI (e.g. through Moodle, or edX), and would like to get your teacher reports, you will need to generate a' %}
-             <a href="{% url 'report_selector' %}">{% trans 'Custom Report' %}</a>.
-          </p>
+              <p class='mdc-typography--body1'> {% trans "There aren't any assignments for this group yet." %}</p>
+              <p class='mdc-typography--body1'>
+                {% trans 'If you are using myDALITE via LTI (e.g. through Moodle, or edX), and would like to get your teacher reports, you will need to generate a' %}
+                <a href="{% url 'report_selector' %}">{% trans 'Custom Report' %}</a>.
+              </p>
 
-          {% endfor %}
-          <li class="mdc-list-divider" role="separator"></li>
-        </ul>
+            {% endfor %}
+            <li class="mdc-list-divider" role="separator"></li>
+          </ul>
+        </div>
       </div>
-    </div>
 
 
-<div class="mdc-snackbar mdc-snackbar--align-start"
-     aria-live="assertive"
-     aria-atomic="true"
-     aria-hidden="true">
-  <div class="mdc-snackbar__text bold"></div>
-  <div class="mdc-snackbar__action-wrapper" hidden>
-    <button type="button" class="mdc-snackbar__action-button"></button>
-  </div>
-</div>
-  </section>
-</main>
+      <div class="mdc-snackbar mdc-snackbar--align-start"
+        aria-live="assertive"
+        aria-atomic="true"
+        aria-hidden="true">
+        <div class="mdc-snackbar__text bold"></div>
+        <div class="mdc-snackbar__action-wrapper" hidden>
+          <button type="button" class="mdc-snackbar__action-button"></button>
+        </div>
+      </div>
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
+  {{ block.super }}
 
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/dataTables.jqueryui.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.jqueryui.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/dataTables.jqueryui.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.jqueryui.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
 
-<script nonce="{{ request.csp_nonce }}">
+  <script nonce="{{ request.csp_nonce }}">
 
-  bundle.addDialog();
+    bundle.addDialog();
 
-  $.ajaxSetup({
+    $.ajaxSetup({
       beforeSend: function(xhr, settings) {
-          if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
-              xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
-          }
+        if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+          xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+        }
       }
-  });
+    });
 
-  $("#collection-select").one("click",
-    () => {;
-      group.createCollection(
-        $("#collection-select").attr('data-pk'),
-        "{% url 'collection-add-assignment' %}",
-        "{% url 'collection-update' 0 %}"
-      );
-      return;
-  });
+    $("#collection-select").one("click",
+      () => {;
+        group.createCollection(
+          $("#collection-select").attr('data-pk'),
+          "{% url 'collection-add-assignment' %}",
+          "{% url 'collection-update' 0 %}"
+        );
+        return;
+      });
 
-async function courseLinking(
+    async function courseLinking(
       linkUrl,
       unlinkUrl,
       linkTrans,
@@ -516,16 +516,16 @@ async function courseLinking(
     }
 
 
-  window.addEventListener("load", () => {
-    group.initDetails({{ data|safe }});
+    window.addEventListener("load", () => {
+      group.initDetails({{ data|safe }});
 
-    [].forEach.call(document.querySelectorAll("#characteristics .mdc-list-item"), el => {
-      el.addEventListener("click", () => {
-        window.location.assign("{% url 'group-update' group.hash %}");
+      [].forEach.call(document.querySelectorAll("#characteristics .mdc-list-item"), el => {
+        el.addEventListener("click", () => {
+          window.location.assign("{% url 'group-update' group.hash %}");
+        });
       });
-    });
 
-    {% comment %}
+      {% comment %}
     courseLinking(
       "{% url 'connect-group-course' %}",
       "{% url 'disconnect-group-course' %}",
@@ -537,7 +537,7 @@ async function courseLinking(
       "{% url 'course_flow:course-detail-view' pk=0 %}",
     );
     {% endcomment %}
-  })
+    })
 
-</script>
+  </script>
 {% endblock %}

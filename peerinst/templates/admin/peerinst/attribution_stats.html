@@ -15,11 +15,11 @@
   </thead>
   <tbody>
     {% for row in data %}
-    <tr class="grp-row-{% cycle 'odd' 'even' %}">
-      {% for item in row %}
-      <td>{{ item }}</td>
-      {% endfor %}
-    </tr>
+      <tr class="grp-row-{% cycle 'odd' 'even' %}">
+        {% for item in row %}
+          <td>{{ item }}</td>
+        {% endfor %}
+      </tr>
     {% endfor %}
   </tbody>
 </table>

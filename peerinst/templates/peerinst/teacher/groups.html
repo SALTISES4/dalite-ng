@@ -4,152 +4,152 @@
 
 {% block body %}
 
-<main>
-<section>
-  <h1 class="mdc-typography--display3">{% trans 'My Groups' %}
-    <svg class="underline" width=150 height=4></svg>
-  </h1>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'My Groups' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-  <div class="admin-link">
-    <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
-  </div>
-
-  <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Create a new group' %}</h2>
-
-  <div class='field-container'>
-    <div class='number-box'><span class='number'>?</span></div>
-    <div class='field'>
-      <p><small>
-        {% blocktrans %}
-        The group title may be displayed and should be informative. The group name is used as the keyword for access.  It must be unique but does not need to be informative.
-        {% endblocktrans %}
-      </small></p>
-    </div>
-  </div>
-
-  <form method="post">
-    {% csrf_token %}
-    {% for field in create_form %}
-    {% if forloop.counter0 < 2 %}
-      <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
-        {{ field|add_class:"mdc-text-field__input" }}
-        {{ field.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-        <div class="mdc-notched-outline">
-          <svg>
-            <path class="mdc-notched-outline__path"/>
-          </svg>
-        </div>
-        <div class="mdc-notched-outline__idle"></div>
+      <div class="admin-link">
+        <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
       </div>
-      <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
-        {{ field.help_text|safe }}
-      </p>
-      {{ field.errors }}
-    {% else %}
-      <div class='field'>
-        <div>
-          <div class='mdc-form-field'>
-            <label for='id_discipline'>{{ field.label }}:</label>
-            <div class='mdc-select'>
-              {{ field|add_class:"mdc-select__native-control" }}
-              <div class="mdc-select__bottom-line"></div>
-            </div>
-          </div>
+
+      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Create a new group' %}</h2>
+
+      <div class='field-container'>
+        <div class='number-box'><span class='number'>?</span></div>
+        <div class='field'>
+          <p><small>
+            {% blocktrans %}
+              The group title may be displayed and should be informative. The group name is used as the keyword for access.  It must be unique but does not need to be informative.
+            {% endblocktrans %}
+          </small></p>
         </div>
-        <p class="form-helper-text" aria-hidden="true">
-          {{ field.help_text|safe }}
-        </p>
-          {{ field.discipline.errors }}
       </div>
-    {% endif %}
-    {% endfor %}
-    <input class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Create' %}" />
-  </form>
 
-  <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'My current groups' %}</h2>
-  {% if not teacher.current_groups.all %}
-  <p>{% blocktrans %}You have no current student groups.{% endblocktrans %}</p>
-  {% endif %}
-
-  <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-    {% for g in teacher.current_groups.all %}
-    <li role="separator" class="mdc-list-divider"></li>
-    <li class="mdc-list-item pointer group-link">
-      <span class="mdc-list-item__graphic mdc-theme--primary">
-        <i class="mdc-theme--primary material-icons md-48">group</i>
-      </span>
-      <span class="mdc-list-item__text mdc-theme--secondary bold">
-        {{ g }}
-        <span class="mdc-list-item__secondary-text">
-          {% trans "Created: " %} {{ g.creation_date }}
-        </span>
-        <span class="mdc-list-item__secondary-text">
-          {% trans "Students: " %} {{ g.students.all.count  }}
-        </span>
-      </span>
-      <span class="mdc-list-item__meta">
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" id="id_group" name="group" value="{{g.pk}}"/>
-            <div class="mdc-ripple-surface input-ripple-wrapper">
-              <input class="material-icons md-24 mdc-button small-button no-whitespace" type="submit" value="remove"/>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in create_form %}
+          {% if forloop.counter0 < 2 %}
+            <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+              {{ field|add_class:"mdc-text-field__input" }}
+              {{ field.label_tag|add_class:"mdc-floating-label"|cut:":" }}
+              <div class="mdc-notched-outline">
+                <svg>
+                  <path class="mdc-notched-outline__path"/>
+                </svg>
+              </div>
+              <div class="mdc-notched-outline__idle"></div>
             </div>
-        </form>
-      </span>
-    </li>
-    {% endfor %}
-    <li role="separator" class="mdc-list-divider"></li>
-  </ul>
-
-  {% if teacher.current_groups.count < teacher.studentgroup_set.count %}
-  <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'My archived groups' %}</h2>
-
-  <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-    {% for g in object_list.all %}
-    {% if g not in teacher.current_groups.all %}
-    <li role="separator" class="mdc-list-divider"></li>
-    <li class="mdc-list-item">
-      <span class="mdc-list-item__graphic mdc-theme--primary">
-        <i class="mdc-theme--primary material-icons md-48">group</i>
-      </span>
-      <span class="mdc-list-item__text mdc-theme--secondary bold">
-        {{ g }}
-        <span class="mdc-list-item__secondary-text">
-          {% trans "Created: " %}{{ g.creation_date }}
-        </span>
-        <span class="mdc-list-item__secondary-text">
-          {% trans "Students: " %} {{ g.students.all.count  }}
-        </span>
-      </span>
-      <span class="mdc-list-item__meta">
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" id="id_group" name="group" value="{{g.pk}}"/>
-            <div class="mdc-ripple-surface input-ripple-wrapper">
-              <input class="material-icons md-24 mdc-button small-button no-whitespace" type="submit" value="add"/>
+            <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
+              {{ field.help_text|safe }}
+            </p>
+            {{ field.errors }}
+          {% else %}
+            <div class='field'>
+              <div>
+                <div class='mdc-form-field'>
+                  <label for='id_discipline'>{{ field.label }}:</label>
+                  <div class='mdc-select'>
+                    {{ field|add_class:"mdc-select__native-control" }}
+                    <div class="mdc-select__bottom-line"></div>
+                  </div>
+                </div>
+              </div>
+              <p class="form-helper-text" aria-hidden="true">
+                {{ field.help_text|safe }}
+              </p>
+              {{ field.discipline.errors }}
             </div>
-        </form>
-      </span>
-    </li>
-    {% endif %}
-    {% endfor %}
-    <li role="separator" class="mdc-list-divider"></li>
-  </ul>
-  {% endif %}
+          {% endif %}
+        {% endfor %}
+        <input class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Create' %}" />
+      </form>
 
-  </section>
-</main>
+      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'My current groups' %}</h2>
+      {% if not teacher.current_groups.all %}
+        <p>{% blocktrans %}You have no current student groups.{% endblocktrans %}</p>
+      {% endif %}
+
+      <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
+        {% for g in teacher.current_groups.all %}
+          <li role="separator" class="mdc-list-divider"></li>
+          <li class="mdc-list-item pointer group-link">
+            <span class="mdc-list-item__graphic mdc-theme--primary">
+              <i class="mdc-theme--primary material-icons md-48">group</i>
+            </span>
+            <span class="mdc-list-item__text mdc-theme--secondary bold">
+              {{ g }}
+              <span class="mdc-list-item__secondary-text">
+                {% trans "Created: " %} {{ g.creation_date }}
+              </span>
+              <span class="mdc-list-item__secondary-text">
+                {% trans "Students: " %} {{ g.students.all.count  }}
+              </span>
+            </span>
+            <span class="mdc-list-item__meta">
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" id="id_group" name="group" value="{{g.pk}}"/>
+                <div class="mdc-ripple-surface input-ripple-wrapper">
+                  <input class="material-icons md-24 mdc-button small-button no-whitespace" type="submit" value="remove"/>
+                </div>
+              </form>
+            </span>
+          </li>
+        {% endfor %}
+        <li role="separator" class="mdc-list-divider"></li>
+      </ul>
+
+      {% if teacher.current_groups.count < teacher.studentgroup_set.count %}
+        <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'My archived groups' %}</h2>
+
+        <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
+          {% for g in object_list.all %}
+            {% if g not in teacher.current_groups.all %}
+              <li role="separator" class="mdc-list-divider"></li>
+              <li class="mdc-list-item">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">group</i>
+                </span>
+                <span class="mdc-list-item__text mdc-theme--secondary bold">
+                  {{ g }}
+                  <span class="mdc-list-item__secondary-text">
+                    {% trans "Created: " %}{{ g.creation_date }}
+                  </span>
+                  <span class="mdc-list-item__secondary-text">
+                    {% trans "Students: " %} {{ g.students.all.count  }}
+                  </span>
+                </span>
+                <span class="mdc-list-item__meta">
+                  <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="id_group" name="group" value="{{g.pk}}"/>
+                    <div class="mdc-ripple-surface input-ripple-wrapper">
+                      <input class="material-icons md-24 mdc-button small-button no-whitespace" type="submit" value="add"/>
+                    </div>
+                  </form>
+                </span>
+              </li>
+            {% endif %}
+          {% endfor %}
+          <li role="separator" class="mdc-list-divider"></li>
+        </ul>
+      {% endif %}
+
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-    const links = document.getElementsByClassName("group-link")
-    {% for g in teacher.current_groups.all %}
-      links[{{ forloop.counter0 }}].addEventListener("click", function() {
-        window.location.href='{% url 'group-details' g.hash %}'
-      })
-    {% endfor %}
-  })
-</script>
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      const links = document.getElementsByClassName("group-link")
+      {% for g in teacher.current_groups.all %}
+        links[{{ forloop.counter0 }}].addEventListener("click", function() {
+          window.location.href='{% url 'group-details' g.hash %}'
+        })
+      {% endfor %}
+    })
+  </script>
 {% endblock %}

@@ -5,263 +5,263 @@
 {% block mdc %}{% endblock %}
 
 {% block stylesheets %}
-{{ block.super }}
-{% compress js file preact %}
-<script src="{% static 'peerinst/js/preact.min.js' %}" defer="true"></script>
-{% endcompress %}
-{% compress css file rationale_table %}
-<link href="{% static 'peerinst/js/group.min.css' %}" rel="stylesheet">
-{% endcompress %}
-{% compress css file rmwc %}
-<link href="{% static 'peerinst/css/rmwc.min.css' %}" rel="stylesheet">
-{% endcompress %}
+  {{ block.super }}
+  {% compress js file preact %}
+    <script src="{% static 'peerinst/js/preact.min.js' %}" defer="true"></script>
+  {% endcompress %}
+  {% compress css file rationale_table %}
+    <link href="{% static 'peerinst/js/group.min.css' %}" rel="stylesheet">
+  {% endcompress %}
+  {% compress css file rmwc %}
+    <link href="{% static 'peerinst/css/rmwc.min.css' %}" rel="stylesheet">
+  {% endcompress %}
 {% endblock %}
 
 {% block body %}
-<main>
-  <section>
+  <main>
+    <section>
 
-    <h1 class="mdc-typography--display3">
-      {{ assignment.assignment.title }} ({{ assignment.group.name }})
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+      <h1 class="mdc-typography--display3">
+        {{ assignment.assignment.title }} ({{ assignment.group.name }})
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="admin-link">
-      <a href="{% url 'teacher' request.user.teacher.id %}">{% trans 'Back to My Account' %}</a>
-      <span class="admin-link--padded">|</span><a href="{% url 'group-details' group.hash %}">{% trans 'Back to group' %}</a>
-    </div>
+      <div class="admin-link">
+        <a href="{% url 'teacher' request.user.teacher.id %}">{% trans 'Back to My Account' %}</a>
+        <span class="admin-link--padded">|</span><a href="{% url 'group-details' group.hash %}">{% trans 'Back to group' %}</a>
+      </div>
 
-    <div class="foldable foldable__unfolded" id="details-section">
-      <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
-        {% trans 'Details' %}
-      </h2>
-      <div class="foldable--body">
-        <div data-update-url="{% url 'group-assignment-update' assignment.hash %}">
-          {% csrf_token %}
-          <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-            <li class="mdc-list-divider" role="separator"></li>
-            <li class="mdc-list-item">
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">calendar_today</i>
-              </span>
-              <span id="assignment-distribution"
-                    class="mdc-list-item__text mdc-theme--secondary bold">
-              </span>
-            </li>
-            <li class="mdc-list-divider" role="separator"></li>
-            <li class="mdc-list-item">
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">calendar_today</i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {% trans 'Due date' %}
-                <span name="due_date" class="mdc-list-item__secondary-text">
-                  {{ assignment.due_date|date:"Y-m-d H:i" }}
+      <div class="foldable foldable__unfolded" id="details-section">
+        <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
+          {% trans 'Details' %}
+        </h2>
+        <div class="foldable--body">
+          <div data-update-url="{% url 'group-assignment-update' assignment.hash %}">
+            {% csrf_token %}
+            <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
+              <li class="mdc-list-divider" role="separator"></li>
+              <li class="mdc-list-item">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">calendar_today</i>
                 </span>
-              </span>
-              <span class="mdc-list-item__meta">
-                <i title="Edit" class="material-icons md-24 mdc-ripple-surface icon-list edit-btn">edit</i>
-              </span>
-            </li>
-            <li class="mdc-list-divider" role="separator"></li>
-            <li class="mdc-list-item">
-              {% if assignment.show_correct_answers %}
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">check</i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {% trans 'Show correct answers' %}
-                <span name="due_date" class="mdc-list-item__secondary-text">
-                  {% trans 'Grade answer and show correct' %}
+                <span id="assignment-distribution"
+                  class="mdc-list-item__text mdc-theme--secondary bold">
                 </span>
-              </span>
-              {% else %}
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">clear</i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {% trans 'Hide correct answers' %}
-                <span name="due_date" class="mdc-list-item__secondary-text">
-                  {% trans 'Do not grade or show correct' %}
+              </li>
+              <li class="mdc-list-divider" role="separator"></li>
+              <li class="mdc-list-item">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">calendar_today</i>
                 </span>
-              </span>
-              {% endif %}
-            </li>
-            {% comment %} <li class="mdc-list-divider" role="separator"></li> {% endcomment %}
-            {% comment %} <li class="mdc-list-item" {% endcomment %}
-                {% comment %} title="{% trans 'Quality evaluation for allowing rationale submission' %}"> {% endcomment %}
+                <span class="mdc-list-item__text mdc-theme--secondary bold">
+                  {% trans 'Due date' %}
+                  <span name="due_date" class="mdc-list-item__secondary-text">
+                    {{ assignment.due_date|date:"Y-m-d H:i" }}
+                  </span>
+                </span>
+                <span class="mdc-list-item__meta">
+                  <i title="Edit" class="material-icons md-24 mdc-ripple-surface icon-list edit-btn">edit</i>
+                </span>
+              </li>
+              <li class="mdc-list-divider" role="separator"></li>
+              <li class="mdc-list-item">
+                {% if assignment.show_correct_answers %}
+                  <span class="mdc-list-item__graphic mdc-theme--primary">
+                    <i class="mdc-theme--primary material-icons md-48">check</i>
+                  </span>
+                  <span class="mdc-list-item__text mdc-theme--secondary bold">
+                    {% trans 'Show correct answers' %}
+                    <span name="due_date" class="mdc-list-item__secondary-text">
+                      {% trans 'Grade answer and show correct' %}
+                    </span>
+                  </span>
+                {% else %}
+                  <span class="mdc-list-item__graphic mdc-theme--primary">
+                    <i class="mdc-theme--primary material-icons md-48">clear</i>
+                  </span>
+                  <span class="mdc-list-item__text mdc-theme--secondary bold">
+                    {% trans 'Hide correct answers' %}
+                    <span name="due_date" class="mdc-list-item__secondary-text">
+                      {% trans 'Do not grade or show correct' %}
+                    </span>
+                  </span>
+                {% endif %}
+              </li>
+              {% comment %} <li class="mdc-list-divider" role="separator"></li> {% endcomment %}
+              {% comment %} <li class="mdc-list-item" {% endcomment %}
+              {% comment %} title="{% trans 'Quality evaluation for allowing rationale submission' %}"> {% endcomment %}
               {% comment %} <span class="mdc-list-item__graphic mdc-theme--primary"> {% endcomment %}
-                {% comment %} <i class="mdc-theme--primary material-icons md-48"> {% endcomment %}
-                  {% comment %} assistant {% endcomment %}
-                {% comment %} </i> {% endcomment %}
+              {% comment %} <i class="mdc-theme--primary material-icons md-48"> {% endcomment %}
+              {% comment %} assistant {% endcomment %}
+              {% comment %} </i> {% endcomment %}
               {% comment %} </span> {% endcomment %}
               {% comment %} <span class="mdc-list-item__text mdc-theme--secondary bold"> {% endcomment %}
-                {% comment %} {% trans 'Submission quality' %} {% endcomment %}
-                {% comment %} <div class="mdc-list-item__secondary-text"> {% endcomment %}
-                  {% comment %} {% if assignment.quality %} {% endcomment %}
-                  {% comment %} <ul class="p-left-0"> {% endcomment %}
-                    {% comment %} {% for criterion in assignment.quality.criterions.all %} {% endcomment %}
-                    {% comment %} <li class="mdc-list-item__secondary-text"> {% endcomment %}
-                      {% comment %} {{ criterion.name }} v{{ criterion.version }} {% endcomment %}
-                    {% comment %} </li> {% endcomment %}
-                    {% comment %} {% endfor %} {% endcomment %}
-                  {% comment %} </ul> {% endcomment %}
-                  {% comment %} {% endif %} {% endcomment %}
-                {% comment %} </div> {% endcomment %}
+              {% comment %} {% trans 'Submission quality' %} {% endcomment %}
+              {% comment %} <div class="mdc-list-item__secondary-text"> {% endcomment %}
+              {% comment %} {% if assignment.quality %} {% endcomment %}
+              {% comment %} <ul class="p-left-0"> {% endcomment %}
+              {% comment %} {% for criterion in assignment.quality.criterions.all %} {% endcomment %}
+              {% comment %} <li class="mdc-list-item__secondary-text"> {% endcomment %}
+              {% comment %} {{ criterion.name }} v{{ criterion.version }} {% endcomment %}
+              {% comment %} </li> {% endcomment %}
+              {% comment %} {% endfor %} {% endcomment %}
+              {% comment %} </ul> {% endcomment %}
+              {% comment %} {% endif %} {% endcomment %}
+              {% comment %} </div> {% endcomment %}
               {% comment %} </span> {% endcomment %}
               {% comment %} <span class="mdc-list-item__meta"> {% endcomment %}
-                {% comment %} <a href="{% url 'quality:edit' %}?type=validation&assignment={{ assignment.pk }}&next={{ request.path }}"> {% endcomment %}
-                  {% comment %} <i class="material-icons md-24 mdc-ripple-surface icon-list"> {% endcomment %}
-                    {% comment %} edit {% endcomment %}
-                  {% comment %} </i> {% endcomment %}
-                {% comment %} </a> {% endcomment %}
+              {% comment %} <a href="{% url 'quality:edit' %}?type=validation&assignment={{ assignment.pk }}&next={{ request.path }}"> {% endcomment %}
+              {% comment %} <i class="material-icons md-24 mdc-ripple-surface icon-list"> {% endcomment %}
+              {% comment %} edit {% endcomment %}
+              {% comment %} </i> {% endcomment %}
+              {% comment %} </a> {% endcomment %}
               {% comment %} </span> {% endcomment %}
-            {% comment %} </li> {% endcomment %}
-            <li class="mdc-list-divider" role="separator"></li>
+              {% comment %} </li> {% endcomment %}
+              <li class="mdc-list-divider" role="separator"></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="foldable">
+        <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
+          {% trans 'Question order' %}
+        </h2>
+        <div class="foldable--body p-bot-3">
+          <ul id="question-list" class="mdc-list mdc-list--two-line mdc-list--non-interactive">
+            {% for q in questions %}
+              <li class="draggable mdc-list-item" data-draggable-name="{{ q.title }}" draggable="true">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">question_answer</i>
+                </span>
+                <span class="mdc-list-item__text mdc-theme--secondary bold">
+                  {{ q.title|safe|striptags }}
+                  <span class="mdc-list-item__secondary-text">
+                    {{ q.text|safe|striptags }}
+                  </span>
+                </span>
+                <span class="mdc-list-item__meta">
+                  <i class="material-icons md-24 icon-list">reorder</i>
+                </span>
+              </li>
+
+            {% endfor %}
+          </ul>
+          <button id="question-list-save"
+            class="mdc-button mdc-button--raised padded-top"
+            disabled>
+            {% trans 'Save' %}
+          </button>
+        </div>
+      </div>
+
+      <div class="foldable hidden" id="progress-section">
+        <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
+          {% trans 'Progress and feedback' %}
+        </h2>
+
+        <div class="foldable--body">
+          <div class="admin-link">
+            <a href="{% url 'report-custom' %}?student_groups={{group.pk}}&assignments={{assignment.assignment.identifier}}">{% trans 'Generate detailed report' %}</a>
+          </div>
+
+          <div id="rationale-table-app"></div>
+
+          <ul id="student-progress"
+            class="mdc-list mdc-list--two-line">
           </ul>
         </div>
       </div>
-    </div>
 
-    <div class="foldable">
-      <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
-        {% trans 'Question order' %}
-      </h2>
-      <div class="foldable--body p-bot-3">
-        <ul id="question-list" class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-          {% for q in questions %}
-          <li class="draggable mdc-list-item" data-draggable-name="{{ q.title }}" draggable="true">
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-48">question_answer</i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {{ q.title|safe|striptags }}
-                <span class="mdc-list-item__secondary-text">
-                  {{ q.text|safe|striptags }}
+      <div class="foldable">
+        <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
+          {% trans 'Student list' %}
+        </h2>
+        <div class="foldable--body">
+          <ul id="student-list" class="mdc-list mdc-list--two-line mdc-list--non-interactive">
+
+            {% for student in group.students.all %}
+
+              <li class="mdc-list-item">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-48">person</i>
                 </span>
-              </span>
-              <span class="mdc-list-item__meta">
-                <i class="material-icons md-24 icon-list">reorder</i>
-              </span>
-            </li>
-
-          {% endfor %}
-        </ul>
-        <button id="question-list-save"
-                class="mdc-button mdc-button--raised padded-top"
-                disabled>
-          {% trans 'Save' %}
-        </button>
-      </div>
-    </div>
-
-    <div class="foldable hidden" id="progress-section">
-      <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
-        {% trans 'Progress and feedback' %}
-      </h2>
-
-      <div class="foldable--body">
-        <div class="admin-link">
-          <a href="{% url 'report-custom' %}?student_groups={{group.pk}}&assignments={{assignment.assignment.identifier}}">{% trans 'Generate detailed report' %}</a>
-        </div>
-
-        <div id="rationale-table-app"></div>
-
-        <ul id="student-progress"
-            class="mdc-list mdc-list--two-line">
-        </ul>
-      </div>
-    </div>
-
-    <div class="foldable">
-      <h2 class="foldable--title mdc-typography--display1 mdc-theme--secondary">
-        {% trans 'Student list' %}
-      </h2>
-      <div class="foldable--body">
-        <ul id="student-list" class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-
-          {% for student in group.students.all %}
-
-          <li class="mdc-list-item">
-            <span class="mdc-list-item__graphic mdc-theme--primary">
-              <i class="mdc-theme--primary material-icons md-48">person</i>
-            </span>
-            <span data-email="{{ student.student.email }}" class="student-list--email mdc-list-item__text mdc-theme--secondary">
-              {% if student.student.email %}
-              {{ student.student.email }}
-              {% else %}
-              {{ student.student.username }}
-              {% endif %}
-              {% if assignment.distribution_date %}
-              <span class="mdc-list-item__secondary-text">
-                {% trans "Started assignment: " %}
-                {% if student.student.username in students_with_answers %}
-                {% trans 'Yes' %}
-                {% else %}
-                {% trans 'No' %}
+                <span data-email="{{ student.student.email }}" class="student-list--email mdc-list-item__text mdc-theme--secondary">
+                  {% if student.student.email %}
+                    {{ student.student.email }}
+                  {% else %}
+                    {{ student.student.username }}
+                  {% endif %}
+                  {% if assignment.distribution_date %}
+                    <span class="mdc-list-item__secondary-text">
+                      {% trans "Started assignment: " %}
+                      {% if student.student.username in students_with_answers %}
+                        {% trans 'Yes' %}
+                      {% else %}
+                        {% trans 'No' %}
+                      {% endif %}
+                    </span>
+                  {% endif %}
+                </span>
+                {% if student.student.email %}
+                  <span class="mdc-list-item__meta">
+                    <i class="email-btn material-icons md-24 icon-list mdc-ripple-surface" title="{% trans 'Resend link' %}">
+                      email
+                    </i>
+                  </span>
                 {% endif %}
-              </span>
-              {% endif %}
-            </span>
-            {% if student.student.email %}
-            <span class="mdc-list-item__meta">
-              <i class="email-btn material-icons md-24 icon-list mdc-ripple-surface" title="{% trans 'Resend link' %}">
-                email
-              </i>
-            </span>
-            {% endif %}
 
-          </li>
+              </li>
 
-          {% empty %}
+            {% empty %}
 
-          <p class='mdc-typography--body1'> {% trans 'No student has signed up yet' %}</p>
+              <p class='mdc-typography--body1'> {% trans 'No student has signed up yet' %}</p>
 
-          {% endfor %}
+            {% endfor %}
 
-        </ul>
+          </ul>
 
+        </div>
       </div>
-    </div>
-  </section>
-</main>
+    </section>
+  </main>
 {% endblock %}
 
 {% block init-scripts %}
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-    group.initAssignment({{ data|safe }}, callback);
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      group.initAssignment({{ data|safe }}, callback);
 
-    // If distributed, update which sections are shown
-    {% if assignment.is_distributed %}
-    document.getElementById("details-section").classList.remove("foldable__unfolded");
-    document.getElementById("progress-section").classList.add("foldable__unfolded");
-    {% endif %}
+      // If distributed, update which sections are shown
+      {% if assignment.is_distributed %}
+        document.getElementById("details-section").classList.remove("foldable__unfolded");
+        document.getElementById("progress-section").classList.add("foldable__unfolded");
+      {% endif %}
 
-    // Callback executed after async load of student progress elements
-    function callback() {
-      const progressList = document.getElementById("progress-section").querySelectorAll("li.link-feedback-dialog");
+      // Callback executed after async load of student progress elements
+      function callback() {
+        const progressList = document.getElementById("progress-section").querySelectorAll("li.link-feedback-dialog");
 
-      progressList.forEach((el) => {
-        el.addEventListener("click", () => render(true, el));
-      });
-    }
-
-    function render(isOpen, el) {
-      const pk = el.getAttribute("data-id");
-      const rationaleTableApp = () => {
-        return preact.h(
-          group.RationaleTableApp, {
-            dialogIsOpen: isOpen,
-            feedbackURL: "{% url 'REST:teacher-feedback-list' %}",
-            gettext: gettext,
-            listener: () => render(false, el),
-            questionURL: "{% url 'REST:question-list' %}" + pk + "/?field=answerchoice_set&field=pk&field=text&field=title",
-            readURL: "{% url 'REST:student-group-assigment-answers' %}{{ assignment.pk }}/" + pk + "/",
-          });
+        progressList.forEach((el) => {
+          el.addEventListener("click", () => render(true, el));
+        });
       }
-      preact.render(rationaleTableApp(), document.getElementById("rationale-table-app"));
-    }
-  });
-</script>
+
+      function render(isOpen, el) {
+        const pk = el.getAttribute("data-id");
+        const rationaleTableApp = () => {
+          return preact.h(
+            group.RationaleTableApp, {
+              dialogIsOpen: isOpen,
+              feedbackURL: "{% url 'REST:teacher-feedback-list' %}",
+              gettext: gettext,
+              listener: () => render(false, el),
+              questionURL: "{% url 'REST:question-list' %}" + pk + "/?field=answerchoice_set&field=pk&field=text&field=title",
+              readURL: "{% url 'REST:student-group-assigment-answers' %}{{ assignment.pk }}/" + pk + "/",
+            });
+        }
+        preact.render(rationaleTableApp(), document.getElementById("rationale-table-app"));
+      }
+    });
+  </script>
 {% endblock %}

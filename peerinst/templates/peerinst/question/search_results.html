@@ -8,19 +8,19 @@
       <div>{% trans 'No search results' %}</div>
     {% else %}
       <div class="pagination">
-          <span>
-              {% if paginator.has_previous %}
-                  <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
-              {% endif %}
+        <span>
+          {% if paginator.has_previous %}
+            <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
+          {% endif %}
 
-              <span class="current">
-                  {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
-              </span>
-
-              {% if paginator.has_next %}
-                  <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
-              {% endif %}
+          <span class="current">
+            {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
           </span>
+
+          {% if paginator.has_next %}
+            <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
+          {% endif %}
+        </span>
       </div>
     {% endif %}
   {% endif %}
@@ -28,227 +28,227 @@
 
 {% for search_results_term in search_results|dictsortreversed:"term" %}
   {% if search_results_term.count > 0 %}
-  <div class="search-set">
-    <h3 class="mdc-theme--secondary-bg">
-      "{{ search_results_term.term }}"
-      <i class="icon ion-ios-arrow-forward"></i>
-      <span class="filter-count">{{ search_results_term.count }}</span>/<span class="filter-count-total">{{ search_results_term.count }}</span> {% trans 'results' %}
-    </h3>
+    <div class="search-set">
+      <h3 class="mdc-theme--secondary-bg">
+        "{{ search_results_term.term }}"
+        <i class="icon ion-ios-arrow-forward"></i>
+        <span class="filter-count">{{ search_results_term.count }}</span>/<span class="filter-count-total">{{ search_results_term.count }}</span> {% trans 'results' %}
+      </h3>
 
-    {% for g in search_results_term.questions|dictsortreversed:"answer_count"  %}
-    <div class="mdc-card"
-         id="{{ g.id|safe }}"
-         discipline="'{{ g.discipline|safe }}'"
-         category="{% for c in g.category.all %}{{ c.title|safe }},{% endfor %}"
-         matrix="{{ g.get_matrix|safe }}">
-      <div class="mdc-typography--title bold">
-        {{ g.title|safe }}
-      </div>
+      {% for g in search_results_term.questions|dictsortreversed:"answer_count"  %}
+        <div class="mdc-card"
+          id="{{ g.id|safe }}"
+          discipline="'{{ g.discipline|safe }}'"
+          category="{% for c in g.category.all %}{{ c.title|safe }},{% endfor %}"
+          matrix="{{ g.get_matrix|safe }}">
+          <div class="mdc-typography--title bold">
+            {{ g.title|safe }}
+          </div>
 
-      <div class="mdc-typography--caption">
-        #{{ g.id|safe }} {% if g.user %}{% trans 'by' %} {{ g.user.username|safe }}{% endif %}
-      </div>
-
-      <div class="mdc-typography--body1 question-text">
-        {{ g.text|bleach_html|safe }}
-      </div>
-
-      {% if g.image %}
-        <img class="question-image display-none" src="{{ g.image.url|safe }}" alt="g.image_alt_text">
-      {% endif %}
-
-      {% if g.video_url %}
-      <div id="question-video">
-        <object class="question-image" width="640" height="390" data="{{ g.video_url|safe }}"></object>
-      </div>
-      {% endif %}
-
-      <div class="question-answers display-none">
-        <ul>
-          {% for label, choice in g.get_choices %}
-            <li class="dense-list">{{ label }}. {{ choice|bleach_html|safe }}
-            {% for c in g.answerchoice_set.all %}
-              {% if forloop.counter == forloop.parentloop.counter %}
-                {% if c.correct %}
-                  <i class="check material-icons">check</i>
-                {% endif %}
-              {% endif %}
-            {% endfor %}
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <div class="mdc-card__actions">
-
-        <div class="mdc-card__action-buttons">
           <div class="mdc-typography--caption">
-            <div>
-              {% trans 'Discipline' %}: {{ g.discipline|safe }}
+            #{{ g.id|safe }} {% if g.user %}{% trans 'by' %} {{ g.user.username|safe }}{% endif %}
+          </div>
+
+          <div class="mdc-typography--body1 question-text">
+            {{ g.text|bleach_html|safe }}
+          </div>
+
+          {% if g.image %}
+            <img class="question-image display-none" src="{{ g.image.url|safe }}" alt="g.image_alt_text">
+          {% endif %}
+
+          {% if g.video_url %}
+            <div id="question-video">
+              <object class="question-image" width="640" height="390" data="{{ g.video_url|safe }}"></object>
             </div>
-            <div>
-              {% trans 'Categories' %}:
-              {% for c in g.category.all %}
-              {{ c.title|safe }}{% if not forloop.last %}, {% endif %}
-              {% empty %}
-              {% trans 'Uncategorized' %}
+          {% endif %}
+
+          <div class="question-answers display-none">
+            <ul>
+              {% for label, choice in g.get_choices %}
+                <li class="dense-list">{{ label }}. {{ choice|bleach_html|safe }}
+                  {% for c in g.answerchoice_set.all %}
+                    {% if forloop.counter == forloop.parentloop.counter %}
+                      {% if c.correct %}
+                        <i class="check material-icons">check</i>
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                </li>
               {% endfor %}
-            </div>
-            <div>
-              {% trans 'Student answers' %}: {{ g.answer_set.all.count }}
-            </div>
-          </div>
-        </div>
-
-        <div class="mdc-card__action-icons">
-
-          <div id="stats-{{ g.id|safe }}" class="stats">
-            <i id="activate-dialog-analytics-{{ g.id|safe }}"
-            ref_id="{{ g.id|safe }}" class="material-icons md-24 analytics-tags">info</i>
-            <span id="rating-{{ g.id|safe }}"></span>
+            </ul>
           </div>
 
-          {% if assignment %}
+          <div class="mdc-card__actions">
 
-            {% if request.user == g.user or request.user in g.collaborators.all %}
-            <a title="{% trans 'Edit' %}" id="edit-question-{{ g.pk }}" href="{% url 'question-update' g.pk %}">
-              <i class="material-icons md-24 mdc-ripple-surface card-icon-list mdc-theme--primary">mode_edit</i>
-            </a>
-            {% else %}
-            <a title="{% trans 'Copy and edit' %}" id="clone-question-{{ g.pk }}" href="{% url 'question-clone' g.pk %}">
-              <i class="material-icons md-24 mdc-ripple-surface card-icon-list mdc-theme--primary">file_copy</i>
-            </a>
-            {% endif %}
-
-            <i class="material-icons mdc-theme--primary md-24 mdc-ripple-surface icon-list update-questions-btn"
-                data-url="{% url 'assignment-edit-ajax' %}"
-                data-id="{{ g.id|safe }}"
-                data-assignment-id="{{ assignment.identifier|safe }}">
-              add
-            </i>
-
-          {% elif type == None %}
-
-            {% if request.user.teacher %}
-            <div class="flag-question" data-id="{{ g.pk }}">
-              <i class="mdc-icon-toggle material-icons mdc-theme--primary flag-question__btn"
-                 role="button"
-                 aria-pressed="false"
-                 aria-label="{% trans 'Flag question' %}"
-                 tabindex="0"
-                 title="{% trans 'Flag question' %}">
-                 outlined_flag
-              </i>
-              <div class="flag-question__form" hidden>
-                <h3>{% trans 'Flag question' %}</h3>
-                <form>
-                  <select class="flag-question__form__select"
-                          title="{% trans 'Possible reasons' %}"
-                          aria-label="{% trans 'Possible reasons' %}">
-                  </select>
-                  <input type="submit"
-                         class="mdc-button mdc-button--raised"
-                         value="{% trans 'Flag' %}">
-                </form>
-                <svg class="icon flag-question__close">
-                  <use xlink:href="#close"></use>
-                </svg>
+            <div class="mdc-card__action-buttons">
+              <div class="mdc-typography--caption">
+                <div>
+                  {% trans 'Discipline' %}: {{ g.discipline|safe }}
+                </div>
+                <div>
+                  {% trans 'Categories' %}:
+                  {% for c in g.category.all %}
+                    {{ c.title|safe }}{% if not forloop.last %}, {% endif %}
+                  {% empty %}
+                    {% trans 'Uncategorized' %}
+                  {% endfor %}
+                </div>
+                <div>
+                  {% trans 'Student answers' %}: {{ g.answer_set.all.count }}
+                </div>
               </div>
             </div>
-            <i class="mdc-icon-toggle material-icons mdc-theme--primary favourite-btn"
-                id="favourite-btn-{{ g.pk|safe }}"
-                role="button"
-                aria-pressed="false"
-                aria-label="Add to favorites" tabindex="0"
-                data-id="{{ g.pk|safe }}"
-                {% if g in request.user.teacher.favourite_questions.all %}
-                data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
-                data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+
+            <div class="mdc-card__action-icons">
+
+              <div id="stats-{{ g.id|safe }}" class="stats">
+                <i id="activate-dialog-analytics-{{ g.id|safe }}"
+                  ref_id="{{ g.id|safe }}" class="material-icons md-24 analytics-tags">info</i>
+                <span id="rating-{{ g.id|safe }}"></span>
+              </div>
+
+              {% if assignment %}
+
+                {% if request.user == g.user or request.user in g.collaborators.all %}
+                  <a title="{% trans 'Edit' %}" id="edit-question-{{ g.pk }}" href="{% url 'question-update' g.pk %}">
+                    <i class="material-icons md-24 mdc-ripple-surface card-icon-list mdc-theme--primary">mode_edit</i>
+                  </a>
                 {% else %}
-                data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
-                data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
-                {% endif %}>
-                favorite_border
-            </i>
-            {% endif %}
+                  <a title="{% trans 'Copy and edit' %}" id="clone-question-{{ g.pk }}" href="{% url 'question-clone' g.pk %}">
+                    <i class="material-icons md-24 mdc-ripple-surface card-icon-list mdc-theme--primary">file_copy</i>
+                  </a>
+                {% endif %}
 
-          {% else %}
+                <i class="material-icons mdc-theme--primary md-24 mdc-ripple-surface icon-list update-questions-btn"
+                  data-url="{% url 'assignment-edit-ajax' %}"
+                  data-id="{{ g.id|safe }}"
+                  data-assignment-id="{{ assignment.identifier|safe }}">
+                  add
+                </i>
 
-            <form class="display-inline" method="post" action="#{{ g.id|slugify }}">
-              {% csrf_token %}
-              <input type="hidden" name="{{ form_field_name|safe }}" value="{{ g.pk|safe }}" />
-              <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised m-left-20" id="add-{{g.pk}}" type="submit" value="add" />
-            </form>
+              {% elif type == None %}
 
-          {% endif %}
-        </div>
-      </div>
-    </div>
+                {% if request.user.teacher %}
+                  <div class="flag-question" data-id="{{ g.pk }}">
+                    <i class="mdc-icon-toggle material-icons mdc-theme--primary flag-question__btn"
+                      role="button"
+                      aria-pressed="false"
+                      aria-label="{% trans 'Flag question' %}"
+                      tabindex="0"
+                      title="{% trans 'Flag question' %}">
+                      outlined_flag
+                    </i>
+                    <div class="flag-question__form" hidden>
+                      <h3>{% trans 'Flag question' %}</h3>
+                      <form>
+                        <select class="flag-question__form__select"
+                          title="{% trans 'Possible reasons' %}"
+                          aria-label="{% trans 'Possible reasons' %}">
+                        </select>
+                        <input type="submit"
+                          class="mdc-button mdc-button--raised"
+                          value="{% trans 'Flag' %}">
+                      </form>
+                      <svg class="icon flag-question__close">
+                        <use xlink:href="#close"></use>
+                      </svg>
+                    </div>
+                  </div>
+                  <i class="mdc-icon-toggle material-icons mdc-theme--primary favourite-btn"
+                    id="favourite-btn-{{ g.pk|safe }}"
+                    role="button"
+                    aria-pressed="false"
+                    aria-label="Add to favorites" tabindex="0"
+                    data-id="{{ g.pk|safe }}"
+                    {% if g in request.user.teacher.favourite_questions.all %}
+                      data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
+                      data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+                    {% else %}
+                      data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
+                      data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
+                    {% endif %}>
+                    favorite_border
+                  </i>
+                {% endif %}
 
-    <aside id="dialog-analytics-{{g.id}}"
-      class="mdc-dialog plot-dialog"
-      role="alertdialog"
-      aria-labelledby="label"
-      aria-describedby="description"
-      data-get-matrix="{{ g.get_matrix|safe }}"
-      data-get-frequency="{{ g.get_frequency|striptags }}"
-      data-id="{{ g.id }}">
-      <div class="mdc-dialog__surface">
-        <header class="mdc-dialog__header">
-          <h2 id="label" class="mdc-dialog__header__title">
-            {{ g.title }}
-          </h2>
-        </header>
-        <section id="description" class="mdc-dialog__body mdc-dialog__body--scrollable">
-          <h2 id="label" class="mdc-dialog__header__title">
-            {% trans 'Analytics' %}
-          </h2>
-          <div id="{{ g.id }}" name="analytics" class="items-for-question">
-            <svg id="first-frequency-{{ g.id }}" width="300" height="80" class="vertical-align"></svg>
-            <svg id="matrix-{{ g.id }}" width="60" height="60" class="vertical-align"></svg>
-            <svg id="second-frequency-{{ g.id }}" width="300" height="80" class="vertical-align"></svg>
-          </div>
-          <h2 id="label" class="mdc-dialog__header__title">
-            {% trans 'Rationales' %}
-          </h2>
-          <div class='field-container'>
-            <div class='number-box'><span class='number'>?</span></div>
-            <div class='field'>
-              <p class="dialog-help-text"><small>
-                {% blocktrans %}
-                The following rationales consist of the most popular, while the preceding fraction indicates, of those that have viewed the rationale, how many have chosen it.
-                {% endblocktrans %}
-              </small></p>
+              {% else %}
+
+                <form class="display-inline" method="post" action="#{{ g.id|slugify }}">
+                  {% csrf_token %}
+                  <input type="hidden" name="{{ form_field_name|safe }}" value="{{ g.pk|safe }}" />
+                  <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised m-left-20" id="add-{{g.pk}}" type="submit" value="add" />
+                </form>
+
+              {% endif %}
             </div>
           </div>
-          <ul>
-            {% for answer_choice in g.get_most_convincing_rationales %}
-              <li id="{{ g.id }}" name="rationale" class="items-for-question">{{ answer_choice.label }}. {{ answer_choice.text|safe|striptags }}</li>
+        </div>
+
+        <aside id="dialog-analytics-{{g.id}}"
+          class="mdc-dialog plot-dialog"
+          role="alertdialog"
+          aria-labelledby="label"
+          aria-describedby="description"
+          data-get-matrix="{{ g.get_matrix|safe }}"
+          data-get-frequency="{{ g.get_frequency|striptags }}"
+          data-id="{{ g.id }}">
+          <div class="mdc-dialog__surface">
+            <header class="mdc-dialog__header">
+              <h2 id="label" class="mdc-dialog__header__title">
+                {{ g.title }}
+              </h2>
+            </header>
+            <section id="description" class="mdc-dialog__body mdc-dialog__body--scrollable">
+              <h2 id="label" class="mdc-dialog__header__title">
+                {% trans 'Analytics' %}
+              </h2>
+              <div id="{{ g.id }}" name="analytics" class="items-for-question">
+                <svg id="first-frequency-{{ g.id }}" width="300" height="80" class="vertical-align"></svg>
+                <svg id="matrix-{{ g.id }}" width="60" height="60" class="vertical-align"></svg>
+                <svg id="second-frequency-{{ g.id }}" width="300" height="80" class="vertical-align"></svg>
+              </div>
+              <h2 id="label" class="mdc-dialog__header__title">
+                {% trans 'Rationales' %}
+              </h2>
+              <div class='field-container'>
+                <div class='number-box'><span class='number'>?</span></div>
+                <div class='field'>
+                  <p class="dialog-help-text"><small>
+                    {% blocktrans %}
+                      The following rationales consist of the most popular, while the preceding fraction indicates, of those that have viewed the rationale, how many have chosen it.
+                    {% endblocktrans %}
+                  </small></p>
+                </div>
+              </div>
               <ul>
-                {% for rationale in answer_choice.most_convincing %}
-                    <li id="{{ g.id }}" data-id="{{ rationale.id }}" name="rationale" class="items-for-question"><span class="rationale-stats">({{ rationale.times_chosen }}/{{ rationale.times_shown }})</span> {{ rationale.rationale|safe|striptags }}</li>
+                {% for answer_choice in g.get_most_convincing_rationales %}
+                  <li id="{{ g.id }}" name="rationale" class="items-for-question">{{ answer_choice.label }}. {{ answer_choice.text|safe|striptags }}</li>
+                  <ul>
+                    {% for rationale in answer_choice.most_convincing %}
+                      <li id="{{ g.id }}" data-id="{{ rationale.id }}" name="rationale" class="items-for-question"><span class="rationale-stats">({{ rationale.times_chosen }}/{{ rationale.times_shown }})</span> {{ rationale.rationale|safe|striptags }}</li>
+                    {% endfor %}
+                  </ul>
+
                 {% endfor %}
               </ul>
+              <h2 id="label" class="mdc-dialog__header__title">
+                {% trans 'Assignments using ' %}{{ g.title }}
+              </h2>
+              {% for assignment in g.assignment_set.all %}
+                <p id="{{ g.id }}" name="assignment" class="items-for-question"><a class="assignment-link" href="{% url 'question-list' assignment_id=assignment.pk %}">{{ assignment.title }}</a></p>
+              {% endfor %}
+            </section>
+            <footer class="mdc-dialog__footer">
+              <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
+            </footer>
+          </div>
+          <div class="mdc-dialog__backdrop"></div>
+        </aside>
 
-            {% endfor %}
-          </ul>
-          <h2 id="label" class="mdc-dialog__header__title">
-            {% trans 'Assignments using ' %}{{ g.title }}
-          </h2>
-          {% for assignment in g.assignment_set.all %}
-            <p id="{{ g.id }}" name="assignment" class="items-for-question"><a class="assignment-link" href="{% url 'question-list' assignment_id=assignment.pk %}">{{ assignment.title }}</a></p>
-          {% endfor %}
-        </section>
-        <footer class="mdc-dialog__footer">
-          <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
-        </footer>
-      </div>
-      <div class="mdc-dialog__backdrop"></div>
-    </aside>
+      {% endfor %}
 
-    {% endfor %}
-
-  </div>
+    </div>
   {% endif %}
 {% endfor %}
 
@@ -256,19 +256,19 @@
   {% if forloop.first %}
     {% if r.count > 0 %}
       <div class="pagination">
-          <span>
-            {% if paginator.has_previous %}
-                <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
-            {% endif %}
+        <span>
+          {% if paginator.has_previous %}
+            <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
+          {% endif %}
 
-            <span class="current">
-                {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
-            </span>
-
-            {% if paginator.has_next %}
-                <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
-            {% endif %}
+          <span class="current">
+            {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
           </span>
+
+          {% if paginator.has_next %}
+            <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
+          {% endif %}
+        </span>
       </div>
     {% endif %}
   {% endif %}

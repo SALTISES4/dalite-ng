@@ -2,154 +2,154 @@
 
 {% load compress static add_class i18n %}
 {% block stylesheets %}
-{{ block.super }}
-{% compress css %}
-<link href="{% static 'peerinst/css/collection.min.css' %}" rel="stylesheet">
-{% endcompress %}
+  {{ block.super }}
+  {% compress css %}
+    <link href="{% static 'peerinst/css/collection.min.css' %}" rel="stylesheet">
+  {% endcompress %}
 {% endblock %}
 {% block body %}
-<main>
-  <section>
-    <h1 class="mdc-typography--display3">{% trans 'Collections' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
-    <div>
-      <div class="admin-link">
-        <a href="{% url 'teacher' request.user.teacher.pk %}">{% trans 'Back to My Account' %}</a>
-        <span class="links-divider">|</span><a href="{% url 'collection-list' %}">{% trans 'View Collections' %}</a>
-      </div>
-    </div>
-    <div>
-      <h2 class="mdc-typography--display1 mdc-theme--secondary">
-        {% trans 'Create a Collection' %}
-      </h2>
-      <div class='field-container'>
-        <div class='number-box'><span class='number'>?</span></div>
-        <div class='field'>
-          <p><small>
-            {% blocktrans %}
-            Please use this page to create your collection of assignments. Please
-            provide what discipline this collection would be most pertinent for,
-            as well as a description which would help your colleagues understand
-            how best to incorporate it into their pedagogy.
-            {% endblocktrans %}
-          </small></p>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Collections' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
+      <div>
+        <div class="admin-link">
+          <a href="{% url 'teacher' request.user.teacher.pk %}">{% trans 'Back to My Account' %}</a>
+          <span class="links-divider">|</span><a href="{% url 'collection-list' %}">{% trans 'View Collections' %}</a>
         </div>
       </div>
-    <form id="collection-create-form" enctype="multipart/form-data" method="post">
-      {% csrf_token %}
-      <div class='field-container'>
-        <div class='number-box flush-to-textbox'><span class='number'></span></div>
-        <div class='field'>
-          <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense"
-               data-mdc-auto-init="MDCTextField">
-            {{ form.title|add_class:"mdc-text-field__input" }}
-            {{ form.title.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-          <div class="mdc-notched-outline">
-            <svg>
-              <path class="mdc-notched-outline__path"/>
-            </svg>
+      <div>
+        <h2 class="mdc-typography--display1 mdc-theme--secondary">
+          {% trans 'Create a Collection' %}
+        </h2>
+        <div class='field-container'>
+          <div class='number-box'><span class='number'>?</span></div>
+          <div class='field'>
+            <p><small>
+              {% blocktrans %}
+                Please use this page to create your collection of assignments. Please
+                provide what discipline this collection would be most pertinent for,
+                as well as a description which would help your colleagues understand
+                how best to incorporate it into their pedagogy.
+              {% endblocktrans %}
+            </small></p>
           </div>
-          <div class="mdc-notched-outline__idle"></div>
         </div>
-          <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent"
-             aria-hidden="true">
-          {% trans 'Provide a descriptive title for this collection.'  %}
-          </p>
-            {{ form.title.errors }}
-        </div>
-      </div>
-      <div class='field-container'>
-        <div class='number-box flush-to-textbox'><span class='number'></span></div>
-        <div class="field">
-          <div class="mdc-text-field mdc-text-field--textarea mdc-text-field--dense"
-               data-mdc-auto-init="MDCTextField">
-            {{ form.description|add_class:"mdc-text-field__input" }}
-            {{ form.description.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-          </div>
-          <p class="form-helper-text" aria-hidden="true">
-            {% blocktrans %}
-            Provide a helpful description referencing the content
-            and the indended use of this collection.
-            {% endblocktrans %}
-          </p>
-            {{ form.description.errors }}
-        </div>
-      </div>
-      <div class='field-container'>
-        <div class='number-box'><span class='number'></span></div>
-        <div class='field'>
-          <div id='discipline_form'>
-            <div class='mdc-form-field'>
-              <label for='id_discipline'>{{ form.discipline.label }}:</label>
-              <div class='mdc-select'>
-                {{ form.discipline|add_class:"mdc-select__native-control" }}
-                <div class="mdc-select__bottom-line"></div>
+        <form id="collection-create-form" enctype="multipart/form-data" method="post">
+          {% csrf_token %}
+          <div class='field-container'>
+            <div class='number-box flush-to-textbox'><span class='number'></span></div>
+            <div class='field'>
+              <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense"
+                data-mdc-auto-init="MDCTextField">
+                {{ form.title|add_class:"mdc-text-field__input" }}
+                {{ form.title.label_tag|add_class:"mdc-floating-label"|cut:":" }}
+                <div class="mdc-notched-outline">
+                  <svg>
+                    <path class="mdc-notched-outline__path"/>
+                  </svg>
+                </div>
+                <div class="mdc-notched-outline__idle"></div>
               </div>
+              <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent"
+                aria-hidden="true">
+                {% trans 'Provide a descriptive title for this collection.'  %}
+              </p>
+              {{ form.title.errors }}
             </div>
           </div>
-          <p class="form-helper-text" aria-hidden="true">
-            {{ form.discipline.help_text|safe }}
-          </p>
-          {{ form.discipline.errors }}
-        </div>
-      </div>
-      <div class='field-container'>
-        <div class='number-box'><span class='number'></span></div>
-        <div class='field'>
-          <div class='mdc-form-field'>
-            <label for='id_image'>{{ form.image.label }}</label>
-          </div>
-          <div class='image-field'>
-            {{form.image}}
-          </div>
-          <p class="form-helper-text" aria-hidden="true">
-            {{ form.image.help_text|safe }}
-          </p>
-          {{ form.image.errors }}
-        </div>
-      </div>
-      <div class='field-container'>
-        <div class='number-box'><span class='number'></span></div>
-        <div class='field'>
-          <div class='mdc-form-field'>
-            <label for="private">{{ form.private.label }}</label>
-            <div class="mdc-checkbox">
-              {{ form.private|add_class:'mdc-checkbox__native-control'}}
-              <div class="mdc-checkbox__background">
-                <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
-                  <path class="mdc-checkbox__checkmark-path"
-                    fill="none"
-                    stroke="white"
-                    d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
-                </svg>
-                <div class="mdc-checkbox__mixedmark"></div>
+          <div class='field-container'>
+            <div class='number-box flush-to-textbox'><span class='number'></span></div>
+            <div class="field">
+              <div class="mdc-text-field mdc-text-field--textarea mdc-text-field--dense"
+                data-mdc-auto-init="MDCTextField">
+                {{ form.description|add_class:"mdc-text-field__input" }}
+                {{ form.description.label_tag|add_class:"mdc-floating-label"|cut:":" }}
               </div>
+              <p class="form-helper-text" aria-hidden="true">
+                {% blocktrans %}
+                  Provide a helpful description referencing the content
+                  and the indended use of this collection.
+                {% endblocktrans %}
+              </p>
+              {{ form.description.errors }}
             </div>
           </div>
-          <p class="form-helper-text" aria-hidden="true">
-            {% trans 'A private collection will be hidden from other teachers.' %}
-          </p>
-          {{ form.private.errors }}
-        </div>
-      </div>
-      <input class="mdc-button mdc-button--raised padded-top"
-             type="submit"
-             value="Create"
-             id="id_create"/>
-      <input type="hidden" name="owner" value="">
-    </form>
-  </section>
-</main>
+          <div class='field-container'>
+            <div class='number-box'><span class='number'></span></div>
+            <div class='field'>
+              <div id='discipline_form'>
+                <div class='mdc-form-field'>
+                  <label for='id_discipline'>{{ form.discipline.label }}:</label>
+                  <div class='mdc-select'>
+                    {{ form.discipline|add_class:"mdc-select__native-control" }}
+                    <div class="mdc-select__bottom-line"></div>
+                  </div>
+                </div>
+              </div>
+              <p class="form-helper-text" aria-hidden="true">
+                {{ form.discipline.help_text|safe }}
+              </p>
+              {{ form.discipline.errors }}
+            </div>
+          </div>
+          <div class='field-container'>
+            <div class='number-box'><span class='number'></span></div>
+            <div class='field'>
+              <div class='mdc-form-field'>
+                <label for='id_image'>{{ form.image.label }}</label>
+              </div>
+              <div class='image-field'>
+                {{form.image}}
+              </div>
+              <p class="form-helper-text" aria-hidden="true">
+                {{ form.image.help_text|safe }}
+              </p>
+              {{ form.image.errors }}
+            </div>
+          </div>
+          <div class='field-container'>
+            <div class='number-box'><span class='number'></span></div>
+            <div class='field'>
+              <div class='mdc-form-field'>
+                <label for="private">{{ form.private.label }}</label>
+                <div class="mdc-checkbox">
+                  {{ form.private|add_class:'mdc-checkbox__native-control'}}
+                  <div class="mdc-checkbox__background">
+                    <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                      <path class="mdc-checkbox__checkmark-path"
+                        fill="none"
+                        stroke="white"
+                        d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                    </svg>
+                    <div class="mdc-checkbox__mixedmark"></div>
+                  </div>
+                </div>
+              </div>
+              <p class="form-helper-text" aria-hidden="true">
+                {% trans 'A private collection will be hidden from other teachers.' %}
+              </p>
+              {{ form.private.errors }}
+            </div>
+          </div>
+          <input class="mdc-button mdc-button--raised padded-top"
+            type="submit"
+            value="Create"
+            id="id_create"/>
+          <input type="hidden" name="owner" value="">
+        </form>
+      </section>
+    </main>
 {% endblock %}
 {% block scripts %}
-{{ block.super }}
-{% compress js %}
-<script src="{% static 'peerinst/js/collection.min.js' %}"></script>
-{% endcompress %}
-<script nonce="{{ request.csp_nonce }}">
-window.addEventListener("load", function() {
-    collection.enumerate();
-});
-</script>
+  {{ block.super }}
+  {% compress js %}
+    <script src="{% static 'peerinst/js/collection.min.js' %}"></script>
+  {% endcompress %}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      collection.enumerate();
+    });
+  </script>
 {% endblock %}

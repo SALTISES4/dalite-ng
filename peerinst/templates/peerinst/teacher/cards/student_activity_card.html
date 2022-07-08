@@ -10,9 +10,9 @@
 
         <div class="mdc-typography--caption">
           {% if assignment.assignment %}
-          <a href="{% url 'group-assignment' assignment.hash %}">{{ assignment.assignment }}</a>
+            <a href="{% url 'group-assignment' assignment.hash %}">{{ assignment.assignment }}</a>
           {% else %}
-          {{ assignment }}
+            {{ assignment }}
           {% endif %}
         </div>
 

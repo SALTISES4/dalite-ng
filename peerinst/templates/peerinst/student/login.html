@@ -3,54 +3,54 @@
 {% load static i18n %}
 
 {% block stylesheets %}
-<link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
+  <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
 
-<main>
-  <section id="student-login">
+  <main>
+    <section id="student-login">
 
-    <h1 class="mdc-typography--display3">
-      {% trans 'Student Access' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+      <h1 class="mdc-typography--display3">
+        {% trans 'Student Access' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="admin-link">
-      <a href="{% url 'login' %}">{% trans 'Back to login' %}</a>
-    </div>
-
-    <div class='field-container'>
-      <div class='number-box'><span class='number'>?</span></div>
-      <div class='field'>
-        <p><small>
-          {% blocktrans %}
-          Student access is managed by email.  Enter your email address below and you will receive a message containing links to all of your assignments.
-          {% endblocktrans %}
-        </small></p>
+      <div class="admin-link">
+        <a href="{% url 'login' %}">{% trans 'Back to login' %}</a>
       </div>
-    </div>
 
-    <form action="{% url 'student-send-signin-link' %}" method="POST">
-      {% csrf_token %}
+      <div class='field-container'>
+        <div class='number-box'><span class='number'>?</span></div>
+        <div class='field'>
+          <p><small>
+            {% blocktrans %}
+              Student access is managed by email.  Enter your email address below and you will receive a message containing links to all of your assignments.
+            {% endblocktrans %}
+          </small></p>
+        </div>
+      </div>
 
-      <div class="mdc-text-field mdc-text-field--outlined" data-mdc-auto-init="MDCTextField">
-        <input type="email" id="form_email" name="email" class="mdc-text-field__input" required autofocus></input>
-        <label class="mdc-floating-label" for="form_email">
-          {% trans 'Email' %}
-        </label>
-        <div class="mdc-notched-outline">
+      <form action="{% url 'student-send-signin-link' %}" method="POST">
+        {% csrf_token %}
+
+        <div class="mdc-text-field mdc-text-field--outlined" data-mdc-auto-init="MDCTextField">
+          <input type="email" id="form_email" name="email" class="mdc-text-field__input" required autofocus></input>
+          <label class="mdc-floating-label" for="form_email">
+            {% trans 'Email' %}
+          </label>
+          <div class="mdc-notched-outline">
             <svg>
               <path class="mdc-notched-outline__path"/>
             </svg>
           </div>
           <div class="mdc-notched-outline__idle"></div>
-      </div>
+        </div>
 
-      <input class="mdc-button mdc-button--raised" type="submit" value="{% trans 'Send email' %}"></input>
-    </form>
+        <input class="mdc-button mdc-button--raised" type="submit" value="{% trans 'Send email' %}"></input>
+      </form>
 
-  </section>
-</main>
+    </section>
+  </main>
 
 {% endblock %}

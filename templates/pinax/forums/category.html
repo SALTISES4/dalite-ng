@@ -3,21 +3,21 @@
 {% load i18n %}
 
 {% block heading %}
-{% trans 'Category: ' %}{{ category }}
+  {% trans 'Category: ' %}{{ category }}
 {% endblock %}
 
 {% block breadcrumbs %}
-    <span class="links-divider">|</span><a href="{% url 'pinax_forums:forums' %}">{% trans 'Back to Forums' %}</a>
+  <span class="links-divider">|</span><a href="{% url 'pinax_forums:forums' %}">{% trans 'Back to Forums' %}</a>
 {% endblock %}
 
 {% block content %}
-<h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Forums' %}</h2>
+  <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Forums' %}</h2>
 
-<ul>
-{% for f in forums %}
-  <li>
-    <a href="{% url 'pinax_forums:forum' f.pk %}">{{ f }}</a>
-  </li>
-{% endfor %}
-</ul>
+  <ul>
+    {% for f in forums %}
+      <li>
+        <a href="{% url 'pinax_forums:forum' f.pk %}">{{ f }}</a>
+      </li>
+    {% endfor %}
+  </ul>
 {% endblock %}

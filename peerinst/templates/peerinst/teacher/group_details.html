@@ -3,27 +3,27 @@
 {% load compress i18n %}
 
 {% block body %}
-<main>
-  <section>
-    <h1 class="mdc-typography--display3">{% trans 'Share Group' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Share Group' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="admin-link">
-      <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
-    </div>
+      <div class="admin-link">
+        <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
+      </div>
 
-    <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Registration' %}</h2>
+      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Registration' %}</h2>
 
-    <p class='mdc-typography--body1'>{% trans 'Anyone can join this group by accessing the unique link below:'%}</p>
+      <p class='mdc-typography--body1'>{% trans 'Anyone can join this group by accessing the unique link below:'%}</p>
 
-    <blockquote class='bold'>https://{{ request.get_host }}{% url 'signup-through-link' group_hash=object.hash %}</blockquote>
+      <blockquote class='bold'>https://{{ request.get_host }}{% url 'signup-through-link' group_hash=object.hash %}</blockquote>
 
-    <p class='mdc-typography--body1'>{% trans 'Upon accessing the link, users will be prompted to enter an e-mail address.' %}</p>
-    <p class='mdc-typography--body1'>{% trans 'If the address is not associated with an existing account, we will create a new one.' %}</p>
+      <p class='mdc-typography--body1'>{% trans 'Upon accessing the link, users will be prompted to enter an e-mail address.' %}</p>
+      <p class='mdc-typography--body1'>{% trans 'If the address is not associated with an existing account, we will create a new one.' %}</p>
 
-    <blockquote>{% trans 'Your students never need to remember a username or password; access to your assignments is managed through tokens sent to their e-mail address.' %}</blockquote>
+      <blockquote>{% trans 'Your students never need to remember a username or password; access to your assignments is managed through tokens sent to their e-mail address.' %}</blockquote>
 
-  </section>
-</main>
+    </section>
+  </main>
 {% endblock %}

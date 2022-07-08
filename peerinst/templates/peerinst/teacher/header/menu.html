@@ -6,21 +6,21 @@
     <nav id="icon-with-text-demo" class="mdc-drawer__content mdc-list">
       <a class="mdc-list-item" href="{% url 'teacher-dashboard' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
+          aria-hidden="true">
           home
         </i>
         {% trans 'Home page' %}
       </a>
       <a class="mdc-list-item" href="{% url 'browse-database' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
+          aria-hidden="true">
           search
         </i>
         {% trans 'Search database' %}
       </a>
       <a class="mdc-list-item" href="{% url 'student-activity' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
+          aria-hidden="true">
           {% if user.teacher.student_activity %}
             star
           {% else %}
@@ -31,42 +31,42 @@
       </a>
       <a class="mdc-list-item" href="{% url 'question-create' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
+          aria-hidden="true">
           edit
         </i>
         {% trans 'Create question' %}
       </a>
       <a class="mdc-list-item"
-         href="{% url 'assignment-create' %}">
+        href="{% url 'assignment-create' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
+          aria-hidden="true">
           assignment
         </i>
         {% trans 'Create assignment' %}
       </a>
       <a class="mdc-list-item" href="{% url 'teacher' user.teacher.pk %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
+          aria-hidden="true">
           account_circle
         </i>
         {% trans 'My account' %}
       </a>
       {% if request.session.forum_notifications %}
-      <a class="mdc-list-item" href="{% url 'pinax_forums:thread_updates' %}">
-        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-          aria-hidden="true">
-          help
-        </i>
-        {% trans 'Forums' %}<span class="mdc-theme--primary new-feature">{% trans 'New!' %}</span>
-      </a>
+        <a class="mdc-list-item" href="{% url 'pinax_forums:thread_updates' %}">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            help
+          </i>
+          {% trans 'Forums' %}<span class="mdc-theme--primary new-feature">{% trans 'New!' %}</span>
+        </a>
       {% else %}
-      <a class="mdc-list-item" href="{% url 'pinax_forums:forums' %}">
-        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-          aria-hidden="true">
-          help
-        </i>
-        {% trans 'Forums' %}
-      </a>
+        <a class="mdc-list-item" href="{% url 'pinax_forums:forums' %}">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            help
+          </i>
+          {% trans 'Forums' %}
+        </a>
       {% endif %}
       <a class="mdc-list-item" href="{% url 'course_flow:home' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
