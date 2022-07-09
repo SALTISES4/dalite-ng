@@ -5,7 +5,7 @@ jobs:
   build:
     resource_class: medium
     docker:
-      - image: circleci/python:3.8.3-node-browsers
+      - image: circleci/python:3.8-node-browsers
         environment:
           DALITE_DB_PASSWORD: test key
           DALITE_DB_HOST: 127.0.0.1
@@ -19,7 +19,6 @@ jobs:
           MYSQL_PASSWORD: test key
           MYSQL_HOST: localhost
           MYSQL_ROOT_PASSWORD: mariadb
-
     working_directory: ~/repo
     steps:
       - checkout
@@ -40,11 +39,10 @@ jobs:
             npm install --no-optional
             ./node_modules/gulp/bin/gulp.js build
       - run:
-         name: Safety
-         command: |
-           . .venv/bin/activate
-           pip install safety
-           safety check
+          name: Safety
+          command: |
+            pip install safety
+            safety check -r requirements-prod-aws.txt --key=$SAFETY_API_KEY
       - run:
           name: Setup local_settings.py
           command: |
