@@ -42,7 +42,7 @@ jobs:
           name: Safety
           command: |
             pip install safety
-            safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY
+            safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY --ignore=49733
       - run:
           name: Setup local_settings.py
           command: |
