@@ -5,7 +5,7 @@ jobs:
   build:
     resource_class: medium
     docker:
-      - image: circleci/python:3.8.3-node-browsers
+      - image: cimg/python:3.8-browsers
         environment:
           DALITE_DB_PASSWORD: test key
           DALITE_DB_HOST: 127.0.0.1
@@ -42,7 +42,7 @@ jobs:
           name: Safety
           command: |
             pip install safety
-            safety check -r requirements-prod-aws.txt --key=$SAFETY_API_KEY
+            safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY
       - run:
           name: Setup local_settings.py
           command: |
