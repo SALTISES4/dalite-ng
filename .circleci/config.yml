@@ -24,6 +24,14 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Safety
+          command: |
+            pip install safety
+            safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY --ignore=49733
+      - snyk/scan:
+          fail-on-issues: true
+          token-variable: SNYK_TOKEN
+      - run:
           name: Setup
           command: |
             sudo apt update
@@ -40,14 +48,6 @@ jobs:
             npm install --no-optional
             ./node_modules/gulp/bin/gulp.js build
       - run:
-          name: Safety
-          command: |
-            pip install safety
-            safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY --ignore=49733
-      - snyk/scan:
-          fail-on-issues: true
-          token-variable: SNYK_TOKEN
-      - run:
           name: Setup local_settings.py
           command: |
             tools/gen_secret_key.py > dalite/local_settings.py
@@ -55,7 +55,6 @@ jobs:
             echo 'PIWIK_SITE_ID = "1"' >> dalite/local_settings.py
             echo 'PASSWORD_GENERATOR_NONCE = "secret key"' >> dalite/local_settings.py
             echo 'import os' >> dalite/local_settings.py
-
             echo 'BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))' >> dalite/local_settings.py
             echo 'EMAIL_SUBJECT_PREFIX = "SALTISE/S4 @ Dawson College: "' >> dalite/local_settings.py
             echo 'DEFAULT_FROM_EMAIL = "no-reply-SALTISES4@dawsoncollege.qc.ca"' >> dalite/local_settings.py
