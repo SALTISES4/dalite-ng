@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   aws-s3: circleci/aws-s3@3.0
+  snyk: snyk/snyk@1.2.3
 jobs:
   build:
     resource_class: medium
@@ -43,6 +44,9 @@ jobs:
           command: |
             pip install safety
             safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY --ignore=49733
+      - snyk/scan:
+          fail-on-issues: true
+          token-variable: SNYK_TOKEN
       - run:
           name: Setup local_settings.py
           command: |
