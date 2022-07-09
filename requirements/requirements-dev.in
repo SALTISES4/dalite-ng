@@ -7,7 +7,6 @@ django-sslserver
 flake8
 ipython
 isort
-pip-lock
 pre-commit
 pytest
 pytest-cov

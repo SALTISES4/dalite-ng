@@ -305,6 +305,8 @@ pbr==5.4.4
     # via stevedore
 pillow==9.1.1
     # via -r requirements/requirements-base.in
+pip-lock==2.9.0
+    # via -r requirements/requirements-base.in
 preshed==3.0.5
     # via
     #   spacy
