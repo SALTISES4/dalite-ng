@@ -14,7 +14,7 @@
   <div class="mdc-card">
 
     <div class="mdc-typography--body1" >
-      {{object.content|safe}}
+      {{ object.content|striptags|safe }}
     </div>
 
     <div class="mdc-card__actions">
@@ -27,29 +27,29 @@
   </div>
 
   {% if object.reply_replies.all %}
-    <h4>{% trans 'The following replies will also be deleted: ' %}<h4>
+    <h4>{% trans 'The following replies will also be deleted: ' %}</h4>
 
-      {% for r in object.reply_replies.all %}
-        <div class="mdc-card reply-to-reply">
+    {% for r in object.reply_replies.all %}
+      <div class="mdc-card reply-to-reply">
 
-          <div class="mdc-typography--body1">
-            {{r.content|safe}}
-          </div>
+        <div class="mdc-typography--body1">
+          {{ r.content|striptags|safe }}
+        </div>
 
-          <div class="mdc-card__actions">
-            <div class="mdc-card__action-buttons">
-              <div class="mdc-typography--caption white">
-                {% if r.created|date:"d M" != right_now %}
-                  {{ r.author }} &middot; {{ r.created|date:"SHORT_DATE_FORMAT" }}
-                {% else %}
-                  {{ r.author }} &middot; {{ r.created|timesince }}
-                {% endif %}
-              </div>
+        <div class="mdc-card__actions">
+          <div class="mdc-card__action-buttons">
+            <div class="mdc-typography--caption white">
+              {% if r.created|date:"d M" != right_now %}
+                {{ r.author }} &middot; {{ r.created|date:"SHORT_DATE_FORMAT" }}
+              {% else %}
+                {{ r.author }} &middot; {{ r.created|timesince }}
+              {% endif %}
             </div>
           </div>
-
         </div>
-      {% endfor %}
+
+      </div>
+    {% endfor %}
   {% endif %}
 
   <form method="post">

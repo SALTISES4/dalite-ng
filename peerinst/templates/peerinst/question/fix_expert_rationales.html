@@ -65,7 +65,7 @@
       {% if save_allowed %}
         {% if assignment_id %}
           <form class="inline" id="done" action="{% url 'research-assignment-question-index-by-assignment' assignment_id=assignment_id %}" method="get">
-            <button form="done" type="submit" class="mdc-button mdc-button--raised submit_button">{% trans 'Done' %}</<button>
+            <button form="done" type="submit" class="mdc-button mdc-button--raised submit_button">{% trans 'Done' %}</button>
           </form>
         {% elif question_id %}
           <span class="padded">
@@ -75,12 +75,12 @@
           </span>
           <span class="padded">
             <form class="inline" id="next" action="{% url 'sample-answer-form' question_id=question_id %}" method="get">
-              <button form="next" type="submit" class="mdc-button mdc-button--raised submit_button">{% trans 'Next' %}</<button>
+              <button form="next" type="submit" class="mdc-button mdc-button--raised submit_button">{% trans 'Next' %}</button>
             </form>
           </span>
         {% else %}
           <form class="inline" id="done" action="{% url 'research-discipline-question-index-by-discipline' discipline_title=question.discipline.title %}#{{ question.pk }}" method="get">
-            <button form="done" type="submit" class="mdc-button mdc-button--raised submit_button">{% trans 'Done' %}</<button>
+            <button form="done" type="submit" class="mdc-button mdc-button--raised submit_button">{% trans 'Done' %}</button>
           </form>
         {% endif %}
       {% endif %}

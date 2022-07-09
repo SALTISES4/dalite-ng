@@ -321,11 +321,7 @@
                 </div>
               </div>
 
-              {% if not object or object.user == request.user %}
-                <div>
-              {% else %}
-                <div class="hidden">
-              {% endif %}
+              <div class="{% if not object or object.user == request.user %}{% else %}hidden{% endif %}"></div>
               <h3>{% trans 'Authorship' %}</h3>
 
               <div class='field-container'>
@@ -363,12 +359,8 @@
                       <option selected="selected" value={{c.pk}}>{{c.username}}</option>
                     {% endfor %}
                   </select>
-
                 </div>
               </div>
-
-            </div>
-
             </form>
           {% else %}
             <h2 class="mdc-typography--display1 mdc-theme--secondary">{{question.title}}</h2>
@@ -444,8 +436,8 @@
         </div>
       </div>
 
-    </main>
-  </section>
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}

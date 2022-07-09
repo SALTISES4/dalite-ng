@@ -5,7 +5,7 @@
 {% block stylesheets %}
   {{ block.super }}
   {% compress css %}
-    <link rel="stylesheet" href="{% static 'tos/css/styles.min.css' %}"></link>
+    <link rel="stylesheet" href="{% static 'tos/css/styles.min.css' %}">
   {% endcompress %}
   {% if user.student %}
     {% compress css %}
@@ -91,32 +91,30 @@
                 </span>
               </span>
               <span class="mdc-list-item__meta">
-                {% if email_type.type == 'all' %}
-                  <div id="btn-toggle-all" class="btn-toggle">
-                {% elif all_accepted %}
-                  <div class="btn-toggle">
-                {% else %}
-                  <div class="btn-toggle btn-toggle--disabled">
-                {% endif %}
-                {% if email_type.accepted %}
-                  <input type="checkbox" name="{{ email_type.type }}-consent" checked></input>
-                  <div class="btn-toggle--selected">{% trans 'Yes' %}</div>
-                  <div >{% trans 'No' %}</div>
-                {% else %}
-                  <input type="checkbox" name="{{ email_type.type }}-consent"></input>
-                  <div>{% trans 'Yes' %}</div>
-                  <div class="btn-toggle--selected">{% trans 'No' %}</div>
-                {% endif %}
-              </div>
-            </span>
+                <div
+                  id="{% if email_type.type == 'all' %}btn-toggle-all{% endif %}"
+                  class="btn-toggle {% if not email_type.type == 'all' and not all_accepted %}btn-toggle--disabled{% endif %}"
+                >
+                  {% if email_type.accepted %}
+                    <input type="checkbox" name="{{ email_type.type }}-consent" checked>
+                    <div class="btn-toggle--selected">{% trans 'Yes' %}</div>
+                    <div >{% trans 'No' %}</div>
+                  {% else %}
+                    <input type="checkbox" name="{{ email_type.type }}-consent">
+                    <div>{% trans 'Yes' %}</div>
+                    <div class="btn-toggle--selected">{% trans 'No' %}</div>
+                  {% endif %}
+                </div>
+              </span>
             </li>
           {% endfor %}
           <li role="separator" class="mdc-list-divider"></li>
-          <input id="submit-notification-change-btn" type="submit" class="mdc-button mdc-button--raised padded-top" disabled value="{% trans 'Save' %}"></input>
-        </form>
+        </ul>
+        <input id="submit-notification-change-btn" type="submit" class="mdc-button mdc-button--raised padded-top" disabled value="{% trans 'Save' %}">
+      </form>
 
-      </section>
-    </main>
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}

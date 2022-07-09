@@ -246,23 +246,23 @@
                   </div>
                   <div class="mdc-dialog__backdrop"></div>
                 </aside>
+              </li>
             {% endfor %}
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <div class="mdc-card__actions">
-    <div class="mdc-card__action-buttons">
-      <div class="mdc-typography--caption">
-        <div class="admin-link">
-          <a id="assignment-view" href="{% url 'question-list' obj.pk %}">
-            <b>{% trans 'See More' %}</b>
-          </a>
+          </ul>
         </div>
       </div>
     </div>
-  </div>
+    <div class="mdc-card__actions">
+      <div class="mdc-card__action-buttons">
+        <div class="mdc-typography--caption">
+          <div class="admin-link">
+            <a id="assignment-view" href="{% url 'question-list' obj.pk %}">
+              <b>{% trans 'See More' %}</b>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 {% empty %}
   {% trans 'No assignments available.' %}

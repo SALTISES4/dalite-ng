@@ -40,9 +40,10 @@
         </span>
       </li>
     {% empty %}
-      <p>{% trans 'You are not currently following any threads.' %}</p>
+      <li>{% trans 'You are not currently following any threads.' %}</li>
     {% endfor %}
     <li role="separator" class="mdc-list-divider"></li>
+  </ul>
 {% endblock %}
 
 {% block scripts %}

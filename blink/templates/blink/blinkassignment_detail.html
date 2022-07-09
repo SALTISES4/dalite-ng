@@ -159,39 +159,39 @@
                     {% for label, choice in g.question.get_choices %}
                       <li class="mdc-typography--body1">{{ label }}. {{ choice|bleach_html|safe }}</li>
                     {% endfor %}
-                    <ul>
-                    </div>
+                  </ul>
+                </div>
 
-                    <div class="mdc-card__actions">
+                <div class="mdc-card__actions">
 
-                      <div class="mdc-card__action-buttons grey">
-                        <div class="mdc-typography--caption">
-                          <div>
-                            {% trans 'Discipline' %}: {{g.question.discipline}}
-                          </div>
-                          <div>
-                            {% trans 'Categories' %}:
-                            {% for c in g.question.category.all %}
-                              {{ c.title|bleach_html|safe }}{% if not forloop.last %}, {% endif %}
-                            {% empty %}
-                              {% trans 'Uncategorized' %}
-                            {% endfor %}
-                          </div>
-                          <div>
-                            {% trans 'Student answers' %}: {{g.question.answer_set.count}}
-                          </div>
-                        </div>
+                  <div class="mdc-card__action-buttons grey">
+                    <div class="mdc-typography--caption">
+                      <div>
+                        {% trans 'Discipline' %}: {{g.question.discipline}}
                       </div>
-
-                      <div class="mdc-card__action-icons">
-                        <form class="inline" method="post" action="#{{g.question.id|slugify}}">
-                          {% csrf_token %}
-                          <input type="hidden" name="blink" value="{{g.pk}}" />
-                          <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit" value="add" />
-                        </form>
+                      <div>
+                        {% trans 'Categories' %}:
+                        {% for c in g.question.category.all %}
+                          {{ c.title|bleach_html|safe }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                          {% trans 'Uncategorized' %}
+                        {% endfor %}
+                      </div>
+                      <div>
+                        {% trans 'Student answers' %}: {{g.question.answer_set.count}}
                       </div>
                     </div>
                   </div>
+
+                  <div class="mdc-card__action-icons">
+                    <form class="inline" method="post" action="#{{g.question.id|slugify}}">
+                      {% csrf_token %}
+                      <input type="hidden" name="blink" value="{{g.pk}}" />
+                      <input class="material-icons small-button mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit" value="add" />
+                    </form>
+                  </div>
+                </div>
+              </div>
             {% endif %}
           {% empty %}
             <ul>

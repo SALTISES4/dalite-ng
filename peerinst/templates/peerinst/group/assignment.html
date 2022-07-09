@@ -87,36 +87,6 @@
                   </span>
                 {% endif %}
               </li>
-              {% comment %} <li class="mdc-list-divider" role="separator"></li> {% endcomment %}
-              {% comment %} <li class="mdc-list-item" {% endcomment %}
-              {% comment %} title="{% trans 'Quality evaluation for allowing rationale submission' %}"> {% endcomment %}
-              {% comment %} <span class="mdc-list-item__graphic mdc-theme--primary"> {% endcomment %}
-              {% comment %} <i class="mdc-theme--primary material-icons md-48"> {% endcomment %}
-              {% comment %} assistant {% endcomment %}
-              {% comment %} </i> {% endcomment %}
-              {% comment %} </span> {% endcomment %}
-              {% comment %} <span class="mdc-list-item__text mdc-theme--secondary bold"> {% endcomment %}
-              {% comment %} {% trans 'Submission quality' %} {% endcomment %}
-              {% comment %} <div class="mdc-list-item__secondary-text"> {% endcomment %}
-              {% comment %} {% if assignment.quality %} {% endcomment %}
-              {% comment %} <ul class="p-left-0"> {% endcomment %}
-              {% comment %} {% for criterion in assignment.quality.criterions.all %} {% endcomment %}
-              {% comment %} <li class="mdc-list-item__secondary-text"> {% endcomment %}
-              {% comment %} {{ criterion.name }} v{{ criterion.version }} {% endcomment %}
-              {% comment %} </li> {% endcomment %}
-              {% comment %} {% endfor %} {% endcomment %}
-              {% comment %} </ul> {% endcomment %}
-              {% comment %} {% endif %} {% endcomment %}
-              {% comment %} </div> {% endcomment %}
-              {% comment %} </span> {% endcomment %}
-              {% comment %} <span class="mdc-list-item__meta"> {% endcomment %}
-              {% comment %} <a href="{% url 'quality:edit' %}?type=validation&assignment={{ assignment.pk }}&next={{ request.path }}"> {% endcomment %}
-              {% comment %} <i class="material-icons md-24 mdc-ripple-surface icon-list"> {% endcomment %}
-              {% comment %} edit {% endcomment %}
-              {% comment %} </i> {% endcomment %}
-              {% comment %} </a> {% endcomment %}
-              {% comment %} </span> {% endcomment %}
-              {% comment %} </li> {% endcomment %}
               <li class="mdc-list-divider" role="separator"></li>
             </ul>
           </div>

@@ -1,3 +1,8 @@
+[tool.curlylint.rules]
+html_has_lang = true
+image_alt = true
+meta_viewport = true
+
 [tool.black]
 target-version = ['py38']
 line_length = 79

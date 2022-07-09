@@ -98,28 +98,24 @@
           <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive" >
             {% for a in object.blinkassignment_set.all %}
               <li role="separator" class="mdc-list-divider"></li>
-              {% if a.blinkassignmentquestion_set.all|length > 0 %}
-                <li class="mdc-list-item blink pointer" id="edit-blink-{{a.pk}}">
-              {% else %}
-                <li class="mdc-list-item blink" id="edit-blink-{{a.pk}}">
-              {% endif %}
-              <span class="mdc-list-item__graphic mdc-theme--primary">
-                <i class="mdc-theme--primary material-icons md-36">play_circle_filled</i>
-              </span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {{a.title|safe|striptags}}
-                <span class="mdc-list-item__secondary-text">
-                  {{a.blinkassignmentquestion_set.count}} {% trans 'question(s)' %}
+              <li class="mdc-list-item blink {% if a.blinkassignmentquestion_set.all|length > 0 %}pointer{% endif %}" id="edit-blink-{{a.pk}}">
+                <span class="mdc-list-item__graphic mdc-theme--primary">
+                  <i class="mdc-theme--primary material-icons md-36">play_circle_filled</i>
                 </span>
-              </span>
-              <span class="mdc-list-item__meta">
-                <a href="{% url 'blink:blinkAssignment-delete' a.key %}">
-                  <i class="material-icons md-24 mdc-ripple-surface icon-list">delete</i>
-                </a>
-                <a href="{% url 'blink:blinkAssignment-update' a.pk %}">
-                  <i class="material-icons md-24 mdc-ripple-surface icon-list">mode_edit</i>
-                </a>
-              </span>
+                <span class="mdc-list-item__text mdc-theme--secondary bold">
+                  {{a.title|safe|striptags}}
+                  <span class="mdc-list-item__secondary-text">
+                    {{a.blinkassignmentquestion_set.count}} {% trans 'question(s)' %}
+                  </span>
+                </span>
+                <span class="mdc-list-item__meta">
+                  <a href="{% url 'blink:blinkAssignment-delete' a.key %}">
+                    <i class="material-icons md-24 mdc-ripple-surface icon-list">delete</i>
+                  </a>
+                  <a href="{% url 'blink:blinkAssignment-update' a.pk %}">
+                    <i class="material-icons md-24 mdc-ripple-surface icon-list">mode_edit</i>
+                  </a>
+                </span>
               </li>
             {% endfor %}
             <li role="separator" class="mdc-list-divider"></li>
@@ -184,31 +180,30 @@
                       </h2>
                     </div>
                     <div>
-                      <b>{% trans 'Collection Statistics' %}</b
-                      </div>
-                      <div id="total-answers-{{a.pk}}">
-                        {% trans 'Total Answers' %}: {% trans 'Loading...' %}
-                      </div>
-                      <div id="switches-{{a.pk}}">
-                        {% trans 'Answers Switched' %}: {% trans 'Loading...' %}
-                      </div>
-                      <div id="correct-first-answers-{{a.pk}}">
-                        {% trans 'Correct Answers on First Attempt' %}: {% trans 'Loading...' %}
-                      </div>
-                      <div id="correct-second-answers-{{a.pk}}">
-                        {% trans 'Correct Answers on Second Attempt' %}: {% trans 'Loading...' %}
-                      </div>
-                      <div>
-                        {% trans 'Followers' %}: {{ a.followers.count }}
-                      </div>
-                    </section>
-                    <footer class="mdc-dialog__footer">
-                      <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
-                    </footer>
-                  </div>
-                  <div class="mdc-dialog__backdrop"></div>
-                </aside>
-
+                      <b>{% trans 'Collection Statistics' %}</b>
+                    </div>
+                    <div id="total-answers-{{a.pk}}">
+                      {% trans 'Total Answers' %}: {% trans 'Loading...' %}
+                    </div>
+                    <div id="switches-{{a.pk}}">
+                      {% trans 'Answers Switched' %}: {% trans 'Loading...' %}
+                    </div>
+                    <div id="correct-first-answers-{{a.pk}}">
+                      {% trans 'Correct Answers on First Attempt' %}: {% trans 'Loading...' %}
+                    </div>
+                    <div id="correct-second-answers-{{a.pk}}">
+                      {% trans 'Correct Answers on Second Attempt' %}: {% trans 'Loading...' %}
+                    </div>
+                    <div>
+                      {% trans 'Followers' %}: {{ a.followers.count }}
+                    </div>
+                  </section>
+                  <footer class="mdc-dialog__footer">
+                    <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
+                  </footer>
+                </div>
+                <div class="mdc-dialog__backdrop"></div>
+              </aside>
             {% endfor %}
             <li role="separator" class="mdc-list-divider"></li>
           </ul>
@@ -263,38 +258,32 @@
             </li>
             <li role="separator" class="mdc-list-divider"></li>
             <li class="mdc-list-item pointer" id="tos-modify-btn">
-              {% if tos_accepted %}
-                <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-36">check</i></span>
-                <span class="mdc-list-item__text mdc-theme--secondary bold">
-                  {% trans 'Terms of service: Sharing' %}
-              {% else %}
-                <span class="mdc-list-item__graphic mdc-theme--primary red"><i class="material-icons md-36">clear</i></span>
-                <span class="mdc-list-item__text mdc-theme--secondary bold">
-                  {% trans 'Terms of service: Not sharing' %}
-              {% endif %}
-              <span class="mdc-list-item__secondary-text">
-                {% trans 'Signed: ' %}{{ tos_timestamp }}
+              <span class="mdc-list-item__graphic mdc-theme--primary {% if not tos_accepted %}red{% endif %}"><i class="material-icons md-36">{% if tos_accepted %}check{% else %}clear{% endif %}</i></span>
+              <span class="mdc-list-item__text mdc-theme--secondary bold">
+                {% if tos_accepted %}{% trans 'Terms of service: Sharing' %}{% else %}{% trans 'Terms of service: Not sharing' %}{% endif %}
+                <span class="mdc-list-item__secondary-text">
+                  {% trans 'Signed: ' %}{{ tos_timestamp }}
+                </span>
               </span>
-            </span>
-            <span class="mdc-list-item__meta"><i class="material-icons md-24">settings</i></span>
-          </li>
-          <li role="separator" class="mdc-list-divider"></li>
-          <li class="mdc-list-item pointer" id="email-modify-btn">
-            <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-36">email</i></span>
-            <span class="mdc-list-item__text mdc-theme--secondary bold">
-              {% trans "Email settings" %}
-              <span class="mdc-list-item__secondary-text">
-                {% trans 'Notifications: ' %}{{ user.emailconsent_set.latest.datetime }}
+              <span class="mdc-list-item__meta"><i class="material-icons md-24">settings</i></span>
+            </li>
+            <li role="separator" class="mdc-list-divider"></li>
+            <li class="mdc-list-item pointer" id="email-modify-btn">
+              <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-36">email</i></span>
+              <span class="mdc-list-item__text mdc-theme--secondary bold">
+                {% trans "Email settings" %}
+                <span class="mdc-list-item__secondary-text">
+                  {% trans 'Notifications: ' %}{{ user.emailconsent_set.latest.datetime }}
+                </span>
               </span>
-            </span>
-            <span class="mdc-list-item__meta"><i class="material-icons md-24">settings</i></span>
-          </li>
-          <li role="separator" class="mdc-list-divider"></li>
-        </ul>
+              <span class="mdc-list-item__meta"><i class="material-icons md-24">settings</i></span>
+            </li>
+            <li role="separator" class="mdc-list-divider"></li>
+          </ul>
+        </div>
       </div>
-    </div>
 
-  </section>
+    </section>
   </main>
 {% endblock %}
 

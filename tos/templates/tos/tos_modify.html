@@ -5,7 +5,7 @@
 {% block stylesheets %}
   {{ block.super }}
   {% compress css %}
-    <link rel="stylesheet" href="{% static 'tos/css/styles.min.css' %}"></link>
+    <link rel="stylesheet" href="{% static 'tos/css/styles.min.css' %}">
   {% endcompress %}
   {% if user.student %}
     {% compress css %}
@@ -79,7 +79,7 @@
           {% trans 'Refuse' %}
         </button>
 
-        <input type="hidden" name="redirect_to" value="{{ redirect_to }}"></input>
+        <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
 
       </form>
     </section>
