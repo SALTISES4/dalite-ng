@@ -24,7 +24,18 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Safety
+          name: OS setup
+          command: |
+            sudo apt update
+            sudo apt install mariadb-client
+      - run:
+          name: Create virtualenv and activate
+          command: |
+            python -m venv .venv
+            . .venv/bin/activate
+            pip install --upgrade pip
+      - run:
+          name: Run safety
           command: |
             pip install safety
             safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY --ignore=49733
@@ -32,16 +43,8 @@ jobs:
           fail-on-issues: true
           token-variable: SNYK_TOKEN
       - run:
-          name: Setup
-          command: |
-            sudo apt update
-            sudo apt install mariadb-client
-      - run:
           name: Build
           command: |
-            python -m venv .venv
-            . .venv/bin/activate
-            pip install --upgrade pip
             pip install -r requirements/requirements-dev.txt
             pip freeze
             python -m spacy download en_core_web_sm
@@ -63,15 +66,13 @@ jobs:
           name: Waiting for db
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 1m
       - run:
-          name: Setup db
+          name: DB setup
           command: |
             mysql --host=$DALITE_DB_HOST --port=$DALITE_DB_PORT -u root --password=$MYSQL_ROOT_PASSWORD -e "grant all privileges on test_dalite_ng.* to dalite@'%'"
-            . .venv/bin/activate
             ./manage.py migrate
       - run:
           name: Collect static content and compress
           command: |
-            . .venv/bin/activate
             ./manage.py collectstatic -c
             ./manage.py compress
       - store_artifacts:
@@ -80,7 +81,6 @@ jobs:
           from: /home/circleci/repo/static
           to: 's3://staging-courseflow-static'
       - run:
-          name: Tests
+          name: Run tests
           command: |
-            . .venv/bin/activate
             pytest --migrations --cov --create-db --reruns 1
