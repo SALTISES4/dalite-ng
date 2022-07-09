@@ -37,14 +37,14 @@ jobs:
             pip install -r requirements/requirements-dev.txt
             pip freeze
             python -m spacy download en_core_web_sm
-            npm install
+            npm install --no-optional
             ./node_modules/gulp/bin/gulp.js build
-#      - run:
-#          name: Safety
-#          command: |
-#            . .venv/bin/activate
-#            pip install safety
-#            safety check --ignore=43313
+      - run:
+         name: Safety
+         command: |
+           . .venv/bin/activate
+           pip install safety
+           safety check
       - run:
           name: Setup local_settings.py
           command: |
