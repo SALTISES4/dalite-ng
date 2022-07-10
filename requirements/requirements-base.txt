@@ -11,36 +11,26 @@
 -e git+https://github.com/SALTISES4/pinax-forums@dev#egg=pinax_forums
     # via -r requirements/requirements-base.in
 aioredis==1.3.1
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   channels-redis
+    # via channels-redis
 amqp==5.0.9
     # via kombu
 asgiref==3.2.10
     # via
-    #   -r requirements/../blink/requirements.txt
     #   channels
     #   channels-redis
     #   daphne
     #   saltise-course-flow
 async-timeout==3.0.1
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   aioredis
+    # via aioredis
 attrs==20.2.0
     # via
-    #   -r requirements/../blink/requirements.txt
     #   automat
     #   service-identity
     #   twisted
 autobahn==21.2.2
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   daphne
+    # via daphne
 automat==20.2.0
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   twisted
+    # via twisted
 beautifulsoup4==4.8.2
     # via
     #   django-htmlmin
@@ -71,17 +61,15 @@ certifi==2019.11.28
     #   elasticsearch
     #   requests
 cffi==1.14.2
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   cryptography
+    # via cryptography
 channels==3.0.3
     # via
-    #   -r requirements/../blink/requirements.txt
+    #   -r requirements/../blink/requirements.in
     #   channels-redis
     #   saltise-course-flow
 channels-redis==3.2.0
     # via
-    #   -r requirements/../blink/requirements.txt
+    #   -r requirements/../blink/requirements.in
     #   saltise-course-flow
 charset-normalizer==2.0.12
     # via requests
@@ -100,14 +88,12 @@ click-plugins==1.1.1
 click-repl==0.2.0
     # via celery
 constantly==15.1.0
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   twisted
+    # via twisted
 contextualspellcheck==0.4.1
     # via -r requirements/requirements-base.in
 cryptography==3.4.6
     # via
-    #   -r requirements/../blink/requirements.txt
+    #   -r requirements/../blink/requirements.in
     #   autobahn
     #   pyopenssl
     #   service-identity
@@ -119,12 +105,10 @@ cymem==2.0.5
     #   spacy
     #   thinc
 daphne==3.0.1
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   channels
+    # via channels
 django==2.2.28
     # via
-    #   -r requirements/../blink/requirements.txt
+    #   -r requirements/../blink/requirements.in
     #   -r requirements/requirements-base.in
     #   channels
     #   django-analytical
@@ -198,7 +182,7 @@ django-timezone-field==4.2.1
     # via django-celery-beat
 djangorestframework==3.12.2
     # via
-    #   -r requirements/../REST/requirements.txt
+    #   -r requirements/../REST/requirements.in
     #   -r requirements/requirements-base.in
     #   saltise-course-flow
     #   saltise-user-feedback
@@ -221,9 +205,7 @@ filetype==1.0.5
 future==0.18.2
     # via django-inlinecss
 hiredis==1.1.0
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   aioredis
+    # via aioredis
 html2text==2020.1.16
     # via saltise-course-flow
 html5lib==1.0.1
@@ -232,19 +214,15 @@ huggingface-hub==0.0.12
     # via transformers
 hyperlink==21.0.0
     # via
-    #   -r requirements/../blink/requirements.txt
     #   autobahn
     #   twisted
 idna==2.10
     # via
-    #   -r requirements/../blink/requirements.txt
     #   hyperlink
     #   requests
     #   twisted
 incremental==21.3.0
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   twisted
+    # via twisted
 jinja2==3.0.1
     # via spacy
 joblib==1.0.1
@@ -264,9 +242,7 @@ lxml==4.7.1
 markupsafe==2.0.1
     # via jinja2
 msgpack==1.0.0
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   channels-redis
+    # via channels-redis
 murmurhash==1.0.5
     # via
     #   preshed
@@ -315,17 +291,12 @@ prompt-toolkit==3.0.24
     # via click-repl
 pyasn1==0.4.8
     # via
-    #   -r requirements/../blink/requirements.txt
     #   pyasn1-modules
     #   service-identity
 pyasn1-modules==0.2.8
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   service-identity
+    # via service-identity
 pycparser==2.20
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   cffi
+    # via cffi
 pydantic==1.8.2
     # via
     #   spacy
@@ -337,9 +308,7 @@ pymongo==3.10.1
 pynliner==0.8.0
     # via django-inlinecss
 pyopenssl==19.1.0
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   twisted
+    # via twisted
 pyparsing==2.4.6
     # via packaging
 python-crontab==2.4.0
@@ -353,7 +322,6 @@ python-memcached==1.59
     # via -r requirements/requirements-base.in
 pytz==2021.3
     # via
-    #   -r requirements/../blink/requirements.txt
     #   -r requirements/requirements-base.in
     #   celery
     #   django
@@ -391,12 +359,9 @@ saltise-user-feedback==0.1.2
     #   -r requirements/requirements-base.in
     #   saltise-course-flow
 service-identity==18.1.0
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   twisted
+    # via twisted
 six==1.15.0
     # via
-    #   -r requirements/../blink/requirements.txt
     #   automat
     #   bleach
     #   click-repl
@@ -424,9 +389,7 @@ spacy-legacy==3.0.8
 spacy-loggers==1.0.1
     # via spacy
 sqlparse==0.4.2
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   django
+    # via django
 srsly==2.4.1
     # via
     #   spacy
@@ -448,20 +411,15 @@ tqdm==4.61.2
 transformers==4.8.2
     # via contextualspellcheck
 twisted[tls]==22.4.0
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   daphne
+    # via daphne
 txaio==21.2.1
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   autobahn
+    # via autobahn
 typer==0.4.0
     # via
     #   pathy
     #   spacy
 typing-extensions==4.2.0
     # via
-    #   -r requirements/../blink/requirements.txt
     #   huggingface-hub
     #   pydantic
     #   torch
@@ -489,9 +447,7 @@ webencodings==0.5.1
 xlrd==2.0.1
     # via saltise-course-flow
 zope-interface==5.1.0
-    # via
-    #   -r requirements/../blink/requirements.txt
-    #   twisted
+    # via twisted
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

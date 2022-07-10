@@ -1,5 +1,5 @@
--r ../blink/requirements.txt
--r ../REST/requirements.txt
+-r ../blink/requirements.in
+-r ../REST/requirements.in
 
 bleach
 celery[redis]
