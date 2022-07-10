@@ -33,7 +33,7 @@ jobs:
           command: |
             python -m venv .venv
             . .venv/bin/activate
-            pip install --upgrade pip
+            python -m pip install --upgrade pip
       - run:
           name: Run safety
           command: |
@@ -42,15 +42,15 @@ jobs:
       - run:
           name: Install packages
           command: |
-            pip install -r requirements/requirements-dev.txt
-            pip freeze
+            python -m pip install -r requirements/requirements-dev.txt
+            python -m pip freeze
             python -m spacy download en_core_web_sm
             npm install --no-optional
       - snyk/scan:
           fail-on-issues: false
           token-variable: SNYK_TOKEN
       - snyk/scan:
-          additional-arguments: --file=requirements/requirements-prod-aws.txt --package-manager=pip
+          additional-arguments: --file=requirements/requirements-dev.txt --package-manager=pip
           fail-on-issues: false
           token-variable: SNYK_TOKEN
       - run:
