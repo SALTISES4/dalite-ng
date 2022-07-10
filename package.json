@@ -78,7 +78,7 @@
     "@babel/runtime": "^7.14.6",
     "@babel/runtime-corejs3": "^7.14.7",
     "core-js": "^3.15.2",
-    "d3": "^5.16.0",
+    "d3": "^7",
     "material-components-web": "^0.34.1",
     "moment": "^2.29.1",
     "preact": "^10.5.14",

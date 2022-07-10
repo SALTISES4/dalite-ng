@@ -53,10 +53,8 @@ export {
   axisBottom,
   axisLeft,
   curveNatural,
-  entries,
   format,
   interrupt,
-  keys,
   line,
   now,
   path,
@@ -68,7 +66,6 @@ export {
   select,
   selectAll,
   transition,
-  values,
 } from "d3";
 
 // Custom functions (works with custom_elements.scss)
@@ -896,9 +893,9 @@ export function difficulty(matrix, id) {
   };
   let max = -0;
   let label = "";
-  for (const entry in bundle.entries(matrix)) {
-    if ({}.hasOwnProperty.call(bundle.entries(matrix), entry)) {
-      const item = bundle.entries(matrix)[entry];
+  for (const entry in Object.entries(matrix)) {
+    if ({}.hasOwnProperty.call(Object.entries(matrix), entry)) {
+      const item = Object.entries(matrix)[entry];
       if (item.value > max) {
         max = item.value;
         label = item.key;
@@ -943,9 +940,9 @@ export function plot(matrix, freq, id) {
   };
   let max = -0;
   let label = "";
-  for (const entry in bundle.entries(matrix)) {
-    if ({}.hasOwnProperty.call(bundle.entries(matrix), entry)) {
-      const item = bundle.entries(matrix)[entry];
+  for (const entry in Object.entries(matrix)) {
+    if ({}.hasOwnProperty.call(Object.entries(matrix), entry)) {
+      const item = Object.entries(matrix)[entry];
       if (item.value > max) {
         max = item.value;
         label = item.key;
@@ -1115,7 +1112,7 @@ export function plot(matrix, freq, id) {
   const x = bundle.scaleLinear().domain([0, 1]).rangeRound([0, size]);
   const y = bundle
     .scaleBand()
-    .domain(bundle.keys(freq["first_choice"]).sort())
+    .domain(Object.keys(freq["first_choice"]).sort())
     .rangeRound([0, firstFreqSvg.attr("height")]);
 
   const gg = secondFreqSvg
@@ -1142,7 +1139,7 @@ export function plot(matrix, freq, id) {
 
   gg.append("g")
     .selectAll("rect")
-    .data(bundle.entries(freq["second_choice"]))
+    .data(Object.entries(freq["second_choice"]))
     .enter()
     .append("rect")
     .attr("id", `second_choice-${id}`)
@@ -1157,7 +1154,7 @@ export function plot(matrix, freq, id) {
     .attr(
       "height",
       firstFreqSvg.attr("height") /
-        bundle.values(freq["second_choice"]).length,
+        Object.values(freq["second_choice"]).length,
     )
     .attr("fill", "gray")
     .style("stroke", "white")
@@ -1166,7 +1163,7 @@ export function plot(matrix, freq, id) {
   ggg
     .append("g")
     .selectAll("rect")
-    .data(bundle.entries(freq["first_choice"]))
+    .data(Object.entries(freq["first_choice"]))
     .enter()
     .append("rect")
     .attr("id", `first_choice-${id}`)
@@ -1183,7 +1180,7 @@ export function plot(matrix, freq, id) {
     .attr("width", 0)
     .attr(
       "height",
-      firstFreqSvg.attr("height") / bundle.values(freq["first_choice"]).length,
+      firstFreqSvg.attr("height") / Object.values(freq["first_choice"]).length,
     )
     .attr("fill", "gray")
     .style("stroke", "white")
@@ -1191,7 +1188,7 @@ export function plot(matrix, freq, id) {
 
   gg.append("g")
     .selectAll("text")
-    .data(bundle.entries(freq["second_choice"]))
+    .data(Object.entries(freq["second_choice"]))
     .enter()
     .append("text")
     .attr("x", x(0))
@@ -1209,7 +1206,7 @@ export function plot(matrix, freq, id) {
   ggg
     .append("g")
     .selectAll("text")
-    .data(bundle.entries(freq["first_choice"]))
+    .data(Object.entries(freq["first_choice"]))
     .enter()
     .append("text")
     .attr("x", x(1))
@@ -1226,7 +1223,7 @@ export function plot(matrix, freq, id) {
 
   gg.append("g")
     .selectAll("text")
-    .data(bundle.entries(freq["second_choice"]))
+    .data(Object.entries(freq["second_choice"]))
     .enter()
     .append("text")
     .attr("x", x(0))
@@ -1511,63 +1508,60 @@ export function plotTimeSeries(el, d) {
     .y1(f.y())
     .curve(d3.curveStepAfter);
 
-  svg.on(
-    "mousemove",
-    /* @this */ function () {
-      const xValue = Math.min(
-        d3.mouse(this)[0],
-        1 + x(d3.max(d.answers.map((x) => new Date(d3.timeParse(x))))),
+  svg.on("mousemove", function (event) {
+    const xValue = Math.min(
+      d3.pointer(event)[0],
+      1 + x(d3.max(d.answers.map((x) => new Date(d3.timeParse(x))))),
+    );
+
+    g.select(".slider").attr("d", function () {
+      const path = d3.path();
+      path.moveTo(xValue, height + 30);
+      path.lineTo(xValue, -6);
+      return path;
+    });
+
+    g.select(".slider-label-bottom")
+      .attr("text-anchor", function () {
+        if (xValue < width / 2) {
+          return "start";
+        }
+        return "end";
+      })
+      .attr("dx", function () {
+        if (xValue < width / 2) {
+          return 5;
+        }
+        return -5;
+      })
+      .attr("x", xValue)
+      .text(format(x.invert(xValue)));
+
+    g.select(".slider-label-top")
+      .attr("x", xValue)
+      .text(
+        `${parseInt(
+          (100 *
+            d3.bisectLeft(
+              d.answers.map((x) => new Date(d3.timeParse(x))),
+              x.invert(xValue),
+            )) /
+            d.total,
+        )}%`,
       );
 
-      g.select(".slider").attr("d", function () {
-        const path = d3.path();
-        path.moveTo(xValue, height + 30);
-        path.lineTo(xValue, -6);
-        return path;
-      });
+    let data = d.answers.map((x) => new Date(d3.timeParse(x)));
+    const index = d3.bisectLeft(data, x.invert(xValue));
 
-      g.select(".slider-label-bottom")
-        .attr("text-anchor", function () {
-          if (xValue < width / 2) {
-            return "start";
-          }
-          return "end";
-        })
-        .attr("dx", function () {
-          if (xValue < width / 2) {
-            return 5;
-          }
-          return -5;
-        })
-        .attr("x", xValue)
-        .text(format(x.invert(xValue)));
+    data = data.slice(0, index);
 
-      g.select(".slider-label-top")
-        .attr("x", xValue)
-        .text(
-          `${parseInt(
-            (100 *
-              d3.bisectLeft(
-                d.answers.map((x) => new Date(d3.timeParse(x))),
-                x.invert(xValue),
-              )) /
-              d.total,
-          )}%`,
-        );
+    if (data.length < d.answers.length) {
+      data.push(x.invert(xValue));
+    }
 
-      let data = d.answers.map((x) => new Date(d3.timeParse(x)));
-      const index = d3.bisectLeft(data, x.invert(xValue));
-
-      data = data.slice(0, index);
-
-      if (data.length < d.answers.length) {
-        data.push(x.invert(xValue));
-      }
-
-      g.select(".area").remove();
-      g.append("path").datum(data).attr("class", "area").attr("d", area);
-    },
-  );
+    g.select(".area").remove();
+    g.append("path").datum(data).attr("class", "area").attr("d", area);
+  });
 }
 
 // Commands
