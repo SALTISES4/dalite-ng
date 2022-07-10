@@ -39,13 +39,6 @@ jobs:
           command: |
             pip install safety
             safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY --ignore=49733
-      - snyk/scan:
-          additional-arguments: --file=requirements/requirements-prod-aws.txt --package-manager=pip
-          fail-on-issues: true
-          token-variable: SNYK_TOKEN
-      - snyk/scan:
-          fail-on-issues: true
-          token-variable: SNYK_TOKEN
       - run:
           name: Build
           command: |
@@ -54,6 +47,9 @@ jobs:
             python -m spacy download en_core_web_sm
             npm install --no-optional
             ./node_modules/gulp/bin/gulp.js build
+      - snyk/scan:
+          fail-on-issues: true
+          token-variable: SNYK_TOKEN
       - run:
           name: Setup local_settings.py
           command: |
