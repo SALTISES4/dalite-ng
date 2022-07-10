@@ -1,3 +1,6 @@
 exclude:
   global:
     - "**/tests/**"
+
+language-settings:
+  python: "3.8"
