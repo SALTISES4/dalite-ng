@@ -37,21 +37,25 @@ jobs:
       - run:
           name: Run safety
           command: |
-            pip install safety
+            . .venv/bin/activate
+            python -m pip install safety
             safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY --ignore=49733
       - run:
           name: Install packages
           command: |
+            . .venv/bin/activate
             python -m pip install -r requirements/requirements-dev.txt
             python -m pip freeze
             python -m spacy download en_core_web_sm
             npm install --no-optional
       - snyk/scan:
           fail-on-issues: false
+          monitor-on-build: false
           token-variable: SNYK_TOKEN
       - snyk/scan:
           additional-arguments: --file=requirements/requirements-dev.txt --package-manager=pip
           fail-on-issues: false
+          monitor-on-build: false
           token-variable: SNYK_TOKEN
       - run:
           name: Gulp build
@@ -75,11 +79,13 @@ jobs:
       - run:
           name: DB setup
           command: |
+            . .venv/bin/activate
             mysql --host=$DALITE_DB_HOST --port=$DALITE_DB_PORT -u root --password=$MYSQL_ROOT_PASSWORD -e "grant all privileges on test_dalite_ng.* to dalite@'%'"
             ./manage.py migrate
       - run:
           name: Collect static content and compress
           command: |
+            . .venv/bin/activate
             ./manage.py collectstatic -c
             ./manage.py compress
       - store_artifacts:
@@ -90,4 +96,5 @@ jobs:
       - run:
           name: Run tests
           command: |
+            . .venv/bin/activate
             pytest --migrations --cov --create-db --reruns 1
