@@ -48,6 +48,7 @@ jobs:
             npm install --no-optional
             ./node_modules/gulp/bin/gulp.js build
       - snyk/scan:
+          additional-arguments: --all-projects
           fail-on-issues: true
           token-variable: SNYK_TOKEN
       - run:
