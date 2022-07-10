@@ -20,7 +20,8 @@ django-permissions-policy
 django-referrer-policy
 django-samesite-none
 django < 3.0.0
-djangorestframework>=3.11.2  # Reqd by safety
+djangorestframework >= 3.11.2  # Reqd by safety
+edx-opaque-keys
 lxml >= 4.6.2  # Reqd by safety
 mysqlclient
 packaging
@@ -28,7 +29,7 @@ pandas
 pillow > 8.2.0  # Reqd by safety
 pip-lock
 pyjwt >= 2.4  # Reqd by safety
-python-memcached==1.59
+python-memcached == 1.59
 pytz
 requests
 urllib3 > 1.25.8  # Reqd by safety
@@ -37,5 +38,4 @@ SALTISE_course_flow == 0.7.2
 SALTISE_user_feedback > 0.1.1
 
 -e git+https://github.com/SALTISES4/django-lti-tool-provider@dev#egg=django_lti_tool_provider
--e git+https://github.com/edx/opaque-keys#egg=edx_opaque_keys
 -e git+https://github.com/SALTISES4/pinax-forums@dev#egg=pinax_forums

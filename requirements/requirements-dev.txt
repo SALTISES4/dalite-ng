@@ -10,10 +10,6 @@
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
--e git+https://github.com/edx/opaque-keys#egg=edx_opaque_keys
-    # via
-    #   -r requirements/requirements-base.txt
-    #   -r requirements/requirements-test.txt
 -e git+https://github.com/jsumnerPhD/http-observatory#egg=httpobs
     # via -r requirements/requirements-dev.in
 -e git+https://github.com/SALTISES4/pinax-forums@dev#egg=pinax_forums
@@ -342,6 +338,10 @@ editdistance==0.5.3
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   contextualspellcheck
+edx-opaque-keys==2.3.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
 elasticsearch==7.13.1
     # via
     #   -r requirements/requirements-base.txt
