@@ -468,7 +468,6 @@ typing-extensions==4.2.0
     #   twisted
 urllib3==1.26.9
     # via
-    #   -r requirements/requirements-base.in
     #   elasticsearch
     #   requests
 vine==5.0.0

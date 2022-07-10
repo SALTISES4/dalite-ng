@@ -7,7 +7,7 @@ contextualSpellCheck
 django-axes
 django-celery-beat
 django-analytical
-django-compressor>=2.3
+django-compressor >= 2.3
 django-cookie-law
 django-csp
 django-decorator-include
@@ -32,7 +32,6 @@ pyjwt >= 2.4  # Reqd by safety
 python-memcached == 1.59
 pytz
 requests
-urllib3 > 1.25.8  # Reqd by safety
 
 SALTISE_course_flow == 0.7.2
 SALTISE_user_feedback > 0.1.1
