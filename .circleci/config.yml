@@ -49,11 +49,7 @@ jobs:
             python -m spacy download en_core_web_sm
             npm install --no-optional
       - snyk/scan:
-          fail-on-issues: false
-          monitor-on-build: false
-          token-variable: SNYK_TOKEN
-      - snyk/scan:
-          additional-arguments: --file=requirements/requirements-dev.txt --package-manager=pip
+          additional-arguments: --all-projects
           fail-on-issues: false
           monitor-on-build: false
           token-variable: SNYK_TOKEN
