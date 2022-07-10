@@ -40,6 +40,10 @@ jobs:
             pip install safety
             safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY --ignore=49733
       - snyk/scan:
+          additional-args: --file=requirements-prod-aws.txt --package-manager=pip
+          fail-on-issues: true
+          token-variable: SNYK_TOKEN
+      - snyk/scan:
           fail-on-issues: true
           token-variable: SNYK_TOKEN
       - run:
