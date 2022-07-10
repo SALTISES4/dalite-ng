@@ -19,6 +19,7 @@
 .rollup.cache/
 .tern-port
 .venv
+.dccache
 /CACHE
 /dalite/local_settings.py
 /htmlcov
