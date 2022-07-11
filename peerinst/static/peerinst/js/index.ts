@@ -199,7 +199,7 @@ export function categoryForm(
 
     // Put the results in a div
     posting.done(function (data, status) {
-      $("#category_form").empty().append(data);
+      $("#category_form").empty().text(data);
 
       const formType = $("#create_new_category");
       if (formType.length) {
@@ -705,7 +705,7 @@ export function disciplineForm(
 
     // Put the results in a div
     posting.done(function (data, status) {
-      $("#discipline_form").empty().append(data);
+      $("#discipline_form").empty().text(data);
 
       const formType = $("#discipline_create_form");
       if (formType.length) {
