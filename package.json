@@ -59,7 +59,7 @@
     "gulp-typescript": "^6.0.0-alpha.1",
     "postcss": "^8.3.4",
     "postcss-fail-on-warn": "^0.1.0",
-    "postcss-preset-env": "^6.7.0",
+    "postcss-preset-env": "^7",
     "postcss-scss": "^2.1.1",
     "prettier": "^2.3.2",
     "rollup": "^2.53.2",
