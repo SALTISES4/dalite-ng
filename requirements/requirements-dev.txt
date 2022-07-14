@@ -753,11 +753,11 @@ sacremoses==0.0.45
     #   transformers
 safety==2.0.0
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.7.2
+saltise-course-flow==0.7.3
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
-saltise-user-feedback==0.1.2
+saltise-user-feedback==1.1.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt

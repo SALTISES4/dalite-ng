@@ -12,9 +12,6 @@
   {% compress css file reputation__teacher %}
     <link href="{% static 'reputation/css/header/teacher.min.css' %}" rel="stylesheet">
   {% endcompress %}
-  {% compress css file user_feedback %}
-    <link rel="stylesheet" href="{% static 'user_feedback/css/styles.min.css' %}" />
-  {% endcompress %}
 {% endblock %}
 
 {% block scripts %}
@@ -53,7 +50,7 @@
         return user_feedback.h(user_feedback.App, {
           acceptText: "{% trans 'Send' %}",
           cancelText: "{% trans 'Cancel' %}",
-          charCountText: "{% trans 'characters remaining' %}",
+          charCountText: " "+"{% trans 'characters remaining' %}",
           description: "{% trans 'Leave feedback or get help' %}",
           feedbackTypes: [
             { value: 1, text: "Bug report" },
@@ -69,7 +66,8 @@
           snackbarSuccess: "{% trans 'Thanks for your feedback!' %}",
           text: "",
           title: "{% trans 'How can we improve your experience?' %}",
-          url: "{% url 'user_feedback:post' %}"
+          url: "{% url 'user_feedback:post' %}",
+          nonce: "{{ request.csp_nonce }}"
         });
       };
       user_feedback.render(feedback(), document.getElementById("user-feedback-app"));

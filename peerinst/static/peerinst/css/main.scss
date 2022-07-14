@@ -18,55 +18,18 @@
 }
 
 /*
-User feedback app; this can be factored out to its own file and loaded
-last to avoid need for !important
+User feedback app
 */
 #user-feedback-component {
-  & .mdc-icon-button {
-    transform: translate(6px, -3px);
+  > button .MuiSvgIcon-root:first-child {
+    color: white;
+    height: 26px;
+    width: 28px;
   }
-  & .mdc-icon-button:after {
-    background-color: white !important;
-  }
-  & .mdc-icon-button:before {
-    background-color: white !important;
-  }
-  & .mdc-icon-button:hover:before {
-    opacity: 0.25 !important;
-  }
-  & .mdc-icon-button.mdc-ripple-upgraded:before {
-    height: 25px!important;
-    left: 12px!important;
-    top: 12px!important;
-    width: 25px!important;
-  }
-  & .mdc-icon-button.mdc-ripple-upgraded:after {
-    height: 25px!important;
-    left: 12px!important;
-    top: 12px!important;
-    width: 25px!important;
-  }
-  & .mdc-icon-button__icon {
-    vertical-align: baseline;
-  }
-  & .mdc-menu__items {
-    font-size: 14px !important;
-  }
-  & .mdc-button {
-    font-weight: bold !important;
-    &:not(:disabled) {
-      color: var(--mdc-theme-primary) !important;
-    }
-    &:disabled {
-      color: rgba(0,0,0,.37) !important;
-    }
-  }
-  & .mdc-text-field--focused:not(.mdc-text-field--disabled) .mdc-floating-label {
-    color: var(--mdc-theme-secondary) !important;
-  }
-  & :not(i) {
-    font-family: $mdc-typography-font-family !important;
-  }
+}
+
+[class^="Mui"] {
+  font-family: "Montserrat", sans-serif;
 }
 
 /* Stylesheet */
