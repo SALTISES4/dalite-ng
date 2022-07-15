@@ -9,8 +9,8 @@ def new_users(n):
         while True:
             i += 1
             yield {
-                "username": "user{}".format(i),
-                "email": "test{}@test.com".format(i),
+                "username": f"user{i}",
+                "email": f"test{i}@test.com",
                 "password": "test",
             }
 

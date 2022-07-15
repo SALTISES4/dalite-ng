@@ -421,3 +421,14 @@ ElasticSearch
       "default": {"hosts": "<username>:<password>@localhost:9200"},
   }`
 ```
+
+## Snyk
+
+Javascript vulnerability dependency scanning via Snyk is incorporated in the CircleCI config. To scan locally, authenticate with your Snyk account and then test:
+
+`npx snyk auth`
+`npx snyk test --all-projects` or `npx snyk monitor --all-projects`
+
+Security analysis of application code is available via:
+
+`npx snyk code test`

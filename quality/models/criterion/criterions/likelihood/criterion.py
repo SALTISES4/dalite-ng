@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import hashlib
 import json
 from functools import reduce
@@ -164,12 +161,10 @@ class LikelihoodCriterionRules(CriterionRules):
     )
 
     def __str__(self):
-        return "Rules {} for criterion likelihood".format(self.pk)
+        return f"Rules {self.pk} for criterion likelihood"
 
     @staticmethod
-    def get_or_create(
-        threshold=0.95, languages=["english", "french"], max_gram=3
-    ):
+    def get_or_create(threshold=0.95, languages=None, max_gram=3):
         """
         Creates or get the criterion rules.
 
@@ -190,6 +185,8 @@ class LikelihoodCriterionRules(CriterionRules):
         ValueError
             If the arguments have invalid values
         """
+        if languages is None:
+            languages = ["english", "french"]
         if threshold < 0 or threshold > 1:
             raise ValueError("The threshold must be between 0 and 1")
         if not isinstance(languages, list):

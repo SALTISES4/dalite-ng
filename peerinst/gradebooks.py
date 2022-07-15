@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import csv
 
 from django.db.models.functions import Lower
@@ -252,7 +249,7 @@ def convert_gradebook_to_csv(results):
             (["Student ID"] if results["school_id_needed"] else [])
             + ["Student Email"]
             + [
-                "{} - {}".format(n, assignment)
+                f"{n} - {assignment}"
                 for assignment in results["assignments"]
                 for n in ("grade", "n_completed")
             ]

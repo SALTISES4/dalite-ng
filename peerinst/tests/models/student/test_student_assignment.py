@@ -5,12 +5,12 @@ import pytz
 from django.core import mail
 
 from peerinst.models import (
+    Assignment,
     StudentAssignment,
     StudentGroupMembership,
     StudentNotification,
 )
 from peerinst.tests.generators import add_answers, new_student_assignments
-from peerinst.models import Assignment
 
 from .fixtures import *  # noqa F403
 

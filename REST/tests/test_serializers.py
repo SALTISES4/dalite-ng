@@ -1,6 +1,6 @@
 import json
+from unittest import mock
 
-import mock
 import pytest
 from django.urls import reverse
 from rest_framework import status

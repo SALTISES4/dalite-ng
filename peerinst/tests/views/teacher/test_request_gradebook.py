@@ -1,9 +1,9 @@
 import json
+from unittest import mock
 
-import mock
 from celery.result import AsyncResult
-from django.urls import reverse
 from django.http import HttpResponse
+from django.urls import reverse
 
 from peerinst.models import RunningTask
 from peerinst.tests.fixtures import *  # noqa
@@ -16,7 +16,7 @@ def test_request_gradebook__group(client, teacher, group):
 
     class AsyncResultMock(AsyncResult):
         def __new__(cls):
-            return mock.mock(spec=cls)
+            return mock(spec=cls)
 
     with mock.patch(
         "peerinst.views.teacher.compute_gradebook_async"
@@ -37,9 +37,10 @@ def test_request_gradebook__group(client, teacher, group):
     assert resp.status_code == 201
     data = json.loads(resp.content.decode())
     assert data["id"] == 1
-    assert data[
-        "description"
-    ] == "gradebook for group <strong>{}</strong>".format(group.name)
+    assert (
+        data["description"]
+        == f"gradebook for group <strong>{group.name}</strong>"
+    )
     assert not data["completed"]
 
     assert RunningTask.objects.filter(id=1).exists()
@@ -53,7 +54,7 @@ def test_request_gradebook__assignment(
 
     class AsyncResultMock(AsyncResult):
         def __new__(cls):
-            return mock.mock(spec=cls)
+            return mock(spec=cls)
 
     with mock.patch(
         "peerinst.views.teacher.compute_gradebook_async"

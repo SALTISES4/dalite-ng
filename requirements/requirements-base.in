@@ -1,5 +1,5 @@
--r ../blink/requirements.txt
--r ../REST/requirements.txt
+-r ../blink/requirements.in
+-r ../REST/requirements.in
 
 bleach
 celery[redis]
@@ -7,7 +7,7 @@ contextualSpellCheck
 django-axes
 django-celery-beat
 django-analytical
-django-compressor>=2.3
+django-compressor >= 2.3
 django-cookie-law
 django-csp
 django-decorator-include
@@ -15,26 +15,26 @@ django-elasticsearch-dsl
 django-grappelli
 django-htmlmin
 django-inlinecss
-django-ipware==2.1.0  # Temporary pin awaiting django-axes fix
+django-ipware == 2.1.0  # Temporary pin awaiting django-axes fix
 django-permissions-policy
 django-referrer-policy
 django-samesite-none
-django<3.0.0
-djangorestframework>=3.11.2  # Reqd by safety
+django < 3.0.0
+djangorestframework >= 3.11.2  # Reqd by safety
+edx-opaque-keys
 lxml >= 4.6.2  # Reqd by safety
 mysqlclient
 packaging
 pandas
-pillow>8.2.0  # Reqd by safety
-pyjwt
-python-memcached==1.59
+pillow > 8.2.0  # Reqd by safety
+pip-lock
+pyjwt >= 2.4  # Reqd by safety
+python-memcached == 1.59
 pytz
 requests
-urllib3 > 1.25.8  # Reqd by safety
 
-SALTISE_course_flow < 0.7
-SALTISE_user_feedback > 0.1.1
+SALTISE_course_flow == 0.7.3
+SALTISE_user_feedback >= 1.1.1
 
 -e git+https://github.com/SALTISES4/django-lti-tool-provider@dev#egg=django_lti_tool_provider
--e git+https://github.com/edx/opaque-keys#egg=edx_opaque_keys
 -e git+https://github.com/SALTISES4/pinax-forums@dev#egg=pinax_forums

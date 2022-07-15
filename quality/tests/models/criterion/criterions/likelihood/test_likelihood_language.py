@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from quality.models.criterion import LikelihoodLanguage
 
 

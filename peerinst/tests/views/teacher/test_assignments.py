@@ -1,4 +1,5 @@
 from django.urls import reverse
+
 from peerinst.models import Assignment
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.teacher import login_teacher

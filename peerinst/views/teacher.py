@@ -333,7 +333,7 @@ def evaluate_rationale(req, teacher):
         return response_400(
             req,
             msg=translate("The score wasn't in a valid range."),
-            logger_msg=("The score wasn't valid; was {}.".format(score)),
+            logger_msg=(f"The score wasn't valid; was {score}."),
             log=logger.warning,
         )
 
@@ -343,7 +343,7 @@ def evaluate_rationale(req, teacher):
         return response_400(
             req,
             msg=translate("Unkown answer id sent."),
-            logger_msg=("No answer could be found for pk {}.".format(id_)),
+            logger_msg=(f"No answer could be found for pk {id_}."),
             log=logger.warning,
         )
 
@@ -510,9 +510,7 @@ def unsubscribe_from_thread(req, teacher):
         return response_400(
             req,
             msg=translate("The thread couldn't be found."),
-            logger_msg=(
-                "The thread with pk {} couldn't be found.".format(id_)
-            ),
+            logger_msg=(f"The thread with pk {id_} couldn't be found."),
             log=logger.warning,
         )
 
@@ -712,7 +710,7 @@ def get_gradebook_task_result(req, teacher):
             logger_msg="Error computing gradebook for teacher {}".format(
                 teacher.user.username
             )
-            + " and task {}.".format(task_id),
+            + f" and task {task_id}.",
             log=logger.warning,
             use_template=False,
         )
@@ -854,8 +852,8 @@ def download_gradebook(req, teacher, results=None):
                 return response_400(
                     req,
                     msg="The gradebook isn't ready.",
-                    logger_msg="Not completed gradebook {}".format(task_id)
-                    + " accessed by teacher {}".format(teacher.user.username),
+                    logger_msg=f"Not completed gradebook {task_id}"
+                    + f" accessed by teacher {teacher.user.username}",
                 )
         except AttributeError:
             return response_500(
@@ -864,7 +862,7 @@ def download_gradebook(req, teacher, results=None):
                 "Please ask for a new one.",
                 logger_msg="Celery error getting gradebook"
                 " for teacher {}".format(teacher.user.username)
-                + " and task {}.".format(task_id),
+                + f" and task {task_id}.",
                 log=logger.warning,
                 use_template=False,
             )

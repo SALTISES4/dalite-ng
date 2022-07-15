@@ -3,7 +3,7 @@
 {% load add_class compress i18n static %}
 
 {% block heading %}
-{% trans 'Create a New Post' %}
+  {% trans 'Create a New Post' %}
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -11,59 +11,59 @@
 {% endblock %}
 
 {% block content %}
-<form enctype="multipart/form-data" method="post">
-  {% csrf_token %}
+  <form enctype="multipart/form-data" method="post">
+    {% csrf_token %}
 
-  <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
-    {{ form.title|add_class:"mdc-text-field__input" }}
-    {{ form.title.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-    <div class="mdc-notched-outline">
-      <svg>
-        <path class="mdc-notched-outline__path"/>
-      </svg>
+    <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+      {{ form.title|add_class:"mdc-text-field__input" }}
+      {{ form.title.label_tag|add_class:"mdc-floating-label"|cut:":" }}
+      <div class="mdc-notched-outline">
+        <svg>
+          <path class="mdc-notched-outline__path"/>
+        </svg>
+      </div>
+      <div class="mdc-notched-outline__idle"></div>
     </div>
-    <div class="mdc-notched-outline__idle"></div>
-  </div>
-  {{ form.title.errors }}
+    {{ form.title.errors }}
 
-  <div class="mdc-text-field mdc-text-field--textarea mdc-theme--background" data-mdc-auto-init="MDCTextField">
-    {{ form.content|add_class:"mdc-text-field__input" }}
-    <label for="id_content" class="mdc-floating-label">{% trans 'Content' %}</label>
-  </div>
-  {{ form.content.errors }}
-
-  <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
-    {{ form.url|add_class:"mdc-text-field__input" }}
-    {{ form.url.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-    <div class="mdc-notched-outline">
-      <svg>
-        <path class="mdc-notched-outline__path"/>
-      </svg>
+    <div class="mdc-text-field mdc-text-field--textarea mdc-theme--background" data-mdc-auto-init="MDCTextField">
+      {{ form.content|add_class:"mdc-text-field__input" }}
+      <label for="id_content" class="mdc-floating-label">{% trans 'Content' %}</label>
     </div>
-    <div class="mdc-notched-outline__idle"></div>
-  </div>
-  {{ form.url.errors }}
+    {{ form.content.errors }}
 
-  <div class='file-upload'>
-    {{ form.pdf.errors }}
-    <p class="file-upload-label">{% trans 'Upload a pdf (max 2 MB)' %}</p>
-    {{ form.pdf }}<span class='mdc-typography--body1 bold error-span' id='warning'>{% trans 'Max file size exceeded.' %}</span>
-    <p class="mdc-typography--caption">{% trans 'You are responsible for content you post to the site.  <strong>Do not upload copyrighted materials.</strong>' %}</p>
-  </div>
+    <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+      {{ form.url|add_class:"mdc-text-field__input" }}
+      {{ form.url.label_tag|add_class:"mdc-floating-label"|cut:":" }}
+      <div class="mdc-notched-outline">
+        <svg>
+          <path class="mdc-notched-outline__path"/>
+        </svg>
+      </div>
+      <div class="mdc-notched-outline__idle"></div>
+    </div>
+    {{ form.url.errors }}
 
-  <input type="submit" class="padded-top mdc-button mdc-button--raised" value="{% trans 'Create' %}"/>
-</form>
+    <div class='file-upload'>
+      {{ form.pdf.errors }}
+      <p class="file-upload-label">{% trans 'Upload a pdf (max 2 MB)' %}</p>
+      {{ form.pdf }}<span class='mdc-typography--body1 bold error-span' id='warning'>{% trans 'Max file size exceeded.' %}</span>
+      <p class="mdc-typography--caption">{% trans 'You are responsible for content you post to the site.  <strong>Do not upload copyrighted materials.</strong>' %}</p>
+    </div>
+
+    <input type="submit" class="padded-top mdc-button mdc-button--raised" value="{% trans 'Create' %}"/>
+  </form>
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-{% compress js file forums %}
-<script src="{% static 'peerinst/js/forums.min.js' %}"></script>
-{% endcompress %}
+  {{ block.super }}
+  {% compress js file forums %}
+    <script src="{% static 'peerinst/js/forums.min.js' %}"></script>
+  {% endcompress %}
 
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-    forums.limitFileSize();
-  })
-</script>
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      forums.limitFileSize();
+    })
+  </script>
 {% endblock %}

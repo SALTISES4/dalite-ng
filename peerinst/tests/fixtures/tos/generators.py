@@ -16,7 +16,7 @@ def new_tos(n_of_each, roles):
                 yield {
                     "role": role_,
                     "version": i,
-                    "text": "tos{}".format(i),
+                    "text": f"tos{i}",
                     "current": False,
                 }
 

@@ -3,220 +3,169 @@
 {% load get_value bleach_html static compress i18n %}
 
 {% block stylesheets %}
-{{ block.super }}
-{% compress css %}
-<link href="{% static 'peerinst/css/collection.min.css' %}" rel="stylesheet">
-{% endcompress %}
-{% compress css %}
-<link href="{% static 'peerinst/css/search.min.css' %}" rel="stylesheet">
-{% endcompress %}
+  {{ block.super }}
+  {% compress css %}
+    <link href="{% static 'peerinst/css/collection.min.css' %}" rel="stylesheet">
+  {% endcompress %}
+  {% compress css %}
+    <link href="{% static 'peerinst/css/search.min.css' %}" rel="stylesheet">
+  {% endcompress %}
 {% endblock %}
 {% block body %}
-<main>
-  <section>
-    <h1 class="mdc-typography--display3">{% trans 'Collections' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
-    <div class="admin-link">
-      <a href="{% url 'teacher' request.user.teacher.pk %}">{% trans 'Back to My Account' %}</a>
-      <span class="links-divider">|</span><a href="{% url 'collection-list' %}">{% trans 'View Collections' %}</a>
-      <span class="links-divider">|</span>{% if request.user.teacher == object.owner %}<a href="{% url 'collection-update' object.pk %}">{% trans 'Edit' %}</a>
-      <span class="links-divider">|</span><a href="{% url 'collection-delete' object.pk %}">{% trans 'Delete' %}</a>
-      <span class="links-divider">|</span>{% endif %}<a href="{% url 'collection-create' %}">{% trans 'Create' %}</a>
-    </div>
-    <div>
-      <h2 class="mdc-typography--display1
-                 mdc-theme--secondary">{{ object.title|bleach_html|safe }}</h2>
-    </div>
-    <div class='field-container'>
-      <div class='number-box'><span class='number'>?</span></div>
-      <div class='field'>
-        <p><small>
-          {% blocktrans %}
-          A collection is a compilation of assignments that work well in conjunction
-          with one another.
-          Collections have various functions, from housing an entire semester's
-          worth of course material to simply covering one topic.
-          {% endblocktrans %}
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Collections' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
+      <div class="admin-link">
+        <a href="{% url 'teacher' request.user.teacher.pk %}">{% trans 'Back to My Account' %}</a>
+        <span class="links-divider">|</span><a href="{% url 'collection-list' %}">{% trans 'View Collections' %}</a>
+        <span class="links-divider">|</span>{% if request.user.teacher == object.owner %}<a href="{% url 'collection-update' object.pk %}">{% trans 'Edit' %}</a>
+          <span class="links-divider">|</span><a href="{% url 'collection-delete' object.pk %}">{% trans 'Delete' %}</a>
+          <span class="links-divider">|</span>{% endif %}<a href="{% url 'collection-create' %}">{% trans 'Create' %}</a>
+      </div>
+      <div>
+        <h2 class="mdc-typography--display1
+          mdc-theme--secondary">{{ object.title|bleach_html|safe }}</h2>
+      </div>
+      <div class='field-container'>
+        <div class='number-box'><span class='number'>?</span></div>
+        <div class='field'>
+          <p><small>
+            {% blocktrans %}
+              A collection is a compilation of assignments that work well in conjunction
+              with one another.
+              Collections have various functions, from housing an entire semester's
+              worth of course material to simply covering one topic.
+            {% endblocktrans %}
           </small></p>
           <p><small>
-          {% blocktrans %}
-          You may assign the this collection to one of your student groups by
-          clicking on the assign button below.
-          {% endblocktrans %}
-        </small></p>
+            {% blocktrans %}
+              You may assign the this collection to one of your student groups by
+              clicking on the assign button below.
+            {% endblocktrans %}
+          </small></p>
+        </div>
       </div>
-    </div>
-    <div class="mdc-card" id="desciption">
-      <div class="mdc-typography--caption">
-        {% trans 'Created by' %} {{ object.owner.user.username }}
-      </div>
-      <div class="mdc-typography--body1" id="obj.desc">
-        {{ object.description|bleach_html|safe }}
-      </div>
-      <div class="mdc-card__actions">
-        <div class="mdc-card__action-buttons">
-          <div class="mdc-typography--caption caption">
-            <div>
-              {% trans 'Discipline' %}: {{ object.discipline|bleach_html|safe }}
-            </div>
-            <div class="followers-number"
-                 id="follower-count-{{ object.pk }}"
-                 data-count="{{ object.followers.count }}">{% trans 'Followers' %}: {{ object.followers.count }}</div>
-            <div>
-              {% trans 'Published on' %} {{ object.created_on }}
+      <div class="mdc-card" id="desciption">
+        <div class="mdc-typography--caption">
+          {% trans 'Created by' %} {{ object.owner.user.username }}
+        </div>
+        <div class="mdc-typography--body1" id="obj.desc">
+          {{ object.description|bleach_html|safe }}
+        </div>
+        <div class="mdc-card__actions">
+          <div class="mdc-card__action-buttons">
+            <div class="mdc-typography--caption caption">
+              <div>
+                {% trans 'Discipline' %}: {{ object.discipline|bleach_html|safe }}
+              </div>
+              <div class="followers-number"
+                id="follower-count-{{ object.pk }}"
+                data-count="{{ object.followers.count }}">{% trans 'Followers' %}: {{ object.followers.count }}</div>
+              <div>
+                {% trans 'Published on' %} {{ object.created_on }}
+              </div>
             </div>
           </div>
-        </div>
-        <div class="mdc-card__action-icons">
-          <i class="mdc-icon-toggle material-icons mdc-theme--primary md-24 follower-btn"
+          <div class="mdc-card__action-icons">
+            <i class="mdc-icon-toggle material-icons mdc-theme--primary md-24 follower-btn"
               role="button"
               aria-pressed="false"
               aria-label="Add to favorites" tabindex="0"
               {% if request.user.teacher in object.followers.all %}
-              data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
-              data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+                data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
+                data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
               {% else %}
-              data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
-              data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
+                data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
+                data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
               {% endif %}
               pk="{{ object.pk }}"
               data-count="{{ object.followers.count }}">
               favorite_border
-          </i>
-          <i pk="{{ object.pk|safe }}"
-                  class="mdc-icon-toggle material-icons mdc-theme--primary collection-distribute md-24"
-                  >share
-          </i>
-        </div>
-      </div>
-    </div>
-    <div class="mdc-card" id="desciption">
-      <div class="mdc-typography--body1" id="obj.desc">
-        <b>{% trans 'Collection Statistics' %}</b>
-      </div>
-      <div class="mdc-card__actions">
-        <div class="mdc-card__action-buttons">
-          <div class="mdc-typography--caption caption">
-            <div>
-              {% trans 'Total Answers' %}: {{ collection_data.total_answers }}
-            </div>
-            <div>
-              {% trans 'Answers Switched' %}: {{ collection_data.switches }}
-            </div>
+            </i>
+            <i pk="{{ object.pk|safe }}"
+              class="mdc-icon-toggle material-icons mdc-theme--primary collection-distribute md-24"
+            >share
+            </i>
           </div>
         </div>
-        <div class="mdc-card__action-icons">
+      </div>
+      <div class="mdc-card" id="desciption">
+        <div class="mdc-typography--body1" id="obj.desc">
+          <b>{% trans 'Collection Statistics' %}</b>
+        </div>
+        <div class="mdc-card__actions">
           <div class="mdc-card__action-buttons">
             <div class="mdc-typography--caption caption">
               <div>
-                {% trans 'Correct Answers on First Attempt' %}:
-                {{ collection_data.correct_first_answers }}
+                {% trans 'Total Answers' %}: {{ collection_data.total_answers }}
               </div>
               <div>
-                {% trans 'Correct Answers on Second Attempt' %}:
-                {{ collection_data.correct_second_answers }}
+                {% trans 'Answers Switched' %}: {{ collection_data.switches }}
+              </div>
+            </div>
+          </div>
+          <div class="mdc-card__action-icons">
+            <div class="mdc-card__action-buttons">
+              <div class="mdc-typography--caption caption">
+                <div>
+                  {% trans 'Correct Answers on First Attempt' %}:
+                  {{ collection_data.correct_first_answers }}
+                </div>
+                <div>
+                  {% trans 'Correct Answers on Second Attempt' %}:
+                  {{ collection_data.correct_second_answers }}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div id="progressbar" role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate mdc-linear-progress--closed">
-      <div class="mdc-linear-progress__buffering-dots"></div>
-      <div class="mdc-linear-progress__buffer"></div>
-      <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
-        <span class="mdc-linear-progress__bar-inner"></span>
+      <div id="progressbar" role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate mdc-linear-progress--closed">
+        <div class="mdc-linear-progress__buffering-dots"></div>
+        <div class="mdc-linear-progress__buffer"></div>
+        <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+          <span class="mdc-linear-progress__bar-inner"></span>
+        </div>
+        <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
+          <span class="mdc-linear-progress__bar-inner"></span>
+        </div>
       </div>
-      <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
-        <span class="mdc-linear-progress__bar-inner"></span>
-      </div>
-    </div>
-    <div id="assignment-page"></div>
-  </section>
-</main>
+      <div id="assignment-page"></div>
+    </section>
+  </main>
 {% endblock %}
 {% block scripts %}
-{{ block.super }}
-{% compress js %}
-<script src="{% static 'peerinst/js/teacher.min.js' %}"></script>
-{% endcompress %}
-<script
-  src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"
-  integrity="sha384-Dziy8F2VlJQLMShA6FHWNul/veM9bCkRUaLqr199K94ntO5QUrLJBEbYegdSkkqX"
-  crossorigin="anonymous">
-</script>
-<script
-  src="https://unpkg.com/json5@2.1.1/dist/index.min.js"
-  integrity="sha384-gRrJKgBpstjyexh9UmCoTPivgMMb7/EAtEdR5DLbVhiPYdl03QxdzMzbylHUSloD"
-  crossorigin="anonymous">
-</script>
-<script nonce="{{ request.csp_nonce }}">
-  bundle.addDialog();
-
-  [].forEach.call(document.querySelectorAll(".mdc-icon-toggle"), el => {
-    bundle.iconToggle.MDCIconToggle.attachTo(el);
-  });
-
-  $.ajaxSetup({
-      beforeSend: function(xhr, settings) {
-          if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
-              xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
-          }
-      }
-  });
-
-  [].forEach.call(document.querySelectorAll('.analytics-tags'),
-    function(el,i,list) {
-      el.addEventListener('click', function() {
-        showAnalytics(el.getAttribute('ref_id'));
-      }, false);
-    }
-  );
-
-  [].forEach.call(document.querySelectorAll('.ripple-icon'),
-    function(el) {
-      const ripple = bundle.ripple.MDCRipple.attachTo(el);
-      ripple.unbounded = true;
-    });
-
-  function toggleFollower(pk) {
-    var posting = $.post("{% url 'teacher-toggle-follower' %}", {pk: pk});
-    posting.done(function(data) {
-      console.info(data);
-      let followerValue = document.getElementById("follower-count-"+pk).innerHTML;
-      followerValue = followerValue.substring(11);
-      followerValue = parseInt(followerValue);
-      if (data.action == "added") {
-        document.getElementById("follower-count-"+pk).innerHTML = ("{% trans 'Followers' %}: " + (followerValue+1));
-      } else if (data.action == "removed") {
-        document.getElementById("follower-count-"+pk).innerHTML = ("{% trans 'Followers' %}: " + (followerValue-1));
-      }
-    })
-  }
-
-  [].forEach.call(document.querySelectorAll(".follower-btn"), el => {
-    el.addEventListener("click", () => {
-      toggleFollower(el.getAttribute('pk'));
-    });
-  });
-
-  function toggleFavourite(pk) {
-    var posting = $.post("{% url 'teacher-toggle-favourite' %}", {pk: pk});
-    posting.done(function(data) {
-      console.info(data);
-    })
-  }
-
-
-  [].forEach.call(document.querySelectorAll(".collection-distribute"), el => {
-    el.addEventListener("click", () => {
-      window.location.assign("{% url 'collection-distribute' object.pk %}");
-    });
-  });
-
-  function setupAnalytics(){
+  {{ block.super }}
+  {% compress js %}
+    <script src="{% static 'peerinst/js/teacher.min.js' %}"></script>
+  {% endcompress %}
+  <script
+    src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"
+    integrity="sha384-Dziy8F2VlJQLMShA6FHWNul/veM9bCkRUaLqr199K94ntO5QUrLJBEbYegdSkkqX"
+    crossorigin="anonymous">
+  </script>
+  <script
+    src="https://unpkg.com/json5@2.1.1/dist/index.min.js"
+    integrity="sha384-gRrJKgBpstjyexh9UmCoTPivgMMb7/EAtEdR5DLbVhiPYdl03QxdzMzbylHUSloD"
+    crossorigin="anonymous">
+  </script>
+  <script nonce="{{ request.csp_nonce }}">
     bundle.addDialog();
+
+    [].forEach.call(document.querySelectorAll(".mdc-icon-toggle"), el => {
+      bundle.iconToggle.MDCIconToggle.attachTo(el);
+    });
+
+    $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+        if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+          xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+        }
+      }
+    });
+
     [].forEach.call(document.querySelectorAll('.analytics-tags'),
       function(el,i,list) {
         el.addEventListener('click', function() {
@@ -225,100 +174,151 @@
       }
     );
 
-    [].forEach.call(document.querySelectorAll('.plot-dialog'),
-      function(el,i,list) {
-        let show = false;
-        const getMatrixJson = JSON5.parse(el.getAttribute("data-get-matrix"));
-        Object.keys(getMatrixJson).forEach(function (property) {
-          if (getMatrixJson[property] != 0){
-            show = true;
-          }
-        });
-        if(show) {
-          bundle.plot(getMatrixJson, JSON5.parse(el.getAttribute("data-get-frequency")),+el.getAttribute("data-id"));
-        } else {
-          const desc = document.getElementById("description-"+el.getAttribute("data-id"));
-          $(desc).children().slice(0,5).remove();
-        }
-      }
-    );
-
     [].forEach.call(document.querySelectorAll('.ripple-icon'),
       function(el) {
         const ripple = bundle.ripple.MDCRipple.attachTo(el);
         ripple.unbounded = true;
+      });
+
+    function toggleFollower(pk) {
+      var posting = $.post("{% url 'teacher-toggle-follower' %}", {pk: pk});
+      posting.done(function(data) {
+        console.info(data);
+        let followerValue = document.getElementById("follower-count-"+pk).innerHTML;
+        followerValue = followerValue.substring(11);
+        followerValue = parseInt(followerValue);
+        if (data.action == "added") {
+          document.getElementById("follower-count-"+pk).innerHTML = ("{% trans 'Followers' %}: " + (followerValue+1));
+        } else if (data.action == "removed") {
+          document.getElementById("follower-count-"+pk).innerHTML = ("{% trans 'Followers' %}: " + (followerValue-1));
+        }
+      })
+    }
+
+    [].forEach.call(document.querySelectorAll(".follower-btn"), el => {
+      el.addEventListener("click", () => {
+        toggleFollower(el.getAttribute('pk'));
+      });
+    });
+
+    function toggleFavourite(pk) {
+      var posting = $.post("{% url 'teacher-toggle-favourite' %}", {pk: pk});
+      posting.done(function(data) {
+        console.info(data);
+      })
+    }
+
+
+    [].forEach.call(document.querySelectorAll(".collection-distribute"), el => {
+      el.addEventListener("click", () => {
+        window.location.assign("{% url 'collection-distribute' object.pk %}");
+      });
+    });
+
+    function setupAnalytics(){
+      bundle.addDialog();
+      [].forEach.call(document.querySelectorAll('.analytics-tags'),
+        function(el,i,list) {
+          el.addEventListener('click', function() {
+            showAnalytics(el.getAttribute('ref_id'));
+          }, false);
+        }
+      );
+
+      [].forEach.call(document.querySelectorAll('.plot-dialog'),
+        function(el,i,list) {
+          let show = false;
+          const getMatrixJson = JSON5.parse(el.getAttribute("data-get-matrix"));
+          Object.keys(getMatrixJson).forEach(function (property) {
+            if (getMatrixJson[property] != 0){
+              show = true;
+            }
+          });
+          if(show) {
+            bundle.plot(getMatrixJson, JSON5.parse(el.getAttribute("data-get-frequency")),+el.getAttribute("data-id"));
+          } else {
+            const desc = document.getElementById("description-"+el.getAttribute("data-id"));
+            $(desc).children().slice(0,5).remove();
+          }
+        }
+      );
+
+      [].forEach.call(document.querySelectorAll('.ripple-icon'),
+        function(el) {
+          const ripple = bundle.ripple.MDCRipple.attachTo(el);
+          ripple.unbounded = true;
+        }
+      );
+
+      function showAnalytics(id){
+        bundle.selectAll("#first_choice-"+id).transition().duration(1000).attr("x",function(d){return bundle.select(this).attr("finalx");}).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
+        bundle.selectAll("#second_choice-"+id).transition().delay(1000).duration(1000).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
+        return;
       }
-    );
-
-    function showAnalytics(id){
-      bundle.selectAll("#first_choice-"+id).transition().duration(1000).attr("x",function(d){return bundle.select(this).attr("finalx");}).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
-      bundle.selectAll("#second_choice-"+id).transition().delay(1000).duration(1000).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
-      return;
     }
-  }
 
-  window.addEventListener("load", function() {
-    $("#progressbar").removeClass("mdc-linear-progress--closed");
-    $('#assignment-page').load("{% url 'collection-paginate' %}", "collection_pk="+"{{ object.pk }}", function(response){
-      $("#progressbar").addClass("mdc-linear-progress--closed");
-      setupPaginate();
-      setupPaginateButtons();
-      teacher.initSearchFlag("{% url 'question--flag--reasons' %}", "{% url 'question--flag--flag' %}");
-    });
-  });
-
-  function loadPage(page){
-    $("#progressbar").removeClass("mdc-linear-progress--closed");
-    $('#assignment-page').load("{% url 'collection-paginate' %}"+"?page="+page, "collection_pk="+"{{ object.pk }}", function(response){
-      $("#progressbar").addClass("mdc-linear-progress--closed");
-      setupPaginate();
-      setupPaginateButtons();
-      teacher.initSearchFlag("{% url 'question--flag--reasons' %}", "{% url 'question--flag--flag' %}");
-    });
-  }
-
-  function setupPaginateButtons(){
-    [].forEach.call(document.querySelectorAll(".search-nav--back"), el => {
-      el.addEventListener("click", () => {
-        loadPage(el.getAttribute("data-page"));
+    window.addEventListener("load", function() {
+      $("#progressbar").removeClass("mdc-linear-progress--closed");
+      $('#assignment-page').load("{% url 'collection-paginate' %}", "collection_pk="+"{{ object.pk }}", function(response){
+        $("#progressbar").addClass("mdc-linear-progress--closed");
+        setupPaginate();
+        setupPaginateButtons();
+        teacher.initSearchFlag("{% url 'question--flag--reasons' %}", "{% url 'question--flag--flag' %}");
       });
     });
-    [].forEach.call(document.querySelectorAll(".search-nav--forward"), el => {
-      el.addEventListener("click", () => {
-        loadPage(el.getAttribute("data-page"));
-      });
-    });
-  }
 
-  function setupPaginate(){
-    bundle.autoInit();
-    [].forEach.call(document.querySelectorAll(".mdc-icon-toggle"), el => {
-      bundle.iconToggle.MDCIconToggle.attachTo(el);
-    });
-    [].forEach.call(document.querySelectorAll(".favourite-btn"), el => {
-      el.addEventListener("click", () => {
-        toggleFavourite(el.getAttribute('pk'));
+    function loadPage(page){
+      $("#progressbar").removeClass("mdc-linear-progress--closed");
+      $('#assignment-page').load("{% url 'collection-paginate' %}"+"?page="+page, "collection_pk="+"{{ object.pk }}", function(response){
+        $("#progressbar").addClass("mdc-linear-progress--closed");
+        setupPaginate();
+        setupPaginateButtons();
+        teacher.initSearchFlag("{% url 'question--flag--reasons' %}", "{% url 'question--flag--flag' %}");
       });
-    });
-    Array.from(document.getElementsByClassName("foldable--title")).map(x =>
-      x.addEventListener("click", e => toggleFoldable(e)),
-    );
-    setupAnalytics();
-  }
-
-  function toggleFoldable(event) {
-    const foldable = event.currentTarget.parentNode;
-    if (foldable.classList.contains("foldable__unfolded")) {
-      foldable.classList.remove("foldable__unfolded");
-      foldable.querySelector(".foldable--body").style.overflow = "hidden";
-    } else {
-      foldable.classList.add("foldable__unfolded");
-      setTimeout(function() {
-        foldable.querySelector(".foldable--body").style.overflow = "auto";
-      }, 300);
     }
-  }
 
-</script>
+    function setupPaginateButtons(){
+      [].forEach.call(document.querySelectorAll(".search-nav--back"), el => {
+        el.addEventListener("click", () => {
+          loadPage(el.getAttribute("data-page"));
+        });
+      });
+      [].forEach.call(document.querySelectorAll(".search-nav--forward"), el => {
+        el.addEventListener("click", () => {
+          loadPage(el.getAttribute("data-page"));
+        });
+      });
+    }
+
+    function setupPaginate(){
+      bundle.autoInit();
+      [].forEach.call(document.querySelectorAll(".mdc-icon-toggle"), el => {
+        bundle.iconToggle.MDCIconToggle.attachTo(el);
+      });
+      [].forEach.call(document.querySelectorAll(".favourite-btn"), el => {
+        el.addEventListener("click", () => {
+          toggleFavourite(el.getAttribute('pk'));
+        });
+      });
+      Array.from(document.getElementsByClassName("foldable--title")).map(x =>
+        x.addEventListener("click", e => toggleFoldable(e)),
+      );
+      setupAnalytics();
+    }
+
+    function toggleFoldable(event) {
+      const foldable = event.currentTarget.parentNode;
+      if (foldable.classList.contains("foldable__unfolded")) {
+        foldable.classList.remove("foldable__unfolded");
+        foldable.querySelector(".foldable--body").style.overflow = "hidden";
+      } else {
+        foldable.classList.add("foldable__unfolded");
+        setTimeout(function() {
+          foldable.querySelector(".foldable--body").style.overflow = "auto";
+        }, 300);
+      }
+    }
+
+  </script>
 
 {% endblock %}

@@ -1,11 +1,12 @@
 version: 2.1
 orbs:
   aws-s3: circleci/aws-s3@3.0
+  snyk: snyk/snyk@1.2.3
 jobs:
   build:
     resource_class: medium
     docker:
-      - image: circleci/python:3.8.3-node-browsers
+      - image: cimg/python:3.8-browsers
         environment:
           DALITE_DB_PASSWORD: test key
           DALITE_DB_HOST: 127.0.0.1
@@ -19,32 +20,42 @@ jobs:
           MYSQL_PASSWORD: test key
           MYSQL_HOST: localhost
           MYSQL_ROOT_PASSWORD: mariadb
-
     working_directory: ~/repo
     steps:
       - checkout
       - run:
-          name: Setup
+          name: OS setup
           command: |
             sudo apt update
             sudo apt install mariadb-client
       - run:
-          name: Build
+          name: Create virtualenv and activate
           command: |
             python -m venv .venv
             . .venv/bin/activate
-            pip install --upgrade pip
-            pip install -r requirements/requirements-dev.txt
-            pip freeze
+            python -m pip install --upgrade pip
+      - run:
+          name: Run safety
+          command: |
+            . .venv/bin/activate
+            python -m pip install safety
+            safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY --ignore=49733
+      - run:
+          name: Install packages
+          command: |
+            . .venv/bin/activate
+            python -m pip install -r requirements/requirements-dev.txt
+            python -m pip freeze
             python -m spacy download en_core_web_sm
-            npm install
+            npm install --no-optional
+      - snyk/scan:
+          fail-on-issues: false
+          monitor-on-build: false
+          token-variable: SNYK_TOKEN
+      - run:
+          name: Gulp build
+          command: |
             ./node_modules/gulp/bin/gulp.js build
-#      - run:
-#          name: Safety
-#          command: |
-#            . .venv/bin/activate
-#            pip install safety
-#            safety check --ignore=43313
       - run:
           name: Setup local_settings.py
           command: |
@@ -53,7 +64,6 @@ jobs:
             echo 'PIWIK_SITE_ID = "1"' >> dalite/local_settings.py
             echo 'PASSWORD_GENERATOR_NONCE = "secret key"' >> dalite/local_settings.py
             echo 'import os' >> dalite/local_settings.py
-
             echo 'BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))' >> dalite/local_settings.py
             echo 'EMAIL_SUBJECT_PREFIX = "SALTISE/S4 @ Dawson College: "' >> dalite/local_settings.py
             echo 'DEFAULT_FROM_EMAIL = "no-reply-SALTISES4@dawsoncollege.qc.ca"' >> dalite/local_settings.py
@@ -62,10 +72,10 @@ jobs:
           name: Waiting for db
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 1m
       - run:
-          name: Setup db
+          name: DB setup
           command: |
-            mysql --host=$DALITE_DB_HOST --port=$DALITE_DB_PORT -u root --password=$MYSQL_ROOT_PASSWORD -e "grant all privileges on test_dalite_ng.* to dalite@'%'"
             . .venv/bin/activate
+            mysql --host=$DALITE_DB_HOST --port=$DALITE_DB_PORT -u root --password=$MYSQL_ROOT_PASSWORD -e "grant all privileges on test_dalite_ng.* to dalite@'%'"
             ./manage.py migrate
       - run:
           name: Collect static content and compress
@@ -79,7 +89,7 @@ jobs:
           from: /home/circleci/repo/static
           to: 's3://staging-mydalite-static'
       - run:
-          name: Tests
+          name: Run tests
           command: |
             . .venv/bin/activate
             pytest --migrations --cov --create-db --reruns 1

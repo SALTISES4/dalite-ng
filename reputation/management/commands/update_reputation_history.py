@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import logging
 from datetime import datetime
 
@@ -25,6 +22,6 @@ class Command(BaseCommand):
             ReputationHistory.create(reputation)
             progress = progress + step
             print(
-                "{} - ({:>6.2f}%) -".format(datetime.now(), progress)
+                f"{datetime.now()} - ({progress:>6.2f}%) -"
                 + " Updating reputations"
             )

@@ -3,15 +3,15 @@
 {% load compress static %}
 
 {% block stylesheets %}
-{{ block.super }}
-{% compress css file question %}
-<link href="{% static 'peerinst/css/question.min.css' %}" rel="stylesheet">
-{% endcompress %}
+  {{ block.super }}
+  {% compress css file question %}
+    <link href="{% static 'peerinst/css/question.min.css' %}" rel="stylesheet">
+  {% endcompress %}
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-{% compress js file question %}
-<script src="{% static 'peerinst/js/question.min.js' %}"></script>
-{% endcompress %}
+  {{ block.super }}
+  {% compress js file question %}
+    <script src="{% static 'peerinst/js/question.min.js' %}"></script>
+  {% endcompress %}
 {% endblock %}

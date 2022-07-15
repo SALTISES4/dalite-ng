@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import logging
 import operator
 import smtplib
@@ -26,7 +23,7 @@ def update_question_meta_search_difficulty():
             key="difficulty", value=d, type="S"
         )
         if created:
-            logger.info("New difficulty level created: {}".format(f))
+            logger.info(f"New difficulty level created: {f}")
 
     for q in qs:
         level = max(q.get_matrix().iteritems(), key=operator.itemgetter(1))[0]
@@ -34,9 +31,9 @@ def update_question_meta_search_difficulty():
         s = MetaSearch.objects.create(meta_feature=f, content_object=q)
         q.meta_search.add(s)
 
-        logger.info("Updating difficulty of '{}''".format(q))
-        logger.info("Feature: {}".format(f))
-        logger.info("Search object: {}".format(s))
+        logger.info(f"Updating difficulty of '{q}''")
+        logger.info(f"Feature: {f}")
+        logger.info(f"Search object: {s}")
 
         assert (
             q.meta_search.filter(meta_feature__key="difficulty").count() == 1

@@ -31,10 +31,10 @@ from .mixins import (
 from .util import make_percent_function, student_list_from_student_groups
 
 
-class StaffMemberRequiredMixin(object):
+class StaffMemberRequiredMixin:
     @classmethod
     def as_view(cls, **initkwargs):
-        view = super(StaffMemberRequiredMixin, cls).as_view(**initkwargs)
+        view = super().as_view(**initkwargs)
         return staff_member_required(view)
 
 
@@ -221,7 +221,7 @@ def get_question_rationale_aggregates(
 
         # Return a list of dicts, sorted by descending count
         sorted_list = [
-            dict(rationale=rationale, count=counts[rationale])
+            {"rationale": rationale, "count": counts[rationale]}
             for rationale in sorted(counts, key=counts.get, reverse=True)
         ]
         return sorted_list[:perpage], len(sorted_list)
@@ -302,39 +302,40 @@ class QuestionRationaleView(StaffMemberRequiredMixin, TemplateView):
             count = item.get("count", 0)
             rationale = item.get("rationale", None)
             if rationale:
-                row = dict(
-                    data=[
+                row = {
+                    "data": [
                         count,
                         rationale.rationale,
                         rationale.upvotes,
                         rationale.downvotes,
                     ],
-                    link_answers="?".join(
+                    "link_answers": "?".join(
                         [
                             reverse("admin:peerinst_answer_changelist"),
                             urllib.parse.urlencode(
-                                dict(chosen_rationale__id__exact=rationale.id)
+                                {"chosen_rationale__id__exact": rationale.id}
                             ),
                         ]
                     ),
-                )
+                }
+
             else:
-                row = dict(
-                    data=[
+                row = {
+                    "data": [
                         count,
                         _("(Student stuck to own rationale)"),
                         "",
                         "",
                     ],
-                    link_answers="?".join(
+                    "link_answers": "?".join(
                         [
                             reverse("admin:peerinst_answer_changelist"),
                             urllib.parse.urlencode(
-                                dict(chosen_rationale__isnull=True)
+                                {"chosen_rationale__isnull": True}
                             ),
                         ]
                     ),
-                )
+                }
             rows.append(row)
 
         return rows
@@ -446,33 +447,33 @@ class AssignmentResultsViewBase(TemplateView):
         rows = []
         for i, (question, sums) in enumerate(question_data, 1):
             get_params_this = urllib.parse.urlencode(
-                dict(assignment=self.assignment_id, question=question.id)
+                {"assignment": self.assignment_id, "question": question.id}
             )
-            get_params_all = urllib.parse.urlencode(dict(question=question.id))
+            get_params_all = urllib.parse.urlencode({"question": question.id})
             rows.append(
-                dict(
-                    data=[i, question.title]
+                {
+                    "data": [i, question.title]
                     + self.prepare_stats(sums, switch_columns),
-                    link_this="?".join(
+                    "link_this": "?".join(
                         [
                             reverse("admin:peerinst_answer_changelist"),
                             get_params_this,
                         ]
                     ),
-                    link_all="?".join(
+                    "link_all": "?".join(
                         [
                             reverse("admin:peerinst_answer_changelist"),
                             get_params_all,
                         ]
                     ),
-                    link_rationales=reverse(
+                    "link_rationales": reverse(
                         "question-rationales",
                         kwargs={
                             "assignment_id": self.assignment_id,
                             "question_id": question.id,
                         },
                     ),
-                )
+                }
             )
         labels = [
             _("No."),
@@ -489,7 +490,7 @@ class AssignmentResultsViewBase(TemplateView):
         for choice_index in switch_columns:
             labels.append(_("To {index}").format(index=choice_index))
         labels.append(_("Show answers"))
-        return dict(labels=labels, rows=rows)
+        return {"labels": labels, "rows": rows}
 
     def get_context_data(self, **kwargs):
         context = TemplateView.get_context_data(self, **kwargs)
@@ -573,14 +574,12 @@ class QuestionPreviewViewBase(
             models.Question, pk=self.kwargs["question_id"]
         )
         self.answer_choices = self.question.get_choices()
-        kwargs = super(QuestionPreviewViewBase, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update(answer_choices=self.answer_choices)
         return kwargs
 
     def get_context_data(self, **kwargs):
-        context = super(QuestionPreviewViewBase, self).get_context_data(
-            **kwargs
-        )
+        context = super().get_context_data(**kwargs)
         if self.question.get_frequency(all_rationales=True)["first_choice"]:
             save_allowed = 0 not in list(
                 self.question.get_frequency(all_rationales=True)[
@@ -669,11 +668,11 @@ class QuestionPreviewViewBase(
         messages.add_message(
             self.request, messages.INFO, _("Sample answer saved.")
         )
-        return super(QuestionPreviewViewBase, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse(
-            "sample-answer-form", kwargs=dict(question_id=self.question.pk)
+            "sample-answer-form", kwargs={"question_id": self.question.pk}
         )
 
 
@@ -682,7 +681,7 @@ class QuestionPreviewView(StaffMemberRequiredMixin, QuestionPreviewViewBase):
 
     def get_success_url(self):
         return reverse(
-            "question-preview", kwargs=dict(question_id=self.question.pk)
+            "question-preview", kwargs={"question_id": self.question.pk}
         )
 
 
@@ -700,7 +699,7 @@ class QuestionExpertRationaleView(QuestionPreviewViewBase):
         """
         add question to form kwargs
         """
-        kwargs = super(QuestionExpertRationaleView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update(question=self.question)
         return kwargs
 
@@ -711,9 +710,7 @@ class QuestionExpertRationaleView(QuestionPreviewViewBase):
         for each correct answerchoice.
         """
 
-        context = super(QuestionExpertRationaleView, self).get_context_data(
-            **kwargs
-        )
+        context = super().get_context_data(**kwargs)
         answerchoice_correct = self.question.answerchoice_set.values_list(
             "correct", flat=True
         )
@@ -762,15 +759,15 @@ class QuestionExpertRationaleView(QuestionPreviewViewBase):
         if self.kwargs.get("assignment_id"):
             return reverse(
                 "research-fix-expert-rationale",
-                kwargs=dict(
-                    question_id=self.question.pk,
-                    assignment_id=self.kwargs.get("assignment_id"),
-                ),
+                kwargs={
+                    "question_id": self.question.pk,
+                    "assignment_id": self.kwargs.get("assignment_id"),
+                },
             )
         else:
             return reverse(
                 "research-fix-expert-rationale",
-                kwargs=dict(question_id=self.question.pk),
+                kwargs={"question_id": self.question.pk},
             )
 
 
@@ -785,7 +782,7 @@ class StringListForm(forms.Form):
         forms.Form.__init__(self, initial=initial, *args, **kwargs)
 
     def clean(self):
-        cleaned_data = super(StringListForm, self).clean()
+        cleaned_data = super().clean()
         strings = []
         for s in cleaned_data["strings"].splitlines():
             s = s.strip()
@@ -807,7 +804,7 @@ class StringListView(StaffMemberRequiredMixin, FormView):
         return {"strings": self.initial_strings}
 
     def get_context_data(self, **kwargs):
-        context = super(StringListView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update(
             model_name_plural=self.model_class._meta.verbose_name_plural
         )
@@ -831,7 +828,7 @@ class StringListView(StaffMemberRequiredMixin, FormView):
                 model_name=self.model_class._meta.verbose_name_plural
             ),
         )
-        return super(StringListView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse("admin-index")

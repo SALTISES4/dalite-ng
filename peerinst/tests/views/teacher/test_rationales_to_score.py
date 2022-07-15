@@ -1,9 +1,9 @@
 import json
-import pytest
+from unittest import mock
 
-import mock
-from django.urls import reverse
+import pytest
 from django.http import HttpResponse
+from django.urls import reverse
 
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.teacher import login_teacher

@@ -2,79 +2,79 @@
 
 {% if request.session.LTI %}
 
-<i id="menu-icon" class="material-icons md-32 header-icon">menu</i>
-<aside class="mdc-drawer mdc-drawer--temporary mdc-typography">
-  <nav class="mdc-drawer__drawer">
+  <i id="menu-icon" class="material-icons md-32 header-icon">menu</i>
+  <aside class="mdc-drawer mdc-drawer--temporary mdc-typography">
+    <nav class="mdc-drawer__drawer">
 
-    <nav id="icon-with-text-demo" class="mdc-drawer__content mdc-list">
-      <a class="mdc-list-item" href="{% url 'tos:tos_modify' 'student' %}?next={{ request.path }}">
-        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
-          settings
-        </i>
-        {% trans 'Terms of service' %}
-      </a>
+      <nav id="icon-with-text-demo" class="mdc-drawer__content mdc-list">
+        <a class="mdc-list-item" href="{% url 'tos:tos_modify' 'student' %}?next={{ request.path }}">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            settings
+          </i>
+          {% trans 'Terms of service' %}
+        </a>
 
 
-      <a class="mdc-list-item logout" href="{% url 'logout' %}" id='logout-no-iframe'>
-        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
-          logout
-        </i>
-        {% trans 'Logout' %}
-      </a>
+        <a class="mdc-list-item logout" href="{% url 'logout' %}" id='logout-no-iframe'>
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            logout
+          </i>
+          {% trans 'Logout' %}
+        </a>
+      </nav>
+
     </nav>
+  </aside>
 
-  </nav>
-</aside>
-
-<script nonce="{{ request.csp_nonce }}">
-if (parent == window) {
-  document.getElementById('logout-no-iframe').style.visibility = 'visible';
-}
-</script>
+  <script nonce="{{ request.csp_nonce }}">
+    if (parent == window) {
+      document.getElementById('logout-no-iframe').style.visibility = 'visible';
+    }
+  </script>
 
 {% else %}
 
-<i id="menu-icon" class="material-icons md-32 header-icon">menu</i>
-<aside class="mdc-drawer mdc-drawer--temporary mdc-typography">
-  <nav class="mdc-drawer__drawer">
+  <i id="menu-icon" class="material-icons md-32 header-icon">menu</i>
+  <aside class="mdc-drawer mdc-drawer--temporary mdc-typography">
+    <nav class="mdc-drawer__drawer">
 
-    <nav id="icon-with-text-demo" class="mdc-drawer__content mdc-list">
-      <a class="mdc-list-item" href="{% url 'landing_page' %}">
-        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
-          home
-        </i>
-        {% trans 'Home page' %}
-      </a>
+      <nav id="icon-with-text-demo" class="mdc-drawer__content mdc-list">
+        <a class="mdc-list-item" href="{% url 'landing_page' %}">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            home
+          </i>
+          {% trans 'Home page' %}
+        </a>
 
-      <a class="mdc-list-item" href="{% url 'student-page' %}">
-        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
-          account_circle
-        </i>
-        {% trans 'My account' %}
-      </a>
+        <a class="mdc-list-item" href="{% url 'student-page' %}">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            account_circle
+          </i>
+          {% trans 'My account' %}
+        </a>
 
-      <a class="mdc-list-item" href="{% url 'tos:tos_modify' 'student' %}?next={{ request.path }}">
-        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
-          settings
-        </i>
-        {% trans 'Terms of service' %}
-      </a>
+        <a class="mdc-list-item" href="{% url 'tos:tos_modify' 'student' %}?next={{ request.path }}">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            settings
+          </i>
+          {% trans 'Terms of service' %}
+        </a>
 
-      <a class="mdc-list-item" href="{% url 'logout' %}" id="logout">
-        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
-          logout
-        </i>
-        {% trans 'Logout' %}
-      </a>
+        <a class="mdc-list-item" href="{% url 'logout' %}" id="logout">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            logout
+          </i>
+          {% trans 'Logout' %}
+        </a>
+      </nav>
+
     </nav>
-
-  </nav>
-</aside>
+  </aside>
 
 {% endif %}

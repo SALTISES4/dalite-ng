@@ -4,51 +4,51 @@
 
 {% block body %}
 
-<main>
-  <section id="student-assignment-complete">
+  <main>
+    <section id="student-assignment-complete">
 
-    {% if has_expired %}
+      {% if has_expired %}
 
-    <h1 class="mdc-typography--display3">
-      {% trans 'Assignment expired' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+        <h1 class="mdc-typography--display3">
+          {% trans 'Assignment expired' %}
+          <svg class="underline" width=150 height=4></svg>
+        </h1>
 
-    <p>
-      {% blocktrans %}
-      Unfortunately, this assignment has expired. You may look at your answers,
-      but may not answer any new questions.
-      {% endblocktrans %}
-    </p>
+        <p>
+          {% blocktrans %}
+            Unfortunately, this assignment has expired. You may look at your answers,
+            but may not answer any new questions.
+          {% endblocktrans %}
+        </p>
 
-    {% else %}
+      {% else %}
 
-    <h1 class="mdc-typography--display3">
-      {% trans 'Assignment Complete' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+        <h1 class="mdc-typography--display3">
+          {% trans 'Assignment Complete' %}
+          <svg class="underline" width=150 height=4></svg>
+        </h1>
 
-    <p>
-      {% blocktrans %}
-      You've finished this assignment. You may go back and look at your
-      answers.
-      {% endblocktrans %}
-    </p>
+        <p>
+          {% blocktrans %}
+            You've finished this assignment. You may go back and look at your
+            answers.
+          {% endblocktrans %}
+        </p>
 
-    {% endif %}
+      {% endif %}
 
-    <a href="{% url 'question' assignment_id question_id %}" class="mdc-button mdc-button--raised">
-      Go back to assignment
-    </a>
+      <a href="{% url 'question' assignment_id question_id %}" class="mdc-button mdc-button--raised">
+        Go back to assignment
+      </a>
 
-    {% if conclusion_page %}
-    <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Post-Assignment Notes' %}</h2>
-    <div class="mdc-typography--body1">
-      {{ conclusion_page|bleach_html|safe }}
-    </div>
-    {% endif %}
+      {% if conclusion_page %}
+        <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Post-Assignment Notes' %}</h2>
+        <div class="mdc-typography--body1">
+          {{ conclusion_page|bleach_html|safe }}
+        </div>
+      {% endif %}
 
-  </section>
-</main>
+    </section>
+  </main>
 
 {% endblock %}

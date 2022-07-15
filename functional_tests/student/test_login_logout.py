@@ -46,7 +46,7 @@ def signin(browser, student, mail_outbox, new=False):
 def access_logged_in_account_from_landing_page(browser, student):
     browser.get(browser.server_url)
     link = browser.find_element_by_link_text(
-        "Welcome back, {}".format(student.student.email)
+        f"Welcome back, {student.student.email}"
     )
     link.click()
     assert re.search(r"student/", browser.current_url)
@@ -90,7 +90,7 @@ def test_fake_link(browser):
         "There is no user corresponding to the given link. "
         "You may try asking for another one."
     )
-    browser.find_element_by_xpath("//*[contains(text(), '{}')]".format(err))
+    browser.find_element_by_xpath(f"//*[contains(text(), '{err}')]")
 
 
 def test_student_login_logout(browser, assert_, mail_outbox, student):

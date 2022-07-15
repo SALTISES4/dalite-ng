@@ -1,13 +1,9 @@
-# -*- coding: utf-8 -*-
-
-
 from itertools import chain
 
 from django.db import models
 
-from .criterion_list import get_criterion
-
 from ..logger import logger
+from .criterion_list import get_criterion
 
 
 class ReputationType(models.Model):
@@ -96,7 +92,7 @@ class ReputationType(models.Model):
                 evaluation, criterion.points_per_threshold[0]
             )
 
-        equation = "{} = {}".format(equation, points)
+        equation = f"{equation} = {points}"
 
         return {"reputation": points, "details": details, "equation": equation}
 
@@ -154,7 +150,7 @@ class ReputationType(models.Model):
                     model.__class__.__name__.lower(), self.type
                 )
             )
-            logger.error("TypeError: {}".format(msg))
+            logger.error(f"TypeError: {msg}")
             raise TypeError(msg)
 
         if not self.criteria.exists():
@@ -195,10 +191,13 @@ class ReputationType(models.Model):
                     if c.name == criterion
                 )
             except StopIteration:
-                msg = "The criterion {} isn't part of the criteria".format(
-                    criterion
-                ) + " for reputation_type {}.".format(self.type)
-                logger.error("ValueError: {}".format(msg))
+                msg = (
+                    "The criterion {} isn't part of the criteria".format(
+                        criterion
+                    )
+                    + f" for reputation_type {self.type}."
+                )
+                logger.error(f"ValueError: {msg}")
                 raise ValueError(msg)
 
             reputations = dict(

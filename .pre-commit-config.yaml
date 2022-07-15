@@ -1,34 +1,67 @@
+default_language_version:
+  python: python3.8
+
 exclude: "/tinymce/"
+
 fail_fast: false
+
 repos:
-  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-    rev: v1.2.1
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.34.0
     hooks:
-      - id: python-safety-dependencies-check
-        name: safety
-        always_run: true
-        exclude: ".*"
-        verbose: true
-        args: ["requirements/requirements-prod-aws.txt"]
+      - id: pyupgrade
+        args: [--py38-plus]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      - id: check-ast
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-case-conflict
+
+  - repo: https://gitlab.com/bmares/check-json5
+    rev: v1.0.0
+    hooks:
+      - id: check-json5
+
+  - repo: https://github.com/rtts/djhtml
+    rev: v1.5.1
+    hooks:
+      - id: djhtml
+        args:
+          - --tabwidth=2
+
+  - repo: https://github.com/thibaudcolas/curlylint
+    rev: v0.13.0
+    hooks:
+      - id: curlylint
 
   - repo: https://github.com/pycqa/isort
-    rev: 5.8.0
+    rev: 5.10.1
     hooks:
       - id: isort
         args: ["--profile", "black"]
 
   - repo: https://github.com/ambv/black
-    rev: 21.6b0
+    rev: 22.6.0
     hooks:
       - id: black
         exclude: "^.*/migrations/.*.py$"
         args: [--line-length=79, --safe]
 
   - repo: https://github.com/pycqa/flake8
-    rev: 3.9.1
+    rev: 4.0.1
     hooks:
       - id: flake8
-        exclude: "^.*/migrations/.*.py$"
+        additional_dependencies:
+          - flake8-bugbear==22.7.1
+          - flake8-no-pep420==2.3.0
+          - flake8-comprehensions==3.10.0
 
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v7.30.0
@@ -71,11 +104,21 @@ repos:
           - stylelint-order@4.1.0
           - stylelint-scss@3.19.0
 
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.3.0
+    hooks:
+      - id: python-safety-dependencies-check
+        name: safety
+        always_run: true
+        exclude: ".*"
+        verbose: true
+        args: ["requirements/requirements-prod-aws.txt", --ignore=49733]
+
   - repo: local
     hooks:
       - id: npm-audit
         name: npm-audit
         language: system
-        entry: npm audit --audit-level=high
+        entry: npm audit --audit-level=critical
         always_run: true
         exclude: ".*"

@@ -68,9 +68,7 @@ def group_access_required(fct):
             return response_403(
                 req,
                 msg=_("You don't have access to this resource."),
-                logger_msg=(
-                    "Access to {} with a non teacher user.".format(req.path)
-                ),
+                logger_msg=(f"Access to {req.path} with a non teacher user."),
                 log=logger.warning,
             )
 
@@ -97,9 +95,7 @@ def group_access_required(fct):
             if group is None:
                 return response_400(
                     req,
-                    msg=_(
-                        'There is no group with hash "{}".'.format(group_hash)
-                    ),
+                    msg=_(f'There is no group with hash "{group_hash}".'),
                     logger_msg=(
                         "Access to {} with a invalid group hash.".format(
                             req.path
@@ -132,7 +128,7 @@ def group_access_required(fct):
                 teacher=teacher,
                 group=group,
                 assignment=assignment,
-                **kwargs
+                **kwargs,
             )
         else:
             return fct(req, *args, teacher=teacher, group=group, **kwargs)
@@ -146,9 +142,7 @@ def teacher_required(fct):
             return response_403(
                 req,
                 msg=_("You don't have access to this resource."),
-                logger_msg=(
-                    "Access to {} from a non teacher user.".format(req.path)
-                ),
+                logger_msg=(f"Access to {req.path} from a non teacher user."),
                 log=logger.warning,
             )
         try:
@@ -158,9 +152,7 @@ def teacher_required(fct):
             return response_403(
                 req,
                 msg=_("You don't have access to this resource."),
-                logger_msg=(
-                    "Access to {} from a non teacher user.".format(req.path)
-                ),
+                logger_msg=(f"Access to {req.path} from a non teacher user."),
                 log=logger.warning,
             )
 
@@ -173,9 +165,7 @@ def student_required(fct):
             return response_403(
                 req,
                 msg=_("You don't have access to this resource."),
-                logger_msg=(
-                    "Access to {} from a non student user.".format(req.path)
-                ),
+                logger_msg=(f"Access to {req.path} from a non student user."),
                 log=logger.warning,
             )
         try:
@@ -185,9 +175,7 @@ def student_required(fct):
             return response_403(
                 req,
                 msg=_("You don't have access to this resource."),
-                logger_msg=(
-                    "Access to {} with a non student user.".format(req.path)
-                ),
+                logger_msg=(f"Access to {req.path} with a non student user."),
                 log=logger.warning,
             )
 

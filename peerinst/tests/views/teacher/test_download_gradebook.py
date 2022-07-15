@@ -1,8 +1,8 @@
 import json
+from unittest import mock
 
-import mock
-from django.urls import reverse
 from django.http import StreamingHttpResponse
+from django.urls import reverse
 
 from peerinst.models import RunningTask
 from peerinst.tests.fixtures import *  # noqa

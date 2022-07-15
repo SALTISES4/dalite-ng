@@ -1,6 +1,6 @@
 import factory
-
 from django.contrib.auth.models import User
+
 from peerinst.models import Teacher
 
 
@@ -11,7 +11,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     username = factory.LazyAttribute(
-        lambda o: "%s.%s" % (o.first_name.lower(), o.last_name.lower())
+        lambda o: f"{o.first_name.lower()}.{o.last_name.lower()}"
     )
     email = factory.Faker("email")
     password = factory.PostGenerationMethodCall(

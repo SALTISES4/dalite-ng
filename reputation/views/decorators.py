@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import logging
 
 from django.contrib.auth.models import User
@@ -17,9 +14,7 @@ def logged_in_non_student_required(fct):
             return response_403(
                 req,
                 msg=_("You don't have access to this resource."),
-                logger_msg=(
-                    "Access to {} from student {}.".format(req.path, req.user)
-                ),
+                logger_msg=(f"Access to {req.path} from student {req.user}."),
                 log=logger.warning,
             )
         return fct(req, *args, **kwargs)
@@ -33,9 +28,7 @@ def student_required(fct):
             return response_403(
                 req,
                 msg=_("You don't have access to this resource."),
-                logger_msg=(
-                    "Access to {} with a non student user.".format(req.path)
-                ),
+                logger_msg=(f"Access to {req.path} with a non student user."),
                 log=logger.warning,
             )
 

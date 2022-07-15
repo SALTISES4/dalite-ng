@@ -3,84 +3,84 @@
 {% load i18n add_class compress %}
 
 {% block stylesheets %}
-{{ block.super }}
-<style nonce="{{ request.csp_nonce }}">
-  label {
-    padding-right: 10px;
-  }
-</style>
+  {{ block.super }}
+  <style nonce="{{ request.csp_nonce }}">
+    label {
+      padding-right: 10px;
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
-<main>
-<section>
-  <h1 class="mdc-typography--display3">{% trans 'Identity' %}
-    <svg class="underline" width=150 height=4></svg>
-  </h1>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Identity' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-  <div class="admin-link">
-    <a href="{% url 'teacher' user.teacher.id %}">{% trans 'Back to My Account' %}</a>
-  </div>
-
-  <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Discipline and institution' %}</h2>
-
-  <div class='field-container'>
-    <div class='number-box'><span class='number'>?</span></div>
-    <div class='field'>
-      <p class="mdc-theme--secondary"><small>
-        {% blocktrans %}
-        Select content disciplines and the institutions where you teach.  You can select multiple choices using the shift button.
-        {% endblocktrans %}
-      </small></p>
-    </div>
-  </div>
-  <br>
-
-  {{ form.non_field_errors }}
-
-  <form action="{% url 'teacher-update' object.id %}" method="post">
-      {% csrf_token %}
-
-      <div class='mdc-form-field'>
-        <label for='id_institutions'>{{ form.institutions.label }}:</label>
-        {{ form.institutions|add_class:'multiple-select mdc-theme--background' }}
+      <div class="admin-link">
+        <a href="{% url 'teacher' user.teacher.id %}">{% trans 'Back to My Account' %}</a>
       </div>
-      {{ form.institutions.errors }}
 
-      <div class='padded-top'>
-        <div id='discipline_form'>
-          {% include 'peerinst/disciplines_select_form.html' %}
+      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Discipline and institution' %}</h2>
+
+      <div class='field-container'>
+        <div class='number-box'><span class='number'>?</span></div>
+        <div class='field'>
+          <p class="mdc-theme--secondary"><small>
+            {% blocktrans %}
+              Select content disciplines and the institutions where you teach.  You can select multiple choices using the shift button.
+            {% endblocktrans %}
+          </small></p>
         </div>
       </div>
+      <br>
 
-      <input id="update-identity" class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Update' %}"/>
-  </form>
+      {{ form.non_field_errors }}
 
-</section>
-</main>
+      <form action="{% url 'teacher-update' object.id %}" method="post">
+        {% csrf_token %}
+
+        <div class='mdc-form-field'>
+          <label for='id_institutions'>{{ form.institutions.label }}:</label>
+          {{ form.institutions|add_class:'multiple-select mdc-theme--background' }}
+        </div>
+        {{ form.institutions.errors }}
+
+        <div class='padded-top'>
+          <div id='discipline_form'>
+            {% include 'peerinst/disciplines_select_form.html' %}
+          </div>
+        </div>
+
+        <input id="update-identity" class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Update' %}"/>
+      </form>
+
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script nonce="{{ request.csp_nonce }}">
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
 
-  function hook() {
-    form = document.getElementById("id_disciplines");
-    if (form) {
-      document.getElementById("update-identity").disabled = false;
+    function hook() {
+      form = document.getElementById("id_disciplines");
+      if (form) {
+        document.getElementById("update-identity").disabled = false;
+        $("#show_discipline_form").on("click", function() {
+          document.getElementById("update-identity").disabled = true;
+        });
+      }
+    }
+
+    window.addEventListener("load", function() {
       $("#show_discipline_form").on("click", function() {
         document.getElementById("update-identity").disabled = true;
       });
-    }
-  }
 
-  window.addEventListener("load", function() {
-    $("#show_discipline_form").on("click", function() {
-      document.getElementById("update-identity").disabled = true;
+      bundle.bindAjaxTextInputForm('show_discipline_form', 'discipline_form', "{% url 'discipline-create' %}?multiselect=true", "{% url 'disciplines-form' %}", bundle.disciplineForm, null, hook);
     });
 
-    bundle.bindAjaxTextInputForm('show_discipline_form', 'discipline_form', "{% url 'discipline-create' %}?multiselect=true", "{% url 'disciplines-form' %}", bundle.disciplineForm, null, hook);
-  });
-
-</script>
+  </script>
 {% endblock %}

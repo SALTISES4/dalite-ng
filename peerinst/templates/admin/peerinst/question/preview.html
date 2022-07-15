@@ -2,14 +2,14 @@
 {% load i18n %}
 
 {% block pretext %}
-<p><small>
-  {% blocktrans %}
-  This is a preview of how the question looks in the student interface.  You can add example
-  rationales here that will be shown as choices to students.  You should at least provide a few
-  example rationales for the correct choices.  It's best if you provide a few rationales for each
-  choice, even the incorrect ones.
-  {% endblocktrans %}
-</small></p>
-<hr>
+  <p><small>
+    {% blocktrans %}
+      This is a preview of how the question looks in the student interface.  You can add example
+      rationales here that will be shown as choices to students.  You should at least provide a few
+      example rationales for the correct choices.  It's best if you provide a few rationales for each
+      choice, even the incorrect ones.
+    {% endblocktrans %}
+  </small></p>
+  <hr>
 {% endblock %}
 {% block submit_button %}{% trans 'Submit example answer' %}{% endblock %}

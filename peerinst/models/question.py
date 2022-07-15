@@ -31,15 +31,15 @@ def no_hyphens(value):
 
 
 def images(instance, filename):
-    hash = hashlib.sha256(
-        "{}-{}".format(datetime.now(), filename).encode("utf-8")
-    ).hexdigest()[:8]
+    hash = hashlib.sha256(f"{datetime.now()}-{filename}".encode()).hexdigest()[
+        :8
+    ]
     if instance.user:
-        path = "images/{0}/{1}/{2}_{3}".format(
+        path = "images/{}/{}/{}_{}".format(
             instance.user.username, datetime.now().month, hash, filename
         )
     else:
-        path = "images/{0}/{1}/{2}_{3}".format(
+        path = "images/{}/{}/{}_{}".format(
             "unknown", datetime.now().month, hash, filename
         )
     return path
@@ -135,7 +135,7 @@ class Discipline(models.Model):
         verbose_name_plural = _("disciplines")
 
 
-class GradingScheme(object):
+class GradingScheme:
     STANDARD = 0
     ADVANCED = 1
 
@@ -172,11 +172,7 @@ class FlaggedQuestionManager(models.Manager):
             "question", flat=True
         )
 
-        return (
-            super(FlaggedQuestionManager, self)
-            .get_queryset()
-            .filter(pk__in=flagged_questions)
-        )
+        return super().get_queryset().filter(pk__in=flagged_questions)
 
 
 class UnflaggedQuestionManager(models.Manager):
@@ -185,11 +181,7 @@ class UnflaggedQuestionManager(models.Manager):
             "question", flat=True
         )
 
-        return (
-            super(UnflaggedQuestionManager, self)
-            .get_queryset()
-            .exclude(pk__in=flagged_questions)
-        )
+        return super().get_queryset().exclude(pk__in=flagged_questions)
 
 
 class Question(models.Model):
@@ -372,7 +364,7 @@ class Question(models.Model):
 
     def __str__(self):
         if self.discipline:
-            return "{} - {}".format(self.discipline, self.title)
+            return f"{self.discipline} - {self.title}"
         return self.title
 
     def save(self, *args, **kwargs):
@@ -838,10 +830,10 @@ class Question(models.Model):
 
     def get_matrix(self):
         matrix = {}
-        matrix[str("easy")] = 0
-        matrix[str("hard")] = 0
-        matrix[str("tricky")] = 0
-        matrix[str("peer")] = 0
+        matrix["easy"] = 0
+        matrix["hard"] = 0
+        matrix["tricky"] = 0
+        matrix["peer"] = 0
 
         answer_choices = self.answerchoice_set.all()
         correct_choices = self.get_correct_choices()
@@ -870,10 +862,10 @@ class Question(models.Model):
 
                 peer = N - easy - tricky - hard
 
-                matrix[str("easy")] = float(easy) / N
-                matrix[str("hard")] = float(hard) / N
-                matrix[str("tricky")] = float(tricky) / N
-                matrix[str("peer")] = float(peer) / N
+                matrix["easy"] = float(easy) / N
+                matrix["hard"] = float(hard) / N
+                matrix["tricky"] = float(tricky) / N
+                matrix["peer"] = float(peer) / N
 
         return matrix
 
@@ -914,8 +906,8 @@ class Question(models.Model):
             ).count()
             c = c + 1
 
-        frequency[str("first_choice")] = choice1
-        frequency[str("second_choice")] = choice2
+        frequency["first_choice"] = choice1
+        frequency["second_choice"] = choice2
 
         return frequency
 

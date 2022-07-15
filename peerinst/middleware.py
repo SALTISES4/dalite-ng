@@ -5,7 +5,7 @@ from django.urls import reverse
 from .models import TeacherNotification
 
 
-class NotificationMiddleware(object):
+class NotificationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 

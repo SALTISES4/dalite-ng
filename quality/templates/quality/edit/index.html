@@ -3,54 +3,54 @@
 {% load compress i18n static %}
 
 {% block stylesheets %}
-{{ block.super }}
-{% compress css %}
-<link href="{% static 'quality/css/edit.min.css' %}" rel="stylesheet">
-{% endcompress %}
+  {{ block.super }}
+  {% compress css %}
+    <link href="{% static 'quality/css/edit.min.css' %}" rel="stylesheet">
+  {% endcompress %}
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-{% compress js %}
-<script src="{% static 'quality/js/edit.min.js' %}"></script>
-{% endcompress %}
+  {{ block.super }}
+  {% compress js %}
+    <script src="{% static 'quality/js/edit.min.js' %}"></script>
+  {% endcompress %}
 
-<script nonce="{{ request.csp_nonce }}">
-  edit.init({{ data|safe }})
-</script>
+  <script nonce="{{ request.csp_nonce }}">
+    edit.init({{ data|safe }})
+  </script>
 {% endblock %}
 
 
 {% block body %}
-<main>
+  <main>
 
-  <h1 class="mdc-typography--display3">{% trans 'Edit quality' %}
-    <svg class="underline" width=150 height=4></svg>
-  </h1>
+    <h1 class="mdc-typography--display3">{% trans 'Edit quality' %}
+      <svg class="underline" width=150 height=4></svg>
+    </h1>
 
-  <div class="admin-link">
-    <a id="back-link"></a>
-  </div>
-
-  <div class="add-criterion">
-    <button>
-      <i class="material-icons">
-        add
-      </i>
-    </button>
-    <div class="available-criterions">
-      <ul >
-        {% for criterion in available %}
-        <li title="{{ criterion.description }}" name="{{ criterion.name }}">
-          {{ criterion.full_name }}
-        </li>
-        {% endfor %}
-      </ul>
+    <div class="admin-link">
+      <a id="back-link"></a>
     </div>
-  </div>
 
-  <div id="criterions">
-  </div>
+    <div class="add-criterion">
+      <button>
+        <i class="material-icons">
+          add
+        </i>
+      </button>
+      <div class="available-criterions">
+        <ul >
+          {% for criterion in available %}
+            <li title="{{ criterion.description }}" name="{{ criterion.name }}">
+              {{ criterion.full_name }}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
 
-</main>
+    <div id="criterions">
+    </div>
+
+  </main>
 {% endblock %}

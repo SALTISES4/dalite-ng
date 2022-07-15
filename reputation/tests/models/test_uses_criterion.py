@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
-
-import mock
+from unittest import mock
 
 from peerinst.tests.fixtures import *  # noqa
 from reputation.models import UsesCriterion

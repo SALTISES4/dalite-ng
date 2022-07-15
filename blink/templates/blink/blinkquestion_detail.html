@@ -3,312 +3,312 @@
 {% load i18n %}
 
 {% block body %}
-<main>
-  <section>
-    <h1 class="mdc-typography--display3"> {% trans 'Blink Question' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3"> {% trans 'Blink Question' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <h2 id="question-title" class="mdc-typography--display1 mdc-theme--secondary">{{object.question.title}}</h2>
+      <h2 id="question-title" class="mdc-typography--display1 mdc-theme--secondary">{{object.question.title}}</h2>
 
-    <p class="mdc-theme--secondary">{{object.question.text|safe}}</p>
+      <p class="mdc-theme--secondary">{{object.question.text|safe}}</p>
 
-    {% if object.question.image %}
-    <div>
-      <img class="question-image" src="{{ object.question.image.url }}" alt="object.image_alt_text" >
-    </div>
-    {% endif %}
-
-    <div>
-      <div class="inline f-left max-width-400">
-        <ul>
-        {% for label, choice in object.question.get_choices %}
-          <li class="dense-list">
-            {% if not request.user.is_authenticated and label == latest_answer_choice %}
-            <span class="bold">{{label}}. {{choice|safe}}</span>
-            {% else %}
-            {{label}}. {{choice|safe}}
-            {% endif %}
-          </li>
-        {% endfor %}
-        </ul>
-      </div>
-      <svg id="timer" class="block-auto" width=300 height=200></svg>
-      <svg id="results" class="block-auto" width=300 height=200></svg>
-    </div>
-    <div class="clear-both"></div>
-
-    <div class="note">
-      {% trans 'Round:' %} <span id="round">{{round}}</span><br>
-      {% if request.user.is_authenticated %}
-        {% trans 'Number of respondents:' %} <span id="counter"></span>
+      {% if object.question.image %}
+        <div>
+          <img class="question-image" src="{{ object.question.image.url }}" alt="object.image_alt_text" >
+        </div>
       {% endif %}
-    </div>
 
-    {% if request.user.is_authenticated %}
-    <input class="mdc-button mdc-button--raised hidden" id="reset_button" type="button" value="Reset">
-    {% endif %}
+      <div>
+        <div class="inline f-left max-width-400">
+          <ul>
+            {% for label, choice in object.question.get_choices %}
+              <li class="dense-list">
+                {% if not request.user.is_authenticated and label == latest_answer_choice %}
+                  <span class="bold">{{label}}. {{choice|safe}}</span>
+                {% else %}
+                  {{label}}. {{choice|safe}}
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <svg id="timer" class="block-auto" width=300 height=200></svg>
+        <svg id="results" class="block-auto" width=300 height=200></svg>
+      </div>
+      <div class="clear-both"></div>
 
-    {% if request.user.is_authenticated %}
-    <input class="mdc-button mdc-button--raised hidden m-left-20" id="next_button" type="button" value="Next">
-    {% endif %}
+      <div class="note">
+        {% trans 'Round:' %} <span id="round">{{round}}</span><br>
+        {% if request.user.is_authenticated %}
+          {% trans 'Number of respondents:' %} <span id="counter"></span>
+        {% endif %}
+      </div>
 
-  </section>
-</main>
+      {% if request.user.is_authenticated %}
+        <input class="mdc-button mdc-button--raised hidden" id="reset_button" type="button" value="Reset">
+      {% endif %}
+
+      {% if request.user.is_authenticated %}
+        <input class="mdc-button mdc-button--raised hidden m-left-20" id="next_button" type="button" value="Next">
+      {% endif %}
+
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script nonce="{{ request.csp_nonce }}">
-function reset(){
-  window.location = "{% url 'blink:blink-reset' pk=object.pk %}"
-}
-function next(){
-  window.location = "{% url 'blink:blink-get-next' pk=object.pk %}"
-}
-
-const csrftoken = bundle.getCsrfToken();
-
-// AJAX
-function get(url,callback) {
-  const request = new XMLHttpRequest();
-  request.open("GET",url);
-  request.onreadystatechange = function() {
-    if (request.readyState === 4 && request.status === 200) {
-      const type = request.getResponseHeader("Content-Type");
-      console.info('URL: '+url);
-      console.info('Type: '+type);
-      console.info('Response: '+request.responseText);
-      if (type === 'application/json') {
-        callback(JSON.parse(request.responseText));
-      }
-      else {
-        // Strip any html
-        callback(request.responseText);
-      }
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    function reset(){
+      window.location = "{% url 'blink:blink-reset' pk=object.pk %}"
     }
-  }
-  request.send(null);
-  return;
-}
-
-function set_counter(json) {
-  document.getElementById("counter").innerHTML = json['count'];
-}
-
-// Schedule AJAX event
-{% if request.user.is_authenticated %}
-const counterID = window.setInterval(get,1000,"{% url 'blink:blink-count' pk=object.pk %}", set_counter);
-{% endif %}
-
-// Countdown
-let startTime = parseFloat({{ time_left }});
-console.info(startTime);
-
-var svg = bundle.select("#timer"),
-width = +svg.attr("width"),
-height = +svg.attr("height");
-
-var r = 0.6*Math.min(width/2,height/2);
-
-var g = svg.append("g")
-.attr("transform","translate("+width/2+","+height/2+")");
-
-g.append("circle")
-.attr("id","timer-bg")
-.attr("x",0)
-.attr("y",0)
-.attr("r",r);
-
-var time = g.append("text")
-.attr("x",0)
-.attr("y",0)
-.attr("dy",0.35*r)
-.attr("text-anchor","middle")
-.attr("font-size",r)
-.style("fill","white")
-.text(parseInt(startTime));
-
-let timerId;
-
-window.setTimeout(() => {
-  startTime = parseInt(startTime);
-  timerID = window.setInterval(update_time,1000);
-}, 1000*(startTime%1));
-
-function changeQuestionState(url,state,callback) {
-  var request = new XMLHttpRequest();
-  request.open("POST",url);
-  request.onreadystatechange = function() {
-    if (request.readyState === 4 && callback) {
-      callback(request);
+    function next(){
+      window.location = "{% url 'blink:blink-get-next' pk=object.pk %}"
     }
-  };
-  // Need to implement this?: https://docs.djangoproject.com/en/1.8/ref/csrf/
-  request.setRequestHeader("X-CSRFToken", csrftoken);
-  request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-  if (state == false){
-    request.send("");
-  }
-  else {
-    request.send("active=on");
-  }
-  return;
-}
 
-function getResponse(response) {
-  console.info(response);
-  return;
-}
+    const csrftoken = bundle.getCsrfToken();
 
-function getResults(response) {
-  get("{% url 'blink:blink-results' pk=object.pk %}",showResults);
-  return;
-}
-
-function update_time(){
-  time.text(function(){
-    startTime = startTime - 1;
-    if (startTime > 0) {
-      return startTime;
-    }
-    else {
-      {% if request.user.is_authenticated %}
-        clearInterval(counterID);
-      {% endif %}
-      clearInterval(timerID);
-      bundle.select("#timer-bg").style('fill','red');
-      bundle.select("#reset_button").style('display','inline');
-      bundle.select("#next_button").style('display','inline');
-      // Close the question if authenticated, otherwise get results and start checking for redirect
-      if ({{request.user.is_authenticated|yesno:"true,false"}}){
-        changeQuestionState("{% url 'blink:blink-close' pk=object.pk %}",false,getResults);
-      }
-      else {
-        function processStatus(response) {
-          console.info("Checking status");
-          if (response['status'] == false) {
-            clearInterval(checkID);
-            getResults();
-            console.info("Checking for redirect");
-            function checkRedirect(response) {
-              function compare(response){
-                console.info(response);
-                const action = response["action"]
-                if (action != "stop"){
-                  if (window.location.pathname != action) {
-                    window.location = action;
-                  }
-                }
-                if (action == "stop") {
-                  clearInterval(checkURLID);
-                  // Back to waiting room
-                  window.location = "{% url 'blink:blink-waiting' username=teacher %}"
-                }
-                return;
-              }
-              get("{% url 'blink:blink-get-current-url' username=teacher %}",compare);
-              return;
-            }
-            var checkURLID = window.setInterval(checkRedirect,1000);
-            // Consider timeout on checkURLID
+    // AJAX
+    function get(url,callback) {
+      const request = new XMLHttpRequest();
+      request.open("GET",url);
+      request.onreadystatechange = function() {
+        if (request.readyState === 4 && request.status === 200) {
+          const type = request.getResponseHeader("Content-Type");
+          console.info('URL: '+url);
+          console.info('Type: '+type);
+          console.info('Response: '+request.responseText);
+          if (type === 'application/json') {
+            callback(JSON.parse(request.responseText));
+          }
+          else {
+            // Strip any html
+            callback(request.responseText);
           }
         }
-        function blinkStatus() {
-          console.info("Checking status of poll");
-          get("{% url 'blink:blink-status' pk=object.pk %}",processStatus);
-        }
-        // Check round is closed
-        var checkID = window.setInterval(blinkStatus,1000);
-        //window.setTimeout(clearInterval,5000,checkID);
       }
-      return 0;
+      request.send(null);
+      return;
     }
-  });
-}
 
-function showResults(data){
-  // Partly based on: https://bl.ocks.org/mbostock/3048450
-  var timer = bundle.select("#timer").style("display","none");
-
-  var svg = bundle.select("#results")
-  .style('display','block');
-
-  var margin = {left:30,right:30,top:30,bottom:30};
-
-  var width = +svg.attr("width") - margin.left - margin.right;
-  var height = +svg.attr("height") - margin.top - margin.bottom;
-
-  var g = svg.append("g")
-  .attr('transform','translate('+margin.left+','+margin.top+')');
-
-  var x = bundle.scaleBand().domain(bundle.keys(data).sort()).rangeRound([0,width]).padding(0.1);
-  var y = bundle.scaleLinear().domain([0,Math.max(...bundle.values(data))]).rangeRound([height,0]);
-
-  g.append("g")
-  .attr("class", "axis axis--x")
-  .attr("transform", "translate(0," + height + ")")
-  .call(bundle.axisBottom(x));
-
-  g.append("g")
-  .attr("class", "axis axis--y")
-  .style("opacity",0)
-  .call(bundle.axisLeft(y));
-
-  g.append("g")
-  .selectAll("rect")
-  .data(bundle.entries(data))
-  .enter().append("rect")
-  .attr("class","blink_rect")
-  .attr("x",function(d){return x(d.key);})
-  .attr("y",function(d){return y(0);})
-  .attr("width",x.bandwidth())
-  .attr("height",0)
-  .attr("opacity",function(d){
-    if ({{request.user.is_authenticated|yesno:"true,false"}}) {
-      return 1;
+    function set_counter(json) {
+      document.getElementById("counter").innerHTML = json['count'];
     }
-    else {
-      if (d.key == "{{latest_answer_choice}}") {
-        return 1;
+
+    // Schedule AJAX event
+    {% if request.user.is_authenticated %}
+      const counterID = window.setInterval(get,1000,"{% url 'blink:blink-count' pk=object.pk %}", set_counter);
+    {% endif %}
+
+    // Countdown
+    let startTime = parseFloat({{ time_left }});
+    console.info(startTime);
+
+    var svg = bundle.select("#timer"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+    var r = 0.6*Math.min(width/2,height/2);
+
+    var g = svg.append("g")
+      .attr("transform","translate("+width/2+","+height/2+")");
+
+    g.append("circle")
+      .attr("id","timer-bg")
+      .attr("x",0)
+      .attr("y",0)
+      .attr("r",r);
+
+    var time = g.append("text")
+      .attr("x",0)
+      .attr("y",0)
+      .attr("dy",0.35*r)
+      .attr("text-anchor","middle")
+      .attr("font-size",r)
+      .style("fill","white")
+      .text(parseInt(startTime));
+
+    let timerId;
+
+    window.setTimeout(() => {
+      startTime = parseInt(startTime);
+      timerID = window.setInterval(update_time,1000);
+    }, 1000*(startTime%1));
+
+    function changeQuestionState(url,state,callback) {
+      var request = new XMLHttpRequest();
+      request.open("POST",url);
+      request.onreadystatechange = function() {
+        if (request.readyState === 4 && callback) {
+          callback(request);
+        }
+      };
+      // Need to implement this?: https://docs.djangoproject.com/en/1.8/ref/csrf/
+      request.setRequestHeader("X-CSRFToken", csrftoken);
+      request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+      if (state == false){
+        request.send("");
       }
       else {
-        return 0.8;
+        request.send("active=on");
       }
+      return;
     }
-  })
-  .transition()
-  .duration(1000)
-  .attr("y",function(d){return y(d.value);})
-  .attr("height",function(d){return y(0)-y(d.value);});
 
-  g.append("g")
-  .selectAll("text")
-  .data(bundle.entries(data))
-  .enter().append("text")
-  .attr("class","blink_labels")
-  .attr("x",function(d){return x(d.key)+0.9*x.bandwidth();})
-  .attr("y",function(d){return y(0.02);})
-  .attr("text-anchor","end")
-  .text(function(d) {if (d.value>0) {return d.value;}});
+    function getResponse(response) {
+      console.info(response);
+      return;
+    }
 
-  // show average response time per choice1
-}
-</script>
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-    const reset_btn = document.getElementById("reset_button");
-    if (reset_btn) {
-      reset_btn.addEventListener("click", () => {
-        reset();
+    function getResults(response) {
+      get("{% url 'blink:blink-results' pk=object.pk %}",showResults);
+      return;
+    }
+
+    function update_time(){
+      time.text(function(){
+        startTime = startTime - 1;
+        if (startTime > 0) {
+          return startTime;
+        }
+        else {
+          {% if request.user.is_authenticated %}
+            clearInterval(counterID);
+          {% endif %}
+          clearInterval(timerID);
+          bundle.select("#timer-bg").style('fill','red');
+          bundle.select("#reset_button").style('display','inline');
+          bundle.select("#next_button").style('display','inline');
+          // Close the question if authenticated, otherwise get results and start checking for redirect
+          if ({{request.user.is_authenticated|yesno:"true,false"}}){
+            changeQuestionState("{% url 'blink:blink-close' pk=object.pk %}",false,getResults);
+          }
+          else {
+            function processStatus(response) {
+              console.info("Checking status");
+              if (response['status'] == false) {
+                clearInterval(checkID);
+                getResults();
+                console.info("Checking for redirect");
+                function checkRedirect(response) {
+                  function compare(response){
+                    console.info(response);
+                    const action = response["action"]
+                    if (action != "stop"){
+                      if (window.location.pathname != action) {
+                        window.location = action;
+                      }
+                    }
+                    if (action == "stop") {
+                      clearInterval(checkURLID);
+                      // Back to waiting room
+                      window.location = "{% url 'blink:blink-waiting' username=teacher %}"
+                    }
+                    return;
+                  }
+                  get("{% url 'blink:blink-get-current-url' username=teacher %}",compare);
+                  return;
+                }
+                var checkURLID = window.setInterval(checkRedirect,1000);
+                // Consider timeout on checkURLID
+              }
+            }
+            function blinkStatus() {
+              console.info("Checking status of poll");
+              get("{% url 'blink:blink-status' pk=object.pk %}",processStatus);
+            }
+            // Check round is closed
+            var checkID = window.setInterval(blinkStatus,1000);
+            //window.setTimeout(clearInterval,5000,checkID);
+          }
+          return 0;
+        }
       });
     }
-    const next_btn = document.getElementById("next_button");
-    if (next_btn) {
-      next_btn.addEventListener("click", () => {
-        next();
-      });
+
+    function showResults(data){
+      // Partly based on: https://bl.ocks.org/mbostock/3048450
+      var timer = bundle.select("#timer").style("display","none");
+
+      var svg = bundle.select("#results")
+        .style('display','block');
+
+      var margin = {left:30,right:30,top:30,bottom:30};
+
+      var width = +svg.attr("width") - margin.left - margin.right;
+      var height = +svg.attr("height") - margin.top - margin.bottom;
+
+      var g = svg.append("g")
+        .attr('transform','translate('+margin.left+','+margin.top+')');
+
+      var x = bundle.scaleBand().domain(bundle.keys(data).sort()).rangeRound([0,width]).padding(0.1);
+      var y = bundle.scaleLinear().domain([0,Math.max(...bundle.values(data))]).rangeRound([height,0]);
+
+      g.append("g")
+        .attr("class", "axis axis--x")
+        .attr("transform", "translate(0," + height + ")")
+        .call(bundle.axisBottom(x));
+
+      g.append("g")
+        .attr("class", "axis axis--y")
+        .style("opacity",0)
+        .call(bundle.axisLeft(y));
+
+      g.append("g")
+        .selectAll("rect")
+        .data(bundle.entries(data))
+        .enter().append("rect")
+        .attr("class","blink_rect")
+        .attr("x",function(d){return x(d.key);})
+        .attr("y",function(d){return y(0);})
+        .attr("width",x.bandwidth())
+        .attr("height",0)
+        .attr("opacity",function(d){
+        if ({{request.user.is_authenticated|yesno:"true,false"}}) {
+          return 1;
+        }
+        else {
+          if (d.key == "{{latest_answer_choice}}") {
+            return 1;
+          }
+          else {
+            return 0.8;
+          }
+        }
+      })
+        .transition()
+        .duration(1000)
+        .attr("y",function(d){return y(d.value);})
+        .attr("height",function(d){return y(0)-y(d.value);});
+
+      g.append("g")
+        .selectAll("text")
+        .data(bundle.entries(data))
+        .enter().append("text")
+        .attr("class","blink_labels")
+        .attr("x",function(d){return x(d.key)+0.9*x.bandwidth();})
+        .attr("y",function(d){return y(0.02);})
+        .attr("text-anchor","end")
+        .text(function(d) {if (d.value>0) {return d.value;}});
+
+      // show average response time per choice1
     }
-  });
-</script>
+  </script>
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      const reset_btn = document.getElementById("reset_button");
+      if (reset_btn) {
+        reset_btn.addEventListener("click", () => {
+          reset();
+        });
+      }
+      const next_btn = document.getElementById("next_button");
+      if (next_btn) {
+        next_btn.addEventListener("click", () => {
+          next();
+        });
+      }
+    });
+  </script>
 {% endblock %}

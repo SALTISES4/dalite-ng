@@ -1,10 +1,11 @@
-from faker import Faker
 import time
 
+from faker import Faker
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
 from functional_tests.fixtures import *  # noqa
+
 from .utils import accept_cookies, go_to_account, login
 
 fake = Faker()

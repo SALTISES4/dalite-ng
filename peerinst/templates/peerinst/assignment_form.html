@@ -3,137 +3,137 @@
 {% load compress static add_class i18n %}
 
 {% block stylesheets %}
-{{ block.super }}
-<!-- Self-hosted tinyMCE -->
-<script src="{% static 'peerinst/js/tinymce/js/tinymce/tinymce.min.js' %}" defer=true></script>
+  {{ block.super }}
+  <!-- Self-hosted tinyMCE -->
+  <script src="{% static 'peerinst/js/tinymce/js/tinymce/tinymce.min.js' %}" defer=true></script>
 {% endblock %}
 
 {% block body %}
-<main>
-  <section>
-    <div class="meta-container">
-      <div class="container">
-        <h1 class="mdc-typography--display3">{% trans 'Assignment' %}
-          <svg class="underline" width=150 height=4></svg>
-        </h1>
+  <main>
+    <section>
+      <div class="meta-container">
+        <div class="container">
+          <h1 class="mdc-typography--display3">{% trans 'Assignment' %}
+            <svg class="underline" width=150 height=4></svg>
+          </h1>
 
-        <div class="admin-link">
-          <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
-        </div>
-
-        <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Create a new assignment' %}</h2>
-
-        <div class='field-container'>
-          <div class='number-box'><span class='number'>?</span></div>
-          <div class='field'>
-            <p><small>{{ help_text }}</small></p>
+          <div class="admin-link">
+            <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
           </div>
-        </div>
 
-        <form method="post">
-          {% csrf_token %}
+          <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Create a new assignment' %}</h2>
 
           <div class='field-container'>
-            <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
-              {{ form.identifier|add_class:"mdc-text-field__input" }}
-              {{ form.identifier.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-              <div class="mdc-notched-outline">
-                <svg>
-                  <path class="mdc-notched-outline__path"/>
-                </svg>
+            <div class='number-box'><span class='number'>?</span></div>
+            <div class='field'>
+              <p><small>{{ help_text }}</small></p>
+            </div>
+          </div>
+
+          <form method="post">
+            {% csrf_token %}
+
+            <div class='field-container'>
+              <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+                {{ form.identifier|add_class:"mdc-text-field__input" }}
+                {{ form.identifier.label_tag|add_class:"mdc-floating-label"|cut:":" }}
+                <div class="mdc-notched-outline">
+                  <svg>
+                    <path class="mdc-notched-outline__path"/>
+                  </svg>
+                </div>
+                <div class="mdc-notched-outline__idle"></div>
               </div>
-              <div class="mdc-notched-outline__idle"></div>
+              <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
+                {{ form.identifier.help_text|safe }}
+              </p>
+              {{ form.identifier.errors }}
             </div>
-            <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
-              {{ form.identifier.help_text|safe }}
-            </p>
-            {{ form.identifier.errors }}
-          </div>
 
-          <div class='field-container'>
-            <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
-              {{ form.title|add_class:"mdc-text-field__input" }}
-              {{ form.title.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-              <div class="mdc-notched-outline">
-                <svg>
-                  <path class="mdc-notched-outline__path"/>
-                </svg>
+            <div class='field-container'>
+              <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+                {{ form.title|add_class:"mdc-text-field__input" }}
+                {{ form.title.label_tag|add_class:"mdc-floating-label"|cut:":" }}
+                <div class="mdc-notched-outline">
+                  <svg>
+                    <path class="mdc-notched-outline__path"/>
+                  </svg>
+                </div>
+                <div class="mdc-notched-outline__idle"></div>
               </div>
-              <div class="mdc-notched-outline__idle"></div>
+              <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
+                {{ form.title.help_text|safe }}
+              </p>
+              {{ form.title.errors }}
             </div>
-            <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
-              {{ form.title.help_text|safe }}
-            </p>
-            {{ form.title.errors }}
-          </div>
 
-          <div class='field-container'>
-            <div class='mdc-form-field id-text-field'>
-              <label for="id_text" class='p-bottom-10'> {{ form.description.label }}</label>
+            <div class='field-container'>
+              <div class='mdc-form-field id-text-field'>
+                <label for="id_text" class='p-bottom-10'> {{ form.description.label }}</label>
+              </div>
+              <div class="mdc-text-field mdc-text-field--textarea">
+                {{ form.description }}
+              </div>
+              <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent id-text-field-helper" aria-hidden="true">
+                {{ form.description.help_text|safe }}
+              </p>
+              {{ form.description.errors }}
             </div>
-            <div class="mdc-text-field mdc-text-field--textarea">
-              {{ form.description }}
-            </div>
-            <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent id-text-field-helper" aria-hidden="true">
-              {{ form.description.help_text|safe }}
-            </p>
-            {{ form.description.errors }}
-          </div>
 
-          <div class='field-container'>
-            <div class='mdc-form-field id-text-field'>
-              <label for="id_text" class='p-bottom-10'> {{ form.intro_page.label }}</label>
+            <div class='field-container'>
+              <div class='mdc-form-field id-text-field'>
+                <label for="id_text" class='p-bottom-10'> {{ form.intro_page.label }}</label>
+              </div>
+              <div class="mdc-text-field mdc-text-field--textarea">
+                {{ form.intro_page }}
+              </div>
+              <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent id-text-field-helper" aria-hidden="true">
+                {{ form.intro_page.help_text|safe }}
+              </p>
+              {{ form.intro_page.errors }}
             </div>
-            <div class="mdc-text-field mdc-text-field--textarea">
-              {{ form.intro_page }}
-            </div>
-            <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent id-text-field-helper" aria-hidden="true">
-              {{ form.intro_page.help_text|safe }}
-            </p>
-            {{ form.intro_page.errors }}
-          </div>
 
-          <div class='field-container'>
-            <div class='mdc-form-field id-text-field'>
-              <label for="id_text" class='p-bottom-10'> {{ form.conclusion_page.label }}</label>
+            <div class='field-container'>
+              <div class='mdc-form-field id-text-field'>
+                <label for="id_text" class='p-bottom-10'> {{ form.conclusion_page.label }}</label>
+              </div>
+              <div class="mdc-text-field mdc-text-field--textarea">
+                {{ form.conclusion_page }}
+              </div>
+              <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent id-text-field-helper" aria-hidden="true">
+                {{ form.conclusion_page.help_text|safe }}
+              </p>
+              {{ form.conclusion_page.errors }}
             </div>
-            <div class="mdc-text-field mdc-text-field--textarea">
-              {{ form.conclusion_page }}
-            </div>
-            <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent id-text-field-helper" aria-hidden="true">
-              {{ form.conclusion_page.help_text|safe }}
-            </p>
-            {{ form.conclusion_page.errors }}
-          </div>
 
-          <input class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Create' %}" />
-        </form>
+            <input class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Create' %}" />
+          </form>
+        </div>
       </div>
-    </div>
-  </section>
-</main>
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script nonce="{{ request.csp_nonce }}">
-  'use strict';
-  window.addEventListener("load", () => {
-    // TinyMCE bind to textarea
-    tinymce.init({
-      selector: 'textArea',
-      elementpath: false,
-      branding: false,
-      plugins: ['autolink', 'autosave', 'charmap', 'code', 'link', 'paste'],
-      menubar: false,
-      toolbar: 'undo redo | bold italic underline superscript subscript | link | charmap',
-      content_css: "{% static 'peerinst/css/tiny.min.css' %}",
-      link_assume_external_targets: true,
-      default_link_target: '_blank',
-      rel_list: [
-        {title: 'Private', value: 'noreferrer noopener nofollow'},
-      ]
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    'use strict';
+    window.addEventListener("load", () => {
+      // TinyMCE bind to textarea
+      tinymce.init({
+        selector: 'textArea',
+        elementpath: false,
+        branding: false,
+        plugins: ['autolink', 'autosave', 'charmap', 'code', 'link', 'paste'],
+        menubar: false,
+        toolbar: 'undo redo | bold italic underline superscript subscript | link | charmap',
+        content_css: "{% static 'peerinst/css/tiny.min.css' %}",
+        link_assume_external_targets: true,
+        default_link_target: '_blank',
+        rel_list: [
+          {title: 'Private', value: 'noreferrer noopener nofollow'},
+        ]
+      });
     });
-  });
-</script>
+  </script>
 {% endblock %}

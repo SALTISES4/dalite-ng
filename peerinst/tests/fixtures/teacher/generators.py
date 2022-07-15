@@ -9,8 +9,8 @@ def new_teachers(n):
         while True:
             i += 1
             yield {
-                "username": "teacher{}".format(i),
-                "email": "test{}@test.com".format(i),
+                "username": f"teacher{i}",
+                "email": f"test{i}@test.com",
                 "password": "test",
             }
 

@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
+from unittest import mock
 
-
-import mock
 import pytest
 
 from peerinst.models import AnswerAnnotation

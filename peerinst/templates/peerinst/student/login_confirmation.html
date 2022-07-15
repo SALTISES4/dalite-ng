@@ -3,49 +3,49 @@
 {% load static i18n %}
 
 {% block stylesheets %}
-<link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
+  <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
 
-<main>
-  <section id="student-login-confirmation">
+  <main>
+    <section id="student-login-confirmation">
 
-    {% if error %}
+      {% if error %}
 
-    <h1 class="mdc-typography--display3">
-      {% trans 'There was an error with your email' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+        <h1 class="mdc-typography--display3">
+          {% trans 'There was an error with your email' %}
+          <svg class="underline" width=150 height=4></svg>
+        </h1>
 
-    <p>
-      {% blocktrans %}
-      Your email doesn't seem to be associated with any group. Make sure that
-      it is correct and that you followed any signup link provided by your
-      teacher.
-      {% endblocktrans %}
-    </p>
+        <p>
+          {% blocktrans %}
+            Your email doesn't seem to be associated with any group. Make sure that
+            it is correct and that you followed any signup link provided by your
+            teacher.
+          {% endblocktrans %}
+        </p>
 
-    {% else %}
+      {% else %}
 
-    <h1 class="mdc-typography--display3">
-      {% trans 'Email sent' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+        <h1 class="mdc-typography--display3">
+          {% trans 'Email sent' %}
+          <svg class="underline" width=150 height=4></svg>
+        </h1>
 
-    <p>
-      {% blocktrans %}
-      An email has been sent with links to your assignments for
-      all groups to which you are signed up. If any assignment or group are
-      missing, make sure you registered for the group and verify with your teacher.
-      {% endblocktrans %}
-    </p>
+        <p>
+          {% blocktrans %}
+            An email has been sent with links to your assignments for
+            all groups to which you are signed up. If any assignment or group are
+            missing, make sure you registered for the group and verify with your teacher.
+          {% endblocktrans %}
+        </p>
 
-    {% endif %}
+      {% endif %}
 
-    <a href="{% url 'landing_page' %}" class="mdc-button mdc-button--raised">Ok</a>
+      <a href="{% url 'landing_page' %}" class="mdc-button mdc-button--raised">Ok</a>
 
-  </section>
-</main>
+    </section>
+  </main>
 
 {% endblock %}

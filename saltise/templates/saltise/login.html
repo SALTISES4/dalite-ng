@@ -3,70 +3,70 @@
 {% load i18n static %}
 
 {% block head_title %}
-<title>SALTISE | {% trans 'Login' %}</title>
+  <title>SALTISE | {% trans 'Login' %}</title>
 {% endblock %}
 
 {% block header %}{% endblock %}
 
 {% block content %}
-<main class="site-content" role="main">
-  <div class="container-fluid">
-    <div class="login">
-      <header>
-        <img src="{% static '/saltise/img/logo.svg' %}" alt="SALTISE">
-      </header>
+  <main class="site-content" role="main">
+    <div class="container-fluid">
+      <div class="login">
+        <header>
+          <img src="{% static '/saltise/img/logo.svg' %}" alt="SALTISE">
+        </header>
 
-      <form method="post" class="login-form">
-        {% csrf_token %}
-        <h1>{% trans 'Log in to your SALTISE account' %}</h1>
+        <form method="post" class="login-form">
+          {% csrf_token %}
+          <h1>{% trans 'Log in to your SALTISE account' %}</h1>
 
-        {% if form.errors %}
-        <p class="input-error">
-          {% trans "Your username and password didn't match or your account has not yet been activated." %}
-        </p>
-        {% endif %}
-
-        {% if next %}
-          {% if user.is_authenticated %}
-            <p>
-              {% trans "Your account doesn't have access to this page. To proceed, please login with an account that has access." %}
+          {% if form.errors %}
+            <p class="input-error">
+              {% trans "Your username and password didn't match or your account has not yet been activated." %}
             </p>
-          {% else %}
-            <p>{% trans 'Please login to access this page.' %}</p>
           {% endif %}
-        {% endif %}
 
-        <div class="input-field input-field--error">
-          {{ form.username }}
-        </div>
+          {% if next %}
+            {% if user.is_authenticated %}
+              <p>
+                {% trans "Your account doesn't have access to this page. To proceed, please login with an account that has access." %}
+              </p>
+            {% else %}
+              <p>{% trans 'Please login to access this page.' %}</p>
+            {% endif %}
+          {% endif %}
 
-        <div class="input-field">
-          {{ form.password }}
-          <p class="input-helper">
-            <a href="{% url 'password_reset' %}">Forgot your password?</a>
-          </p>
-        </div>
-        <input type="hidden" name="next" value="{{ next }}"/>
-        <button id="submit-btn" type="submit" class="btn btn--full">{% trans 'Log in' %}</button>
+          <div class="input-field input-field--error">
+            {{ form.username }}
+          </div>
 
-        <p class="login__no-account">
+          <div class="input-field">
+            {{ form.password }}
+            <p class="input-helper">
+              <a href="{% url 'password_reset' %}">Forgot your password?</a>
+            </p>
+          </div>
+          <input type="hidden" name="next" value="{{ next }}"/>
+          <button id="submit-btn" type="submit" class="btn btn--full">{% trans 'Log in' %}</button>
+
+          <p class="login__no-account">
             {% trans "Don't have an account?" %} <a href="{% url 'sign_up' %}">{% trans 'Sign up' %}</a>
-        </p>
-      </form>
+          </p>
+        </form>
+      </div>
     </div>
-  </div>
-</main>
+  </main>
 {% endblock %}
 
 {% block scripts %}
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-    document.getElementById("submit-btn").addEventListener("click", function() {
-      this.form.submit();
-      if (this.form.reportValidity()) {
-        this.disabled=true;
-      }
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      document.getElementById("submit-btn").addEventListener("click", function() {
+        this.form.submit();
+        if (this.form.reportValidity()) {
+          this.disabled=true;
+        }
+      })
     })
-  })
-</script>
+  </script>
 {% endblock %}

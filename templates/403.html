@@ -3,16 +3,16 @@
 {% load i18n %}
 
 {% block body %}
-<h1>403 Forbidden</h1>
+  <h1>403 Forbidden</h1>
 
-<p>
-  {% trans 'You do not have permission to perform that action.' %}
-</p>
+  <p>
+    {% trans 'You do not have permission to perform that action.' %}
+  </p>
 
-<p>
-  {% trans 'You may need to refresh your session by logging in again: ' %}<a href="{% url 'logout' %}">{% trans 'Go to login' %}</a>
-</p>
+  <p>
+    {% trans 'You may need to refresh your session by logging in again: ' %}<a href="{% url 'logout' %}">{% trans 'Go to login' %}</a>
+  </p>
 
-<i class="corner-icon material-icons">block</i>
+  <i class="corner-icon material-icons">block</i>
 
 {% endblock %}

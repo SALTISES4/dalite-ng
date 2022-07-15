@@ -17,7 +17,7 @@ def celery_config():
 
 
 def celery_config(redis_proc):
-    redis_server = "redis://localhost:{}/0".format(redis_proc.port)
+    redis_server = f"redis://localhost:{redis_proc.port}/0"
     setattr(settings, "CELERY_BROKER_URL", redis_server)
     setattr(settings, "CELERY_RESULT_BACKEND", redis_server)
     return {"broker_url": redis_server, "result_backend": redis_server}

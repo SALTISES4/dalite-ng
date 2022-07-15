@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -95,10 +92,10 @@ class NegWordsCriterionRules(CriterionRules):
     )
 
     def __str__(self):
-        return "Rules {} for criterion neg_words".format(self.pk)
+        return f"Rules {self.pk} for criterion neg_words"
 
     @staticmethod
-    def get_or_create(threshold=1, neg_words=[]):
+    def get_or_create(threshold=1, neg_words=None):
         """
         Creates or get the criterion rules.
 
@@ -119,6 +116,8 @@ class NegWordsCriterionRules(CriterionRules):
         ValueError
             If the arguments have invalid values
         """
+        if neg_words is None:
+            neg_words = []
         if threshold < 0 or threshold > 1:
             raise ValueError("The threshold must be between 0 and 1")
         if not isinstance(neg_words, list):

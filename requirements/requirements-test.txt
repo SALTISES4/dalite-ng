@@ -8,8 +8,6 @@
 
 -e git+https://github.com/SALTISES4/django-lti-tool-provider@dev#egg=django_lti_tool_provider
     # via -r requirements/requirements-base.txt
--e git+https://github.com/edx/opaque-keys#egg=edx_opaque_keys
-    # via -r requirements/requirements-base.txt
 -e git+https://github.com/SALTISES4/pinax-forums@dev#egg=pinax_forums
     # via -r requirements/requirements-base.txt
 aioredis==1.3.1
@@ -26,6 +24,7 @@ asgiref==3.2.10
     #   channels
     #   channels-redis
     #   daphne
+    #   saltise-course-flow
 async-timeout==3.0.1
     # via
     #   -r requirements/requirements-base.txt
@@ -89,8 +88,11 @@ channels==3.0.3
     # via
     #   -r requirements/requirements-base.txt
     #   channels-redis
+    #   saltise-course-flow
 channels-redis==3.2.0
-    # via -r requirements/requirements-base.txt
+    # via
+    #   -r requirements/requirements-base.txt
+    #   saltise-course-flow
 charset-normalizer==2.0.12
     # via
     #   -r requirements/requirements-base.txt
@@ -148,7 +150,7 @@ daphne==3.0.1
     #   channels
 ddt==1.2.2
     # via -r requirements/requirements-test.in
-django==2.2.27
+django==2.2.28
     # via
     #   -r requirements/requirements-base.txt
     #   channels
@@ -164,6 +166,7 @@ django==2.2.27
     #   django-lti-tool-provider
     #   django-model-utils
     #   django-permissions-policy
+    #   django-redis
     #   django-referrer-policy
     #   django-timezone-field
     #   djangorestframework
@@ -191,7 +194,7 @@ django-compressor==2.4
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
-django-cookie-law==2.0.3
+django-cookie-law==2.2.0
     # via -r requirements/requirements-base.txt
 django-csp==3.6
     # via
@@ -217,6 +220,10 @@ django-model-utils==4.1.1
     #   saltise-course-flow
 django-permissions-policy==4.1.0
     # via -r requirements/requirements-base.txt
+django-redis==5.2.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   saltise-course-flow
 django-referrer-policy==1.0
     # via -r requirements/requirements-base.txt
 django-samesite-none==0.0.2
@@ -234,6 +241,8 @@ editdistance==0.5.3
     # via
     #   -r requirements/requirements-base.txt
     #   contextualspellcheck
+edx-opaque-keys==2.3.0
+    # via -r requirements/requirements-base.txt
 elasticsearch==7.13.1
     # via
     #   -r requirements/requirements-base.txt
@@ -347,7 +356,7 @@ murmurhash==1.0.5
     #   thinc
 mysqlclient==1.4.6
     # via -r requirements/requirements-base.txt
-numpy==1.22.3
+numpy==1.22.4
     # via
     #   -r requirements/requirements-base.txt
     #   blis
@@ -385,7 +394,9 @@ pbr==5.4.4
     # via
     #   -r requirements/requirements-base.txt
     #   stevedore
-pillow==9.1.0
+pillow==9.1.1
+    # via -r requirements/requirements-base.txt
+pip-lock==2.9.0
     # via -r requirements/requirements-base.txt
 pluggy==0.13.1
     # via pytest
@@ -418,7 +429,7 @@ pydantic==1.8.2
     #   -r requirements/requirements-base.txt
     #   spacy
     #   thinc
-pyjwt==1.7.1
+pyjwt==2.4.0
     # via -r requirements/requirements-base.txt
 pymongo==3.10.1
     # via
@@ -447,10 +458,6 @@ pytest-cov==2.8.1
     # via -r requirements/requirements-test.in
 pytest-django==3.8.0
     # via -r requirements/requirements-test.in
-pytest-runner==5.2
-    # via
-    #   -r requirements/requirements-base.txt
-    #   django-cookie-law
 python-crontab==2.4.0
     # via
     #   -r requirements/requirements-base.txt
@@ -485,12 +492,13 @@ redis==3.4.1
     # via
     #   -r requirements/requirements-base.txt
     #   celery
+    #   django-redis
 regex==2021.7.6
     # via
     #   -r requirements/requirements-base.txt
     #   sacremoses
     #   transformers
-requests==2.27.1
+requests==2.28.0
     # via
     #   -r requirements/requirements-base.txt
     #   huggingface-hub
@@ -509,9 +517,9 @@ sacremoses==0.0.45
     # via
     #   -r requirements/requirements-base.txt
     #   transformers
-saltise-course-flow==0.6.6
+saltise-course-flow==0.7.3
     # via -r requirements/requirements-base.txt
-saltise-user-feedback==0.1.2
+saltise-user-feedback==1.1.1
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
@@ -646,6 +654,10 @@ webencodings==0.5.1
     #   -r requirements/requirements-base.txt
     #   bleach
     #   html5lib
+xlrd==2.0.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   saltise-course-flow
 zope-interface==5.1.0
     # via
     #   -r requirements/requirements-base.txt

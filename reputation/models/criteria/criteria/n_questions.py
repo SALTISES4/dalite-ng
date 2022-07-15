@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models
 
 from reputation.logger import logger
@@ -43,15 +40,13 @@ class NQuestionsCriterion(Criterion):
         TypeError
             If `teacher` isn't of type Teacher
         """
-        super(NQuestionsCriterion, self).evaluate(teacher)
+        super().evaluate(teacher)
         if teacher.__class__.__name__ != "Teacher":
             msg = "`teacher` has to be of type Teacher."
-            logger.error("TypeError: {}".format(msg))
+            logger.error(f"TypeError: {msg}")
             raise TypeError(msg)
 
         return teacher.user.question_set.count(), {}
 
     def info(self):
-        return super(NQuestionsCriterion, self).info(
-            NQuestionsCriterion.general_info()
-        )
+        return super().info(NQuestionsCriterion.general_info())

@@ -50,14 +50,14 @@ class BlinkAssignmentTestCase(TestCase):
 
     def test_move_down_rank(self):
         print("Move down")
-        print((self.blinkassignment.blinkassignmentquestion_set.all()))
+        print(self.blinkassignment.blinkassignmentquestion_set.all())
         this_q = self.blinkassignment.blinkassignmentquestion_set.get(rank=0)
         this_q_rank = this_q.rank
         print(this_q)
-        print((this_q.rank))
+        print(this_q.rank)
         this_q.move_down_rank()
         this_q.save()
-        print((self.blinkassignment.blinkassignmentquestion_set.all()))
+        print(self.blinkassignment.blinkassignmentquestion_set.all())
 
         self.assertEqual(
             self.blinkassignment.blinkassignmentquestion_set.get(
@@ -68,15 +68,15 @@ class BlinkAssignmentTestCase(TestCase):
 
     def test_move_up_rank(self):
         print("Move up")
-        print((self.blinkassignment.blinkassignmentquestion_set.all()))
+        print(self.blinkassignment.blinkassignmentquestion_set.all())
         this_q = self.blinkassignment.blinkassignmentquestion_set.get(rank=2)
         this_q_rank = this_q.rank
         print(this_q)
-        print((this_q.rank))
+        print(this_q.rank)
         this_q.move_up_rank()
-        print((this_q.rank))
+        print(this_q.rank)
         this_q.save()
-        print((self.blinkassignment.blinkassignmentquestion_set.all()))
+        print(self.blinkassignment.blinkassignmentquestion_set.all())
 
         self.assertEqual(
             self.blinkassignment.blinkassignmentquestion_set.get(

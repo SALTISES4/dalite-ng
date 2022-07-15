@@ -5,9 +5,9 @@
 {% block stylesheets %}
   {{ block.super }}
   {% if user.student %}
-  {% compress css %}
-  <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
-  {% endcompress %}
+    {% compress css %}
+      <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
+    {% endcompress %}
   {% endif %}
 {% endblock %}
 
@@ -22,7 +22,7 @@
 
       <p>
         {% blocktrans %}
-        You must agree to share created content in the Terms of Service (accessible from your account) in order to access this page.
+          You must agree to share created content in the Terms of Service (accessible from your account) in order to access this page.
         {% endblocktrans %}
       </p>
     </section>
@@ -33,16 +33,16 @@
   {{ block.super }}
 
   {% if user.student %}
-  {% compress js %}
-  <script src="{% static 'peerinst/js/student.min.js' %}"></script>
-  {% endcompress %}
+    {% compress js %}
+      <script src="{% static 'peerinst/js/student.min.js' %}"></script>
+    {% endcompress %}
 
-  <script nonce="{{ request.csp_nonce }}">
-    window.addEventListener("load", function() {
-      student.initStudentHeader(
-        "{% url 'student-get-notifications' %}"
-      )
-    });
-  </script>
+    <script nonce="{{ request.csp_nonce }}">
+      window.addEventListener("load", function() {
+        student.initStudentHeader(
+          "{% url 'student-get-notifications' %}"
+        )
+      });
+    </script>
   {% endif %}
 {% endblock %}

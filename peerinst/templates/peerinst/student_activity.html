@@ -3,57 +3,57 @@
 {% load i18n %}
 
 {% block body %}
-<main>
-  <section>
-    <h1 class="mdc-typography--display3">{% trans 'Student Activity' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Student Activity' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="admin-link">
-      <a href="{% url 'teacher' user.teacher.id %}">{% trans 'Back to My Account' %}</a>
-    </div>
+      <div class="admin-link">
+        <a href="{% url 'teacher' user.teacher.id %}">{% trans 'Back to My Account' %}</a>
+      </div>
 
-    {% for group, dataset in data.items %}
-      {% for assignment, answers in dataset.items %}
-        {% if answers.answers|length > 0 %}
-        <h3 class="mdc-typography--headline mdc-theme--secondary">
-          {{ group.title }}
-          <i class="material-icons">keyboard_arrow_right</i>
-          {% if assignment.assignment %}
-          <a href="{% url 'group-assignment' assignment.hash %}">{{ assignment.assignment }}</a>
-          {% else %}
-          {{ assignment }}
+      {% for group, dataset in data.items %}
+        {% for assignment, answers in dataset.items %}
+          {% if answers.answers|length > 0 %}
+            <h3 class="mdc-typography--headline mdc-theme--secondary">
+              {{ group.title }}
+              <i class="material-icons">keyboard_arrow_right</i>
+              {% if assignment.assignment %}
+                <a href="{% url 'group-assignment' assignment.hash %}">{{ assignment.assignment }}</a>
+              {% else %}
+                {{ assignment }}
+              {% endif %}
+            </h3>
+
+            <ul class='pt9'>
+              <li>Answers submitted: {{ answers.answers|length }}</li>
+              <li>New answers since last login: {{ answers.new|length }} </li>
+              <li>Percent complete: {{ answers.percent_complete }}%</li>
+            </ul>
+
+            <svg class="progress-chart" group="{{group.name}}" assignment="{% if assignment.assignment %}{{assignment.assignment}}{% else %}{{ assignment }}{% endif %}" width=600 height=70></svg>
+
           {% endif %}
-        </h3>
-
-        <ul class='pt9'>
-          <li>Answers submitted: {{ answers.answers|length }}</li>
-          <li>New answers since last login: {{ answers.new|length }} </li>
-          <li>Percent complete: {{ answers.percent_complete }}%</li>
-        </ul>
-
-        <svg class="progress-chart" group="{{group.name}}" assignment="{% if assignment.assignment %}{{assignment.assignment}}{% else %}{{ assignment }}{% endif %}" width=600 height=70></svg>
-
-        {% endif %}
+        {% endfor %}
       {% endfor %}
-    {% endfor %}
 
-  </section>
-</main>
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script nonce="{{ request.csp_nonce }}">
-let data = {{ json|safe }};
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    let data = {{ json|safe }};
 
-function draw() {
-  $('.progress-chart').each(function() {
-    let dataset = data[$(this).attr('group')][$(this).attr('assignment')];
-    bundle.plotTimeSeries(this, dataset);
-  });
-}
-draw();
-window.addEventListener('resize', draw);
-</script>
+    function draw() {
+      $('.progress-chart').each(function() {
+        let dataset = data[$(this).attr('group')][$(this).attr('assignment')];
+        bundle.plotTimeSeries(this, dataset);
+      });
+    }
+    draw();
+    window.addEventListener('resize', draw);
+  </script>
 {% endblock %}

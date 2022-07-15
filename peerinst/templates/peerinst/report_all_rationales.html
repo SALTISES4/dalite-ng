@@ -3,355 +3,355 @@
 {% load i18n get_value %}
 
 {% block stylesheets %}
-{{ block.super }}
-<!--
+  {{ block.super }}
+  <!--
 DataTables
 https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
--->
-<link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/dataTables.jqueryui.min.css">
-<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.5.2/css/buttons.jqueryui.min.css">
+  -->
+  <link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/dataTables.jqueryui.min.css">
+  <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.5.2/css/buttons.jqueryui.min.css">
 
-<style nonce="{{ request.csp_nonce }}">
-  .dataTables_wrapper {
-    font-size: smaller;
-  }
-  .dt-button {
-    font-family: inherit;
-  }
-  .small {
-    font-size: smaller;
-  }
-  ul {
-    padding-left:0px;
-  }
-</style>
+  <style nonce="{{ request.csp_nonce }}">
+    .dataTables_wrapper {
+      font-size: smaller;
+    }
+    .dt-button {
+      font-family: inherit;
+    }
+    .small {
+      font-size: smaller;
+    }
+    ul {
+      padding-left:0px;
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
-<main>
-  <section>
-    <h1 class="mdc-typography--display3">{% trans 'Report' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Report' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="admin-link">
-      <a href="{% url 'teacher' pk=teacher.pk %}">{% trans 'Back to My Account' %}</a>
-      <span class="admin-link--padded">|</span><a href="{% url 'report_selector' %}">{% trans 'Back to Custom Reports' %}</a>
-    </div>
+      <div class="admin-link">
+        <a href="{% url 'teacher' pk=teacher.pk %}">{% trans 'Back to My Account' %}</a>
+        <span class="admin-link--padded">|</span><a href="{% url 'report_selector' %}">{% trans 'Back to Custom Reports' %}</a>
+      </div>
 
-    <h2 id='question_gradebook' class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Question-level gradebook' %}</h2>
+      <h2 id='question_gradebook' class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Question-level gradebook' %}</h2>
 
-    <table id='question_gradebook_table' class="display">
+      <table id='question_gradebook_table' class="display">
         <thead>
           <tr>
             <th>Question</th>
             {% for label in gradebook_keys %}
-            <th>{{ label }}</th>
+              <th>{{ label }}</th>
             {% endfor %}
           </tr>
         </thead>
         <tbody>
-      {% for question in gradebook_question %}
-      <tr>
-        <th class="mdc-ripple-surface"><a href="#{{question.question.title}}">{{question.question.title}}</a></th>
-        {% for label in gradebook_keys %}
-        <td>{{ question|get_value:label }}</td>
-        {% endfor %}
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-
-    <h2 id="student_gradebook" class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Student-level gradebook' %}</h2>
-
-    <table id='student_gradebook_table' class='display'>
-      <thead>
-        <tr>
-          <th>{% trans 'Student' %}</th>
-          {% for label in gradebook_keys %}
-          <th>{{ label }}</th>
+          {% for question in gradebook_question %}
+            <tr>
+              <th class="mdc-ripple-surface"><a href="#{{question.question.title}}">{{question.question.title}}</a></th>
+              {% for label in gradebook_keys %}
+                <td>{{ question|get_value:label }}</td>
+              {% endfor %}
+            </tr>
           {% endfor %}
-          {% for question in question_list %}
-          <th> {{ question|safe }} </th>
-          {% endfor %}
-        </tr>
-      </thead>
-      <tbody>
-        {% for student in gradebook_student %}
-        <tr>
-          <th id="{{ student.student }}">{{student.student}}</th>
-          <td>{{student.N}}</td>
-          <td>{{student.RR}}</td>
-          <td>{{student.RW}}</td>
-          <td>{{student.WR}}</td>
-          <td>{{student.WW}}</td>
-          {% for question in question_list %}
-          {% if student|get_value:question != '-' %}
-          <td class="mdc-ripple-surface"><a href="#{{ student.student }}{{ question|safe }}">{{ student|get_value:question }}</a></td>
-          {% else %}
-          <td>{{ student|get_value:question }}</td>
-          {% endif %}
-          {% endfor %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
 
-    {% for assignment in data %}
-    <h2 class="mdc-typography--display1 mdc-theme--secondary">Assignment {{ forloop.counter }}: {{ assignment.assignment }}</h2>
+      <h2 id="student_gradebook" class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Student-level gradebook' %}</h2>
 
-    <h4 class="mdc-typography--title bold">{% trans 'Overall Student Transitions' %}</h4>
-    <ul>
-    {% for transition in assignment.transitions %}
-      <li>{{ transition.transition_type }}: {{ transition.count }}</li>
-    {% endfor %}
-    </ul>
+      <table id='student_gradebook_table' class='display'>
+        <thead>
+          <tr>
+            <th>{% trans 'Student' %}</th>
+            {% for label in gradebook_keys %}
+              <th>{{ label }}</th>
+            {% endfor %}
+            {% for question in question_list %}
+              <th> {{ question|safe }} </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in gradebook_student %}
+            <tr>
+              <th id="{{ student.student }}">{{student.student}}</th>
+              <td>{{student.N}}</td>
+              <td>{{student.RR}}</td>
+              <td>{{student.RW}}</td>
+              <td>{{student.WR}}</td>
+              <td>{{student.WW}}</td>
+              {% for question in question_list %}
+                {% if student|get_value:question != '-' %}
+                  <td class="mdc-ripple-surface"><a href="#{{ student.student }}{{ question|safe }}">{{ student|get_value:question }}</a></td>
+                {% else %}
+                  <td>{{ student|get_value:question }}</td>
+                {% endif %}
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% for assignment in data %}
+        <h2 class="mdc-typography--display1 mdc-theme--secondary">Assignment {{ forloop.counter }}: {{ assignment.assignment }}</h2>
+
+        <h4 class="mdc-typography--title bold">{% trans 'Overall Student Transitions' %}</h4>
+        <ul>
+          {% for transition in assignment.transitions %}
+            <li>{{ transition.transition_type }}: {{ transition.count }}</li>
+          {% endfor %}
+        </ul>
 
         {% for question in assignment.questions %}
-            <h4 id="{{ question.title }}" class="mdc-typography--title bold">{% trans 'Question' %}: {{ question.title|safe }}</h4>
-            <div class="admin-link">
-                <a href="#question_gradebook">{% trans 'Back to top' %}</a>
+          <h4 id="{{ question.title }}" class="mdc-typography--title bold">{% trans 'Question' %}: {{ question.title|safe }}</h4>
+          <div class="admin-link">
+            <a href="#question_gradebook">{% trans 'Back to top' %}</a>
+          </div>
+
+          <div class="mdc-card">
+            <div class="mdc-typography--body1">
+              {{question.text|safe}}
             </div>
 
-            <div class="mdc-card">
-              <div class="mdc-typography--body1">
-                {{question.text|safe}}
-              </div>
-
-              {% if question.question_image %}
+            {% if question.question_image %}
               <img class="question-image" src="{{ question.question_image.url }}">
-              {% endif %}
+            {% endif %}
 
-              <div class="question-answers">
-                <ol type='A'>
-                  {% for choice in question.answer_choices %}
+            <div class="question-answers">
+              <ol type='A'>
+                {% for choice in question.answer_choices %}
                   <li class="mdc-typography--body1">{{ choice|safe }}</li>
-                  {% endfor %}
-                <ol>
-              </div>
+                {% endfor %}
+              </ol>
             </div>
+          </div>
 
-            <h4>{% trans 'Statistics' %}</h4>
-            <h5>{% trans 'Historical performance (all students in database)' %}</h5>
-            <div id="analytics-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" class="width-auto">
-              <svg id="first-frequency-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" class="vertical-align"></svg>
-              <svg id="matrix-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="60" height="60" class="vertical-align"></svg>
-              <svg id="second-frequency-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" class="vertical-align"></svg>
-            </div>
+          <h4>{% trans 'Statistics' %}</h4>
+          <h5>{% trans 'Historical performance (all students in database)' %}</h5>
+          <div id="analytics-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" class="width-auto">
+            <svg id="first-frequency-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" class="vertical-align"></svg>
+            <svg id="matrix-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="60" height="60" class="vertical-align"></svg>
+            <svg id="second-frequency-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" class="vertical-align"></svg>
+          </div>
 
 
-            <h5>{% trans 'Performance of this group ' %}({{ question.num_responses}} {% trans 'students' %})</h5>
-            <div id="analytics-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" class="width-auto">
-              <svg id="first-frequency-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" class="vertical-align"></svg>
-              <svg id="matrix-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="60" height="60" class="vertical-align"></svg>
-              <svg id="second-frequency-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" class="vertical-align"></svg>
-            </div>
+          <h5>{% trans 'Performance of this group ' %}({{ question.num_responses}} {% trans 'students' %})</h5>
+          <div id="analytics-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" class="width-auto">
+            <svg id="first-frequency-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" class="vertical-align"></svg>
+            <svg id="matrix-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="60" height="60" class="vertical-align"></svg>
+            <svg id="second-frequency-group-{{ assignment.assignment|slugify }}-{{ question.answer_choices.first.question.pk }}" width="300" height="80" class="vertical-align"></svg>
+          </div>
 
-              {% for distribution in question.answer_distributions %}
-              <div class="analytics-div">
+          {% for distribution in question.answer_distributions %}
+            <div class="analytics-div">
               <h5>{{ distribution.label }}</h5>
-                  <ul>
-                  {% for answer_choice in distribution.data %}
-                      <li> {{ answer_choice.count }} : {{ answer_choice.answer_choice }}
-                          {% if answer_choice.answer_choice_correct %}
-                          <em>({% trans "Correct" %})</em>
-                          {% endif %}
-                      </li>
-                  {% endfor %}
-                  </ul>
-              </div>
-              {% endfor %}
+              <ul>
+                {% for answer_choice in distribution.data %}
+                  <li> {{ answer_choice.count }} : {{ answer_choice.answer_choice }}
+                    {% if answer_choice.answer_choice_correct %}
+                      <em>({% trans "Correct" %})</em>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endfor %}
 
-              <div class="analytics-div">
-              {% for transition in question.transitions %}
+          <div class="analytics-div">
+            {% for transition in question.transitions %}
               <h5>{% trans "Overall Transitions" %}</h5>
-                  <ul>
-                  {% for answer_choice in transition.data %}
-                      <li> {{ answer_choice.count }} : {{ answer_choice.transition_type }}</li>
-                  {% endfor %}
-                  </ul>
-              {% endfor %}
-              </div>
+              <ul>
+                {% for answer_choice in transition.data %}
+                  <li> {{ answer_choice.count }} : {{ answer_choice.transition_type }}</li>
+                {% endfor %}
+              </ul>
+            {% endfor %}
+          </div>
 
-              {% if question.confusion_matrix %}
-              <div class="analytics-div">
-                <h5>{% trans "Confusion Matrix" %}</h5>
-                <table>
-                    {% for first_ans in question.confusion_matrix %}
-                    <tr>
-                        {% for second_ans in first_ans.second_answer_choice %}
-                        <td>{{second_ans.N}}</td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </table>
-              </div>
-              {% endif %}
-
-              <h4>{% trans "Student Responses" %}</h4>
-              <div class="admin-link">
-                <a href="#student_gradebook">{% trans "Back to top" %}</a>
-              </div>
-
-              <table id="student_responses_table" class="display">
-                  <thead>
+          {% if question.confusion_matrix %}
+            <div class="analytics-div">
+              <h5>{% trans "Confusion Matrix" %}</h5>
+              <table>
+                {% for first_ans in question.confusion_matrix %}
                   <tr>
-                      <th>{% trans "Student" %}</th>
-
-                      {% if group_school_id_needed %}
-                        <th>{% trans "Student ID" %}</th>
-                      {% endif %}
-
-                      {% if question.type == "PI" %}
-                        <th>{% trans "1st Ans" %}</th>
-                      {% endif %}
-
-                      <th>{% trans "Rationale" %} </th>
-
-                      {% if question.sequential_review %}
-                        <th>{% trans "Up" %}</th>
-                        <th>{% trans "Down" %}</th>
-                      {% endif %}
-
-
-                      {% if question.type == "PI" %}
-                        <th>{% trans "2nd Ans" %}</th>
-                        <th>{% trans "Chosen Rationale" %}</th>
-                      {% endif %}
-                      <th>{% trans "Submitted" %}</th>
-                      <th>{% trans "Evaluate" %}</th>
-                      <!--<th>{% trans "Feedback" %}</th>-->
+                    {% for second_ans in first_ans.second_answer_choice %}
+                      <td>{{second_ans.N}}</td>
+                    {% endfor %}
                   </tr>
-                  </thead>
-                  <tbody>
-                  {% for student_response in question.student_responses %}
-
-                  <tr class="custom-report__rationale"
-                      data-id="{{ student_response.id }}"
-                      data-score="{{ student_response.score }}">
-                      <th id="{{student_response.student}}{{ question.title|safe }}" class="mdc-ripple-surface">
-                          <a href="#{{ student_response.student }}">{{ student_response.student }}</a></th>
-
-                      {% if group_school_id_needed %}
-                        <td>{{ student_response.student_id }}</td>
-                      {% endif %}
-
-                      {% if question.type == "PI" %}
-                        <td>{{ student_response.first_answer_choice }}</td>
-                      {% endif %}
-
-                      <td>{{ student_response.rationale }}</td>
-
-                      {% if question.sequential_review %}
-                        <th>{{ student_response.upvotes }}</th>
-                        <th>{{ student_response.downvotes }}</th>
-                      {% endif %}
-
-                      {% if question.type == "PI" %}
-                        <td>{{ student_response.second_answer_choice }}</td>
-                        <td>{{ student_response.chosen_rationale }}</td>
-                      {% endif %}
-
-                      <td>{{ student_response.submitted }}</td>
-                      <td class="custom-report__rationale__evaluation">
-                        <i
-                          class="mdc-icon-toggle material-icons mdc-theme--primary star"
-                          role="button"
-                          aria-pressed="false"
-                          aria-label="{% trans 'Score' %}"
-                          tabindex="0"
-                          title="{% trans 'This rationale should be shown OFTEN to students' %}">
-                            star_border
-                        </i>
-                        <i
-                          class="mdc-icon-toggle material-icons mdc-theme--primary star"
-                          role="button"
-                          aria-pressed="false"
-                          aria-label="{% trans 'Score' %}"
-                          tabindex="0"
-                          title="{% trans 'This rationale could be shown SOMETIMES to students' %}">
-                            star_border
-                        </i>
-                        <i
-                          class="mdc-icon-toggle material-icons mdc-theme--primary star"
-                          role="button"
-                          aria-pressed="false"
-                          aria-label="{% trans 'Score' %}"
-                          tabindex="0"
-                          title="{% trans 'This rationale should RARELY be shown to students' %}">
-                            star_border
-                        </i>
-                        <i
-                          class="mdc-icon-toggle material-icons mdc-theme--primary flag"
-                          role="button"
-                          aria-pressed="false"
-                          aria-label="{% trans 'Flag' %}"
-                          tabindex="0"
-                          title="{% trans 'This rationale should NEVER be shown to students' %}">
-                            outlined_flag
-                        </i>
-                      </td>
-                      <!--<td class="custom-report__rationale__feedback"></td>-->
-                  </tr>
-
-                  {% endfor %}
-                  </tbody>
+                {% endfor %}
               </table>
+            </div>
+          {% endif %}
+
+          <h4>{% trans "Student Responses" %}</h4>
+          <div class="admin-link">
+            <a href="#student_gradebook">{% trans "Back to top" %}</a>
+          </div>
+
+          <table id="student_responses_table" class="display">
+            <thead>
+              <tr>
+                <th>{% trans "Student" %}</th>
+
+                {% if group_school_id_needed %}
+                  <th>{% trans "Student ID" %}</th>
+                {% endif %}
+
+                {% if question.type == "PI" %}
+                  <th>{% trans "1st Ans" %}</th>
+                {% endif %}
+
+                <th>{% trans "Rationale" %} </th>
+
+                {% if question.sequential_review %}
+                  <th>{% trans "Up" %}</th>
+                  <th>{% trans "Down" %}</th>
+                {% endif %}
+
+
+                {% if question.type == "PI" %}
+                  <th>{% trans "2nd Ans" %}</th>
+                  <th>{% trans "Chosen Rationale" %}</th>
+                {% endif %}
+                <th>{% trans "Submitted" %}</th>
+                <th>{% trans "Evaluate" %}</th>
+                <!--<th>{% trans "Feedback" %}</th>-->
+              </tr>
+            </thead>
+            <tbody>
+              {% for student_response in question.student_responses %}
+
+                <tr class="custom-report__rationale"
+                  data-id="{{ student_response.id }}"
+                  data-score="{{ student_response.score }}">
+                  <th id="{{student_response.student}}{{ question.title|safe }}" class="mdc-ripple-surface">
+                    <a href="#{{ student_response.student }}">{{ student_response.student }}</a></th>
+
+                  {% if group_school_id_needed %}
+                    <td>{{ student_response.student_id }}</td>
+                  {% endif %}
+
+                  {% if question.type == "PI" %}
+                    <td>{{ student_response.first_answer_choice }}</td>
+                  {% endif %}
+
+                  <td>{{ student_response.rationale }}</td>
+
+                  {% if question.sequential_review %}
+                    <th>{{ student_response.upvotes }}</th>
+                    <th>{{ student_response.downvotes }}</th>
+                  {% endif %}
+
+                  {% if question.type == "PI" %}
+                    <td>{{ student_response.second_answer_choice }}</td>
+                    <td>{{ student_response.chosen_rationale }}</td>
+                  {% endif %}
+
+                  <td>{{ student_response.submitted }}</td>
+                  <td class="custom-report__rationale__evaluation">
+                    <i
+                      class="mdc-icon-toggle material-icons mdc-theme--primary star"
+                      role="button"
+                      aria-pressed="false"
+                      aria-label="{% trans 'Score' %}"
+                      tabindex="0"
+                      title="{% trans 'This rationale should be shown OFTEN to students' %}">
+                      star_border
+                    </i>
+                    <i
+                      class="mdc-icon-toggle material-icons mdc-theme--primary star"
+                      role="button"
+                      aria-pressed="false"
+                      aria-label="{% trans 'Score' %}"
+                      tabindex="0"
+                      title="{% trans 'This rationale could be shown SOMETIMES to students' %}">
+                      star_border
+                    </i>
+                    <i
+                      class="mdc-icon-toggle material-icons mdc-theme--primary star"
+                      role="button"
+                      aria-pressed="false"
+                      aria-label="{% trans 'Score' %}"
+                      tabindex="0"
+                      title="{% trans 'This rationale should RARELY be shown to students' %}">
+                      star_border
+                    </i>
+                    <i
+                      class="mdc-icon-toggle material-icons mdc-theme--primary flag"
+                      role="button"
+                      aria-pressed="false"
+                      aria-label="{% trans 'Flag' %}"
+                      tabindex="0"
+                      title="{% trans 'This rationale should NEVER be shown to students' %}">
+                      outlined_flag
+                    </i>
+                  </td>
+                  <!--<td class="custom-report__rationale__feedback"></td>-->
+                </tr>
+
+              {% endfor %}
+            </tbody>
+          </table>
         {% endfor %}
-    {% endfor %}
-  </section>
-</main>
+      {% endfor %}
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/dataTables.jqueryui.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.jqueryui.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+  {{ block.super }}
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/dataTables.jqueryui.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.jqueryui.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
 
-<script nonce="{{ request.csp_nonce }}">
-$(document).ready( function () {
-  $('table.display').each(function() {
-    var table = $(this).DataTable({
-      pageLength: 20,
-      dom: '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"Bf>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"ip>',
-      buttons: ['csv', 'colvis']
+  <script nonce="{{ request.csp_nonce }}">
+    $(document).ready( function () {
+      $('table.display').each(function() {
+        var table = $(this).DataTable({
+          pageLength: 20,
+          dom: '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"Bf>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"ip>',
+          buttons: ['csv', 'colvis']
+        });
+      });
     });
-  });
-});
 
-var id;
-{% for assignment in data %}
-{% for obj in assignment.questions %}
-id = "{{ assignment.assignment|slugify }}-{{ obj.answer_choices.first.question.pk }}";
+    var id;
+    {% for assignment in data %}
+      {% for obj in assignment.questions %}
+        id = "{{ assignment.assignment|slugify }}-{{ obj.answer_choices.first.question.pk }}";
 
-{% if obj.answer_choices %}
-bundle.plot({{ obj.answer_choices.first.question.get_matrix|safe }},{{ obj.answer_choices.first.question.get_frequency|safe|striptags }}, id);
-bundle.selectAll("#first_choice-"+id).transition().duration(1000).attr("x",function(d){return bundle.select(this).attr("finalx");}).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
-bundle.selectAll("#second_choice-"+id).transition().delay(1000).duration(1000).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
+        {% if obj.answer_choices %}
+          bundle.plot({{ obj.answer_choices.first.question.get_matrix|safe }},{{ obj.answer_choices.first.question.get_frequency|safe|striptags }}, id);
+          bundle.selectAll("#first_choice-"+id).transition().duration(1000).attr("x",function(d){return bundle.select(this).attr("finalx");}).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
+          bundle.selectAll("#second_choice-"+id).transition().delay(1000).duration(1000).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
 
-bundle.plot({{ obj.matrix|safe }},{{ obj.choices|safe }}, "group-"+id);
-bundle.selectAll("#first_choice-group-"+id).transition().duration(1000).attr("x",function(d){return bundle.select(this).attr("finalx");}).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
-bundle.selectAll("#second_choice-group-"+id).transition().delay(1000).duration(1000).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
-{% endif %}
+          bundle.plot({{ obj.matrix|safe }},{{ obj.choices|safe }}, "group-"+id);
+          bundle.selectAll("#first_choice-group-"+id).transition().duration(1000).attr("x",function(d){return bundle.select(this).attr("finalx");}).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
+          bundle.selectAll("#second_choice-group-"+id).transition().delay(1000).duration(1000).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
+        {% endif %}
 
-{% endfor %}
-{% endfor %}
+      {% endfor %}
+    {% endfor %}
 
-</script>
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-  teacher.initCustomReport(
-    {
-      evaluateRationale: "{% url 'teacher-dashboard--evaluate-rationale' %}"
+  </script>
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      teacher.initCustomReport(
+        {
+          evaluateRationale: "{% url 'teacher-dashboard--evaluate-rationale' %}"
 
-    }
-  )
-});
-</script>
+        }
+      )
+    });
+  </script>
 
 {% endblock %}

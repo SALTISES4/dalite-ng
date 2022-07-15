@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import io
 import os
 import pickle
@@ -39,9 +36,9 @@ def read_data(language, urls, left_to_right):
 
 
 def read_gram_file(language, gram, url, path):
-    path = os.path.join(path, "{}-grams.txt".format(gram))
+    path = os.path.join(path, f"{gram}-grams.txt")
     if os.path.exists(path):
-        with open(path, "r") as f:
+        with open(path) as f:
             f.readline()
             lines = [line.strip().split() for line in f]
             data = {line[0]: float(line[1]) for line in lines}
@@ -80,6 +77,6 @@ def download_gram_file(language, gram, url, path):
     with open(path, "w") as f:
         f.write("n-gram\tfrequency\n")
         for n_gram, frequency in list(data.items()):
-            f.write("{}\t{}\n".format(n_gram, frequency))
+            f.write(f"{n_gram}\t{frequency}\n")
 
     return data

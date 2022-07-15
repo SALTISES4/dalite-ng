@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from itertools import chain
 
 from django.db import models
@@ -77,7 +74,7 @@ class Criterion(models.Model):
                 "different from the others or it may lead to some trouble "
                 "down the line."
             )
-        super(Criterion, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     @property
     def rules(self):

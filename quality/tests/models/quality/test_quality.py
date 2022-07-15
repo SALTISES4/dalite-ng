@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-
-
 import time
+from unittest import mock
 
-import mock
 import pytest
 
 from quality.models import (
@@ -18,7 +15,7 @@ from quality.tests.fixtures import *  # noqa
 def test_str(global_validation_quality, assignment_validation_quality):
     assert (
         str(global_validation_quality)
-        == "{} for global ".format(global_validation_quality.pk)
+        == f"{global_validation_quality.pk} for global "
         + "and use type validation"
     )
     assert (
@@ -53,7 +50,7 @@ def test_evaluate__all_equal(assignment_validation_quality):
     for i in range(3):
         UsesCriterion.objects.create(
             quality=assignment_validation_quality,
-            name="fake_{}".format(i + 1),
+            name=f"fake_{i + 1}",
             version=0,
             rules=0,
             weight=1,
@@ -88,7 +85,7 @@ def test_evaluate__different_weights(assignment_validation_quality):
     for i in range(3):
         UsesCriterion.objects.create(
             quality=assignment_validation_quality,
-            name="fake_{}".format(i + 1),
+            name=f"fake_{i + 1}",
             version=0,
             rules=0,
             weight=i + 1,
@@ -125,7 +122,7 @@ def test_evaluate__cached(assignment_validation_quality):
     for i in range(3):
         UsesCriterion.objects.create(
             quality=assignment_validation_quality,
-            name="fake_{}".format(i + 1),
+            name=f"fake_{i + 1}",
             version=0,
             rules=0,
             weight=1,
@@ -186,7 +183,7 @@ def test_batch_evaluate__all_equal(assignment_validation_quality):
     for i in range(3):
         UsesCriterion.objects.create(
             quality=assignment_validation_quality,
-            name="fake_{}".format(i + 1),
+            name=f"fake_{i + 1}",
             version=0,
             rules=0,
             weight=1,
@@ -225,7 +222,7 @@ def test_batch_evaluate__different_weights(assignment_validation_quality):
     for i in range(3):
         UsesCriterion.objects.create(
             quality=assignment_validation_quality,
-            name="fake_{}".format(i + 1),
+            name=f"fake_{i + 1}",
             version=0,
             rules=0,
             weight=i + 1,
@@ -268,7 +265,7 @@ def test_batch_evaluate__cached_all(assignment_validation_quality):
     for i in range(3):
         UsesCriterion.objects.create(
             quality=assignment_validation_quality,
-            name="fake_{}".format(i + 1),
+            name=f"fake_{i + 1}",
             version=0,
             rules=0,
             weight=1,
@@ -329,7 +326,7 @@ def test_batch_evaluate__cached_some(assignment_validation_quality):
     for i in range(3):
         UsesCriterion.objects.create(
             quality=assignment_validation_quality,
-            name="fake_{}".format(i + 1),
+            name=f"fake_{i + 1}",
             version=0,
             rules=0,
             weight=1,

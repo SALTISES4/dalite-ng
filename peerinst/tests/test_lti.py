@@ -1,5 +1,6 @@
+from unittest import mock
+
 import ddt
-import mock
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import IntegrityError
@@ -27,7 +28,7 @@ class TestApplicationHookManager(TestCase):
 
         # Update for new schemes
         if not email:
-            email = "{}@localhost".format(user_id)
+            email = f"{user_id}@localhost"
 
         uname, password = get_student_username_and_password(email)
 
@@ -289,7 +290,7 @@ class TestUpdateStaffUser(TestCase):
         }
         user = User.objects.create(username="test")
         self.manager.update_staff_user(user)
-        actual_perms = set((p.codename for p in user.user_permissions.all()))
+        actual_perms = {p.codename for p in user.user_permissions.all()}
         self.assertEqual(expected_perms, actual_perms)
 
 

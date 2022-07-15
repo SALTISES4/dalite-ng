@@ -1,7 +1,6 @@
-from __future__ import unicode_literals
-from django.db.utils import IntegrityError
-
 import time
+
+from django.db.utils import IntegrityError
 
 from peerinst.tests.fixtures import *  # noqa
 from quality.models import LikelihoodCache, LikelihoodLanguage

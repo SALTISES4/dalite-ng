@@ -1,13 +1,14 @@
 import pytest
+
 from peerinst.tests.generators import (
     add_answer_choices,
     add_assignments,
     add_groups,
     add_questions,
-    add_to_group,
     add_student_assignments,
     add_student_group_assignments,
     add_students,
+    add_to_group,
     new_assignments,
     new_groups,
     new_questions,

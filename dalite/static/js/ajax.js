@@ -17,13 +17,12 @@ export function buildReq(data, method) {
     const body = data ? JSON.stringify(data) : "";
     return {
       method: method.toUpperCase(),
-      body: body,
+      body,
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": getCsrfToken(),
       },
     };
-  } else {
-    throw Error(`Method ${method} not implemented yet.`);
   }
+  throw Error(`Method ${method} not implemented yet.`);
 }

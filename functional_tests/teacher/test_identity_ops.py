@@ -1,11 +1,11 @@
 import time
 
 from django.urls import reverse
-
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
 from functional_tests.fixtures import *  # noqa
+
 from .utils import accept_cookies, go_to_account, login, logout
 
 

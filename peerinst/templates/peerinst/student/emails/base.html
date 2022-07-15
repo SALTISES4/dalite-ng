@@ -6,38 +6,38 @@
 
 {% inlinecss 'peerinst/css/email.min.css' %}
 
-<body>
-  <header>
-    <div class="header">
-    <img src="https://static.mydalite.org/peerinst/img/SALTISE-favicon.gif"
-         alt="myDALITE logo"
-         id="logo">
+  <body>
+    <header>
+      <div class="header">
+        <img src="https://static.mydalite.org/peerinst/img/SALTISE-favicon.gif"
+          alt="myDALITE logo"
+          id="logo">
+      </div>
+    </header>
+
+    <div id="content">
+      {% block body %}{% endblock %}
+
+      <p>
+        {% trans "Don't want to receive these emails anymore?  You can toggle notifications for any group by logging in to your dashboard and clicking the notifications icon.  You can also remove yourself from any group for which you have registered." %}
+      </p>
     </div>
-  </header>
-
-  <div id="content">
-    {% block body %}{% endblock %}
-
-    <p>
-      {% trans "Don't want to receive these emails anymore?  You can toggle notifications for any group by logging in to your dashboard and clicking the notifications icon.  You can also remove yourself from any group for which you have registered." %}
-    </p>
-  </div>
 
 
-  <footer>
-    <div class="footer">
-      <table role="presentation">
-        <tbody>
-          <tr>
-            <td>{% trans 'myDALITE by SALTISE/S4' %}</td>
-          </tr>
-          <tr>
-            <td>{% trans 'Copyright' %} {% now  'Y' %}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </footer>
-</body>
+    <footer>
+      <div class="footer">
+        <table role="presentation">
+          <tbody>
+            <tr>
+              <td>{% trans 'myDALITE by SALTISE/S4' %}</td>
+            </tr>
+            <tr>
+              <td>{% trans 'Copyright' %} {% now  'Y' %}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </footer>
+  </body>
 
 {% endinlinecss %}

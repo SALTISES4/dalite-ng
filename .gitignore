@@ -11,6 +11,7 @@
 *.rdb
 *.tar.gz
 .*requirements-timestamp
+.vscode
 .DS_Store
 .coverage
 .data/
@@ -18,6 +19,7 @@
 .rollup.cache/
 .tern-port
 .venv
+.dccache
 /CACHE
 /dalite/local_settings.py
 /htmlcov

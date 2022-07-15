@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _

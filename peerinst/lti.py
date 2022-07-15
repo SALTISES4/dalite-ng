@@ -12,7 +12,7 @@ from peerinst.auth import authenticate_student
 logger = logging.getLogger(__name__)
 
 
-class LTIRoles(object):
+class LTIRoles:
     """
     Non-comprehensive list of roles commonly used in LTI applications
     """
@@ -88,7 +88,10 @@ class ApplicationHookManager(AbstractApplicationHookManager):
 
         redirect_url = reverse(
             "question",
-            kwargs=dict(assignment_id=assignment_id, question_id=question_id),
+            kwargs={
+                "assignment_id": assignment_id,
+                "question_id": question_id,
+            },
         )
         if show_results_view == "true":
             redirect_url += "?show_results_view=true"

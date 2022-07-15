@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
+from unittest import mock
 
-
-import mock
 import pytest
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -132,7 +130,7 @@ def test_info__no_threshold():
             app_label = "reputation"
 
         def info(self):
-            return super(FakeCriterion, self).info(
+            return super().info(
                 {"name": "test", "full_name": "test", "description": "A test."}
             )
 
@@ -157,7 +155,7 @@ def test_info__same_thresholds():
             app_label = "reputation"
 
         def info(self):
-            return super(FakeCriterion, self).info(
+            return super().info(
                 {"name": "test", "full_name": "test", "description": "A test."}
             )
 
@@ -183,7 +181,7 @@ def test_info__past_thresholds():
             app_label = "reputation"
 
         def info(self):
-            return super(FakeCriterion, self).info(
+            return super().info(
                 {"name": "test", "full_name": "test", "description": "A test."}
             )
 

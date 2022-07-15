@@ -6,7 +6,7 @@ import pytest
 from django.conf import settings
 
 
-class SimpleMessage(object):
+class SimpleMessage:
     """
     A very simple substitute for an EmailMessage
     """
@@ -22,7 +22,7 @@ class SimpleMessage(object):
         self.body = str(message.get_body(preferencelist=("plain",)))
 
 
-class FileBasedOutbox(object):
+class FileBasedOutbox:
     def __init__(self, *args, **kwargs):
         self.volume = Path(settings.EMAIL_FILE_PATH)
 

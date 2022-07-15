@@ -3,23 +3,23 @@
 {% load i18n %}
 
 {% block body %}
-<main>
-  <section>
-    <h1 class="mdc-typography--display3">{% trans 'Confirm Registration' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Confirm Registration' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="admin-link">
-      <a href="{% url 'landing_page' %}">{% trans 'About myDALITE' %}</a>
-    </div>
+      <div class="admin-link">
+        <a href="{% url 'landing_page' %}">{% trans 'About myDALITE' %}</a>
+      </div>
 
-    <p class='mdc-typography--body1'>
-      {% trans 'You have requested registration in: ' %}<span class='bold'>{{ group.name }}</span>.
-    </p>
+      <p class='mdc-typography--body1'>
+        {% trans 'You have requested registration in: ' %}<span class='bold'>{{ group.name }}</span>.
+      </p>
 
-    <p class='mdc-typography--body1'>
-      {% trans 'To validate this request, click the link in the confirmation email sent to: ' %}<span class='bold'>{{ student.student.email }}</span>
-    </p>
-  </section>
-</main>
+      <p class='mdc-typography--body1'>
+        {% trans 'To validate this request, click the link in the confirmation email sent to: ' %}<span class='bold'>{{ student.student.email }}</span>
+      </p>
+    </section>
+  </main>
 {% endblock %}

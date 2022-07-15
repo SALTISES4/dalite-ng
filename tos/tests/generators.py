@@ -13,8 +13,8 @@ def new_users(n):
         while True:
             i += 1
             yield {
-                "username": "user{}".format(i),
-                "email": "test{}@test.com".format(i),
+                "username": f"user{i}",
+                "email": f"test{i}@test.com",
                 "password": "test",
             }
 
@@ -27,7 +27,7 @@ def new_roles(n):
         i = 0
         while True:
             i += 1
-            yield {"role": "r{}".format(string.ascii_lowercase[i])}
+            yield {"role": f"r{string.ascii_lowercase[i]}"}
 
     gen = generator()
 
@@ -44,7 +44,7 @@ def new_tos(n, roles, all_roles_present=False, random_current=True):
             tos = {
                 "role": role,
                 "version": versions[role],
-                "text": "text{}".format(gens[role]),
+                "text": f"text{gens[role]}",
                 "current": False,
             }
             yield tos
@@ -116,9 +116,9 @@ def new_email_types(
             i += 1
             yield {
                 "role": role,
-                "type": "type{}".format(i),
-                "title": "title{}".format(i),
-                "description": "description{}".format(i),
+                "type": f"type{i}",
+                "title": f"title{i}",
+                "description": f"description{i}",
             }
 
     gen = generator(roles[0])

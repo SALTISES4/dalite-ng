@@ -11,7 +11,8 @@
   window.addEventListener("load", () => {
     const link = document.getElementById("accept-cookies");
     link.onclick = function() {
-      Cookielaw.createCookielawCookie();
+      Cookielaw.setCookielawCookie();
+      Cookielaw.hideCookielawBanner();
     }
   });
 </script>

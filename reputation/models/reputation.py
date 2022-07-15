@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import json
 from datetime import date as date_
 

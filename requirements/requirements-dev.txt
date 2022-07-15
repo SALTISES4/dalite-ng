@@ -10,10 +10,6 @@
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
--e git+https://github.com/edx/opaque-keys#egg=edx_opaque_keys
-    # via
-    #   -r requirements/requirements-base.txt
-    #   -r requirements/requirements-test.txt
 -e git+https://github.com/jsumnerPhD/http-observatory#egg=httpobs
     # via -r requirements/requirements-dev.in
 -e git+https://github.com/SALTISES4/pinax-forums@dev#egg=pinax_forums
@@ -31,10 +27,8 @@ amqp==5.0.9
     #   -r requirements/requirements-test.txt
     #   kombu
 appdirs==1.4.3
-    # via
-    #   black
-    #   virtualenv
-appnope==0.1.2
+    # via virtualenv
+appnope==0.1.3
     # via ipython
 asgiref==3.2.10
     # via
@@ -43,6 +37,7 @@ asgiref==3.2.10
     #   channels
     #   channels-redis
     #   daphne
+    #   saltise-course-flow
 async-timeout==3.0.1
     # via
     #   -r requirements/requirements-base.txt
@@ -82,7 +77,7 @@ billiard==3.6.4.0
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   celery
-black==21.6b0
+black==22.6.0
     # via -r requirements/requirements-dev.in
 bleach==4.1.0
     # via
@@ -129,10 +124,12 @@ channels==3.0.3
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   channels-redis
+    #   saltise-course-flow
 channels-redis==3.2.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
+    #   saltise-course-flow
 charset-normalizer==2.0.12
     # via
     #   -r requirements/requirements-base.txt
@@ -210,7 +207,7 @@ decorator==4.4.2
     #   traitlets
 distlib==0.3.2
     # via virtualenv
-django==2.2.27
+django==2.2.28
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -227,6 +224,7 @@ django==2.2.27
     #   django-lti-tool-provider
     #   django-model-utils
     #   django-permissions-policy
+    #   django-redis
     #   django-referrer-policy
     #   django-sslserver
     #   django-timezone-field
@@ -264,7 +262,7 @@ django-compressor==2.4
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-django-cookie-law==2.0.3
+django-cookie-law==2.2.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -307,6 +305,11 @@ django-permissions-policy==4.1.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
+django-redis==5.2.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   saltise-course-flow
 django-referrer-policy==1.0
     # via
     #   -r requirements/requirements-base.txt
@@ -335,6 +338,10 @@ editdistance==0.5.3
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   contextualspellcheck
+edx-opaque-keys==2.3.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
 elasticsearch==7.13.1
     # via
     #   -r requirements/requirements-base.txt
@@ -408,7 +415,7 @@ hyperlink==21.0.0
     #   -r requirements/requirements-test.txt
     #   autobahn
     #   twisted
-identify==1.4.11
+identify==2.5.1
     # via pre-commit
 idna==2.10
     # via
@@ -426,7 +433,7 @@ ipython==7.13.0
     # via -r requirements/requirements-dev.in
 ipython-genutils==0.2.0
     # via traitlets
-isort==5.7.0
+isort==5.10.1
     # via -r requirements/requirements-dev.in
 jedi==0.16.0
     # via ipython
@@ -500,7 +507,7 @@ mysqlclient==1.4.6
     #   -r requirements/requirements-test.txt
 nodeenv==1.3.5
     # via pre-commit
-numpy==1.22.3
+numpy==1.22.4
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -539,7 +546,7 @@ pandas==1.3.5
     #   saltise-course-flow
 parso==0.6.2
     # via jedi
-pathspec==0.8.1
+pathspec==0.9.0
     # via black
 pathy==0.6.0
     # via
@@ -555,15 +562,21 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==9.1.0
+pillow==9.1.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
+pip-lock==2.9.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+platformdirs==2.5.2
+    # via black
 pluggy==0.13.1
     # via
     #   -r requirements/requirements-test.txt
     #   pytest
-pre-commit==2.13.0
+pre-commit==2.19.0
     # via -r requirements/requirements-dev.in
 preshed==3.0.5
     # via
@@ -613,7 +626,7 @@ pyflakes==2.1.1
     # via flake8
 pygments==2.5.2
     # via ipython
-pyjwt==1.7.1
+pyjwt==2.4.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -659,11 +672,6 @@ pytest-mock==2.0.0
     # via -r requirements/requirements-dev.in
 pytest-rerunfailures==8.0
     # via -r requirements/requirements-dev.in
-pytest-runner==5.2
-    # via
-    #   -r requirements/requirements-base.txt
-    #   -r requirements/requirements-test.txt
-    #   django-cookie-law
 python-crontab==2.4.0
     # via
     #   -r requirements/requirements-base.txt
@@ -707,14 +715,14 @@ redis==3.4.1
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   celery
+    #   django-redis
 regex==2021.7.6
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
-    #   black
     #   sacremoses
     #   transformers
-requests==2.27.1
+requests==2.28.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -734,18 +742,22 @@ rjsmin==1.1.0
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   django-compressor
+ruamel-yaml==0.17.21
+    # via safety
+ruamel-yaml-clib==0.2.6
+    # via ruamel-yaml
 sacremoses==0.0.45
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   transformers
-safety==1.10.3
+safety==2.0.0
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.6.6
+saltise-course-flow==0.7.3
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
-saltise-user-feedback==0.1.2
+saltise-user-feedback==1.1.1
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -841,9 +853,10 @@ tokenizers==0.10.3
     #   transformers
 toml==0.10.2
     # via
-    #   black
     #   dparse
     #   pre-commit
+tomli==2.0.1
+    # via black
 torch==1.9.0
     # via
     #   -r requirements/requirements-base.txt
@@ -884,6 +897,7 @@ typing-extensions==4.2.0
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
+    #   black
     #   huggingface-hub
     #   pydantic
     #   torch
@@ -922,6 +936,11 @@ webencodings==0.5.1
     #   -r requirements/requirements-test.txt
     #   bleach
     #   html5lib
+xlrd==2.0.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
+    #   saltise-course-flow
 zope-interface==5.1.0
     # via
     #   -r requirements/requirements-base.txt

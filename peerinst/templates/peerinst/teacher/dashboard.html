@@ -3,136 +3,128 @@
 {% load static compress i18n %}
 
 {% block stylesheets %}
-{{ block.super }}
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+  {{ block.super }}
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
 {% endblock %}
 
 {% block body %}
-<main id="teacher-dashboard">
-  <section id="dalite-messages" class="hidden">
-    <h1 class="mdc-typography--display3">{% trans 'Messages' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
-    <br>
-  </section>
-  <section id="questions">
-    <h1 class="mdc-typography--display3">{% trans 'New question for you' %}
+  <main id="teacher-dashboard">
+    <section id="dalite-messages" class="hidden">
+      <h1 class="mdc-typography--display3">{% trans 'Messages' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
+      <br>
+    </section>
+    <section id="questions">
+      <h1 class="mdc-typography--display3">{% trans 'New question for you' %}
 
-      <i id="activate-dialog-question-help" class="mdc-theme--primary material-icons md-28 mdc-ripple-surface icon-list">help</i>
-      <aside id="dialog-question-help"
-        class="mdc-dialog"
-        role="alertdialog"
-        aria-labelledby="question-help-label"
-        aria-describedby="question-help-description">
-        <div class="mdc-dialog__surface">
-          <header class="mdc-dialog__header">
-            <h2 id="question-help-label" class="mdc-dialog__header__title">
-              {% trans 'New questions chosen for you' %}
-            </h2>
-          </header>
-          <section id="question-help-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
-            <p class="mdc-typography--body1">
-              {% blocktrans %}
-              Everyday, teachers are writing new questions on myDALITE and sharing them with the SALTISE community. Here is a sampling of these new questions selected especially for you! If the questions here are not relevant to your teaching, please help us make better recomendations by updating the discpline information on your account page.<br><br>
-              Click the <i class="mdc-theme--primary material-icons md-24">autorenew</i> icon to see another question, or the <i class="mdc-theme--primary material-icons md-24">favorite_border</i> icon to save it to your list of favourites.<br><br>
-              Finally, the <i class="mdc-theme--primary material-icons md-24">outlined_flag</i> icon is there for you to signal a problem with the question. We depend on the community to help moderate the quality of the content in the database, so your help is vital to the success of myDALITE!<br><br>
-              Thank you for your time,<br>
-              - The SALTISE/S4 Team
-              {% endblocktrans %}
-            </p>
-          </section>
-          <footer class="mdc-dialog__footer">
-            <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">OK</button>
-          </footer>
-        </div>
-        <div class="mdc-dialog__backdrop"></div>
-      </aside>
+        <i id="activate-dialog-question-help" class="mdc-theme--primary material-icons md-28 mdc-ripple-surface icon-list">help</i>
+        <aside id="dialog-question-help"
+          class="mdc-dialog"
+          role="alertdialog"
+          aria-labelledby="question-help-label"
+          aria-describedby="question-help-description">
+          <div class="mdc-dialog__surface">
+            <header class="mdc-dialog__header">
+              <h2 id="question-help-label" class="mdc-dialog__header__title">
+                {% trans 'New questions chosen for you' %}
+              </h2>
+            </header>
+            <section id="question-help-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
+              <p class="mdc-typography--body1">
+                {% blocktrans %}
+                  Everyday, teachers are writing new questions on myDALITE and sharing them with the SALTISE community. Here is a sampling of these new questions selected especially for you! If the questions here are not relevant to your teaching, please help us make better recomendations by updating the discpline information on your account page.<br><br>
+                  Click the <i class="mdc-theme--primary material-icons md-24">autorenew</i> icon to see another question, or the <i class="mdc-theme--primary material-icons md-24">favorite_border</i> icon to save it to your list of favourites.<br><br>
+                  Finally, the <i class="mdc-theme--primary material-icons md-24">outlined_flag</i> icon is there for you to signal a problem with the question. We depend on the community to help moderate the quality of the content in the database, so your help is vital to the success of myDALITE!<br><br>
+                  Thank you for your time,<br>
+                  - The SALTISE/S4 Team
+                {% endblocktrans %}
+              </p>
+            </section>
+            <footer class="mdc-dialog__footer">
+              <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">OK</button>
+            </footer>
+          </div>
+          <div class="mdc-dialog__backdrop"></div>
+        </aside>
 
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
-    <br>
-    {% include "peerinst/question/cards/question_card.html" %}
-  </section>
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
+      <br>
+      {% include "peerinst/question/cards/question_card.html" %}
+    </section>
 
-  <section id="rationales">
-    <h1 class="mdc-typography--display3">{% trans 'New rationale to score' %}
+    <section id="rationales">
+      <h1 class="mdc-typography--display3">{% trans 'New rationale to score' %}
 
-      <i id="activate-dialog-rationale-help" class="mdc-theme--primary material-icons md-28 mdc-ripple-surface icon-list">help</i>
-      <aside id="dialog-rationale-help"
-        class="mdc-dialog"
-        role="alertdialog"
-        aria-labelledby="rationale-help-label"
-        aria-describedby="rationale-help-description">
-        <div class="mdc-dialog__surface">
-          <header class="mdc-dialog__header">
-            <h2 id="rationale-help-label" class="mdc-dialog__header__title">
-              {% trans 'New student rationales' %}
-            </h2>
-          </header>
-          <section id="rationale-help-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
-            <p class="mdc-typography--body1">
-              {% blocktrans %}
-              Everyday, students are writing new rationales on myDALITE to explain the reasoning behind their answers. One way for us to give better feedback to students is for discipline experts like yourself to rate these rationales and for us to show the highest-rated rationales to students.<br><br>
-              If you have already used myDALITE for your classes, the rationales shown here will mainly be from your students.  We will also show you rationales that other students have found very convincing, so you get a sneak peak at how students think about the ideas in your class! The scores you provide are used to build statistical natural language processing models so that myDALITE can provide automated feedback to students.<br><br>
-              Click the <i class="mdc-theme--primary material-icons md-24">star</i> icon to rate the rationale. Note that some of these rationales will be for the <em>wrong</em> answer! Your scores are still valuable here, as they help us identify the content that best creates teachable moments for our students.<br><br> Finally, the <i class="mdc-theme--primary material-icons md-24">outlined_flag</i> icon is there for you to signal a problem with the rationale. We depend on the community to help moderate the quality of the content in the database, so your help is vital to the success of myDALITE!<br><br>
-              Thank you for your time,<br>
-              - The SALTISE/S4 Team
-              {% endblocktrans %}
-            </p>
-          </section>
-          <footer class="mdc-dialog__footer">
-            <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
-          </footer>
-        </div>
-        <div class="mdc-dialog__backdrop"></div>
-      </aside>
+        <i id="activate-dialog-rationale-help" class="mdc-theme--primary material-icons md-28 mdc-ripple-surface icon-list">help</i>
+        <aside id="dialog-rationale-help"
+          class="mdc-dialog"
+          role="alertdialog"
+          aria-labelledby="rationale-help-label"
+          aria-describedby="rationale-help-description">
+          <div class="mdc-dialog__surface">
+            <header class="mdc-dialog__header">
+              <h2 id="rationale-help-label" class="mdc-dialog__header__title">
+                {% trans 'New student rationales' %}
+              </h2>
+            </header>
+            <section id="rationale-help-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
+              <p class="mdc-typography--body1">
+                {% blocktrans %}
+                  Everyday, students are writing new rationales on myDALITE to explain the reasoning behind their answers. One way for us to give better feedback to students is for discipline experts like yourself to rate these rationales and for us to show the highest-rated rationales to students.<br><br>
+                  If you have already used myDALITE for your classes, the rationales shown here will mainly be from your students.  We will also show you rationales that other students have found very convincing, so you get a sneak peak at how students think about the ideas in your class! The scores you provide are used to build statistical natural language processing models so that myDALITE can provide automated feedback to students.<br><br>
+                  Click the <i class="mdc-theme--primary material-icons md-24">star</i> icon to rate the rationale. Note that some of these rationales will be for the <em>wrong</em> answer! Your scores are still valuable here, as they help us identify the content that best creates teachable moments for our students.<br><br> Finally, the <i class="mdc-theme--primary material-icons md-24">outlined_flag</i> icon is there for you to signal a problem with the rationale. We depend on the community to help moderate the quality of the content in the database, so your help is vital to the success of myDALITE!<br><br>
+                  Thank you for your time,<br>
+                  - The SALTISE/S4 Team
+                {% endblocktrans %}
+              </p>
+            </section>
+            <footer class="mdc-dialog__footer">
+              <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
+            </footer>
+          </div>
+          <div class="mdc-dialog__backdrop"></div>
+        </aside>
 
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
-    <br>
-    {% include "peerinst/teacher/cards/rationale_to_score_card.html" with rationales=rationales %}
-  </section>
-  <section id="student-activity">
-    <h1 class="mdc-typography--display3">{% trans 'Student Activity' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
-    <br>
-    {% include "peerinst/teacher/cards/student_activity_card.html" with data=student_activity_data %}
-  </section>
-  <!--
-  <section id="collections">
-    <h1 class="mdc-typography--display3">{% trans 'Featured Collection' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
-    <br>
-  </section>
-  -->
-</main>
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
+      <br>
+      {% include "peerinst/teacher/cards/rationale_to_score_card.html" with rationales=rationales %}
+    </section>
+    <section id="student-activity">
+      <h1 class="mdc-typography--display3">{% trans 'Student Activity' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
+      <br>
+      {% include "peerinst/teacher/cards/student_activity_card.html" with data=student_activity_data %}
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script nonce="{{ request.csp_nonce }}">
-  $.ajaxSetup({
+  {{ block.super }}
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script nonce="{{ request.csp_nonce }}">
+    $.ajaxSetup({
       beforeSend: function(xhr, settings) {
-          if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
-              xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
-          }
+        if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
+          xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
+        }
       }
-  });
-  window.addEventListener("load", async () => {
-    teacher.initDashboard({{ data|safe }});
-    await teacher.initQuestionCards(
-      "{% url 'teacher-toggle-favourite' %}",
-      "{% url 'teacher-dashboard--new-questions' %}",
-      "{% url 'question--flag--reasons' %}",
-      "{% url 'question--flag--flag' %}"
-    );
-    teacher.initStudentActivityCards({{ student_activity_json|safe }});
-    teacher.initRationalesToScoreCards("{% url 'teacher-dashboard--evaluate-rationale' %}");
-  });
+    });
+    window.addEventListener("load", async () => {
+      teacher.initDashboard({{ data|safe }});
+      await teacher.initQuestionCards(
+        "{% url 'teacher-toggle-favourite' %}",
+        "{% url 'teacher-dashboard--new-questions' %}",
+        "{% url 'question--flag--reasons' %}",
+        "{% url 'question--flag--flag' %}"
+      );
+      teacher.initStudentActivityCards({{ student_activity_json|safe }});
+      teacher.initRationalesToScoreCards("{% url 'teacher-dashboard--evaluate-rationale' %}");
+    });
 
-  bundle.addDialog();
-</script>
+    bundle.addDialog();
+  </script>
 {% endblock %}

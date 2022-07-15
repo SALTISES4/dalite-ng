@@ -3,631 +3,631 @@
 {% load static compress i18n %}
 
 {% block stylesheets %}
-{% compress css %}
-<link href="{% static 'peerinst/css/landing_page.min.css' %}" rel="stylesheet">
-{% endcompress %}
+  {% compress css %}
+    <link href="{% static 'peerinst/css/landing_page.min.css' %}" rel="stylesheet">
+  {% endcompress %}
 {% endblock %}
 
 {% block body %}
-<script nonce="{{ request.csp_nonce }}">
-var desktop = window.matchMedia("(min-width:450px)").matches&&window.matchMedia("(min-height:450px)").matches;
-// Override default size of header to fill page based on window size
-var styles = document.createElement('style');
-styles.setAttribute("nonce", "{{ request.csp_nonce }}");
-document.head.appendChild(styles);
-var styleSheet = styles.sheet;
-if (desktop) {
-  styleSheet.insertRule(".mdc-toolbar--flexible {--mdc-toolbar-ratio-to-extend-flexible:"+window.innerHeight/64+" !important;}", 0);
-}
-</script>
+  <script nonce="{{ request.csp_nonce }}">
+    var desktop = window.matchMedia("(min-width:450px)").matches&&window.matchMedia("(min-height:450px)").matches;
+    // Override default size of header to fill page based on window size
+    var styles = document.createElement('style');
+    styles.setAttribute("nonce", "{{ request.csp_nonce }}");
+    document.head.appendChild(styles);
+    var styleSheet = styles.sheet;
+    if (desktop) {
+      styleSheet.insertRule(".mdc-toolbar--flexible {--mdc-toolbar-ratio-to-extend-flexible:"+window.innerHeight/64+" !important;}", 0);
+    }
+  </script>
 
-<header class="mdc-toolbar mdc-toolbar--fixed mdc-toolbar--flexible mdc-toolbar--waterfall">
-  <div class="mdc-toolbar__row">
-    <svg id="animation" width=800 height=80></svg>
-    <i id="scrollprompt" class="icon ion-ios-arrow-dropdown"></i>
-    <span class="navtopright">
-      {% if user.is_authenticated and not request.session.LTI %}
-        <a id='link-to-login-or-welcome' href="{% url 'welcome' %}">
-          {% trans 'Welcome back, ' %}
-          {% if user.student %}
-            <span class='bold'>{{ user.email }}</span>
-          {% else %}
-            <span class='bold'>{{ user.username }}</span>
-          {% endif %}
-        </a>
-      {% else %}
-        <a id='link-to-login-or-welcome' href="{% url 'login' %}">{% trans 'Login' %}</a>
-        <a id='link-to-signup' href="{% url 'sign_up' %}">{% trans 'Signup' %}</a>
-      {% endif %}
-    </span>
-  </div>
-</header>
+  <header class="mdc-toolbar mdc-toolbar--fixed mdc-toolbar--flexible mdc-toolbar--waterfall">
+    <div class="mdc-toolbar__row">
+      <svg id="animation" width=800 height=80></svg>
+      <i id="scrollprompt" class="icon ion-ios-arrow-dropdown"></i>
+      <span class="navtopright">
+        {% if user.is_authenticated and not request.session.LTI %}
+          <a id='link-to-login-or-welcome' href="{% url 'welcome' %}">
+            {% trans 'Welcome back, ' %}
+            {% if user.student %}
+              <span class='bold'>{{ user.email }}</span>
+            {% else %}
+              <span class='bold'>{{ user.username }}</span>
+            {% endif %}
+          </a>
+        {% else %}
+          <a id='link-to-login-or-welcome' href="{% url 'login' %}">{% trans 'Login' %}</a>
+          <a id='link-to-signup' href="{% url 'sign_up' %}">{% trans 'Signup' %}</a>
+        {% endif %}
+      </span>
+    </div>
+  </header>
 
-<main class="mdc-toolbar-fixed-adjust">
-  <section>
-    <h1 id="Features" class="mdc-typography--display3 mdc-theme--background">{% trans 'Features' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+  <main class="mdc-toolbar-fixed-adjust">
+    <section>
+      <h1 id="Features" class="mdc-typography--display3 mdc-theme--background">{% trans 'Features' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="blurb">
-      <div class="balloon">
+      <div class="blurb">
+        <div class="balloon">
           <svg class="lightbulb icon-resize" width=80 height=80></svg>
+        </div>
+        <p class="mdc-typography--headline">
+          {% blocktrans %}
+            <span class="dalite-my">my</span>DALITE is a free open-source web-based platform that promotes <strong>conceptual learning</strong>. Its pedagogical foundations are guided by social learning and based on learning principles and practical know-how. It engages students in cognitive tasks that include written self-explanation, comparison and evaluation of explanations produced by peers, and reflection.
+          {% endblocktrans %}
+        </p>
       </div>
-      <p class="mdc-typography--headline">
-        {% blocktrans %}
-        <span class="dalite-my">my</span>DALITE is a free open-source web-based platform that promotes <strong>conceptual learning</strong>. Its pedagogical foundations are guided by social learning and based on learning principles and practical know-how. It engages students in cognitive tasks that include written self-explanation, comparison and evaluation of explanations produced by peers, and reflection.
-        {% endblocktrans %}
-      </p>
-    </div>
 
-    <div class="blurb">
-      <div class="balloon">
+      <div class="blurb">
+        <div class="balloon">
           <svg class="peerinst icon-resize" width=80 height=80></svg>
+        </div>
+        <p class="mdc-typography--headline">
+          {% blocktrans %}
+            <strong>Peer instruction</strong> is an active learning strategy popularized by Eric Mazur from Harvard University. It involves a sequence of steps that promotes critical thinking and discussion through the use of multiple choice conceptual questions.  It encourages students to first reflect on a conceptually challenging idea, vote, <strong>discuss with peers</strong>, and revote.
+          {% endblocktrans %}
+        </p>
       </div>
-      <p class="mdc-typography--headline">
-        {% blocktrans %}
-        <strong>Peer instruction</strong> is an active learning strategy popularized by Eric Mazur from Harvard University. It involves a sequence of steps that promotes critical thinking and discussion through the use of multiple choice conceptual questions.  It encourages students to first reflect on a conceptually challenging idea, vote, <strong>discuss with peers</strong>, and revote.
-        {% endblocktrans %}
-      </p>
-    </div>
 
-    <div class="blurb">
-      <div class="balloon">
+      <div class="blurb">
+        <div class="balloon">
           <svg class="school icon-resize" width=80 height=80></svg>
+        </div>
+        <p class="mdc-typography--headline">
+          {% blocktrans %}
+            With <span class="dalite-my">my</span>DALITE, teachers can use the same questions <strong>in class</strong> in polling mode, or assign questions as <strong>out-of-class</strong> homework through any learning management system.  Teachers can peruse content based on analytics and get reports for how their students are doing over time.
+          {% endblocktrans %}
+        </p>
       </div>
-      <p class="mdc-typography--headline">
-        {% blocktrans %}
-        With <span class="dalite-my">my</span>DALITE, teachers can use the same questions <strong>in class</strong> in polling mode, or assign questions as <strong>out-of-class</strong> homework through any learning management system.  Teachers can peruse content based on analytics and get reports for how their students are doing over time.
-        {% endblocktrans %}
-      </p>
-    </div>
 
-    <div class="blurb">
-      <div class="balloon">
+      <div class="blurb">
+        <div class="balloon">
           <svg class="activity icon-resize" width=80 height=80></svg>
-      </div>
-      <p class="mdc-typography--headline">
-        {% blocktrans %}
-        <span class="dalite-my">my</span>DALITE has a <strong>growing database</strong> of questions in subjects ranging from chemistry to the humanities. It is funded by the SALTISE/S4 grant and aims to be the home of an open-source community offering high-impact high-quality learning resources <strong>built for teachers by teachers</strong>. If you don't find the type of content you are looking for, you can author new question items and contribute to the ever-growing community!   The current top disciplines are:
-        {% endblocktrans %}
-      </p>
-      <div class="mdc-layout-grid">
-        <div class="mdc-layout-grid__inner">
-          {% for l in disciplines|first %}
-          {% if l != "name" %}
-          <div class="mdc-layout-grid__cell--span-2-phone mdc-layout-grid__cell--span-4-tablet mdc-layout-grid__cell--span-3-desktop">
-            <svg class="stats" id="{{ l }}" width=150 height=150></svg>
-            <div class="mdc-typography--caption mdc-theme--primary">{{ l|capfirst }}</div>
+        </div>
+        <p class="mdc-typography--headline">
+          {% blocktrans %}
+            <span class="dalite-my">my</span>DALITE has a <strong>growing database</strong> of questions in subjects ranging from chemistry to the humanities. It is funded by the SALTISE/S4 grant and aims to be the home of an open-source community offering high-impact high-quality learning resources <strong>built for teachers by teachers</strong>. If you don't find the type of content you are looking for, you can author new question items and contribute to the ever-growing community!   The current top disciplines are:
+          {% endblocktrans %}
+        </p>
+        <div class="mdc-layout-grid">
+          <div class="mdc-layout-grid__inner">
+            {% for l in disciplines|first %}
+              {% if l != "name" %}
+                <div class="mdc-layout-grid__cell--span-2-phone mdc-layout-grid__cell--span-4-tablet mdc-layout-grid__cell--span-3-desktop">
+                  <svg class="stats" id="{{ l }}" width=150 height=150></svg>
+                  <div class="mdc-typography--caption mdc-theme--primary">{{ l|capfirst }}</div>
+                </div>
+              {% endif %}
+            {% endfor %}
           </div>
-          {% endif %}
+        </div>
+        <div class="mdc-chip-set mdc-chip-set--choice" data-mdc-auto-init="MDCChipSet">
+          {% for d in disciplines %}
+            <div id="{{ d.name }}" class="mdc-chip" tabindex="0" data-mdc-auto-init="MDCChip">
+              <div class="mdc-chip__checkmark">
+                <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
+                  <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
+                    d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                </svg>
+              </div>
+              <div class="mdc-chip__text">{{ d.name }}</div>
+            </div>
           {% endfor %}
         </div>
       </div>
-      <div class="mdc-chip-set mdc-chip-set--choice" data-mdc-auto-init="MDCChipSet">
-        {% for d in disciplines %}
-        <div id="{{ d.name }}" class="mdc-chip" tabindex="0" data-mdc-auto-init="MDCChip">
-          <div class="mdc-chip__checkmark">
-            <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
-              <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
-              d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
-            </svg>
-          </div>
-          <div class="mdc-chip__text">{{ d.name }}</div>
-        </div>
-        {% endfor %}
+    </section>
+
+    <section>
+      <h1 class="mdc-typography--display3 mdc-theme--background">{% trans 'A Guided Tour' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
+      <iframe
+        class="embedded-video"
+        width="700"
+        height="394"
+        src="https://www.youtube-nocookie.com/embed/0tJVVy2ay7c"
+        frameborder="0"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope"
+        allowfullscreen>
+      </iframe>
+    </section>
+
+    <section>
+      <h1 class="mdc-typography--display3 mdc-theme--background">{% trans 'Tutorials' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
+      <div class="video-tray">
+        <iframe
+          class="small-embedded-video"
+          width="225"
+          height="127"
+          src="https://www.youtube-nocookie.com/embed/JP0TE24MX50"
+          frameborder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope"
+          allowfullscreen>
+        </iframe>
+        <iframe
+          class="small-embedded-video"
+          width="225"
+          height="127"
+          src="https://www.youtube-nocookie.com/embed/oOd87b6lGjc"
+          frameborder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope"
+          allowfullscreen>
+        </iframe>
+        <iframe
+          class="small-embedded-video"
+          width="225"
+          height="127"
+          src="https://www.youtube-nocookie.com/embed/CN3ynmvnfeI"
+          frameborder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope"
+          allowfullscreen>
+        </iframe>
       </div>
-    </div>
-  </section>
+    </section>
+    <section>
 
-  <section>
-    <h1 class="mdc-typography--display3 mdc-theme--background">{% trans 'A Guided Tour' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
-    <iframe
-      class="embedded-video"
-      width="700"
-      height="394"
-      src="https://www.youtube-nocookie.com/embed/0tJVVy2ay7c"
-      frameborder="0"
-      allow="accelerometer; autoplay; encrypted-media; gyroscope"
-      allowfullscreen>
-    </iframe>
-  </section>
+      <h1 class="mdc-typography--display3  mdc-theme--background">{% trans "Timeline" %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-  <section>
-    <h1 class="mdc-typography--display3 mdc-theme--background">{% trans 'Tutorials' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
-    <div class="video-tray">
-      <iframe
-        class="small-embedded-video"
-        width="225"
-        height="127"
-        src="https://www.youtube-nocookie.com/embed/JP0TE24MX50"
-        frameborder="0"
-        allow="accelerometer; autoplay; encrypted-media; gyroscope"
-        allowfullscreen>
-      </iframe>
-      <iframe
-        class="small-embedded-video"
-        width="225"
-        height="127"
-        src="https://www.youtube-nocookie.com/embed/oOd87b6lGjc"
-        frameborder="0"
-        allow="accelerometer; autoplay; encrypted-media; gyroscope"
-        allowfullscreen>
-      </iframe>
-      <iframe
-        class="small-embedded-video"
-        width="225"
-        height="127"
-        src="https://www.youtube-nocookie.com/embed/CN3ynmvnfeI"
-        frameborder="0"
-        allow="accelerometer; autoplay; encrypted-media; gyroscope"
-        allowfullscreen>
-      </iframe>
-    </div>
-  </section>
-  <section>
+      <div class="blurb">
+        <svg id="history" width=350 height=450></svg>
+      </div>
 
-    <h1 class="mdc-typography--display3  mdc-theme--background">{% trans "Timeline" %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+    </section>
 
-    <div class="blurb">
-      <svg id="history" width=350 height=450></svg>
-    </div>
+    <section>
+      <h1 class="mdc-typography--display3 mdc-theme--background">SALTISE/S4
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-  </section>
-
-  <section>
-    <h1 class="mdc-typography--display3 mdc-theme--background">SALTISE/S4
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
-
-    <div class="blurb">
-      <div class="balloon">
+      <div class="blurb">
+        <div class="balloon">
           <svg class="saltise icon-resize" width=80 height=80></svg>
+        </div>
+        <p class="mdc-typography--headline">
+          {% blocktrans %}
+            <a class="text-link" href="http://www.saltise.ca">SALTISE</a> is a learning community that fosters the research and development of tools and resources for <strong>pedagogical innovation</strong>.  It brings together educators (researchers and practitioners) and professional development personnel across the province of Quebec, and welcomes national and international partnerships.
+          {% endblocktrans %}
+        </p>
       </div>
-      <p class="mdc-typography--headline">
-        {% blocktrans %}
-        <a class="text-link" href="http://www.saltise.ca">SALTISE</a> is a learning community that fosters the research and development of tools and resources for <strong>pedagogical innovation</strong>.  It brings together educators (researchers and practitioners) and professional development personnel across the province of Quebec, and welcomes national and international partnerships.
-        {% endblocktrans %}
-      </p>
-    </div>
 
-    <div class="blurb">
-      <p class="mdc-typography--headline">
-        {% blocktrans %}
-        The SALTISE/S4 project is a major five-year multi-institution infrastructure grant hosted at Dawson College. The mandate is to develop a <strong>data-driven platform</strong> founded on three pillars:
-        {% endblocktrans %}
-      </p>
-      <svg id="pillars" width=300 height=340></svg>
-    </div>
-  </section>
+      <div class="blurb">
+        <p class="mdc-typography--headline">
+          {% blocktrans %}
+            The SALTISE/S4 project is a major five-year multi-institution infrastructure grant hosted at Dawson College. The mandate is to develop a <strong>data-driven platform</strong> founded on three pillars:
+          {% endblocktrans %}
+        </p>
+        <svg id="pillars" width=300 height=340></svg>
+      </div>
+    </section>
 
-  <section>
-    <h1 class="mdc-typography--display3 mdc-theme--background">{% trans 'Browser Requirements' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+    <section>
+      <h1 class="mdc-typography--display3 mdc-theme--background">{% trans 'Browser Requirements' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="blurb">
-      <div class="balloon">
+      <div class="blurb">
+        <div class="balloon">
           <svg class="browser icon-resize" width=80 height=80></svg>
+        </div>
+        <p class="mdc-typography--headline">
+          <span class="dalite-my">my</span>DALITE {% blocktrans %}supports the following browsers:{% endblocktrans %}
+          <ul class="mdc-typography--headline pad-l-25">
+            <li>Google Chrome 76+</li>
+            <li>Mozilla Firefox 69+</li>
+            <li>Microsoft Edge 17+</li>
+            <li>Opera 63+</li>
+            <li>Safari 12+</li>
+            <li>Chrome 78+ on Android</li>
+            <li>Firefox 68+ on Android</li>
+            <li>Opera Mini all</li>
+            <li>Safari 12.2+ on Mobile iOS</li>
+            <li>Samsung Internet 9.2+</li>
+          </ul>
+        </p>
+        <p class="mdc-typography--headline">
+          {% blocktrans %} If you are viewing this site from a supported browser and encounter technical difficulties, please contact: <a class="text-link" href='mailto:support@scivero.com'>support@scivero.com</a>
+          {% endblocktrans %}
+        </p>
       </div>
-      <p class="mdc-typography--headline">
-        <span class="dalite-my">my</span>DALITE {% blocktrans %}supports the following browsers:{% endblocktrans %}
-        <ul class="mdc-typography--headline pad-l-25">
-          <li>Google Chrome 76+</li>
-          <li>Mozilla Firefox 69+</li>
-          <li>Microsoft Edge 17+</li>
-          <li>Opera 63+</li>
-          <li>Safari 12+</li>
-          <li>Chrome 78+ on Android</li>
-          <li>Firefox 68+ on Android</li>
-          <li>Opera Mini all</li>
-          <li>Safari 12.2+ on Mobile iOS</li>
-          <li>Samsung Internet 9.2+</li>
-        </ul>
-      </p>
-      <p class="mdc-typography--headline">
-        {% blocktrans %} If you are viewing this site from a supported browser and encounter technical difficulties, please contact: <a class="text-link" href='mailto:support@scivero.com'>support@scivero.com</a>
-        {% endblocktrans %}
-      </p>
-    </div>
 
-  </section>
+    </section>
 
-  <section>
-    <h1 class="mdc-typography--display3 mdc-theme--background">{% trans "Partners" %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+    <section>
+      <h1 class="mdc-typography--display3 mdc-theme--background">{% trans "Partners" %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <ul class="mdc-image-list partner-list">
-      <li class="mdc-image-list__item">
-        <a href="http://www.dawsoncollege.qc.ca"><img class="mdc-image-list__image school-logo" src="{% static 'peerinst/img/Dawson-logo.png' %}"></a>
-      </li>
-      <li class="mdc-image-list__item">
-        <a href="http://www.johnabbott.qc.ca"><img class="mdc-image-list__image school-logo" src="{% static 'peerinst/img/JAC-logo-2.gif' %}"></a>
-      </li>
-      <li class="mdc-image-list__item">
-        <a href="http://www.vaniercollege.qc.ca"><img class="mdc-image-list__image school-logo" src="{% static 'peerinst/img/Vanier-logo.png' %}"></a>
-      </li>
+      <ul class="mdc-image-list partner-list">
+        <li class="mdc-image-list__item">
+          <a href="http://www.dawsoncollege.qc.ca"><img class="mdc-image-list__image school-logo" src="{% static 'peerinst/img/Dawson-logo.png' %}"></a>
+        </li>
+        <li class="mdc-image-list__item">
+          <a href="http://www.johnabbott.qc.ca"><img class="mdc-image-list__image school-logo" src="{% static 'peerinst/img/JAC-logo-2.gif' %}"></a>
+        </li>
+        <li class="mdc-image-list__item">
+          <a href="http://www.vaniercollege.qc.ca"><img class="mdc-image-list__image school-logo" src="{% static 'peerinst/img/Vanier-logo.png' %}"></a>
+        </li>
 
-      <li class="mdc-image-list__item">
-        <a href="http://www.education.gouv.qc.ca/ministere-de-leducation-et-de-lenseignement-superieur/"><img class="mdc-image-list__image school-logo" src="{% static 'peerinst/img/MESR-logo.png' %}"></a>
-      </li>
-    </ul>
+        <li class="mdc-image-list__item">
+          <a href="http://www.education.gouv.qc.ca/ministere-de-leducation-et-de-lenseignement-superieur/"><img class="mdc-image-list__image school-logo" src="{% static 'peerinst/img/MESR-logo.png' %}"></a>
+        </li>
+      </ul>
 
-  </section>
-</main>
+    </section>
+  </main>
 {% endblock %}
 
 {% block footer %}
-<footer>
-  <div class="wrapper">
-    <div class="footer_content float-left">
-      &copy 2020 SALTISE/S4
+  <footer>
+    <div class="wrapper">
+      <div class="footer_content float-left">
+        &copy 2020 SALTISE/S4
+      </div>
+      <div class="footer_content align-right">
+        <a href="mailto:info@saltise.ca"><i class="icon ion-ios-mail"></i></a>
+        <a href="https://www.saltise.ca"><i class="icon ion-md-globe"></i></a>
+        <a href="https://www.facebook.com/SALTISE/"><i class="icon ion-logo-facebook"></i></a>
+        <a href="https://twitter.com/saltise"><i class="icon ion-logo-twitter"></i></a>
+        <a href="https://github.com/SALTISES4/dalite-ng"><i class="icon ion-logo-github"></i></a>
+      </div>
     </div>
-    <div class="footer_content align-right">
-      <a href="mailto:info@saltise.ca"><i class="icon ion-ios-mail"></i></a>
-      <a href="https://www.saltise.ca"><i class="icon ion-md-globe"></i></a>
-      <a href="https://www.facebook.com/SALTISE/"><i class="icon ion-logo-facebook"></i></a>
-      <a href="https://twitter.com/saltise"><i class="icon ion-logo-twitter"></i></a>
-      <a href="https://github.com/SALTISES4/dalite-ng"><i class="icon ion-logo-github"></i></a>
-    </div>
-  </div>
-</footer>
+  </footer>
 {% endblock %}
 
 {% block scripts %}
-<script nonce="{{ request.csp_nonce }}">
-// MDC binds
-var arrow = document.getElementById('scrollprompt');
-if (desktop) {
-  var toolbar = bundle.toolbar.MDCToolbar.attachTo(document.querySelector('.mdc-toolbar'));
-  toolbar.fixedAdjustElement = document.querySelector('.mdc-toolbar-fixed-adjust');
-
-  var flexibleExpansionRatio = 1.0;
-  toolbar.listen('MDCToolbar:change', function(evt) {
-    flexibleExpansionRatio = evt.detail.flexibleExpansionRatio;
-    arrow.style.opacity = flexibleExpansionRatio;
-  });
-  arrow.onclick = function() {
-    document.querySelector("#Features").scrollIntoView({block: "center", inline: "center", behavior: "smooth"});
-  }
-} else {
-  arrow.style.opacity = 0;
-}
-</script>
-
-<script nonce="{{ request.csp_nonce }}">
-// Animations
-function logo(){
-  'use strict';
-
-  var scale;
-  if (desktop) {
-    scale = 1;
-  } else {
-    scale = 0.8;
-  }
-
-  // Waves
-  var svg = bundle.select("#animation");
-  svg.attr("width",document.body.offsetWidth);
-  svg.attr("height",scale*80);
-
-  var width = +svg.attr("width");
-  var height = +svg.attr("height");
-  var margin = {top:1,bottom:1,left:1,right:1};
-
-  var innerWidth = width-margin.left-margin.right;
-  var innerHeight = height-margin.top-margin.bottom;
-
-  svg.selectAll("g").remove();
-
-  var g = svg.append("g")
-  .attr("transform","translate("+margin.left+","+(margin.top+innerHeight/2)+")");
-
-  var x = bundle.scaleLinear().domain([0,2*Math.PI]).range([0,innerWidth]);
-  var y = bundle.scaleLinear().domain([-1,1]).range([-innerHeight/2,innerHeight/2]);
-
-  var xAxis = g.append("g").style("opacity",0).call(bundle.axisBottom(x));
-  var yAxis = g.append("g").style("opacity",0).call(bundle.axisLeft(y));
-
-  var xPoints = bundle.range(0,2*Math.PI+0.01,(2*Math.PI/5));
-
-  function f(v,x,t,a) {
-    var factor;
-    if(desktop){
-      factor = Math.min(Math.max(10*flexibleExpansionRatio,2),4);
-    } else {
-      factor = 1;
-    }
-    return factor*a*Math.sin(x-0.5*v*t);
-  }
-
-  function animation() {
-    'use strict';
-
-    var dt = 0;
-    var offset1 = null;
-    var offset2 = null;
-    var offset3 = null;
-    var t0 = bundle.now();
-    var t = t0;
-
-    var a1 = 0.5;
-    var a2 = 0.3;
-    var a3 = 0.4;
-
-    var v1 = 0.001;
-    var v2 = 0.0018;
-    var v3 = -0.001;
-
-    var y1 = 0;
-    var y2 = -0.1;
-    var y3 = +0.05;
-
-    var line1 = bundle.line()
-    .x(function(d) { return x(d); })
-    .y(function(d) { return y(f(v1,d,t-dt-offset1,a1)+y1); })
-    .curve(bundle.curveNatural);
-
-    var line2 = bundle.line()
-    .x(function(d) { return x(d); })
-    .y(function(d) { return y(f(v2,d,t-dt-offset2,a2)+y2); })
-    .curve(bundle.curveNatural);
-
-    var line3 = bundle.line()
-    .x(function(d) { return x(d); })
-    .y(function(d) { return y(f(v3,d,t-dt-offset3,a3)+y3); })
-    .curve(bundle.curveNatural);
-
-    var intersection1 = bundle.area()
-    .x(line1.x())
-    .y0(y(0))
-    .y1(line1.y())
-    .curve(bundle.curveNatural);
-
-    var intersection2 = bundle.area()
-    .x0(line1.x())
-    .y0(line1.y())
-    .x1(line2.x())
-    .y1(line2.y())
-    .curve(bundle.curveNatural);
-
-    var intersection3 = bundle.area()
-    .x0(line1.x())
-    .y0(line1.y())
-    .x1(line3.x())
-    .y1(line3.y())
-    .curve(bundle.curveNatural);
-
-    var one = g.append("path")
-    .datum(xPoints)
-    .attr("class","intersection")
-    .attr("fill",bundle.rgb(244,244,244,0.3))
-    .attr("opacity",0)
-    .attr("d",intersection1)
-    .transition()
-    .duration(1000)
-    .attr("opacity",1);
-
+  <script nonce="{{ request.csp_nonce }}">
+    // MDC binds
+    var arrow = document.getElementById('scrollprompt');
     if (desktop) {
-      one.transition()
-      .duration(50)
-      .on("start", function repeat() {
-        if (offset1 == null) {
-          offset1 = bundle.now()-t0;
+      var toolbar = bundle.toolbar.MDCToolbar.attachTo(document.querySelector('.mdc-toolbar'));
+      toolbar.fixedAdjustElement = document.querySelector('.mdc-toolbar-fixed-adjust');
+
+      var flexibleExpansionRatio = 1.0;
+      toolbar.listen('MDCToolbar:change', function(evt) {
+        flexibleExpansionRatio = evt.detail.flexibleExpansionRatio;
+        arrow.style.opacity = flexibleExpansionRatio;
+      });
+      arrow.onclick = function() {
+        document.querySelector("#Features").scrollIntoView({block: "center", inline: "center", behavior: "smooth"});
+      }
+    } else {
+      arrow.style.opacity = 0;
+    }
+  </script>
+
+  <script nonce="{{ request.csp_nonce }}">
+    // Animations
+    function logo(){
+      'use strict';
+
+      var scale;
+      if (desktop) {
+        scale = 1;
+      } else {
+        scale = 0.8;
+      }
+
+      // Waves
+      var svg = bundle.select("#animation");
+      svg.attr("width",document.body.offsetWidth);
+      svg.attr("height",scale*80);
+
+      var width = +svg.attr("width");
+      var height = +svg.attr("height");
+      var margin = {top:1,bottom:1,left:1,right:1};
+
+      var innerWidth = width-margin.left-margin.right;
+      var innerHeight = height-margin.top-margin.bottom;
+
+      svg.selectAll("g").remove();
+
+      var g = svg.append("g")
+        .attr("transform","translate("+margin.left+","+(margin.top+innerHeight/2)+")");
+
+      var x = bundle.scaleLinear().domain([0,2*Math.PI]).range([0,innerWidth]);
+      var y = bundle.scaleLinear().domain([-1,1]).range([-innerHeight/2,innerHeight/2]);
+
+      var xAxis = g.append("g").style("opacity",0).call(bundle.axisBottom(x));
+      var yAxis = g.append("g").style("opacity",0).call(bundle.axisLeft(y));
+
+      var xPoints = bundle.range(0,2*Math.PI+0.01,(2*Math.PI/5));
+
+      function f(v,x,t,a) {
+        var factor;
+        if(desktop){
+          factor = Math.min(Math.max(10*flexibleExpansionRatio,2),4);
+        } else {
+          factor = 1;
         }
-        if (flexibleExpansionRatio>0.01) {
-          t = bundle.now();
-          bundle.active(this)
+        return factor*a*Math.sin(x-0.5*v*t);
+      }
+
+      function animation() {
+        'use strict';
+
+        var dt = 0;
+        var offset1 = null;
+        var offset2 = null;
+        var offset3 = null;
+        var t0 = bundle.now();
+        var t = t0;
+
+        var a1 = 0.5;
+        var a2 = 0.3;
+        var a3 = 0.4;
+
+        var v1 = 0.001;
+        var v2 = 0.0018;
+        var v3 = -0.001;
+
+        var y1 = 0;
+        var y2 = -0.1;
+        var y3 = +0.05;
+
+        var line1 = bundle.line()
+          .x(function(d) { return x(d); })
+          .y(function(d) { return y(f(v1,d,t-dt-offset1,a1)+y1); })
+          .curve(bundle.curveNatural);
+
+        var line2 = bundle.line()
+          .x(function(d) { return x(d); })
+          .y(function(d) { return y(f(v2,d,t-dt-offset2,a2)+y2); })
+          .curve(bundle.curveNatural);
+
+        var line3 = bundle.line()
+          .x(function(d) { return x(d); })
+          .y(function(d) { return y(f(v3,d,t-dt-offset3,a3)+y3); })
+          .curve(bundle.curveNatural);
+
+        var intersection1 = bundle.area()
+          .x(line1.x())
+          .y0(y(0))
+          .y1(line1.y())
+          .curve(bundle.curveNatural);
+
+        var intersection2 = bundle.area()
+          .x0(line1.x())
+          .y0(line1.y())
+          .x1(line2.x())
+          .y1(line2.y())
+          .curve(bundle.curveNatural);
+
+        var intersection3 = bundle.area()
+          .x0(line1.x())
+          .y0(line1.y())
+          .x1(line3.x())
+          .y1(line3.y())
+          .curve(bundle.curveNatural);
+
+        var one = g.append("path")
+          .datum(xPoints)
+          .attr("class","intersection")
+          .attr("fill",bundle.rgb(244,244,244,0.3))
+          .attr("opacity",0)
           .attr("d",intersection1)
           .transition()
-          .on("start", repeat);
-        }
-        else {
-          dt += bundle.now() - t;
-          t = bundle.now();
-          bundle.active(this)
-          .transition()
-          .on("start", repeat);
-        }
-      });
-    }
+          .duration(1000)
+          .attr("opacity",1);
 
-    var two = g.append("path")
-    .datum(xPoints)
-    .attr("class","intersection")
-    .attr("fill",bundle.rgb(244,244,244,0.5))
-    .attr("opacity",0)
-    .attr("d",intersection2)
-    .transition()
-    .duration(1000)
-    .attr("opacity",1);
-
-    if (desktop) {
-      two.transition()
-      .duration(50)
-      .on("start", function repeat() {
-        if (offset2 == null) {
-          offset2 = bundle.now()-t0;
+        if (desktop) {
+          one.transition()
+            .duration(50)
+            .on("start", function repeat() {
+            if (offset1 == null) {
+              offset1 = bundle.now()-t0;
+            }
+            if (flexibleExpansionRatio>0.01) {
+              t = bundle.now();
+              bundle.active(this)
+                .attr("d",intersection1)
+                .transition()
+                .on("start", repeat);
+            }
+            else {
+              dt += bundle.now() - t;
+              t = bundle.now();
+              bundle.active(this)
+                .transition()
+                .on("start", repeat);
+            }
+          });
         }
-        if (flexibleExpansionRatio>0.01) {
-          bundle.active(this)
+
+        var two = g.append("path")
+          .datum(xPoints)
+          .attr("class","intersection")
+          .attr("fill",bundle.rgb(244,244,244,0.5))
+          .attr("opacity",0)
           .attr("d",intersection2)
           .transition()
-          .on("start", repeat);
-        }
-        else {
-          bundle.active(this)
-          .transition()
-          .on("start", repeat);
-        }
-      });
-    }
+          .duration(1000)
+          .attr("opacity",1);
 
-    var three = g.append("path")
-    .datum(xPoints)
-    .attr("class","intersection")
-    .attr("fill",bundle.rgb(0,66,102,0.5))
-    .attr("opacity",0)
-    .attr("d",intersection3)
-    .transition()
-    .duration(1000)
-    .attr("opacity",1);
-
-    if (desktop) {
-      three.transition()
-      .duration(50)
-      .on("start", function repeat() {
-        if (offset3 == null) {
-          offset3 = bundle.now()-t0;
+        if (desktop) {
+          two.transition()
+            .duration(50)
+            .on("start", function repeat() {
+            if (offset2 == null) {
+              offset2 = bundle.now()-t0;
+            }
+            if (flexibleExpansionRatio>0.01) {
+              bundle.active(this)
+                .attr("d",intersection2)
+                .transition()
+                .on("start", repeat);
+            }
+            else {
+              bundle.active(this)
+                .transition()
+                .on("start", repeat);
+            }
+          });
         }
-        if (flexibleExpansionRatio>0.01) {
-          bundle.active(this)
+
+        var three = g.append("path")
+          .datum(xPoints)
+          .attr("class","intersection")
+          .attr("fill",bundle.rgb(0,66,102,0.5))
+          .attr("opacity",0)
           .attr("d",intersection3)
           .transition()
-          .on("start", repeat);
+          .duration(1000)
+          .attr("opacity",1);
+
+        if (desktop) {
+          three.transition()
+            .duration(50)
+            .on("start", function repeat() {
+            if (offset3 == null) {
+              offset3 = bundle.now()-t0;
+            }
+            if (flexibleExpansionRatio>0.01) {
+              bundle.active(this)
+                .attr("d",intersection3)
+                .transition()
+                .on("start", repeat);
+            }
+            else {
+              bundle.active(this)
+                .transition()
+                .on("start", repeat);
+            }
+          });
         }
-        else {
-          bundle.active(this)
-          .transition()
-          .on("start", repeat);
+
+        title();
+      }
+
+      function title(){
+        'use strict';
+
+        bundle.selectAll(".title").remove();
+        bundle.selectAll(".scaled-frame").remove();
+
+        var gg;
+        if (desktop) {
+          gg = g.append('g').attr('class', 'scaled-frame');
+        } else {
+          gg = g.append('g')
+            .attr("transform", "scale("+scale+") translate(40,0)")
+            .attr('class', 'scaled-frame');
         }
-      });
+
+        gg.append("text")
+          .attr("class","title")
+          .attr("x",margin.left+innerWidth/2)
+          .attr("dx","25pt")
+          .attr("y",y(0))
+          .attr("fill","white")
+          .attr("text-anchor","middle")
+          .style("font-size","40pt")
+          .style("cursor","pointer")
+          .text("DALITE")
+          .on("click",function(){
+          window.location="{% url 'login' %}"
+        });
+
+        gg.append("text")
+          .attr("class","title")
+          .attr("x",margin.left+innerWidth/2)
+          .attr("dx","-70pt")
+          .attr("y",y(0))
+          .attr("fill","white")
+          .attr("text-anchor","middle")
+          .style("font-family","Cardo, serif")
+          .style("font-style",'italic')
+          .style("font-size","40pt")
+          .style("cursor","pointer")
+          .text("my")
+          .on("click",function(){
+          window.location="{% url 'login' %}"
+        });
+
+        var dx = 0;
+        if (!window.matchMedia("(min-width:350px)").matches) {
+          dx = -20;
+        }
+
+        gg.append("text")
+          .attr("class","title")
+          .attr("x",margin.left+innerWidth/2+175)
+          .attr("y",y(0))
+          .attr("dx",-110+dx)
+          .attr("dy","16pt")
+          .attr("fill","white")
+          .attr("text-anchor","end")
+          .style("font-family","Cardo, serif")
+          .style("font-style",'italic')
+          .style("font-size","14pt")
+          .text("by")
+
+        gg.append("text")
+          .attr("class","title")
+          .attr("x",margin.left+innerWidth/2+145+dx)
+          .attr("y",y(0))
+          .attr("dx","20pt")
+          .attr("dy","16pt")
+          .attr("fill","white")
+          .attr("text-anchor","end")
+          .style("font-size","14pt")
+          .text("SALTISE/S4");
+      }
+
+      title();
+      if (document.readyState === 'complete') {
+        animation();
+      }
+      else {
+        window.onload = animation;
+      }
     }
 
-    title();
-  }
+    logo();
 
-  function title(){
-    'use strict';
+    window.addEventListener("resize", logo);
+  </script>
 
-    bundle.selectAll(".title").remove();
-    bundle.selectAll(".scaled-frame").remove();
+  <script nonce="{{ request.csp_nonce }}">
+    // Counts
+    data = {{ json|safe }};
+    labels = bundle.keys(data['All']);
+    var svg = [];
+    var width = [];
+    var height = [];
+    var g = [];
+    var text = [];
 
-    var gg;
-    if (desktop) {
-      gg = g.append('g').attr('class', 'scaled-frame');
-    } else {
-      gg = g.append('g')
-        .attr("transform", "scale("+scale+") translate(40,0)")
-        .attr('class', 'scaled-frame');
-    }
+    function drawCounts() {
+      bundle.selectAll(".count-background").remove();
+      bundle.selectAll(".count").remove();
 
-    gg.append("text")
-    .attr("class","title")
-    .attr("x",margin.left+innerWidth/2)
-    .attr("dx","25pt")
-    .attr("y",y(0))
-    .attr("fill","white")
-    .attr("text-anchor","middle")
-    .style("font-size","40pt")
-    .style("cursor","pointer")
-    .text("DALITE")
-    .on("click",function(){
-      window.location="{% url 'login' %}"
-    });
+      for (var i=0; i<labels.length; i++){
+        svg[i] =  bundle.select("#"+labels[i]);
 
-    gg.append("text")
-    .attr("class","title")
-    .attr("x",margin.left+innerWidth/2)
-    .attr("dx","-70pt")
-    .attr("y",y(0))
-    .attr("fill","white")
-    .attr("text-anchor","middle")
-    .style("font-family","Cardo, serif")
-    .style("font-style",'italic')
-    .style("font-size","40pt")
-    .style("cursor","pointer")
-    .text("my")
-    .on("click",function(){
-      window.location="{% url 'login' %}"
-    });
+        var dy;
+        if (window.matchMedia("(max-width:450px)").matches) {
+          svg[i].attr('width',90);
+          svg[i].attr('height',90);
+          dy = 12;
+        } else {
+          svg[i].attr('width',140);
+          svg[i].attr('height',140);
+          dy = 20;
+        }
 
-    var dx = 0;
-    if (!window.matchMedia("(min-width:350px)").matches) {
-      dx = -20;
-    }
+        width[i] = +svg[i].attr('width');
+        height[i] = +svg[i].attr('height');
 
-    gg.append("text")
-    .attr("class","title")
-    .attr("x",margin.left+innerWidth/2+175)
-    .attr("y",y(0))
-    .attr("dx",-110+dx)
-    .attr("dy","16pt")
-    .attr("fill","white")
-    .attr("text-anchor","end")
-    .style("font-family","Cardo, serif")
-    .style("font-style",'italic')
-    .style("font-size","14pt")
-    .text("by")
+        g[i] = svg[i].append("g")
+          .attr("transform","translate(" + width[i]/2 + "," + height[i]/2 + ")");
 
-    gg.append("text")
-    .attr("class","title")
-    .attr("x",margin.left+innerWidth/2+145+dx)
-    .attr("y",y(0))
-    .attr("dx","20pt")
-    .attr("dy","16pt")
-    .attr("fill","white")
-    .attr("text-anchor","end")
-    .style("font-size","14pt")
-    .text("SALTISE/S4");
-  }
-
-  title();
-  if (document.readyState === 'complete') {
-    animation();
-  }
-  else {
-    window.onload = animation;
-  }
-}
-
-logo();
-
-window.addEventListener("resize", logo);
-</script>
-
-<script nonce="{{ request.csp_nonce }}">
-// Counts
-data = {{ json|safe }};
-labels = bundle.keys(data['All']);
-var svg = [];
-var width = [];
-var height = [];
-var g = [];
-var text = [];
-
-function drawCounts() {
-  bundle.selectAll(".count-background").remove();
-  bundle.selectAll(".count").remove();
-
-  for (var i=0; i<labels.length; i++){
-    svg[i] =  bundle.select("#"+labels[i]);
-
-    var dy;
-    if (window.matchMedia("(max-width:450px)").matches) {
-      svg[i].attr('width',90);
-      svg[i].attr('height',90);
-      dy = 12;
-    } else {
-      svg[i].attr('width',140);
-      svg[i].attr('height',140);
-      dy = 20;
-    }
-
-    width[i] = +svg[i].attr('width');
-    height[i] = +svg[i].attr('height');
-
-    g[i] = svg[i].append("g")
-    .attr("transform","translate(" + width[i]/2 + "," + height[i]/2 + ")");
-
-    /*let gradientR = g[i].append("radialGradient")
+        /*let gradientR = g[i].append("radialGradient")
     .attr("id",'radialGradient')
     .attr('x1',0)
     .attr('x2',1)
@@ -642,235 +642,235 @@ function drawCounts() {
     .attr("offset",'100%')
     .attr('stop-color','var(--mdc-theme-primary)');*/
 
-    g[i].append("circle")
-    .attr("class","count-background")
-    .attr("cx",0)
-    .attr("cy",0)
-    .attr("r",width[i]/2)
-    .attr("fill","white");
+        g[i].append("circle")
+          .attr("class","count-background")
+          .attr("cx",0)
+          .attr("cy",0)
+          .attr("r",width[i]/2)
+          .attr("fill","white");
 
-    g[i].append("circle")
-    .attr("class","count-background fill-primary")
-    .attr("cx",0)
-    .attr("cy",0)
-    .attr("r",width[i]/2)
-    .attr("opacity",0.2);
+        g[i].append("circle")
+          .attr("class","count-background fill-primary")
+          .attr("cx",0)
+          .attr("cy",0)
+          .attr("r",width[i]/2)
+          .attr("opacity",0.2);
 
-    g[i].append("circle")
-    .attr("class","count-background")
-    .attr("cx",0)
-    .attr("cy",0)
-    .attr("r",width[i]/2)
-    .attr("stroke","#54c0db")
-    .attr("stroke-width",1.5)
-    .attr("fill",'none');
+        g[i].append("circle")
+          .attr("class","count-background")
+          .attr("cx",0)
+          .attr("cy",0)
+          .attr("r",width[i]/2)
+          .attr("stroke","#54c0db")
+          .attr("stroke-width",1.5)
+          .attr("fill",'none');
 
-    /*g[i].append("circle")
+        /*g[i].append("circle")
     .attr("class","count-background")
     .attr("cx",0)
     .attr("cy",0)
     .attr("r",80)
     .attr("fill","url(#radialGradient)");*/
 
-    text[i] = g[i].append("text")
-    .attr("class","count fill-primary")
-    .attr("c",data['All'][labels[i]])
-    .attr("x",0)
-    .attr("y",0)
-    .attr("dy",dy)
-    .attr("text-anchor","middle")
-    .text(data['All'][labels[i]]);
-  }
-}
+        text[i] = g[i].append("text")
+          .attr("class","count fill-primary")
+          .attr("c",data['All'][labels[i]])
+          .attr("x",0)
+          .attr("y",0)
+          .attr("dy",dy)
+          .attr("text-anchor","middle")
+          .text(data['All'][labels[i]]);
+      }
+    }
 
-drawCounts();
+    drawCounts();
 
-window.addEventListener("resize", drawCounts);
+    window.addEventListener("resize", drawCounts);
 
-function counts(dataset) {
+    function counts(dataset) {
 
-  // Update counts for new discipline
-  bundle.selectAll(".count").interrupt();
+      // Update counts for new discipline
+      bundle.selectAll(".count").interrupt();
 
-  var delta = [];
-  var set = [];
+      var delta = [];
+      var set = [];
 
-  for (var i = 0; i<labels.length; i++){
-    // Use an iife to simulate block scope (let not available)
-    (function(){
-      var j = i;
-      set[j] = false;
+      for (var i = 0; i<labels.length; i++){
+        // Use an iife to simulate block scope (let not available)
+        (function(){
+          var j = i;
+          set[j] = false;
 
-      text[j].transition()
-      .duration(10)
-      .on("start", function repeat() {
-        if (set[j] == false) {
-          delta[j] = 0.01*((+this.getAttribute("c")) - (+dataset[labels[j]]));
-          set[j] = true;
-        }
-        if (Math.abs((+this.getAttribute("c")) - (+dataset[labels[j]])) >= Math.abs(0.9*delta[j])){
-          this.setAttribute("c",(+this.getAttribute("c")) - delta[j]);
-          if (+this.getAttribute("c") < 0) {
-            this.setAttribute("c",Math.abs(+this.getAttribute("c")));
+          text[j].transition()
+            .duration(10)
+            .on("start", function repeat() {
+            if (set[j] == false) {
+              delta[j] = 0.01*((+this.getAttribute("c")) - (+dataset[labels[j]]));
+              set[j] = true;
+            }
+            if (Math.abs((+this.getAttribute("c")) - (+dataset[labels[j]])) >= Math.abs(0.9*delta[j])){
+              this.setAttribute("c",(+this.getAttribute("c")) - delta[j]);
+              if (+this.getAttribute("c") < 0) {
+                this.setAttribute("c",Math.abs(+this.getAttribute("c")));
+              }
+              bundle.active(this)
+                .text((+this.getAttribute("c")).toFixed(0))
+                .transition()
+                .on("start", repeat);
+            }
+            else {
+              bundle.interrupt(this);
+            }
+          });
+        })();
+      }
+    }
+
+    function update(t,e) {
+      counts(data[t.id]);
+      return;
+    }
+  </script>
+
+  <script nonce="{{ request.csp_nonce }}">
+    function icons() {
+      'use strict';
+
+      // Draw icons
+      bundle.selectAll('.custom-icon').remove();
+
+      var iconRadius;
+      var scaleFactor;
+      if (window.matchMedia("(max-width:450px)").matches) {
+        iconRadius = 30;
+        scaleFactor = iconRadius/40;
+      } else {
+        iconRadius = 40;
+        scaleFactor = 1;
+      }
+
+      bundle.selectAll(".icon-resize").attr('width',2*iconRadius);
+      bundle.selectAll(".icon-resize").attr('height',2*iconRadius);
+
+      var peerinst = bundle.select('.peerinst');
+
+      var g = peerinst.append("g")
+        .attr("transform","translate(" + peerinst.attr('width')/2 + "," + peerinst.attr('height')/2 + ")");
+
+      g.append('circle')
+        .attr('class', 'custom-icon fill-primary')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', iconRadius)
+        .style('opacity', 0.8);
+
+      g.append('text')
+        .attr('class', 'material-icons custom-icon')
+        .attr('id', 'chat_right')
+        .attr('x', 0)
+        .attr('dx', -10*scaleFactor)
+        .attr('y', 0)
+        .attr('dy', 15*scaleFactor)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'white')
+        .style('opacity', 0)
+        .style('font-size', 36*scaleFactor+'px')
+        .text('chat_bubble_outline')
+        .transition()
+        .duration(1000)
+        .delay(Math.random()*500+500)
+        .on('start', function repeat() {
+        bundle.active(this)
+          .style('opacity', function() {
+          if (this.style.opacity > 0) {
+            return 0;
+          } else {
+            return 1;
           }
-          bundle.active(this)
-          .text((+this.getAttribute("c")).toFixed(0))
+        })
           .transition()
+          .delay(Math.random()*500+500)
           .on("start", repeat);
-        }
-        else {
-          bundle.interrupt(this);
-        }
       });
-    })();
-  }
-}
 
-function update(t,e) {
-  counts(data[t.id]);
-  return;
-}
-</script>
+      g.append('text')
+        .attr('class', 'material-icons custom-icon')
+        .attr('id', 'chat_left')
+        .attr('x', 0)
+        .attr('dx', -10*scaleFactor)
+        .attr('y', 0)
+        .attr('dy', 21*scaleFactor)
+        .attr('transform', 'scale(-1,1)')
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'white')
+        .style('opacity', 0)
+        .style('font-size', 36*scaleFactor+'px')
+        .text('chat_bubble_outline')
+        .transition()
+        .duration(1000)
+        .delay(Math.random()*500+200)
+        .on('start', function repeat() {
+        bundle.active(this)
+          .style('opacity', function() {
+          if (this.style.opacity > 0) {
+            return 0;
+          } else {
+            return 1;
+          }
+        })
+          .transition()
+          .delay(Math.random()*500+200)
+          .on("start", repeat);
+      });
 
-<script nonce="{{ request.csp_nonce }}">
-function icons() {
-  'use strict';
+      var school = bundle.select('.school');
 
-  // Draw icons
-  bundle.selectAll('.custom-icon').remove();
+      var g = school.append("g")
+        .attr("transform","translate(" + school.attr('width')/2 + "," + school.attr('height')/2 + ")");
 
-  var iconRadius;
-  var scaleFactor;
-  if (window.matchMedia("(max-width:450px)").matches) {
-    iconRadius = 30;
-    scaleFactor = iconRadius/40;
-  } else {
-    iconRadius = 40;
-    scaleFactor = 1;
-  }
+      g.append('circle')
+        .attr('class', 'custom-icon fill-primary')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', iconRadius)
+        .style('opacity', 0.8);
 
-  bundle.selectAll(".icon-resize").attr('width',2*iconRadius);
-  bundle.selectAll(".icon-resize").attr('height',2*iconRadius);
+      g.append('text')
+        .attr('class', 'material-icons custom-icon')
+        .attr('x', 0)
+        .attr('dx', -15*scaleFactor)
+        .attr('y', 0)
+        .attr('dy', 11*scaleFactor)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'white')
+        .style('font-size', 36*scaleFactor+'px')
+        .text('school');
 
-  var peerinst = bundle.select('.peerinst');
+      g.append('text')
+        .attr('class', 'material-icons custom-icon')
+        .attr('x', 0)
+        .attr('dx', -15*scaleFactor)
+        .attr('y', 0)
+        .attr('dy', 25*scaleFactor)
+        .attr('transform', 'scale(-1,1)')
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'white')
+        .style('font-size', 36*scaleFactor+'px')
+        .text('home');
 
-  var g = peerinst.append("g")
-  .attr("transform","translate(" + peerinst.attr('width')/2 + "," + peerinst.attr('height')/2 + ")");
+      var lightbulb = bundle.select('.lightbulb');
 
-  g.append('circle')
-    .attr('class', 'custom-icon fill-primary')
-    .attr('cx', 0)
-    .attr('cy', 0)
-    .attr('r', iconRadius)
-    .style('opacity', 0.8);
+      var g = lightbulb.append("g")
+        .attr("transform","translate(" + lightbulb.attr('width')/2 + "," + lightbulb.attr('height')/2 + ")");
 
-  g.append('text')
-    .attr('class', 'material-icons custom-icon')
-    .attr('id', 'chat_right')
-    .attr('x', 0)
-    .attr('dx', -10*scaleFactor)
-    .attr('y', 0)
-    .attr('dy', 15*scaleFactor)
-    .attr('text-anchor', 'middle')
-    .attr('fill', 'white')
-    .style('opacity', 0)
-    .style('font-size', 36*scaleFactor+'px')
-    .text('chat_bubble_outline')
-    .transition()
-    .duration(1000)
-    .delay(Math.random()*500+500)
-    .on('start', function repeat() {
-      bundle.active(this)
-      .style('opacity', function() {
-        if (this.style.opacity > 0) {
-          return 0;
-        } else {
-          return 1;
-        }
-      })
-      .transition()
-      .delay(Math.random()*500+500)
-      .on("start", repeat);
-    });
+      g.append('circle')
+        .attr('class', 'custom-icon fill-primary')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', iconRadius)
+        .style('opacity', 0.8);
 
-  g.append('text')
-    .attr('class', 'material-icons custom-icon')
-    .attr('id', 'chat_left')
-    .attr('x', 0)
-    .attr('dx', -10*scaleFactor)
-    .attr('y', 0)
-    .attr('dy', 21*scaleFactor)
-    .attr('transform', 'scale(-1,1)')
-    .attr('text-anchor', 'middle')
-    .attr('fill', 'white')
-    .style('opacity', 0)
-    .style('font-size', 36*scaleFactor+'px')
-    .text('chat_bubble_outline')
-    .transition()
-    .duration(1000)
-    .delay(Math.random()*500+200)
-    .on('start', function repeat() {
-      bundle.active(this)
-      .style('opacity', function() {
-        if (this.style.opacity > 0) {
-          return 0;
-        } else {
-          return 1;
-        }
-      })
-      .transition()
-      .delay(Math.random()*500+200)
-      .on("start", repeat);
-    });
-
-    var school = bundle.select('.school');
-
-    var g = school.append("g")
-    .attr("transform","translate(" + school.attr('width')/2 + "," + school.attr('height')/2 + ")");
-
-    g.append('circle')
-      .attr('class', 'custom-icon fill-primary')
-      .attr('cx', 0)
-      .attr('cy', 0)
-      .attr('r', iconRadius)
-      .style('opacity', 0.8);
-
-    g.append('text')
-      .attr('class', 'material-icons custom-icon')
-      .attr('x', 0)
-      .attr('dx', -15*scaleFactor)
-      .attr('y', 0)
-      .attr('dy', 11*scaleFactor)
-      .attr('text-anchor', 'middle')
-      .attr('fill', 'white')
-      .style('font-size', 36*scaleFactor+'px')
-      .text('school');
-
-    g.append('text')
-      .attr('class', 'material-icons custom-icon')
-      .attr('x', 0)
-      .attr('dx', -15*scaleFactor)
-      .attr('y', 0)
-      .attr('dy', 25*scaleFactor)
-      .attr('transform', 'scale(-1,1)')
-      .attr('text-anchor', 'middle')
-      .attr('fill', 'white')
-      .style('font-size', 36*scaleFactor+'px')
-      .text('home');
-
-  var lightbulb = bundle.select('.lightbulb');
-
-  var g = lightbulb.append("g")
-  .attr("transform","translate(" + lightbulb.attr('width')/2 + "," + lightbulb.attr('height')/2 + ")");
-
-  g.append('circle')
-    .attr('class', 'custom-icon fill-primary')
-    .attr('cx', 0)
-    .attr('cy', 0)
-    .attr('r', iconRadius)
-    .style('opacity', 0.8);
-
-  /*g.append('image')
+      /*g.append('image')
     .attr('class', 'custom-icon')
     .attr('x', -24*scaleFactor)
     .attr('y', -24*scaleFactor)
@@ -879,74 +879,74 @@ function icons() {
     .style('opacity', 1)
     .attr('href', "{% static 'peerinst/img/light-bulb-2-128.png' %}");*/
 
-  g.append('text')
-    .attr('class', 'material-icons custom-icon')
-    .attr('x', 0)
-    .attr('y', 0)
-    .attr('dy', 24*scaleFactor)
-    .attr('text-anchor', 'middle')
-    .attr('fill', 'white')
-    .style('font-size', 48*scaleFactor+'px')
-    .text('lightbulb_outline');
+      g.append('text')
+        .attr('class', 'material-icons custom-icon')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('dy', 24*scaleFactor)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'white')
+        .style('font-size', 48*scaleFactor+'px')
+        .text('lightbulb_outline');
 
-    var activity = bundle.select('.activity');
+      var activity = bundle.select('.activity');
 
-    var g = activity.append("g")
-    .attr("transform","translate(" + activity.attr('width')/2 + "," + activity.attr('height')/2 + ")");
+      var g = activity.append("g")
+        .attr("transform","translate(" + activity.attr('width')/2 + "," + activity.attr('height')/2 + ")");
 
-    g.append('circle')
-      .attr('class', 'custom-icon fill-primary')
-      .attr('cx', 0)
-      .attr('cy', 0)
-      .attr('r', iconRadius)
-      .style('opacity', 0.8);
+      g.append('circle')
+        .attr('class', 'custom-icon fill-primary')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', iconRadius)
+        .style('opacity', 0.8);
 
-    g.append('text')
-      .attr('class', 'material-icons custom-icon')
-      .attr('x', 0)
-      .attr('y', 0)
-      .attr('dy', 30*scaleFactor)
-      .attr('text-anchor', 'middle')
-      .attr('fill', 'white')
-      .style('font-size', 60*scaleFactor+'px')
-      .text('trending_up');
+      g.append('text')
+        .attr('class', 'material-icons custom-icon')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('dy', 30*scaleFactor)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'white')
+        .style('font-size', 60*scaleFactor+'px')
+        .text('trending_up');
 
-    var browser = bundle.select('.browser');
+      var browser = bundle.select('.browser');
 
-    var g = browser.append("g")
-    .attr("transform","translate(" + browser.attr('width')/2 + "," + browser.attr('height')/2 + ")");
+      var g = browser.append("g")
+        .attr("transform","translate(" + browser.attr('width')/2 + "," + browser.attr('height')/2 + ")");
 
-    g.append('circle')
-      .attr('class', 'custom-icon fill-primary')
-      .attr('cx', 0)
-      .attr('cy', 0)
-      .attr('r', iconRadius)
-      .style('opacity', 0.8);
+      g.append('circle')
+        .attr('class', 'custom-icon fill-primary')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', iconRadius)
+        .style('opacity', 0.8);
 
-    g.append('text')
-      .attr('class', 'material-icons custom-icon')
-      .attr('x', 0)
-      .attr('y', 0)
-      .attr('dy', 25*scaleFactor)
-      .attr('text-anchor', 'middle')
-      .attr('fill', 'white')
-      .style('font-size', 50*scaleFactor+'px')
-      .text('settings');
+      g.append('text')
+        .attr('class', 'material-icons custom-icon')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('dy', 25*scaleFactor)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'white')
+        .style('font-size', 50*scaleFactor+'px')
+        .text('settings');
 
-    var saltise = bundle.select('.saltise');
+      var saltise = bundle.select('.saltise');
 
-    var g = saltise.append("g")
-    .attr("transform","translate(" + saltise.attr('width')/2 + "," + saltise.attr('height')/2 + ")");
+      var g = saltise.append("g")
+        .attr("transform","translate(" + saltise.attr('width')/2 + "," + saltise.attr('height')/2 + ")");
 
-    g.append("image")
-    .attr('class', 'custom-icon')
-    .attr('x', -iconRadius)
-    .attr('y', -iconRadius)
-    .attr('width', 2*iconRadius)
-    .attr('height', 2*iconRadius)
-    .attr('href', "{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" );
+      g.append("image")
+        .attr('class', 'custom-icon')
+        .attr('x', -iconRadius)
+        .attr('y', -iconRadius)
+        .attr('width', 2*iconRadius)
+        .attr('height', 2*iconRadius)
+        .attr('href', "{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" );
 
-    /*var x = bundle.scaleLinear().domain([0,2*Math.PI]).range([-25*scaleFactor,25*scaleFactor]);
+      /*var x = bundle.scaleLinear().domain([0,2*Math.PI]).range([-25*scaleFactor,25*scaleFactor]);
     var y = bundle.scaleLinear().domain([-1,1]).range([-25*scaleFactor,25*scaleFactor]);
 
     var xPoints = bundle.range(0,2*Math.PI+0.01,(2*Math.PI/10));
@@ -983,581 +983,581 @@ function icons() {
       path.lineTo(26*scaleFactor, 0);
       return path;
     });*/
-}
-icons();
+    }
+    icons();
 
-window.addEventListener('resize', icons);
-</script>
+    window.addEventListener('resize', icons);
+  </script>
 
-<script nonce="{{ request.csp_nonce }}">
-// History
-function timeline() {
-  'use strict';
+  <script nonce="{{ request.csp_nonce }}">
+    // History
+    function timeline() {
+      'use strict';
 
-  var timelineData = {
-    "events" : [
-      { "year" : "2008",
-        "type"  : "milestone",
-        "shortDesc" : "{% trans 'Initial co-design development' %}",
-        "offset" : 0,
-        "note" : "{% trans 'Teachers from Dawson College, John Abbott College, and Vanier College collaborated with Jim Slotta and the Ontario Institute of Studies in Education to design the tool' %}" },
-      { "year" : "2010",
-        "type"  : "software",
-        "shortDesc" : "{% trans 'First major release' %}",
-        "offset" : 0,
-        "note" : "{% trans 'Beta version of PHP app for Asynchronous Peer Instruction (AsPI) deployed' %}" },
-      { "year" : "2013.7",
-        "type"  : "publication",
-        "shortDesc" : "{% trans 'First major study' %}",
-        "offset" : 0,
-        "note" : "\'Quasi-experimental study of effectiveness of AsPI with five physics teachers across three colleges\'" },
-      { "year" : "2014.5",
-        "type"  : "publication",
-        "shortDesc" : "11th Int. Conference on LS",
-        "offset" : -17,
-        "note" : "Charles, E.S, Whittaker, C., Lasry, N., Dugdale, M., Lenton, K., Bhatnagar, S., Guillemette, J. \'Taking DALITE To the Next Level: What have we learned from a web-based peer instruction application\'.  Proceedings of the 11th International Conference of the Learning Sciences (ICLS 2014), June 23-27, 2014, Boulder, US.",
-        "link" : "https://www.isls.org/icls/2014/Proceedings.html" },
-      { "year" : "2015",
-        "type"  : "publication",
-        "shortDesc" : "Colloque de l’ARC 2015",
-        "offset" : -23,
-        "note" : "Charles, E.S, Lasry, N., Whittaker, C., Dugdale, M., Lenton, K., Bhatnagar, S., \'Les retombées de DALITE\'.  27 mai 2015, Rimouski, Québec.",
-        "link" : "https://dspacecdc-test.inlibro.net/xmlui/bitstream/handle/11515/34789/CHARLES-E-et-coll_2015_Affiche.pdf?sequence=1&isAllowed=y" },
-      { "year" : "2015.2",
-        "type"  : "software",
-        "shortDesc" : "{% trans 'Second major release' %}",
-        "offset" : -18,
-        "note" : "{% trans 'Completely re-written by HarvardX as an open-source LTI compliant tool' %}" },
-      { "year" : "2015.4",
-        "type"  : "publication",
-        "shortDesc" : "CSCL 2015 Conference",
-        "offset" : -12,
-        "note" : "Charles, E.S., Lasry N., Whittaker,C., Dugdale,M., Lenton,K., Bhatnagar, S., Guillemette, J., \'Beyond and Within Classroom Walls: Designing Principled Pedagogical Tools for Student and Faculty Uptake\'. Proceedings of the 11th International Conference on Computer Collaborative Learning, June 7-11, 2015, Gothenburg, Sweden. ",
-        "link" : "https://www.isls.org/cscl2015/papers/MC-0280-FullPaper-Charles.pdf" },
-      { "year" : "2015.5",
-        "type"  : "publication",
-        "shortDesc" : "8th Int. Conference on EDM",
-        "offset" : -2,
-        "note" : "Bhatnagar, S., Desmarais, M.C., Whittaker C., Lasry N., Dugdale M., Lenton K., Charles E., \'An analysis of peer-written and peer-reviewed rationales from an asynchronous peer-instruction learning environment\'. 2015 International Conference on Educational Data Mining, June 26-29, Madrid, Spain.",
-        "link" : "https://files.eric.ed.gov/fulltext/ED560883.pdf" },
-      { "year" : "2015.8",
-        "type"  : "use",
-        "shortDesc" : "HarvardX MOOC - Justice",
-        "offset" : 1,
-        "note" : "\'Justice, one of the most famous courses taught at Harvard College, is an introduction to moral and political philosophy, offering an opportunity to discuss contemporary dilemmas and controversies\'",
-        "link" : "https://www.edx.org/course/justice-harvardx-er22-1x-2" },
-      { "year" : "2016.25",
-        "type"  : "use",
-        "shortDesc" : "MITx MOOC - Physics",
-        "offset" : -2,
-        "note" : "\'This is a college-level Introductory Newtonian Mechanics course designed for both students and teachers\'",
-        "link" : "https://www.edx.org/course/advanced-introductory-classical-mitx-8-mechcx-0" },
-      { "year" : "2016.7",
-        "type"  : "use",
-        "shortDesc" : "McGillx MOOC - Injury Prevention",
-        "offset" : -5,
-        "note" : "\'Learn from leading global experts about the benefits of physical activity and how to prevent and treat injuries\'",
-        "link" : "https://www.edx.org/course/body-matters-why-exercise-makes-you-mcgillx-body101x-0" },
-      { "year" : "2016.85",
-        "type"  : "publication",
-        "shortDesc" : "EC-TEL 2016 Conference",
-        "offset" : 3,
-        "note" : "Bhatnagar, S., Lasry, N., Desmarais, M.C.,Charles, E.S., \'DALITE: Asynchronous Peer Instruction for MOOCs\'. 11th European Conference on Technology Enhanced Learning Adaptive and Adaptable Learning (EC-TEL 2016), September 13-16 2016, Lyon, France.",
-        "link" : "http://www.professeurs.polymtl.ca/michel.desmarais/Publications-Michel/EC-TEL_2016_paper_201.pdf" },
-      { "year" : "2017",
-        "type"  : "use",
-        "shortDesc" : "CalTech MOOC - Quantum Cryptography",
-        "offset" : 11,
-        "note" : "\'Learn how quantum communication provides security that is guaranteed by the laws of nature\'",
-        "link" : "https://www.edx.org/course/quantum-cryptography-caltechx-delftx-qucryptox-0" },
-      { "year" : "2018.42",
-        "type" : "software",
-        "shortDesc" : "{% trans 'Third major release' %}",
-        "offset" : 0,
-        "note" : "{% trans 'Extended from an LTI tool to a modern web app in preparation for widespread use by practitioners' %}"},
-      { "year" : "2018.75",
-        "type" : "event",
-        "shortDesc" : "{% trans 'New feature development' %}",
-        "offset" : 0,
-        "note" : "{% trans 'Content authoring, better analytics, stand-alone functionality outside of an LTI environment, and more...' %}"},
-      { "year" : "2019.00",
-        "type" : "publication",
-        "shortDesc" : "ETOP 2019",
-        "offset" : 5,
-        "note" : "Adams, Rhys, Phoebe Jackson, Kevin Lenton, Michael Dugdale, Chris Whittaker, Nathaniel Lasry, and Elizabeth S. Charles. \'Error-detection tasks and peer feedback for engaging physics students.\' In Education and Training in Optics and Photonics, p. 11143_95. Optical Society of America, 2019.",
-        "link" : "https://www.osapublishing.org/abstract.cfm?uri=ETOP-2019-11143_95"},
-      { "year" : "2019.20",
-        "type" : "publication",
-        "shortDesc" : "ETOP 2019",
-        "offset" : 15,
-        "note" : "Charles, E.S., Lasry, N., Bhatnagar, S., Adams, R., Lenton, K., Brouillette, Y., Dugdale, M., Whittaker, C. and Jackson, P., 2019, May. \'Harnessing peer instruction in-and out-of class with myDALITE.\' In Education and Training in Optics and Photonics (p. 11143_89). Optical Society of America.",
-        "link" : "https://www.osapublishing.org/abstract.cfm?uri=ETOP-2019-11143_89"},
-      { "year" : "2020.10",
-        "type" : "event",
-        "shortDesc" : "{% trans 'New feature development' %}",
-        "offset" : 0,
-        "note" : "{% trans 'Release of web reputation framework for community contributions' %}"},
-      { "year" : "2020.50",
-        "type" : "event",
-        "shortDesc" : "{% trans 'Major Update' %}",
-        "offset" : 0,
-        "note" : "{% trans 'Update to Long Term Support for entire open source compute stack' %}"},
+      var timelineData = {
+        "events" : [
+          { "year" : "2008",
+            "type"  : "milestone",
+            "shortDesc" : "{% trans 'Initial co-design development' %}",
+            "offset" : 0,
+            "note" : "{% trans 'Teachers from Dawson College, John Abbott College, and Vanier College collaborated with Jim Slotta and the Ontario Institute of Studies in Education to design the tool' %}" },
+          { "year" : "2010",
+            "type"  : "software",
+            "shortDesc" : "{% trans 'First major release' %}",
+            "offset" : 0,
+            "note" : "{% trans 'Beta version of PHP app for Asynchronous Peer Instruction (AsPI) deployed' %}" },
+          { "year" : "2013.7",
+            "type"  : "publication",
+            "shortDesc" : "{% trans 'First major study' %}",
+            "offset" : 0,
+            "note" : "\'Quasi-experimental study of effectiveness of AsPI with five physics teachers across three colleges\'" },
+          { "year" : "2014.5",
+            "type"  : "publication",
+            "shortDesc" : "11th Int. Conference on LS",
+            "offset" : -17,
+            "note" : "Charles, E.S, Whittaker, C., Lasry, N., Dugdale, M., Lenton, K., Bhatnagar, S., Guillemette, J. \'Taking DALITE To the Next Level: What have we learned from a web-based peer instruction application\'.  Proceedings of the 11th International Conference of the Learning Sciences (ICLS 2014), June 23-27, 2014, Boulder, US.",
+            "link" : "https://www.isls.org/icls/2014/Proceedings.html" },
+          { "year" : "2015",
+            "type"  : "publication",
+            "shortDesc" : "Colloque de l’ARC 2015",
+            "offset" : -23,
+            "note" : "Charles, E.S, Lasry, N., Whittaker, C., Dugdale, M., Lenton, K., Bhatnagar, S., \'Les retombées de DALITE\'.  27 mai 2015, Rimouski, Québec.",
+            "link" : "https://dspacecdc-test.inlibro.net/xmlui/bitstream/handle/11515/34789/CHARLES-E-et-coll_2015_Affiche.pdf?sequence=1&isAllowed=y" },
+          { "year" : "2015.2",
+            "type"  : "software",
+            "shortDesc" : "{% trans 'Second major release' %}",
+            "offset" : -18,
+            "note" : "{% trans 'Completely re-written by HarvardX as an open-source LTI compliant tool' %}" },
+          { "year" : "2015.4",
+            "type"  : "publication",
+            "shortDesc" : "CSCL 2015 Conference",
+            "offset" : -12,
+            "note" : "Charles, E.S., Lasry N., Whittaker,C., Dugdale,M., Lenton,K., Bhatnagar, S., Guillemette, J., \'Beyond and Within Classroom Walls: Designing Principled Pedagogical Tools for Student and Faculty Uptake\'. Proceedings of the 11th International Conference on Computer Collaborative Learning, June 7-11, 2015, Gothenburg, Sweden. ",
+            "link" : "https://www.isls.org/cscl2015/papers/MC-0280-FullPaper-Charles.pdf" },
+          { "year" : "2015.5",
+            "type"  : "publication",
+            "shortDesc" : "8th Int. Conference on EDM",
+            "offset" : -2,
+            "note" : "Bhatnagar, S., Desmarais, M.C., Whittaker C., Lasry N., Dugdale M., Lenton K., Charles E., \'An analysis of peer-written and peer-reviewed rationales from an asynchronous peer-instruction learning environment\'. 2015 International Conference on Educational Data Mining, June 26-29, Madrid, Spain.",
+            "link" : "https://files.eric.ed.gov/fulltext/ED560883.pdf" },
+          { "year" : "2015.8",
+            "type"  : "use",
+            "shortDesc" : "HarvardX MOOC - Justice",
+            "offset" : 1,
+            "note" : "\'Justice, one of the most famous courses taught at Harvard College, is an introduction to moral and political philosophy, offering an opportunity to discuss contemporary dilemmas and controversies\'",
+            "link" : "https://www.edx.org/course/justice-harvardx-er22-1x-2" },
+          { "year" : "2016.25",
+            "type"  : "use",
+            "shortDesc" : "MITx MOOC - Physics",
+            "offset" : -2,
+            "note" : "\'This is a college-level Introductory Newtonian Mechanics course designed for both students and teachers\'",
+            "link" : "https://www.edx.org/course/advanced-introductory-classical-mitx-8-mechcx-0" },
+          { "year" : "2016.7",
+            "type"  : "use",
+            "shortDesc" : "McGillx MOOC - Injury Prevention",
+            "offset" : -5,
+            "note" : "\'Learn from leading global experts about the benefits of physical activity and how to prevent and treat injuries\'",
+            "link" : "https://www.edx.org/course/body-matters-why-exercise-makes-you-mcgillx-body101x-0" },
+          { "year" : "2016.85",
+            "type"  : "publication",
+            "shortDesc" : "EC-TEL 2016 Conference",
+            "offset" : 3,
+            "note" : "Bhatnagar, S., Lasry, N., Desmarais, M.C.,Charles, E.S., \'DALITE: Asynchronous Peer Instruction for MOOCs\'. 11th European Conference on Technology Enhanced Learning Adaptive and Adaptable Learning (EC-TEL 2016), September 13-16 2016, Lyon, France.",
+            "link" : "http://www.professeurs.polymtl.ca/michel.desmarais/Publications-Michel/EC-TEL_2016_paper_201.pdf" },
+          { "year" : "2017",
+            "type"  : "use",
+            "shortDesc" : "CalTech MOOC - Quantum Cryptography",
+            "offset" : 11,
+            "note" : "\'Learn how quantum communication provides security that is guaranteed by the laws of nature\'",
+            "link" : "https://www.edx.org/course/quantum-cryptography-caltechx-delftx-qucryptox-0" },
+          { "year" : "2018.42",
+            "type" : "software",
+            "shortDesc" : "{% trans 'Third major release' %}",
+            "offset" : 0,
+            "note" : "{% trans 'Extended from an LTI tool to a modern web app in preparation for widespread use by practitioners' %}"},
+          { "year" : "2018.75",
+            "type" : "event",
+            "shortDesc" : "{% trans 'New feature development' %}",
+            "offset" : 0,
+            "note" : "{% trans 'Content authoring, better analytics, stand-alone functionality outside of an LTI environment, and more...' %}"},
+          { "year" : "2019.00",
+            "type" : "publication",
+            "shortDesc" : "ETOP 2019",
+            "offset" : 5,
+            "note" : "Adams, Rhys, Phoebe Jackson, Kevin Lenton, Michael Dugdale, Chris Whittaker, Nathaniel Lasry, and Elizabeth S. Charles. \'Error-detection tasks and peer feedback for engaging physics students.\' In Education and Training in Optics and Photonics, p. 11143_95. Optical Society of America, 2019.",
+            "link" : "https://www.osapublishing.org/abstract.cfm?uri=ETOP-2019-11143_95"},
+          { "year" : "2019.20",
+            "type" : "publication",
+            "shortDesc" : "ETOP 2019",
+            "offset" : 15,
+            "note" : "Charles, E.S., Lasry, N., Bhatnagar, S., Adams, R., Lenton, K., Brouillette, Y., Dugdale, M., Whittaker, C. and Jackson, P., 2019, May. \'Harnessing peer instruction in-and out-of class with myDALITE.\' In Education and Training in Optics and Photonics (p. 11143_89). Optical Society of America.",
+            "link" : "https://www.osapublishing.org/abstract.cfm?uri=ETOP-2019-11143_89"},
+          { "year" : "2020.10",
+            "type" : "event",
+            "shortDesc" : "{% trans 'New feature development' %}",
+            "offset" : 0,
+            "note" : "{% trans 'Release of web reputation framework for community contributions' %}"},
+          { "year" : "2020.50",
+            "type" : "event",
+            "shortDesc" : "{% trans 'Major Update' %}",
+            "offset" : 0,
+            "note" : "{% trans 'Update to Long Term Support for entire open source compute stack' %}"},
 
-  ]
-};
+        ]
+      };
 
-  var svg = bundle.select("#history");
+      var svg = bundle.select("#history");
 
-  svg.attr("width",document.querySelector("section").offsetWidth);
+      svg.attr("width",document.querySelector("section").offsetWidth);
 
-  var width = +svg.attr("width"),
-  height = +svg.attr("height"),
-  margin = {top:20,bottom:10,left:1,right:1};
+      var width = +svg.attr("width"),
+      height = +svg.attr("height"),
+      margin = {top:20,bottom:10,left:1,right:1};
 
-  var innerWidth = width-margin.left-margin.right,
-  innerHeight = height-margin.top-margin.bottom;
+      var innerWidth = width-margin.left-margin.right,
+      innerHeight = height-margin.top-margin.bottom;
 
-  svg.selectAll("g").remove();
+      svg.selectAll("g").remove();
 
-  var g = svg.append("g").attr("transform","translate("+(margin.left+0.175*innerWidth)+","+(margin.top+innerHeight/2)+")");
+      var g = svg.append("g").attr("transform","translate("+(margin.left+0.175*innerWidth)+","+(margin.top+innerHeight/2)+")");
 
-  var y = bundle.scaleLinear().domain([2008,2021]).range([-innerHeight/2,innerHeight/2]);
+      var y = bundle.scaleLinear().domain([2008,2021]).range([-innerHeight/2,innerHeight/2]);
 
-  var c = bundle.scaleOrdinal().domain(['milestone', 'software', 'use', 'publication']).range(['green','red','#54c0db','#004266']);
+      var c = bundle.scaleOrdinal().domain(['milestone', 'software', 'use', 'publication']).range(['green','red','#54c0db','#004266']);
 
-  var yAxis = g.append("g")
-    .attr('class', 'timeline-axis')
-    .call(
-      bundle.axisLeft(y).tickSize(15).tickFormat(bundle.format('.0f'))
+      var yAxis = g.append("g")
+        .attr('class', 'timeline-axis')
+        .call(
+        bundle.axisLeft(y).tickSize(15).tickFormat(bundle.format('.0f'))
       );
 
-g.append('text')
-  .attr('x', 0)
-  .attr('dx', 20)
-  .attr('y', y(2007.4))
-  .attr('dy', 3)
-  .attr('font-size', '7pt')
-  .attr('fill', 'gray')
-  .text("{% trans 'Click/hover to expand' %}");
+      g.append('text')
+        .attr('x', 0)
+        .attr('dx', 20)
+        .attr('y', y(2007.4))
+        .attr('dy', 3)
+        .attr('font-size', '7pt')
+        .attr('fill', 'gray')
+        .text("{% trans 'Click/hover to expand' %}");
 
-g.append('path')
-  .attr('stroke', 'gray')
-  .attr('fill', 'none')
-  .attr('stroke-width', '0.5px')
-  .attr('d', function(d) {
-    var path = bundle.path();
-    path.moveTo(17, y(2007.4));
-    path.quadraticCurveTo(2, y(2007.5), 0, y(2008));
-    return path;
-  });
+      g.append('path')
+        .attr('stroke', 'gray')
+        .attr('fill', 'none')
+        .attr('stroke-width', '0.5px')
+        .attr('d', function(d) {
+        var path = bundle.path();
+        path.moveTo(17, y(2007.4));
+        path.quadraticCurveTo(2, y(2007.5), 0, y(2008));
+        return path;
+      });
 
-  var links = g.append('g')
-    .selectAll('.links')
-    .data(timelineData.events)
-    .enter().append('path')
-    .attr('class', 'links')
-    .attr('stroke', 'gray')
-    .attr('stroke-width', '0.5px')
-    .attr('fill', 'none')
-    .attr('d', function(d) {
-      var path = bundle.path();
-      if (+d.offset != 0) {
-        path.moveTo(0, y(d.year));
-        path.lineTo(17, y(d.year)+d.offset);
-      }
-      return path;
-    });
+      var links = g.append('g')
+        .selectAll('.links')
+        .data(timelineData.events)
+        .enter().append('path')
+        .attr('class', 'links')
+        .attr('stroke', 'gray')
+        .attr('stroke-width', '0.5px')
+        .attr('fill', 'none')
+        .attr('d', function(d) {
+        var path = bundle.path();
+        if (+d.offset != 0) {
+          path.moveTo(0, y(d.year));
+          path.lineTo(17, y(d.year)+d.offset);
+        }
+        return path;
+      });
 
-  var events = g.append('g')
-    .selectAll('circle')
-    .data(timelineData.events)
-    .enter().append('circle')
-    .attr('cx', 0)
-    .attr('cy', function(d) { return y(d.year); })
-    .attr('r', 5)
-    .attr('fill', 'white')
-    .attr('stroke', function(d) { return c(d.type); });
+      var events = g.append('g')
+        .selectAll('circle')
+        .data(timelineData.events)
+        .enter().append('circle')
+        .attr('cx', 0)
+        .attr('cy', function(d) { return y(d.year); })
+        .attr('r', 5)
+        .attr('fill', 'white')
+        .attr('stroke', function(d) { return c(d.type); });
 
-    var descriptions = g.append('g')
-      .selectAll('.description')
-      .data(timelineData.events)
-      .enter().append('text')
-      .attr('class', 'description')
-      .attr('id', function(d) { return "description_"+d.year.replace('.','_'); })
-      .attr('x', 21)
-      .attr('y', function(d) { return y(d.year); })
-      .attr('dy', function(d) { return 25+d.offset; })
-      .attr('text-anchor', 'start')
-      .style('font-size', '10pt')
-      .style('opacity', 0)
-      .attr('fill', function(d) { return c(d.type); })
-      .text(function(d) {return (d.note);})
-      .call(bundle.wrap, 0.7*innerWidth);
+      var descriptions = g.append('g')
+        .selectAll('.description')
+        .data(timelineData.events)
+        .enter().append('text')
+        .attr('class', 'description')
+        .attr('id', function(d) { return "description_"+d.year.replace('.','_'); })
+        .attr('x', 21)
+        .attr('y', function(d) { return y(d.year); })
+        .attr('dy', function(d) { return 25+d.offset; })
+        .attr('text-anchor', 'start')
+        .style('font-size', '10pt')
+        .style('opacity', 0)
+        .attr('fill', function(d) { return c(d.type); })
+        .text(function(d) {return (d.note);})
+        .call(bundle.wrap, 0.7*innerWidth);
 
-  var notes = g.append('g')
-    .selectAll('.timelineLabel')
-    .data(timelineData.events)
-    .enter().append('text')
-    .attr('class', 'timelineLabel')
-    .attr('id', function(d) { return "label_"+d.year.replace('.','_'); })
-    .attr('x', 0)
-    .attr('dx', 20)
-    .attr('y', function(d) { return y(d.year); })
-    .attr('dy', function(d) { return 5+d.offset; })
-    .attr('text-anchor', 'start')
-    .style('cursor', function(d) { if (d.link) { return 'pointer'; } })
-    .style('font-size', '9pt')
-    .attr('fill', function(d) { return c(d.type); })
-    .text(function(d) {return d.shortDesc;});
+      var notes = g.append('g')
+        .selectAll('.timelineLabel')
+        .data(timelineData.events)
+        .enter().append('text')
+        .attr('class', 'timelineLabel')
+        .attr('id', function(d) { return "label_"+d.year.replace('.','_'); })
+        .attr('x', 0)
+        .attr('dx', 20)
+        .attr('y', function(d) { return y(d.year); })
+        .attr('dy', function(d) { return 5+d.offset; })
+        .attr('text-anchor', 'start')
+        .style('cursor', function(d) { if (d.link) { return 'pointer'; } })
+        .style('font-size', '9pt')
+        .attr('fill', function(d) { return c(d.type); })
+        .text(function(d) {return d.shortDesc;});
 
-  notes.on('click', function(d) {
-    if (d.link) {
-      location = d.link;
+      notes.on('click', function(d) {
+        if (d.link) {
+          location = d.link;
+        }
+      })
+
+      events.on('mouseover', function(d) {
+        var exclude = "label_"+d.year.replace('.','_');
+        bundle.selectAll('.timelineLabel').filter(function(d){return this.getAttribute('id') != exclude})
+          .transition()
+          .duration(100)
+          .style('opacity', 0.05);
+
+        bundle.select('#'+exclude)
+          .transition()
+          .duration(500)
+          .style('opacity', 1)
+          .style('font-size', '15pt');
+
+        var desc = "description_"+d.year.replace('.','_');
+        bundle.select('#'+desc)
+          .transition()
+          .duration(500)
+          .delay(150)
+          .style('opacity', 1);
+
+        bundle.select(this)
+          .transition()
+          .duration(500)
+          .attr('r',10);
+      })
+
+      events.on('mouseout', function(d) {
+        bundle.selectAll('.timelineLabel')
+          .transition()
+          .duration(200)
+          .style('font-size', '9pt')
+          .style('opacity', 1);
+
+        bundle.selectAll('.description')
+          .transition()
+          .duration(200)
+          .style('opacity', 0);
+
+        bundle.select(this)
+          .transition()
+          .duration(200)
+          .attr('r',5);
+
+      })
     }
-  })
 
-  events.on('mouseover', function(d) {
-    var exclude = "label_"+d.year.replace('.','_');
-    bundle.selectAll('.timelineLabel').filter(function(d){return this.getAttribute('id') != exclude})
-    .transition()
-    .duration(100)
-    .style('opacity', 0.05);
+    timeline();
 
-    bundle.select('#'+exclude)
-    .transition()
-    .duration(500)
-    .style('opacity', 1)
-    .style('font-size', '15pt');
+    window.addEventListener('resize', timeline);
 
-    var desc = "description_"+d.year.replace('.','_');
-    bundle.select('#'+desc)
-    .transition()
-    .duration(500)
-    .delay(150)
-    .style('opacity', 1);
+  </script>
 
-    bundle.select(this)
-      .transition()
-      .duration(500)
-      .attr('r',10);
-  })
+  <script nonce="{{ request.csp_nonce }}">
+    function pillars() {
+      var pillars = bundle.select("#pillars");
+      pillars.attr("width",document.querySelector(".blurb").offsetWidth);
 
-  events.on('mouseout', function(d) {
-    bundle.selectAll('.timelineLabel')
-    .transition()
-    .duration(200)
-    .style('font-size', '9pt')
-    .style('opacity', 1);
+      bundle.selectAll('.pillar').remove();
 
-    bundle.selectAll('.description')
-    .transition()
-    .duration(200)
-    .style('opacity', 0);
+      var r = Math.min(0.2*pillars.attr('width'),90);
+      var s = r/90;
 
-    bundle.select(this)
-    .transition()
-    .duration(200)
-    .attr('r',5);
+      var g = pillars.append("g")
+        .attr("transform","translate(" + pillars.attr('width')/2 + "," + s*0.5*pillars.attr('height') + ")");
 
-  })
-}
+      var titleX = -0.4*pillars.attr('width')
+      var titleY = 0.4*pillars.attr('height')
 
-timeline();
+      var circle = g.append('circle')
+        .attr('class', 'pillar fill-primary')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', r)
+        .style('opacity', 0.6)
+        .attr('stroke', '#54c0db')
+        .attr('stroke-width', '2px');
 
-window.addEventListener('resize', timeline);
+      var triangle = g.append('path')
+        .attr('class', 'pillar')
+        .attr('stroke', 'white')
+        .attr('stroke-width', '4px')
+        .attr('fill', 'none')
+        .attr('d', function(d) {
+        var path = bundle.path();
+        path.moveTo(0,-r);
+        path.lineTo(Math.cos(13/6*Math.PI)*r, Math.sin(13/6*Math.PI)*r);
+        path.lineTo(-Math.cos(13/6*Math.PI)*r, Math.sin(13/6*Math.PI)*r);
+        path.closePath();
+        return path;
+      });
 
-</script>
+      function blendIn(className) {
+        bundle.select('#'+className+'-title')
+          .transition()
+          .duration(500)
+          .attr('x', titleX)
+          .attr('y', titleY)
+          .style('font-size', '14pt');
+        bundle.select('#'+className+'-content')
+          .transition()
+          .duration(500)
+          .delay(200)
+          .style('opacity', 1);
+        bundle.select('#'+className+'-text')
+          .attr('fill', 'white');
+        bundle.select('#'+className+'-circle')
+          .attr('fill', '#54c0db')
+          .attr('stroke', 'white')
+          .transition()
+          .duration(500)
+          .attr('r', 25*s);
+      }
 
-<script nonce="{{ request.csp_nonce }}">
-function pillars() {
-  var pillars = bundle.select("#pillars");
-  pillars.attr("width",document.querySelector(".blurb").offsetWidth);
+      function blendOut(className) {
+        bundle.select('#'+className+'-title')
+          .transition()
+          .duration(500)
+          .attr('x', function(d) { return +bundle.select(this).attr('x0'); })
+          .attr('y', function(d) { return +bundle.select(this).attr('y0'); })
+          .style('font-size', '12pt');
+        bundle.select('#'+className+'-content')
+          .transition()
+          .duration(200)
+          .style('opacity', 0);
+        bundle.select('#'+className+'-text')
+          .attr('fill', '#54c0db');
+        bundle.select('#'+className+'-circle')
+          .attr('fill', 'white')
+          .attr('stroke', '#54c0db')
+          .transition()
+          .duration(200)
+          .attr('r', 20*s);
+      }
 
-  bundle.selectAll('.pillar').remove();
+      g.append('text')
+        .attr('class', 'pillar')
+        .attr('x', Math.cos(13/6*Math.PI)*r)
+        .attr('dx', 30)
+        .attr('y', Math.sin(13/6*Math.PI)*r)
+        .attr('dy', -42)
+        .attr('font-size', '7pt')
+        .attr('fill', 'gray')
+        .text("{% trans 'Click' %}");
 
-  var r = Math.min(0.2*pillars.attr('width'),90);
-  var s = r/90;
+      g.append('path')
+        .attr('class', 'pillar')
+        .attr('stroke', 'gray')
+        .attr('fill', 'none')
+        .attr('stroke-width', '0.5px')
+        .attr('d', function(d) {
+        var path = bundle.path();
+        path.moveTo(Math.cos(13/6*Math.PI)*r, Math.sin(13/6*Math.PI)*r);
+        path.quadraticCurveTo(Math.cos(13/6*Math.PI)*r+30, Math.sin(13/6*Math.PI)*r-10, Math.cos(13/6*Math.PI)*r+40, Math.sin(13/6*Math.PI)*r-40);
+        return path;
+      });
 
-  var g = pillars.append("g")
-  .attr("transform","translate(" + pillars.attr('width')/2 + "," + s*0.5*pillars.attr('height') + ")");
+      var students = g.append('circle')
+        .attr('class', 'pillar')
+        .attr('id', 'student-circle')
+        .attr('cx', Math.cos(13/6*Math.PI)*r)
+        .attr('cy', Math.sin(13/6*Math.PI)*r)
+        .attr('r', 20*s)
+        .attr('stroke', '#54c0db')
+        .attr('stroke-width', 2*s+'px')
+        .attr('fill', 'white')
+        .on('mouseover', function(d) {blendIn('student');})
+        .on('mouseout', function(d) {blendOut('student');});
 
-  var titleX = -0.4*pillars.attr('width')
-  var titleY = 0.4*pillars.attr('height')
+      g.append('text')
+        .attr('class', 'pillar fill-primary')
+        .attr('id', 'student-text')
+        .attr('x', Math.cos(13/6*Math.PI)*r)
+        .attr('y', Math.sin(13/6*Math.PI)*r)
+        .attr('dy', 8*s)
+        .attr('text-anchor', 'middle')
+        .style('font-size', 20*s+'px')
+        .text(3)
+        .on('mouseover', function(d) {blendIn('student');})
+        .on('mouseout', function(d) {blendOut('student');});
 
-  var circle = g.append('circle')
-  .attr('class', 'pillar fill-primary')
-  .attr('cx', 0)
-  .attr('cy', 0)
-  .attr('r', r)
-  .style('opacity', 0.6)
-  .attr('stroke', '#54c0db')
-  .attr('stroke-width', '2px');
+      g.append('text')
+        .attr('class', 'pillar fill-primary')
+        .attr('id', 'student-title')
+        .attr('x', Math.cos(13/6*Math.PI)*r)
+        .attr('y', Math.sin(13/6*Math.PI)*r+50*s)
+        .attr('x0', Math.cos(13/6*Math.PI)*r)
+        .attr('y0', Math.sin(13/6*Math.PI)*r+50*s)
+        .attr('text-anchor', 'start')
+        .style('font-size', '12pt')
+        .text("{% trans 'Students' %}");
 
-  var triangle = g.append('path')
-  .attr('class', 'pillar')
-  .attr('stroke', 'white')
-  .attr('stroke-width', '4px')
-  .attr('fill', 'none')
-  .attr('d', function(d) {
-    var path = bundle.path();
-      path.moveTo(0,-r);
-      path.lineTo(Math.cos(13/6*Math.PI)*r, Math.sin(13/6*Math.PI)*r);
-      path.lineTo(-Math.cos(13/6*Math.PI)*r, Math.sin(13/6*Math.PI)*r);
-      path.closePath();
-    return path;
-  });
+      g.append('text')
+        .attr('class', 'pillar')
+        .attr('id', 'student-content')
+        .attr('x', titleX)
+        .attr('y', titleY)
+        .attr('dy', 20)
+        .attr('fill', 'gray')
+        .attr('text-anchor', 'left')
+        .style('font-size', '12px')
+        .style('opacity', 0)
+        .text("{% trans 'A cloud-based service that puts students at the heart of the research-design loop and monitors knowledge construction over years, not a semester.' %}")
+        .call(bundle.wrap, +pillars.attr("width")*0.7);
 
-  function blendIn(className) {
-    bundle.select('#'+className+'-title')
-      .transition()
-      .duration(500)
-      .attr('x', titleX)
-      .attr('y', titleY)
-      .style('font-size', '14pt');
-    bundle.select('#'+className+'-content')
-      .transition()
-      .duration(500)
-      .delay(200)
-      .style('opacity', 1);
-    bundle.select('#'+className+'-text')
-      .attr('fill', 'white');
-    bundle.select('#'+className+'-circle')
-      .attr('fill', '#54c0db')
-      .attr('stroke', 'white')
-      .transition()
-      .duration(500)
-      .attr('r', 25*s);
-  }
+      var researchers = g.append('circle')
+        .attr('class', 'pillar')
+        .attr('id', 'researcher-circle')
+        .attr('cx', -Math.cos(13/6*Math.PI)*r)
+        .attr('cy', Math.sin(13/6*Math.PI)*r)
+        .attr('r', 20*s)
+        .attr('stroke', '#54c0db')
+        .attr('stroke-width', 2*s+'px')
+        .attr('fill', 'white')
+        .on('mouseover', function(d) {blendIn('researcher');})
+        .on('mouseout', function(d) {blendOut('researcher');});
 
-  function blendOut(className) {
-    bundle.select('#'+className+'-title')
-      .transition()
-      .duration(500)
-      .attr('x', function(d) { return +bundle.select(this).attr('x0'); })
-      .attr('y', function(d) { return +bundle.select(this).attr('y0'); })
-      .style('font-size', '12pt');
-    bundle.select('#'+className+'-content')
-      .transition()
-      .duration(200)
-      .style('opacity', 0);
-    bundle.select('#'+className+'-text')
-      .attr('fill', '#54c0db');
-    bundle.select('#'+className+'-circle')
-      .attr('fill', 'white')
-      .attr('stroke', '#54c0db')
-      .transition()
-      .duration(200)
-      .attr('r', 20*s);
-  }
+      g.append('text')
+        .attr('class', 'pillar fill-primary')
+        .attr('id', 'researcher-text')
+        .attr('x', -Math.cos(13/6*Math.PI)*r)
+        .attr('y', Math.sin(13/6*Math.PI)*r)
+        .attr('dy', 8*s)
+        .attr('text-anchor', 'middle')
+        .style('font-size', 20*s+'px')
+        .text(2)
+        .on('mouseover', function(d) {blendIn('researcher');})
+        .on('mouseout', function(d) {blendOut('researcher');});
 
-  g.append('text')
-    .attr('class', 'pillar')
-    .attr('x', Math.cos(13/6*Math.PI)*r)
-    .attr('dx', 30)
-    .attr('y', Math.sin(13/6*Math.PI)*r)
-    .attr('dy', -42)
-    .attr('font-size', '7pt')
-    .attr('fill', 'gray')
-    .text("{% trans 'Click' %}");
+      g.append('text')
+        .attr('class', 'pillar fill-primary')
+        .attr('id', 'researcher-title')
+        .attr('x', -Math.cos(13/6*Math.PI)*r-90)
+        .attr('y', Math.sin(13/6*Math.PI)*r+50*s)
+        .attr('x0', -Math.cos(13/6*Math.PI)*r-90)
+        .attr('y0', Math.sin(13/6*Math.PI)*r+50*s)
+        .attr('text-anchor', 'start')
+        .style('font-size', '12pt')
+        .text("{% trans 'Researchers' %}");
 
-  g.append('path')
-    .attr('class', 'pillar')
-    .attr('stroke', 'gray')
-    .attr('fill', 'none')
-    .attr('stroke-width', '0.5px')
-    .attr('d', function(d) {
-      var path = bundle.path();
-      path.moveTo(Math.cos(13/6*Math.PI)*r, Math.sin(13/6*Math.PI)*r);
-      path.quadraticCurveTo(Math.cos(13/6*Math.PI)*r+30, Math.sin(13/6*Math.PI)*r-10, Math.cos(13/6*Math.PI)*r+40, Math.sin(13/6*Math.PI)*r-40);
-      return path;
-    });
+      g.append('text')
+        .attr('class', 'pillar')
+        .attr('id', 'researcher-content')
+        .attr('x', titleX)
+        .attr('y', titleY)
+        .attr('dy', 20)
+        .attr('fill', 'gray')
+        .attr('text-anchor', 'start')
+        .style('font-size', '12px')
+        .style('opacity', 0)
+        .text("{% trans 'A platform to enable learning science researchers to engage directly with practitioners and bring learning science to the classroom faster.' %}")
+        .call(bundle.wrap, +pillars.attr("width")*0.7);
 
-  var students = g.append('circle')
-  .attr('class', 'pillar')
-  .attr('id', 'student-circle')
-  .attr('cx', Math.cos(13/6*Math.PI)*r)
-  .attr('cy', Math.sin(13/6*Math.PI)*r)
-  .attr('r', 20*s)
-  .attr('stroke', '#54c0db')
-  .attr('stroke-width', 2*s+'px')
-  .attr('fill', 'white')
-  .on('mouseover', function(d) {blendIn('student');})
-  .on('mouseout', function(d) {blendOut('student');});
+      g.append('text')
+        .attr('class', 'pillar fill-primary')
+        .attr('id', 'teacher-title')
+        .attr('x', -35)
+        .attr('y', -r-35*s)
+        .attr('x0', -35)
+        .attr('y0', -r-35*s)
+        .attr('text-anchor', 'start')
+        .style('font-size', '12pt')
+        .text('Teachers');
 
-  g.append('text')
-  .attr('class', 'pillar fill-primary')
-  .attr('id', 'student-text')
-  .attr('x', Math.cos(13/6*Math.PI)*r)
-  .attr('y', Math.sin(13/6*Math.PI)*r)
-  .attr('dy', 8*s)
-  .attr('text-anchor', 'middle')
-  .style('font-size', 20*s+'px')
-  .text(3)
-  .on('mouseover', function(d) {blendIn('student');})
-  .on('mouseout', function(d) {blendOut('student');});
+      var teachers = g.append('circle')
+        .attr('class', 'pillar')
+        .attr('id', 'teacher-circle')
+        .attr('cx', 0)
+        .attr('cy', -r)
+        .attr('r', 20*s)
+        .attr('stroke', '#54c0db')
+        .attr('stroke-width', 2*s+'px')
+        .attr('fill', 'white')
+        .on('mouseover', function(d) {blendIn('teacher');})
+        .on('mouseout', function(d) {blendOut('teacher');});
 
-  g.append('text')
-  .attr('class', 'pillar fill-primary')
-  .attr('id', 'student-title')
-  .attr('x', Math.cos(13/6*Math.PI)*r)
-  .attr('y', Math.sin(13/6*Math.PI)*r+50*s)
-  .attr('x0', Math.cos(13/6*Math.PI)*r)
-  .attr('y0', Math.sin(13/6*Math.PI)*r+50*s)
-  .attr('text-anchor', 'start')
-  .style('font-size', '12pt')
-  .text("{% trans 'Students' %}");
+      g.append('text')
+        .attr('class', 'pillar fill-primary')
+        .attr('id', 'teacher-text')
+        .attr('x', 0)
+        .attr('y', -r)
+        .attr('dy', 8*s)
+        .attr('text-anchor', 'middle')
+        .style('font-size', 20*s+'px')
+        .text(1)
+        .on('mouseover', function(d) {blendIn('teacher');})
+        .on('mouseout', function(d) {blendOut('teacher');});
 
-  g.append('text')
-  .attr('class', 'pillar')
-  .attr('id', 'student-content')
-  .attr('x', titleX)
-  .attr('y', titleY)
-  .attr('dy', 20)
-  .attr('fill', 'gray')
-  .attr('text-anchor', 'left')
-  .style('font-size', '12px')
-  .style('opacity', 0)
-  .text("{% trans 'A cloud-based service that puts students at the heart of the research-design loop and monitors knowledge construction over years, not a semester.' %}")
-  .call(bundle.wrap, +pillars.attr("width")*0.7);
+      g.append('text')
+        .attr('class', 'pillar')
+        .attr('id', 'teacher-content')
+        .attr('x', titleX)
+        .attr('y', titleY)
+        .attr('dy', 20)
+        .attr('fill', 'gray')
+        .attr('text-anchor', 'start')
+        .style('font-size', '12px')
+        .style('opacity', 0)
+        .text("{% trans 'A place where the strategies and artefacts teachers produce can be hosted, showcased, and improved based on collaboration and data.' %}")
+        .call(bundle.wrap, +pillars.attr("width")*0.7);
+    }
 
-  var researchers = g.append('circle')
-  .attr('class', 'pillar')
-  .attr('id', 'researcher-circle')
-  .attr('cx', -Math.cos(13/6*Math.PI)*r)
-  .attr('cy', Math.sin(13/6*Math.PI)*r)
-  .attr('r', 20*s)
-  .attr('stroke', '#54c0db')
-  .attr('stroke-width', 2*s+'px')
-  .attr('fill', 'white')
-  .on('mouseover', function(d) {blendIn('researcher');})
-  .on('mouseout', function(d) {blendOut('researcher');});
+    pillars();
 
-  g.append('text')
-  .attr('class', 'pillar fill-primary')
-  .attr('id', 'researcher-text')
-  .attr('x', -Math.cos(13/6*Math.PI)*r)
-  .attr('y', Math.sin(13/6*Math.PI)*r)
-  .attr('dy', 8*s)
-  .attr('text-anchor', 'middle')
-  .style('font-size', 20*s+'px')
-  .text(2)
-  .on('mouseover', function(d) {blendIn('researcher');})
-  .on('mouseout', function(d) {blendOut('researcher');});
+    window.addEventListener('resize', pillars);
 
-  g.append('text')
-  .attr('class', 'pillar fill-primary')
-  .attr('id', 'researcher-title')
-  .attr('x', -Math.cos(13/6*Math.PI)*r-90)
-  .attr('y', Math.sin(13/6*Math.PI)*r+50*s)
-  .attr('x0', -Math.cos(13/6*Math.PI)*r-90)
-  .attr('y0', Math.sin(13/6*Math.PI)*r+50*s)
-  .attr('text-anchor', 'start')
-  .style('font-size', '12pt')
-  .text("{% trans 'Researchers' %}");
+    function sizeVideos() {
+      var yt = document.querySelector('.embedded-video');
+      var w = Math.min(700,document.querySelector("section").offsetWidth-30);
+      yt.setAttribute("width",w);
+      yt.setAttribute("height",315/560*w);
 
-  g.append('text')
-  .attr('class', 'pillar')
-  .attr('id', 'researcher-content')
-  .attr('x', titleX)
-  .attr('y', titleY)
-  .attr('dy', 20)
-  .attr('fill', 'gray')
-  .attr('text-anchor', 'start')
-  .style('font-size', '12px')
-  .style('opacity', 0)
-  .text("{% trans 'A platform to enable learning science researchers to engage directly with practitioners and bring learning science to the classroom faster.' %}")
-  .call(bundle.wrap, +pillars.attr("width")*0.7);
+      var syt = document.querySelectorAll('.small-embedded-video');
+      syt.forEach((_yt) => {
+        _yt.setAttribute("width",w/3);
+        _yt.setAttribute("height",315/560*w/3);
+      })
+    }
 
-  g.append('text')
-  .attr('class', 'pillar fill-primary')
-  .attr('id', 'teacher-title')
-  .attr('x', -35)
-  .attr('y', -r-35*s)
-  .attr('x0', -35)
-  .attr('y0', -r-35*s)
-  .attr('text-anchor', 'start')
-  .style('font-size', '12pt')
-  .text('Teachers');
+    window.addEventListener("load", sizeVideos);
+    window.addEventListener("resize", sizeVideos);
 
-  var teachers = g.append('circle')
-  .attr('class', 'pillar')
-  .attr('id', 'teacher-circle')
-  .attr('cx', 0)
-  .attr('cy', -r)
-  .attr('r', 20*s)
-  .attr('stroke', '#54c0db')
-  .attr('stroke-width', 2*s+'px')
-  .attr('fill', 'white')
-  .on('mouseover', function(d) {blendIn('teacher');})
-  .on('mouseout', function(d) {blendOut('teacher');});
+    // IE11 sticky patch
+    // Assumes style reverts to position:relative if sticky is unsupported
+    var h = document.querySelector('h1');
+    var hStyles = window.getComputedStyle(h, null);
+    if (hStyles['position'] == 'relative') {
+      [].forEach.call(document.querySelectorAll('h1'), function(el) {
+        el.style.top = 'auto';
+        return;
+      });
+      h = document.querySelector('#Features');
+      h.style.marginTop = '200px';
+    }
+  </script>
 
-  g.append('text')
-  .attr('class', 'pillar fill-primary')
-  .attr('id', 'teacher-text')
-  .attr('x', 0)
-  .attr('y', -r)
-  .attr('dy', 8*s)
-  .attr('text-anchor', 'middle')
-  .style('font-size', 20*s+'px')
-  .text(1)
-  .on('mouseover', function(d) {blendIn('teacher');})
-  .on('mouseout', function(d) {blendOut('teacher');});
-
-  g.append('text')
-  .attr('class', 'pillar')
-  .attr('id', 'teacher-content')
-  .attr('x', titleX)
-  .attr('y', titleY)
-  .attr('dy', 20)
-  .attr('fill', 'gray')
-  .attr('text-anchor', 'start')
-  .style('font-size', '12px')
-  .style('opacity', 0)
-  .text("{% trans 'A place where the strategies and artefacts teachers produce can be hosted, showcased, and improved based on collaboration and data.' %}")
-  .call(bundle.wrap, +pillars.attr("width")*0.7);
-}
-
-pillars();
-
-window.addEventListener('resize', pillars);
-
-function sizeVideos() {
-  var yt = document.querySelector('.embedded-video');
-  var w = Math.min(700,document.querySelector("section").offsetWidth-30);
-  yt.setAttribute("width",w);
-  yt.setAttribute("height",315/560*w);
-
-  var syt = document.querySelectorAll('.small-embedded-video');
-  syt.forEach((_yt) => {
-    _yt.setAttribute("width",w/3);
-    _yt.setAttribute("height",315/560*w/3);
-  })
-}
-
-window.addEventListener("load", sizeVideos);
-window.addEventListener("resize", sizeVideos);
-
-// IE11 sticky patch
-// Assumes style reverts to position:relative if sticky is unsupported
-var h = document.querySelector('h1');
-var hStyles = window.getComputedStyle(h, null);
-if (hStyles['position'] == 'relative') {
-  [].forEach.call(document.querySelectorAll('h1'), function(el) {
-    el.style.top = 'auto';
-    return;
-  });
-  h = document.querySelector('#Features');
-  h.style.marginTop = '200px';
-}
-</script>
-
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-    {% for d in disciplines %}
-    document.getElementById("{{ d.name }}").addEventListener("click", function(event) {
-      update(this, event)
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      {% for d in disciplines %}
+        document.getElementById("{{ d.name }}").addEventListener("click", function(event) {
+          update(this, event)
+        })
+      {% endfor %}
     })
-    {% endfor %}
-  })
-</script>
+  </script>
 {% endblock %}

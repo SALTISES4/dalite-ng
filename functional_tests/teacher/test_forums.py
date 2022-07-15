@@ -1,6 +1,6 @@
-from faker import Faker
 import time
 
+from faker import Faker
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -9,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from functional_tests.fixtures import *  # noqa
+
 from .utils import accept_cookies, login, logout
 
 fake = Faker()

@@ -1,9 +1,9 @@
 import json
 import random
 from datetime import datetime
+from unittest import mock
 
 import ddt
-import mock
 import pytest
 import pytz
 from django.contrib.auth.models import User
@@ -27,7 +27,7 @@ from peerinst.util import SessionStageData
 from quality.models import UsesCriterion
 
 
-class Grade(object):
+class Grade:
     CORRECT = 1.0
     INCORRECT = 0.0
     PARTIAL = 0.5
@@ -36,7 +36,7 @@ class Grade(object):
 class QuestionViewTestCase(TestCase):
 
     ORG = "LTIX"
-    COURSE_ID = "course-v1:{org}+LTI-101+now".format(org=ORG)
+    COURSE_ID = f"course-v1:{ORG}+LTI-101+now"
     USAGE_ID = "block-v1:LTIX+LTI-101+now+type@lti+block@d41d8cd98f00b204e9800998ecf8427e"  # noqa
     LTI_PARAMS = {
         "context_id": COURSE_ID,
@@ -61,7 +61,7 @@ class QuestionViewTestCase(TestCase):
     ]
 
     def setUp(self):
-        super(QuestionViewTestCase, self).setUp()
+        super().setUp()
 
         UsesCriterion.objects.filter(
             quality__quality_type__type="global"

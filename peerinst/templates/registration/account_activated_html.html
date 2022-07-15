@@ -4,18 +4,18 @@
 
 {% block body %}
 
-<h1>{% trans 'Welcome to myDALITE' %}</h1>
+  <h1>{% trans 'Welcome to myDALITE' %}</h1>
 
-<p>{% trans "You're receiving this email because your account has been activated." %}</p>
+  <p>{% trans "You're receiving this email because your account has been activated." %}</p>
 
-<p>{% trans "You can login at:" %}</p>
+  <p>{% trans "You can login at:" %}</p>
 
-<p>{{ request.scheme }}://{{ request.get_host }}{% url 'login' %}</p>
+  <p>{{ request.scheme }}://{{ request.get_host }}{% url 'login' %}</p>
 
-<p>{% trans "Your username, in case you've forgotten:" %} {{ username }}</p>
+  <p>{% trans "Your username, in case you've forgotten:" %} {{ username }}</p>
 
-<p>{% trans "Thanks for using our site!" %}</p>
+  <p>{% trans "Thanks for using our site!" %}</p>
 
-<p>{% blocktrans %}The {{ site_name }} team{% endblocktrans %}</p>
+  <p>{% blocktrans %}The {{ site_name }} team{% endblocktrans %}</p>
 
 {% endblock %}

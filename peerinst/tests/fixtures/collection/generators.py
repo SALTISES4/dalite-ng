@@ -7,7 +7,7 @@ def new_collections(n, assignments, discipline, teachers):
         while True:
             i += 1
             yield {
-                "title": "collection{}".format(i),
+                "title": f"collection{i}",
                 "description": "text",
                 "discipline": discipline,
                 "owner": teachers[0],

@@ -1,7 +1,6 @@
 import binascii
 import hmac
 import time
-
 from hashlib import sha1
 
 

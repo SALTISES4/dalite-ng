@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import json
 
 from django.contrib.auth.models import User
@@ -48,7 +45,7 @@ def test_index_student_not_logged_in_token(client, student):
         student.student.username, student.student.email
     )
 
-    resp = client.get(reverse("student-page") + "?token={}".format(token))
+    resp = client.get(reverse("student-page") + f"?token={token}")
     assert resp.status_code == 200
     assert any(t.name == "peerinst/student/index.html" for t in resp.templates)
     assert student.student.email in resp.content.decode()
@@ -61,7 +58,7 @@ def test_index_student_logged_in_token_same_user(client, student):
         student.student.username, student.student.email
     )
 
-    resp = client.get(reverse("student-page") + "?token={}".format(token))
+    resp = client.get(reverse("student-page") + f"?token={token}")
     assert resp.status_code == 200
     assert any(t.name == "peerinst/student/index.html" for t in resp.templates)
     assert student.student.email in resp.content.decode()
@@ -74,7 +71,7 @@ def test_index_student_logged_in_token_different_user(client, students):
         students[1].student.username, students[1].student.email
     )
 
-    resp = client.get(reverse("student-page") + "?token={}".format(token))
+    resp = client.get(reverse("student-page") + f"?token={token}")
     assert resp.status_code == 200
     assert any(t.name == "peerinst/student/index.html" for t in resp.templates)
     assert students[1].student.email in resp.content.decode()
@@ -91,7 +88,7 @@ def test_index_new_student(client, student):
 
     assert not Student.objects.get(student=student.student).student.is_active
 
-    resp = client.get(reverse("student-page") + "?token={}".format(token))
+    resp = client.get(reverse("student-page") + f"?token={token}")
     assert resp.status_code == 200
     assert any(t.name == "peerinst/student/index.html" for t in resp.templates)
     assert student.student.email in resp.content.decode()

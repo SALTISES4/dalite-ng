@@ -92,7 +92,7 @@ def verify_user(
         )
         send_mail_async(
             translate("Please verify your myDalite account"),
-            "Dear {},".format(request.user.username)
+            f"Dear {request.user.username},"
             + "\n\nYour account has been recently activated. Please visit "
             "the following link to verify your email address and "
             "to set your password:\n\n"

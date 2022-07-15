@@ -3,131 +3,131 @@
 {% load bleach_html static compress i18n %}
 
 {% block stylesheets %}
-{{ block.super }}
-{% compress css %}
-<link href="{% static 'peerinst/css/collection.min.css' %}" rel="stylesheet">
-{% endcompress %}
+  {{ block.super }}
+  {% compress css %}
+    <link href="{% static 'peerinst/css/collection.min.css' %}" rel="stylesheet">
+  {% endcompress %}
 {% endblock %}
 {% block body %}
-<main>
-<section>
-<h1 class="mdc-typography--display3">{% trans 'Collections' %}
-  <svg class="underline" width=150 height=4></svg>
-</h1>
-  <div class="admin-link">
-    {% if user.is_staff %}
-    <a href="{% url 'admin_index_wrapper' %}">Click here to access admin</a>
-    <span class="links-divider">|</span>{% endif %}<a href="{% url 'teacher' request.user.teacher.pk %}">{% trans 'Back to My Account' %}</a>
-    <span class="links-divider">|</span><a href="{% url 'collection-list' %}">{% trans 'All' %}</a>
-    <span class="links-divider">|</span><a href="{% url 'followed-collection-list' %}">{% trans 'Followed' %}</a>
-    <span class="links-divider">|</span><a href="{% url 'featured-collection-list' %}">{% trans 'Featured' %}</a>
-    <span class="links-divider">|</span><a href="{% url 'collection-create' %}">{% trans 'Create' %}</a>
-  </div>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Collections' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
+      <div class="admin-link">
+        {% if user.is_staff %}
+          <a href="{% url 'admin_index_wrapper' %}">Click here to access admin</a>
+          <span class="links-divider">|</span>{% endif %}<a href="{% url 'teacher' request.user.teacher.pk %}">{% trans 'Back to My Account' %}</a>
+        <span class="links-divider">|</span><a href="{% url 'collection-list' %}">{% trans 'All' %}</a>
+        <span class="links-divider">|</span><a href="{% url 'followed-collection-list' %}">{% trans 'Followed' %}</a>
+        <span class="links-divider">|</span><a href="{% url 'featured-collection-list' %}">{% trans 'Featured' %}</a>
+        <span class="links-divider">|</span><a href="{% url 'collection-create' %}">{% trans 'Create' %}</a>
+      </div>
 
-<div>
-<h2 class="mdc-typography--display1 mdc-theme--secondary">
-  {% trans 'Your Collections' %}
-</h2>
-</div>
-<div>
-<div class='field-container'>
-  <div class='number-box'><span class='number'>?</span></div>
-  <div class='field'>
-    <p><small>
-      {% blocktrans %}
-      A collection is a compilation of assignments that work well in conjunction
-      with one another. Collections have various functions, from housing an entire
-      semester's worth of course material to simply covering one topic.
-      {% endblocktrans %}
-      </small></p>
-      <p><small>
-      {% blocktrans %}
-      These collections belong to you. View a collection, if you wish to assign
-      it to a group or edit its contents.
-      {% endblocktrans %}
-    </small></p>
-  </div>
-</div>
-</div>
-<ul>
-
-{% for obj in object_list %}
-
-<li class="dense-list searchable">
-<div class="mdc-card" id="card{% if obj.featured == True %}-featured{% endif %}">
-<div class="clickable detail-view" id="{{ obj.pk|safe }}">
-  <div class="mdc-typography--title bold">
-    {% if obj.image %}
-    <img id="thumbnail"
-         src="{{obj.image.url}}">&nbsp;&nbsp;{% endif %}{{ obj.title|bleach_html|safe }}
-  </div>
-
-  <div class="mdc-typography--caption">
-    {% trans 'Created by' %} {{ obj.owner.user.username }}
-  </div>
-
-  <div class="mdc-typography--body1">
-    {{ obj.description|bleach_html|safe }}
-  </div>
-</div>
-
-  <div class="mdc-card__actions">
-    <div class="mdc-card__action-buttons">
-      <div class="mdc-typography--caption caption">
-        <div>
-          {% trans 'Discipline' %}: {{ obj.discipline|bleach_html|safe }}
-        </div>
-        <div class="followers-number"
-             id="follower-count-{{ obj.pk }}"
-             data-count="{{ obj.followers.count }}">{% trans 'Followers' %}: {{ obj.followers.count }}</div>
-        <div>
-          {% trans 'Published on' %} {{ obj.created_on }}
+      <div>
+        <h2 class="mdc-typography--display1 mdc-theme--secondary">
+          {% trans 'Your Collections' %}
+        </h2>
+      </div>
+      <div>
+        <div class='field-container'>
+          <div class='number-box'><span class='number'>?</span></div>
+          <div class='field'>
+            <p><small>
+              {% blocktrans %}
+                A collection is a compilation of assignments that work well in conjunction
+                with one another. Collections have various functions, from housing an entire
+                semester's worth of course material to simply covering one topic.
+              {% endblocktrans %}
+            </small></p>
+            <p><small>
+              {% blocktrans %}
+                These collections belong to you. View a collection, if you wish to assign
+                it to a group or edit its contents.
+              {% endblocktrans %}
+            </small></p>
+          </div>
         </div>
       </div>
-    </div>
+      <ul>
 
-    <div class="mdc-card__action-icons">
-      <i class="mdc-icon-toggle material-icons mdc-theme--primary follower-btn"
-          role="button"
-          aria-pressed="false"
-          aria-label="Add to favorites" tabindex="0"
-          {% if request.user.teacher in obj.followers.all %}
-          data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
-          data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
-          {% else %}
-          data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
-          data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
-          {% endif %}
-          pk="{{ obj.pk|safe }}"
-          data-count="{{ obj.followers.count }}">
-          favorite_border
-      </i>
-    </div>
-  </div>
-</div>
+        {% for obj in object_list %}
 
-  </li>
-{% empty %}
-  <li>{% trans 'No collections available.' %}</li>
-{% endfor %}
-</ul>
+          <li class="dense-list searchable">
+            <div class="mdc-card" id="card{% if obj.featured == True %}-featured{% endif %}">
+              <div class="clickable detail-view" id="{{ obj.pk|safe }}">
+                <div class="mdc-typography--title bold">
+                  {% if obj.image %}
+                    <img id="thumbnail"
+                      src="{{obj.image.url}}">&nbsp;&nbsp;{% endif %}{{ obj.title|bleach_html|safe }}
+                </div>
 
-</section>
-</main>
+                <div class="mdc-typography--caption">
+                  {% trans 'Created by' %} {{ obj.owner.user.username }}
+                </div>
+
+                <div class="mdc-typography--body1">
+                  {{ obj.description|bleach_html|safe }}
+                </div>
+              </div>
+
+              <div class="mdc-card__actions">
+                <div class="mdc-card__action-buttons">
+                  <div class="mdc-typography--caption caption">
+                    <div>
+                      {% trans 'Discipline' %}: {{ obj.discipline|bleach_html|safe }}
+                    </div>
+                    <div class="followers-number"
+                      id="follower-count-{{ obj.pk }}"
+                      data-count="{{ obj.followers.count }}">{% trans 'Followers' %}: {{ obj.followers.count }}</div>
+                    <div>
+                      {% trans 'Published on' %} {{ obj.created_on }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mdc-card__action-icons">
+                  <i class="mdc-icon-toggle material-icons mdc-theme--primary follower-btn"
+                    role="button"
+                    aria-pressed="false"
+                    aria-label="Add to favorites" tabindex="0"
+                    {% if request.user.teacher in obj.followers.all %}
+                      data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
+                      data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+                    {% else %}
+                      data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
+                      data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
+                    {% endif %}
+                    pk="{{ obj.pk|safe }}"
+                    data-count="{{ obj.followers.count }}">
+                    favorite_border
+                  </i>
+                </div>
+              </div>
+            </div>
+
+          </li>
+        {% empty %}
+          <li>{% trans 'No collections available.' %}</li>
+        {% endfor %}
+      </ul>
+
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-{% compress js %}
-<script src="{% static 'peerinst/js/collection.min.js' %}"></script>
-{% endcompress %}
-<script nonce="{{ request.csp_nonce }}">
-window.addEventListener("load", function() {
-    collection.initCollectionList(
-      "{% url 'collection-detail' 0 %}",
-      "{% url 'teacher-toggle-follower' %}",
-      "{% trans 'Followers' %}: ",
-    );
-});
-</script>
+  {{ block.super }}
+  {% compress js %}
+    <script src="{% static 'peerinst/js/collection.min.js' %}"></script>
+  {% endcompress %}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      collection.initCollectionList(
+        "{% url 'collection-detail' 0 %}",
+        "{% url 'teacher-toggle-follower' %}",
+        "{% trans 'Followers' %}: ",
+      );
+    });
+  </script>
 {% endblock %}

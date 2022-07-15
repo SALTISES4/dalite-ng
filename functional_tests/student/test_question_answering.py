@@ -53,7 +53,7 @@ def signin(browser, student, mail_outbox, new=False):
 def access_logged_in_account_from_landing_page(browser, student):
     browser.get(browser.server_url)
     link = browser.find_element_by_link_text(
-        "Welcome back, {}".format(student.student.email)
+        f"Welcome back, {student.student.email}"
     )
     link.click()
     assert re.search(r"student/", browser.current_url)
@@ -152,7 +152,9 @@ def test_question_answering(
     for question in assignment.questions.all():
         for i in range(4):
             q = AnswerChoice.objects.create(
-                question=question, text=fake.paragraph(), correct=False,
+                question=question,
+                text=fake.paragraph(),
+                correct=False,
             )
             if i == 0:
                 q.correct = True

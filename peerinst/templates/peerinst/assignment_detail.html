@@ -5,109 +5,109 @@
 {% block mdc %}{% endblock %}
 
 {% block stylesheets %}
-{{ block.super }}
-{% compress js file preact %}
-<script src="{% static 'peerinst/js/preact.min.js' %}" defer="true"></script>
-{% endcompress %}
-{% compress js file assignment %}
-<script src="{% static 'peerinst/js/assignment.min.js' %}" defer="true"></script>
-{% endcompress %}
-{% compress css file assignment %}
-<link href="{% static 'peerinst/js/assignment.min.css' %}" rel="stylesheet">
-{% endcompress %}
-{% compress css file rmwc %}
-<link href="{% static 'peerinst/css/rmwc.min.css' %}" rel="stylesheet">
-{% endcompress %}
+  {{ block.super }}
+  {% compress js file preact %}
+    <script src="{% static 'peerinst/js/preact.min.js' %}" defer="true"></script>
+  {% endcompress %}
+  {% compress js file assignment %}
+    <script src="{% static 'peerinst/js/assignment.min.js' %}" defer="true"></script>
+  {% endcompress %}
+  {% compress css file assignment %}
+    <link href="{% static 'peerinst/js/assignment.min.css' %}" rel="stylesheet">
+  {% endcompress %}
+  {% compress css file rmwc %}
+    <link href="{% static 'peerinst/css/rmwc.min.css' %}" rel="stylesheet">
+  {% endcompress %}
 {% endblock %}
 
 {% block body %}
-<main>
-  <section>
-    <h1 class="mdc-typography--display3">{% trans 'Update Assignment' %}
-      <svg class="underline" width=150 height=4></svg>
-    </h1>
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">{% trans 'Update Assignment' %}
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
 
-    <div class="admin-link">
-      <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
-      <span class="links-divider">|</span><a href="{% url 'question-create' %}">{% trans 'Create new question' %}</a>
-    </div>
+      <div class="admin-link">
+        <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
+        <span class="links-divider">|</span><a href="{% url 'question-create' %}">{% trans 'Create new question' %}</a>
+      </div>
 
-    <h2 id="assignment" class="mdc-typography--display1 mdc-theme--secondary">{{ object.title }}</h2>
+      <h2 id="assignment" class="mdc-typography--display1 mdc-theme--secondary">{{ object.title }}</h2>
 
-    <div class="admin-link">
-      <a href="{% url 'assignment-edit' object.pk %}">{% trans 'Edit meta-data' %}</a>
-      <span class="links-divider">|</span><a href="{% url 'question-list' object.pk %}">{% trans 'Preview' %}</a>
-    </div>
+      <div class="admin-link">
+        <a href="{% url 'assignment-edit' object.pk %}">{% trans 'Edit meta-data' %}</a>
+        <span class="links-divider">|</span><a href="{% url 'question-list' object.pk %}">{% trans 'Preview' %}</a>
+      </div>
 
-    {% if assignment.intro_page %}
-    <div id="assignment-preamble">
-      <p class="mdc-typography--body1">{{ assignment.intro_page|bleach_html|safe }}</p>
-    </div>
-    <hr>
-    {% endif %}
+      {% if assignment.intro_page %}
+        <div id="assignment-preamble">
+          <p class="mdc-typography--body1">{{ assignment.intro_page|bleach_html|safe }}</p>
+        </div>
+        <hr>
+      {% endif %}
 
-    <div id="assignment-update-app"></div>
+      <div id="assignment-update-app"></div>
 
-    {% if assignment.conclusion_page %}
-    <hr>
-    <div id="assignment-preamble">
-      <p class="mdc-typography--body1">{{ assignment.conclusion_page|bleach_html|safe }}</p>
-    </div>
-    {% endif %}
+      {% if assignment.conclusion_page %}
+        <hr>
+        <div id="assignment-preamble">
+          <p class="mdc-typography--body1">{{ assignment.conclusion_page|bleach_html|safe }}</p>
+        </div>
+      {% endif %}
 
-    <div id="favourites-app"></div>
+      <div id="favourites-app"></div>
 
-    <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Quick add' %}</h2>
+      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Quick add' %}</h2>
 
-    <p>{% blocktrans %}Your favourite questions are listed below.  You can add them to this assignment using the plus sign.  Or, you can enter search terms to find new questions from the selected discipline.{% endblocktrans %}</p>
+      <p>{% blocktrans %}Your favourite questions are listed below.  You can add them to this assignment using the plus sign.  Or, you can enter search terms to find new questions from the selected discipline.{% endblocktrans %}</p>
 
-    <div id="search-db-app"></div>
+      <div id="search-db-app"></div>
 
-  </section>
-</main>
+    </section>
+  </main>
 {% endblock %}
 
 
 {% block scripts %}
-{{ block.super }}
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", function() {
-    function render() {
-      console.debug("Callback");
-      preact.render(assignmentUpdateApp(), document.getElementById("assignment-update-app"));
-    }
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      function render() {
+        console.debug("Callback");
+        preact.render(assignmentUpdateApp(), document.getElementById("assignment-update-app"));
+      }
 
-    const assignmentUpdateApp = () => {
-      return preact.h(
-        assignment.AssignmentUpdateApp, {
-          assignmentURL: "{% url 'REST:assignment-detail' object.pk %}?format=json",
-          assignmentQuestionURL: "{% url 'REST:assignment_question-list' %}",
-          teacherURL: "{% url 'REST:teacher' teacher.pk %}?field=favourite_questions",
-          gettext: gettext,
-          nonce: "{{ request.csp_nonce }}",
-          questionCloneBaseURL: "/question/clone/",
-          questionEditBaseURL: "/question/update/",
-          user: "{{ request.user }}",
-        });
-    }
+      const assignmentUpdateApp = () => {
+        return preact.h(
+          assignment.AssignmentUpdateApp, {
+            assignmentURL: "{% url 'REST:assignment-detail' object.pk %}?format=json",
+            assignmentQuestionURL: "{% url 'REST:assignment_question-list' %}",
+            teacherURL: "{% url 'REST:teacher' teacher.pk %}?field=favourite_questions",
+            gettext: gettext,
+            nonce: "{{ request.csp_nonce }}",
+            questionCloneBaseURL: "/question/clone/",
+            questionEditBaseURL: "/question/update/",
+            user: "{{ request.user }}",
+          });
+      }
 
-    const searchDbApp = preact.h(assignment.SearchDbApp, {
-      assignment: "{{ object.pk }}",
-      assignmentQuestionURL: "{% url 'REST:assignment_question-list' %}",
-      callback: render,
-      disciplineURL: "{% url 'REST:discipline-list' %}",
-      defaultDiscipline: "{{ teacher.disciplines.first.pk }}",
-      teacherURL: "{% url 'REST:teacher' teacher.pk %}?field=favourite_questions",
-      gettext: gettext,
-      questionCloneBaseURL: "/question/clone/",
-      questionEditBaseURL: "/question/update/",
-      searchURL: "{% url 'REST:question-search' %}",
-      user: "{{ request.user }}",
-    });
-    preact.render(searchDbApp, document.getElementById("search-db-app"))
+      const searchDbApp = preact.h(assignment.SearchDbApp, {
+        assignment: "{{ object.pk }}",
+        assignmentQuestionURL: "{% url 'REST:assignment_question-list' %}",
+        callback: render,
+        disciplineURL: "{% url 'REST:discipline-list' %}",
+        defaultDiscipline: "{{ teacher.disciplines.first.pk }}",
+        teacherURL: "{% url 'REST:teacher' teacher.pk %}?field=favourite_questions",
+        gettext: gettext,
+        questionCloneBaseURL: "/question/clone/",
+        questionEditBaseURL: "/question/update/",
+        searchURL: "{% url 'REST:question-search' %}",
+        user: "{{ request.user }}",
+      });
+      preact.render(searchDbApp, document.getElementById("search-db-app"))
 
-    render();
-  })
-</script>
+      render();
+    })
+  </script>
 
 {% endblock %}

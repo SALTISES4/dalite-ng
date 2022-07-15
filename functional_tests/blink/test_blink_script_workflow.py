@@ -6,7 +6,6 @@ from selenium.webdriver.common.keys import Keys
 from functional_tests.fixtures import *  # noqa
 from functional_tests.teacher.utils import accept_cookies, go_to_account, login
 
-
 TIME = 15
 
 
@@ -33,7 +32,7 @@ def make_blink_script(browser, q):
     time.sleep(1)
     assert q[0].title in browser.find_element_by_id("search_results").text
 
-    card = browser.find_element_by_id("add-{}".format(q[0].pk)).click()
+    card = browser.find_element_by_id(f"add-{q[0].pk}").click()
 
     search = browser.find_element_by_id("search-bar")
     search.send_keys(q[1].title)
@@ -42,7 +41,7 @@ def make_blink_script(browser, q):
     time.sleep(1)
     assert q[1].title in browser.find_element_by_id("search_results").text
 
-    card = browser.find_element_by_id("add-{}".format(q[1].pk)).click()
+    card = browser.find_element_by_id(f"add-{q[1].pk}").click()
 
     go_to_account(browser)
 

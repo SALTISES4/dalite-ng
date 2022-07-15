@@ -1,8 +1,8 @@
 import json
+from unittest import mock
 
-import mock
-from django.urls import reverse
 from django.template.response import TemplateResponse
+from django.urls import reverse
 
 from peerinst.tests.fixtures import *  # noqa
 from quality.models import Quality, QualityType, QualityUseType, UsesCriterion
@@ -170,7 +170,7 @@ def test_verify_teacher__use_type_doesnt_exist(client, rf, teacher):
 def test_index__question(client, question, teacher):
     client.login(username=teacher.user.username, password="test")
     resp = client.get(
-        "/quality/edit/?type=validation&question={}".format(question.pk),
+        f"/quality/edit/?type=validation&question={question.pk}",
         follow=True,
     )
     #  assert resp.status_code == 200
@@ -198,7 +198,7 @@ def test_index__group(client, group, teacher):
 
     client.login(username=teacher.user.username, password="test")
     resp = client.get(
-        "/quality/edit/?type=validation&teacher={}".format(group.pk),
+        f"/quality/edit/?type=validation&teacher={group.pk}",
         follow=True,
     )
     assert resp.status_code == 200
@@ -208,7 +208,7 @@ def test_index__group(client, group, teacher):
 def test_index__teacher(client, teacher):
     client.login(username=teacher.user.username, password="test")
     resp = client.get(
-        "/quality/edit/?type=validation&teacher={}".format(teacher.pk),
+        f"/quality/edit/?type=validation&teacher={teacher.pk}",
         follow=True,
     )
     assert resp.status_code == 200
@@ -225,7 +225,7 @@ def test_index__missing_pk(client, student_group_assignment, teacher):
 def test_index__missing_type(client, student_group_assignment, teacher):
     client.login(username=teacher.user.username, password="test")
     resp = client.get(
-        "/quality/edit/?assignment={}".format(student_group_assignment.pk),
+        f"/quality/edit/?assignment={student_group_assignment.pk}",
         follow=True,
     )
     assert resp.status_code == 400
@@ -240,7 +240,7 @@ def test_index__question_error(client, rf, question, teacher):
             req, "400.html", status=400
         )
         resp = client.get(
-            "/quality/edit/?type=validation&question={}".format(question.pk),
+            f"/quality/edit/?type=validation&question={question.pk}",
             follow=True,
         )
         assert resp.status_code == 400
@@ -276,7 +276,7 @@ def test_index__group_error(client, rf, group, teacher):
             req, "400.html", status=400
         )
         resp = client.get(
-            "/quality/edit/?type=validation&group={}".format(group.pk),
+            f"/quality/edit/?type=validation&group={group.pk}",
             follow=True,
         )
         assert resp.status_code == 400
@@ -291,7 +291,7 @@ def test_index__teacher_error(client, rf, teacher):
             req, "400.html", status=400
         )
         resp = client.get(
-            "/quality/edit/?type=validation&teacher={}".format(teacher.pk),
+            f"/quality/edit/?type=validation&teacher={teacher.pk}",
             follow=True,
         )
         assert resp.status_code == 400

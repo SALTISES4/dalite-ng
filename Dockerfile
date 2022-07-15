@@ -2,7 +2,7 @@
 # https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/
 # https://mherman.org/presentations/dockercon-2018
 
-FROM node:12.18.2 AS static
+FROM node:16 AS static
 RUN mkdir /code
 WORKDIR /code
 COPY package*.json ./
@@ -29,6 +29,7 @@ WORKDIR /code
 RUN mkdir log
 RUN mkdir static
 COPY requirements/requirements-prod-aws.txt requirements.txt
+RUN python3 -m pip install --upgrade pip
 RUN pip3 install -r requirements.txt
 COPY --from=static /code/analytics ./analytics
 COPY --from=static /code/blink ./blink

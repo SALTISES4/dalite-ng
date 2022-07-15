@@ -1,6 +1,6 @@
-from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 
 
 def admin_index_wrapper(request):
@@ -17,5 +17,5 @@ def admin_index_wrapper(request):
         # third-party cookies disabled, so we show help on enabling cookies for
         # this site.
         return render(
-            request, "peerinst/cookie_help.html", dict(host=request.get_host())
+            request, "peerinst/cookie_help.html", {"host": request.get_host()}
         )

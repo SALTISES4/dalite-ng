@@ -4,188 +4,188 @@
 
 {% timezone "Canada/Eastern" %}
 
-<!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}">
+  <!DOCTYPE html>
+  <html lang="{{ LANGUAGE_CODE }}">
 
-<head>
-  <!-- Meta -->
-  <title>{% block title %}myDALITE{% endblock %}</title>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="{% trans 'myDALITE is a free open-source web-based platform that promotes conceptual learning.' %}">
-  <meta name="theme-color" content="#004266">
+    <head>
+      <!-- Meta -->
+      <title>{% block title %}myDALITE{% endblock %}</title>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="{% trans 'myDALITE is a free open-source web-based platform that promotes conceptual learning.' %}">
+      <meta name="theme-color" content="#004266">
 
-  <!-- Dependencies -->
-  <script
-    src="https://code.jquery.com/jquery-3.0.0.js"
-    integrity="sha384-4s7h2GHjGL3pidmgZNMUflDgyCMrPn1cnW/2NsD1U7SCZcCU5lBzlNhd6QENeuSK"
-    crossorigin="anonymous">
-  </script>
-  <!-- jQuery migration patches (use non-minified for debugging purposes)-->
-  <script
-    src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"
-    integrity="sha384-Pm1fyRwPgIbpBpjdSYtcKzBv+Z/nHekZIGmhoVSBTSJ+cynSJChqUaVhkQZvb7FV"
-    crossorigin="anonymous">
-  </script>
+      <!-- Dependencies -->
+      <script
+        src="https://code.jquery.com/jquery-3.0.0.js"
+        integrity="sha384-4s7h2GHjGL3pidmgZNMUflDgyCMrPn1cnW/2NsD1U7SCZcCU5lBzlNhd6QENeuSK"
+        crossorigin="anonymous">
+      </script>
+      <!-- jQuery migration patches (use non-minified for debugging purposes)-->
+      <script
+        src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"
+        integrity="sha384-Pm1fyRwPgIbpBpjdSYtcKzBv+Z/nHekZIGmhoVSBTSJ+cynSJChqUaVhkQZvb7FV"
+        crossorigin="anonymous">
+      </script>
 
-  <script
-    src="https://unpkg.com/browse/@webcomponents/webcomponentsjs@2.6.0/webcomponents-loader.js"
-    integrity="sha384-d79el5czCrB9MIVLbOTAsdBPXLKL2FCaAZE2BSHZSSf2zZoB5BWZzpaccglhCblp"
-    crossorigin="anonymous"
-    type="application/json">
-  </script>
+      <script
+        src="https://unpkg.com/browse/@webcomponents/webcomponentsjs@2.6.0/webcomponents-loader.js"
+        integrity="sha384-d79el5czCrB9MIVLbOTAsdBPXLKL2FCaAZE2BSHZSSf2zZoB5BWZzpaccglhCblp"
+        crossorigin="anonymous"
+        type="application/json">
+      </script>
 
-  <!-- Local resources -->
-  <!-- * Icons -->
-  <link href="{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" rel="icon">
-  <link href="{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" rel="apple-touch-icon">
-  <!-- * Styles -->
-  {% block mdc %}
-  {% compress css file mdc %}
-  <link href="{% static 'peerinst/css/mdc.min.css' %}" rel="stylesheet">
-  {% endcompress %}
-  {% endblock %}
-  {% compress css file main %}
-  <link href="{% static 'peerinst/css/main.min.css' %}" rel="stylesheet">
-  {% endcompress %}
+      <!-- Local resources -->
+      <!-- * Icons -->
+      <link href="{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" rel="icon">
+      <link href="{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" rel="apple-touch-icon">
+      <!-- * Styles -->
+      {% block mdc %}
+        {% compress css file mdc %}
+          <link href="{% static 'peerinst/css/mdc.min.css' %}" rel="stylesheet">
+        {% endcompress %}
+      {% endblock %}
+      {% compress css file main %}
+        <link href="{% static 'peerinst/css/main.min.css' %}" rel="stylesheet">
+      {% endcompress %}
 
-  <!-- Cookie law -->
-  {% if not request.session.LTI %}
-  {% compress js file cookie_law %}
-  <script src="{% static 'cookielaw/js/cookielaw.js' %}" defer="true"></script>
-  {% endcompress %}
-  {% compress css file cookie_law %}
-  <link href="{% static 'peerinst/css/cookie_law.min.css' %}" rel="stylesheet">
-  {% endcompress %}
-  {% endif %}
+      <!-- Cookie law -->
+      {% if not request.session.LTI %}
+        {% compress js file cookie_law %}
+          <script src="{% static 'cookielaw/js/cookielaw.js' %}" defer="true"></script>
+        {% endcompress %}
+        {% compress css file cookie_law %}
+          <link href="{% static 'peerinst/css/cookie_law.min.css' %}" rel="stylesheet">
+        {% endcompress %}
+      {% endif %}
 
-  <!-- Javascript translations -->
-  <script src="{% url 'javascript-catalog' %}"></script>
+      <!-- Javascript translations -->
+      <script src="{% url 'javascript-catalog' %}"></script>
 
-  <!-- External resources -->
-  <!-- * Icons -->
-  <!-- ** Preloads -->
-  <link
-    rel="preload"
-    href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round&display=swap"
-    as="style"
-  />
-  <!-- ** Loads -->
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round&display=swap"
-    type="text/css"
-  />
-  <link href="https://unpkg.com/ionicons@4.2.4/dist/css/ionicons.min.css" rel="stylesheet">
-  <!-- * Fonts -->
-  <!-- ** Preloads -->
-  <link
-    rel="preload"
-    href="https://fonts.googleapis.com/css?family=Cardo:400,400i&display=swap"
-    as="style"
-  />
-  <link
-    rel="preload"
-    href="https://fonts.googleapis.com/css?family=Montserrat:300,700&display=swap"
-    as="style"
-  />
-  <!-- ** Loads -->
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css?family=Cardo:400,400i&display=swap"
-    type="text/css"
-  />
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css?family=Montserrat:300,700&display=swap"
-    type="text/css"
-  />
+      <!-- External resources -->
+      <!-- * Icons -->
+      <!-- ** Preloads -->
+      <link
+        rel="preload"
+        href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round&display=swap"
+        as="style"
+      />
+      <!-- ** Loads -->
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round&display=swap"
+        type="text/css"
+      />
+      <link href="https://unpkg.com/ionicons@4.2.4/dist/css/ionicons.min.css" rel="stylesheet">
+      <!-- * Fonts -->
+      <!-- ** Preloads -->
+      <link
+        rel="preload"
+        href="https://fonts.googleapis.com/css?family=Cardo:400,400i&display=swap"
+        as="style"
+      />
+      <link
+        rel="preload"
+        href="https://fonts.googleapis.com/css?family=Montserrat:300,700&display=swap"
+        as="style"
+      />
+      <!-- ** Loads -->
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Cardo:400,400i&display=swap"
+        type="text/css"
+      />
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Montserrat:300,700&display=swap"
+        type="text/css"
+      />
 
-  {% block stylesheets %}{% endblock %}
-</head>
+      {% block stylesheets %}{% endblock %}
+    </head>
 
-<body {% block logged_in_layout_class %}{% endblock %} >
-  <header id="header">
-    <div id="header-left">
-      {% block header-left %}{% endblock %}
-      <div class="header branding">
-        {% if not request.session.LTI %}
-        <a href="{% url 'landing_page' %}">
-          <img src="{% static 'peerinst/img/SALTISE-favicon.gif' %}"
-               alt="site-logo"
-               id="logo">
-        </a>
-        {% else %}
-          <img src="{% static 'peerinst/img/SALTISE-favicon.gif' %}"
-               alt="site-logo"
-               id="logo">
-        {% endif %}
-        {% if not user.student and not request.session.LTI  %}
-        <a href="{% url 'browse-database' %}">
-          <div id="custom-instance-header">
-            <span class="dalite-my">my</span><span class="dalite-dalite">Dalite</span>
+    <body {% block logged_in_layout_class %}{% endblock %} >
+      <header id="header">
+        <div id="header-left">
+          {% block header-left %}{% endblock %}
+          <div class="header branding">
+            {% if not request.session.LTI %}
+              <a href="{% url 'landing_page' %}">
+                <img src="{% static 'peerinst/img/SALTISE-favicon.gif' %}"
+                  alt="site-logo"
+                  id="logo">
+              </a>
+            {% else %}
+              <img src="{% static 'peerinst/img/SALTISE-favicon.gif' %}"
+                alt="site-logo"
+                id="logo">
+            {% endif %}
+            {% if not user.student and not request.session.LTI  %}
+              <a href="{% url 'browse-database' %}">
+                <div id="custom-instance-header">
+                  <span class="dalite-my">my</span><span class="dalite-dalite">Dalite</span>
+                </div>
+              </a>
+            {% else %}
+              <div id="custom-instance-header">
+                <span class="dalite-my">my</span><span class="dalite-dalite">Dalite</span>
+              </div>
+            {% endif %}
           </div>
-        </a>
-        {% else %}
-        <div id="custom-instance-header">
-          <span class="dalite-my">my</span><span class="dalite-dalite">Dalite</span>
         </div>
-        {% endif %}
+        <div id="header-right">
+          {% block header-right %}{% endblock %}
+        </div>
+        <div id="header-background"></div>
+      </header>
+
+      <div class="site-content">
+        <form id="switchLanguage" action="{% url 'set_language' %}" method="post">
+          {% csrf_token %}
+          <input name="next"
+            type="hidden"
+            value={{ request.path|slice:"3:"|urlencode }}>
+          <input name="language"
+            type="hidden"
+            value={% if LANGUAGE_CODE == 'en' %}fr{% else %}en{% endif %}>
+        </form>
+        <svg id="corner" class="corner" width=35 height=35></svg>
+        {% block body %}{% endblock %}
+
+        {% block footer %}{% endblock %}
       </div>
-    </div>
-    <div id="header-right">
-      {% block header-right %}{% endblock %}
-    </div>
-    <div id="header-background"></div>
-  </header>
 
-  <div class="site-content">
-    <form id="switchLanguage" action="{% url 'set_language' %}" method="post">
-      {% csrf_token %}
-      <input name="next"
-             type="hidden"
-             value={{ request.path|slice:"3:"|urlencode }}>
-      <input name="language"
-             type="hidden"
-             value={% if LANGUAGE_CODE == 'en' %}fr{% else %}en{% endif %}>
-    </form>
-    <svg id="corner" class="corner" width=35 height=35></svg>
-    {% block body %}{% endblock %}
+      <!-- JS bundle -->
+      {% compress js file index %}
+        <script src="{% static 'peerinst/js/index.min.js' %}"></script>
+      {% endcompress %}
 
-  {% block footer %}{% endblock %}
-  </div>
+      {% script type="text/javascript" %}
+        <script>
+          if (document.querySelector('.mdc-drawer--temporary')){
+            var drawer = new bundle.drawer.MDCTemporaryDrawer(document.querySelector('.mdc-drawer--temporary'));
+            document.querySelector('#menu-icon').addEventListener('click', function() {
+              drawer.open = true;
+            });
+          }
+          bundle.cornerGraphic('#corner', 'switchLanguage', {% if LANGUAGE_CODE == 'en' %}'FR'{% else %}'EN'{% endif %}, 'fill-primary');
+        </script>
+      {% endscript %}
 
-  <!-- JS bundle -->
-  {% compress js file index %}
-  <script src="{% static 'peerinst/js/index.min.js' %}"></script>
-  {% endcompress %}
+      {% block scripts %}{% endblock %}
 
-  {% script type="text/javascript" %}
-  <script>
-  if (document.querySelector('.mdc-drawer--temporary')){
-    var drawer = new bundle.drawer.MDCTemporaryDrawer(document.querySelector('.mdc-drawer--temporary'));
-    document.querySelector('#menu-icon').addEventListener('click', function() {
-      drawer.open = true;
-    });
-  }
-  bundle.cornerGraphic('#corner', 'switchLanguage', {% if LANGUAGE_CODE == 'en' %}'FR'{% else %}'EN'{% endif %}, 'fill-primary');
-  </script>
-  {% endscript %}
+      {% script type="text/javascript" %}
+        {% piwik %}
+      {% endscript %}
 
-  {% block scripts %}{% endblock %}
+      {% if not request.session.LTI %}
+        {% cookielaw_banner %}
+      {% endif %}
 
-  {% script type="text/javascript" %}
-  {% piwik %}
-  {% endscript %}
+      {% include 'icons.svg' %}
+    </body>
 
-  {% if not request.session.LTI %}
-  {% cookielaw_banner %}
-  {% endif %}
-
-  {% include 'icons.svg' %}
-</body>
-
-</html>
+  </html>
 
 {% endtimezone %}

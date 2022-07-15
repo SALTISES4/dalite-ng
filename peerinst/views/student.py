@@ -648,7 +648,7 @@ def update_student_id(req, student):
         return response_400(
             req,
             msg=_("The wanted group doesn't seem to exist."),
-            logger_msg=("Group {} doesn't exist.".format(group_name)),
+            logger_msg=(f"Group {group_name} doesn't exist."),
             log=logger.warning,
         )
 
@@ -702,7 +702,7 @@ def send_signin_link(req):
 
     if not student:
         student, created = Student.get_or_create(email)
-        logger.info("Student created with email {}.".format(email))
+        logger.info(f"Student created with email {email}.")
 
     elif len(student) == 1:
         student = student[0]

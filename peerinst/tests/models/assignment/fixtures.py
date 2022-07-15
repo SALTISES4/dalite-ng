@@ -1,4 +1,5 @@
 import pytest
+
 from peerinst.tests.generators import (
     add_answer_choices,
     add_assignments,
@@ -94,7 +95,7 @@ def student_group_assignment_all_answers_correct(
 
 @pytest.fixture
 def students_with_assignment_all_answers_correct(
-    student_group_assignment_all_answers_correct
+    student_group_assignment_all_answers_correct,
 ):
     students = add_students(new_students(20))
     add_to_group(students, student_group_assignment_all_answers_correct.group)

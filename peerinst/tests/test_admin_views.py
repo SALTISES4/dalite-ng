@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
+from itertools import repeat
+from unittest import mock
 
 import ddt
-import mock
-
-from itertools import repeat
 from django.test import TestCase
 from django.urls import reverse
+
+from .. import admin, admin_views, models
 from . import factories
-from .. import admin_views
-from .. import models
-from .. import admin
 
 
 class AggregatesTestCase(TestCase):
@@ -89,11 +86,14 @@ class AggregatesTestCase(TestCase):
         self.assertDictEqual(dict(sums), expected_sums)
 
 
-class TopRationalesTestData(object):
+class TopRationalesTestData:
     @staticmethod
     def getData(count):
         assignment = factories.AssignmentFactory()
-        question = factories.QuestionFactory(choices=2, choices__correct=[1],)
+        question = factories.QuestionFactory(
+            choices=2,
+            choices__correct=[1],
+        )
         assignment.questions.add(question)
 
         # Many chosen rationales, with long text
@@ -153,7 +153,7 @@ class TopRationalesTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TopRationalesTestCase, cls).setUpClass()
+        super().setUpClass()
         (cls.assignment, cls.question) = TopRationalesTestData.getData(5000)
 
     @ddt.data(0, 100, 2, 1500)
@@ -195,13 +195,13 @@ class TopRationalesTestCase(TestCase):
         admin_user.save()
 
         self.client.login(username=admin_user.username, password="test")
-        kwargs = dict(
-            assignment_id=self.assignment.identifier,
-            question_id=self.question.id,
-        )
+        kwargs = {
+            "assignment_id": self.assignment.identifier,
+            "question_id": self.question.id,
+        }
         url = reverse("question-rationales", kwargs=kwargs)
         if perpage:
-            url = "?".join([url, "perpage={0}".format(perpage)])
+            url = "?".join([url, f"perpage={perpage}"])
         else:
             perpage = admin.AnswerAdmin.list_per_page
 

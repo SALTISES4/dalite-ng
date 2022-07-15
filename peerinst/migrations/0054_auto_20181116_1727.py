@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-
-
-from django.db import migrations, models
 import django.db.models.deletion
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -137,6 +134,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name="studentgroupmembership",
-            unique_together=set([("student", "group")]),
+            unique_together={("student", "group")},
         ),
     ]

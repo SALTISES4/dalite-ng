@@ -1,4 +1,4 @@
 channels
 channels_redis
-cryptography>=3.3  # Reqd by safety
-django<3
+cryptography >= 3.3
+django < 3

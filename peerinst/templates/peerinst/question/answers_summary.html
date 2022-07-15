@@ -3,22 +3,23 @@
 
 {% block title %}{{ question.title }}{% endblock %}
 {% block body %}
-<!-- Show the summary table-->
-<div class="question-answers-summary">
-{% include 'peerinst/question/_answers_summary.html' %}
-</div>
+  <!-- Show the summary table-->
+  <div class="question-answers-summary">
+    {% include 'peerinst/question/_answers_summary.html' %}
+  </div>
 
-<!-- Show the HTML itself in a non-editable textarea, so course teams can copy-paste and share it.-->
-<div class="share-question-answers-summary">
-<label>Click below to select the HTML table, and copy to share the results.</br>
-<textarea readonly="readonly">
-{% include 'peerinst/question/_answers_summary.html' %}
-</textarea></label>
-</div>
+  <!-- Show the HTML itself in a non-editable textarea, so course teams can copy-paste and share it.-->
+  <div class="share-question-answers-summary">
+    <label>Click below to select the HTML table, and copy to share the results.<br>
+      <textarea readonly="readonly">
+        {% include 'peerinst/question/_answers_summary.html' %}
+      </textarea>
+    </label>
+  </div>
 {% endblock %}
 
 {% block scripts %}
-{% compress js %}
-<script src="{% static 'peerinst/js/question_answers_summary.js' %}"></script>
-{% endcompress %}
+  {% compress js %}
+    <script src="{% static 'peerinst/js/question_answers_summary.js' %}"></script>
+  {% endcompress %}
 {% endblock %}

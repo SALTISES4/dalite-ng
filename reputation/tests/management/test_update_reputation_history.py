@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
+from unittest import mock
 
-
-import mock
 from django.core.management import call_command
 
 from peerinst.tests.fixtures import *  # noqa

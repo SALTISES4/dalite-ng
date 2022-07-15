@@ -3,9 +3,9 @@
 
 {% block title %}{% trans "Heartbeat for dalite-ng" %}{% endblock %}
 {% block body %}
-    <ul>
+  <ul>
     {% for check in checks %}
-        <li {% if check.is_ok %} class="greenyellow" {% else %} class="red" {% endif %}>{{ check.message }}</li>
+      <li {% if check.is_ok %} class="greenyellow" {% else %} class="red" {% endif %}>{{ check.message }}</li>
     {% endfor %}
-    </ul>
+  </ul>
 {% endblock %}

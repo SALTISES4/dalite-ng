@@ -2,8 +2,8 @@
 {% load i18n %}
 
 {% block object-tools-items %}
-{{ block.super }}
-<li>
-  <a href="{% url 'assignment-results' original.pk %}">{% trans 'View assignment results' %}</a>
-</li>
+  {{ block.super }}
+  <li>
+    <a href="{% url 'assignment-results' original.pk %}">{% trans 'View assignment results' %}</a>
+  </li>
 {% endblock %}

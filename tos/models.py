@@ -15,7 +15,7 @@ class Role(models.Model):
 
     def save(self, *args, **kwargs):
         self.role = self.role.lower()
-        super(Role, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class Tos(models.Model):
@@ -41,7 +41,7 @@ class Tos(models.Model):
             )
         elif not Tos.objects.filter(role=self.role):
             self.current = True
-        super(Tos, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     @staticmethod
     def get(role, version=None):
@@ -52,7 +52,7 @@ class Tos(models.Model):
             try:
                 tos = Tos.objects.get(role__role=role, current=True)
             except Tos.DoesNotExist:
-                err = "No terms of service exist yet for role {}.".format(role)
+                err = f"No terms of service exist yet for role {role}."
         else:
             try:
                 tos = Tos.objects.get(role__role=role, version=version)
@@ -78,7 +78,7 @@ class Consent(models.Model):
         try:
             role_ = Role.objects.get(role=role)
         except Role.DoesNotExist:
-            msg = "The role {} doesn't exist yet.".format(role)
+            msg = f"The role {role} doesn't exist yet."
             logger.error(msg)
             raise ValueError(msg)
 
@@ -132,7 +132,7 @@ class EmailType(models.Model):
     show_order = models.PositiveIntegerField(blank=True)
 
     def __str__(self):
-        return "email type {} for {}".format(self.type, self.role)
+        return f"email type {self.type} for {self.role}"
 
     class Meta:
         unique_together = ("role", "type")
@@ -151,7 +151,7 @@ class EmailType(models.Model):
         if self.type == "all":
             self.show_order = len(EmailType.objects.filter(role=self.role)) + 1
 
-        super(EmailType, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class EmailConsent(models.Model):
@@ -199,7 +199,7 @@ class EmailConsent(models.Model):
         return consent
 
     def __str__(self):
-        return "{} for {}".format(self.email_type, self.user)
+        return f"{self.email_type} for {self.user}"
 
 
 def _compute_hash(text):

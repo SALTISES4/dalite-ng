@@ -1,6 +1,7 @@
 import random
 
 from peerinst import models
+
 from ..question.test_question import QuestionTestCase
 
 
@@ -11,7 +12,7 @@ class MetaSearchTests(QuestionTestCase):
     N_correct = 1
 
     def setUp(self):
-        super(MetaSearchTests, self).setUp()
+        super().setUp()
         """ Add meta features to objects """
         easy = models.MetaFeature.objects.create(
             key="difficulty", type="S", value="easy"

@@ -215,7 +215,7 @@ export class PlotConfusionMatrix extends Component {
       const x = d3.scaleLinear().domain([0, 1]).rangeRound([0, size]);
       const y = d3
         .scaleBand()
-        .domain(d3.keys(freq["first_choice"]).sort())
+        .domain(Object.keys(freq["first_choice"]).sort())
         .rangeRound([0, firstFreqSvg.attr("height")]);
 
       const gg = secondFreqSvg
@@ -242,7 +242,7 @@ export class PlotConfusionMatrix extends Component {
 
       gg.append("g")
         .selectAll("rect")
-        .data(d3.entries(freq["second_choice"]))
+        .data(Object.entries(freq["second_choice"]))
         .enter()
         .append("rect")
         .attr("finalwidth", function (d) {
@@ -258,7 +258,7 @@ export class PlotConfusionMatrix extends Component {
         .attr(
           "height",
           firstFreqSvg.attr("height") /
-            d3.values(freq["second_choice"]).length,
+            Object.values(freq["second_choice"]).length,
         )
         .attr("fill", "#757575")
         .style("stroke", "white")
@@ -267,7 +267,7 @@ export class PlotConfusionMatrix extends Component {
       ggg
         .append("g")
         .selectAll("rect")
-        .data(d3.entries(freq["first_choice"]))
+        .data(Object.entries(freq["first_choice"]))
         .enter()
         .append("rect")
         .attr("finalwidth", function (d) {
@@ -287,7 +287,8 @@ export class PlotConfusionMatrix extends Component {
         })
         .attr(
           "height",
-          firstFreqSvg.attr("height") / d3.values(freq["first_choice"]).length,
+          firstFreqSvg.attr("height") /
+            Object.values(freq["first_choice"]).length,
         )
         .attr("fill", "#757575")
         .style("stroke", "white")
@@ -295,7 +296,7 @@ export class PlotConfusionMatrix extends Component {
 
       gg.append("g")
         .selectAll("text")
-        .data(d3.entries(freq["second_choice"]))
+        .data(Object.entries(freq["second_choice"]))
         .enter()
         .append("text")
         .attr("x", x(0))
@@ -313,7 +314,7 @@ export class PlotConfusionMatrix extends Component {
       ggg
         .append("g")
         .selectAll("text")
-        .data(d3.entries(freq["first_choice"]))
+        .data(Object.entries(freq["first_choice"]))
         .enter()
         .append("text")
         .attr("x", x(1))
@@ -330,7 +331,7 @@ export class PlotConfusionMatrix extends Component {
 
       gg.append("g")
         .selectAll("text")
-        .data(d3.entries(freq["second_choice"]))
+        .data(Object.entries(freq["second_choice"]))
         .enter()
         .append("text")
         .attr("x", x(0))

@@ -96,7 +96,7 @@ async function getNewQuestion(question) {
   posting.done((data) => {
     $(question).toggle("fade", () => {
       $(question).remove();
-      $("#questions").append(data);
+      $("#questions").text(data);
       $("#questions .mdc-card").hide().toggle("slide", transition);
       initNewCard(model.urls.toggleFavourite, model.urls.getNewQuestion);
       window.location.href = "#questions";
@@ -195,7 +195,7 @@ function initNewCard(favUrl, refreshUrl) {
             posting.done((data) => {
               $(el).toggle("fade", () => {
                 $(el).remove();
-                $("#questions").append(data);
+                $("#questions").text(data);
                 $("#questions .mdc-card").hide().toggle("slide", transition);
                 initNewCard(favUrl, refreshUrl);
                 window.location.href = "#questions";

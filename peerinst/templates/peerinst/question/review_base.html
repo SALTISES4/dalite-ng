@@ -3,47 +3,47 @@
 {% load bleach_html i18n %}
 
 {% block answers %}
-{% if question.type == "PI" %}
-<ul id="answer-choices">
-  {% for label, choice in answer_choices %}
-  <li class="dense-list {% if label == first_choice_label %}first-choice{% endif %}{% if label == second_choice_label %} second-choice{% endif %}">{{ label }}. {{ choice.strip|bleach_html|safe  }}
-    {% if first_choice_label and second_choice_label %}
-      {% if label == second_choice_label %}
-        {% for c in question.answerchoice_set.all %}
-          {% if forloop.counter == forloop.parentloop.counter %}
-            {% if not group_assignment or group_assignment.show_correct_answers %}
-            {% if c.correct %}
-              <i id="check" class="material-icons check-12">check</i>
-            {% else %}
-              <i id="check" class="material-icons check-12">close</i>
-            {% endif %}
+  {% if question.type == "PI" %}
+    <ul id="answer-choices">
+      {% for label, choice in answer_choices %}
+        <li class="dense-list {% if label == first_choice_label %}first-choice{% endif %}{% if label == second_choice_label %} second-choice{% endif %}">{{ label }}. {{ choice.strip|bleach_html|safe  }}
+          {% if first_choice_label and second_choice_label %}
+            {% if label == second_choice_label %}
+              {% for c in question.answerchoice_set.all %}
+                {% if forloop.counter == forloop.parentloop.counter %}
+                  {% if not group_assignment or group_assignment.show_correct_answers %}
+                    {% if c.correct %}
+                      <i id="check" class="material-icons check-12">check</i>
+                    {% else %}
+                      <i id="check" class="material-icons check-12">close</i>
+                    {% endif %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
             {% endif %}
           {% endif %}
-        {% endfor %}
-      {% endif %}
-    {% endif %}
-  </li>
-  {% endfor %}
-</ul>
-<div id="your-answer">
-  <p class="mdc-typography--body1">
-    {% blocktrans %}
-    You answered <strong>{{ first_choice_label }}</strong> and gave this rationale:
-    {% endblocktrans %}
-  </p>
-  <blockquote id="your-rationale">{{ rationale.strip|bleach_html|safe }}</blockquote>
-</div>
-{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    <div id="your-answer">
+      <p class="mdc-typography--body1">
+        {% blocktrans %}
+          You answered <strong>{{ first_choice_label }}</strong> and gave this rationale:
+        {% endblocktrans %}
+      </p>
+      <blockquote id="your-rationale">{{ rationale.strip|bleach_html|safe }}</blockquote>
+    </div>
+  {% endif %}
 
-{% if question.type == "RO" %}
-<div id="your-answer">
-  <p class="mdc-typography--body1">
-    {% blocktrans %}
-    Your rationale:
-    {% endblocktrans %}
-  </p>
-  <blockquote id="your-rationale">{{ rationale.strip|bleach_html|safe }}</blockquote>
-</div>
-{% endif %}
+  {% if question.type == "RO" %}
+    <div id="your-answer">
+      <p class="mdc-typography--body1">
+        {% blocktrans %}
+          Your rationale:
+        {% endblocktrans %}
+      </p>
+      <blockquote id="your-rationale">{{ rationale.strip|bleach_html|safe }}</blockquote>
+    </div>
+  {% endif %}
 
 {% endblock %}

@@ -20,7 +20,7 @@ def add_answers(
         for i in range(2):
             AnswerChoice.objects.create(
                 question=question,
-                text="choice{}".format(i + 1),
+                text=f"choice{i + 1}",
                 correct=i == 0,
             )
 

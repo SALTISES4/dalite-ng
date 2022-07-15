@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
-
 import json
+from unittest import mock
 
-import mock
-from django.urls import reverse
 from django.http import HttpResponse
+from django.urls import reverse
 
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.student import login_student

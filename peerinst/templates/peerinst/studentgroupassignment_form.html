@@ -3,143 +3,144 @@
 {% load compress static add_class i18n %}
 
 {% block stylesheets %}
-{{ block.super }}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script
-  src="https://cdn.jsdelivr.net/npm/flatpickr"
-  integrity="sha384-gaslNpKooBa6zI83pdMZf4vI0B98c874imcQNRXEQKgdof7KVMUVZmSy8br/WBI2"
-  crossorigin="anonymous">
-</script>
+  {{ block.super }}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script
+    src="https://cdn.jsdelivr.net/npm/flatpickr"
+    integrity="sha384-gaslNpKooBa6zI83pdMZf4vI0B98c874imcQNRXEQKgdof7KVMUVZmSy8br/WBI2"
+    crossorigin="anonymous">
+  </script>
 
-<style nonce="{{ request.csp_nonce }}">
-.flatpickr-input {
-  width: 150px;
-}
-</style>
+  <style nonce="{{ request.csp_nonce }}">
+    .flatpickr-input {
+      width: 150px;
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
-<main>
-  <section>
-    <div class="meta-container">
-      <div class="container">
-        <h1 class="mdc-typography--display3">{% trans 'Distribute Assignment' %}
-          <svg class="underline" width=150 height=4></svg>
-        </h1>
+  <main>
+    <section>
+      <div class="meta-container">
+        <div class="container">
+          <h1 class="mdc-typography--display3">{% trans 'Distribute Assignment' %}
+            <svg class="underline" width=150 height=4></svg>
+          </h1>
 
-        <div class="admin-link">
-          <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
-          <span class="admin-link--padded">|</span><a href="{% url 'teacher-assignments' teacher.id %}">{% trans 'Create new assignment' %}</a>
-        </div>
-
-        <h2 class="mdc-typography--display1 mdc-theme--secondary">{{ assignment.title }}</h2>
-
-        <div class='field-container'>
-          <div class='number-box'><span class='number'>?</span></div>
-          <div class='field'>
-            <p><small>
-              {% blocktrans %}
-              Select which of your current groups you would like to complete this assignment and specify a due date (the due date can be changed later).  Also indicate whether or not the correct answers should be shown after each question is completed.  Upon clicking submit, your students will receive an e-mail with a link to the assignment.
-              {% endblocktrans %}
-            </small></p>
+          <div class="admin-link">
+            <a href="{% url 'teacher' teacher.id %}">{% trans 'Back to My Account' %}</a>
+            <span class="admin-link--padded">|</span><a href="{% url 'teacher-assignments' teacher.id %}">{% trans 'Create new assignment' %}</a>
           </div>
-        </div>
 
-        <h3>{% trans 'Settings' %}</h3>
+          <h2 class="mdc-typography--display1 mdc-theme--secondary">{{ assignment.title }}</h2>
 
-        <form id="create-group-assignment" method="post">
-          {% csrf_token %}
-          {{ form.non_field_errors }}
           <div class='field-container'>
-            <div class='number-box'><span class='number'>1</span></div>
+            <div class='number-box'><span class='number'>?</span></div>
             <div class='field'>
-              <div class='mdc-form-field'>
-                <label for='id_group'>{{ form.group.label }}:</label>
-                <div class='mdc-select m-right-20'>
-                  {{ form.group|add_class:"mdc-select__native-control" }}
-                  <div class="mdc-select__bottom-line"></div>
-                </div>
-              </div>
-              <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
-                {{ form.group.help_text|safe }}
-              </p>
-              {{ form.group.errors }}
+              <p><small>
+                {% blocktrans %}
+                  Select which of your current groups you would like to complete this assignment and specify a due date (the due date can be changed later).  Also indicate whether or not the correct answers should be shown after each question is completed.  Upon clicking submit, your students will receive an e-mail with a link to the assignment.
+                {% endblocktrans %}
+              </small></p>
             </div>
           </div>
 
-          <div class='field-container'>
-            <div class='number-box flush-to-textbox'><span class='number'>2</span></div>
-            <div class='field'>
-              <div class="mdc-text-field mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
-                {{ form.due_date|add_class:"mdc-text-field__input" }}
-                {{ form.due_date.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-              </div>
-              {{ form.due_date.errors }}
-            </div>
-          </div>
+          <h3>{% trans 'Settings' %}</h3>
 
-          <div class='field-container'>
-            <div class='number-box'><span class='number'>3</span></div>
-            <div class='field'>
-              <div class='mdc-form-field'>
-                <label for="id_show_correct_answers">{{ form.show_correct_answers.label }}?</label>
-                <div class="mdc-checkbox">
-                  {{ form.show_correct_answers|add_class:'mdc-checkbox__native-control'}}
-                  <div class="mdc-checkbox__background">
-                    <svg class="mdc-checkbox__checkmark"
-                         viewBox="0 0 24 24">
-                      <path class="mdc-checkbox__checkmark-path"
-                            fill="none"
-                            stroke="white"
-                            d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
-                    </svg>
-                    <div class="mdc-checkbox__mixedmark"></div>
+          <form id="create-group-assignment" method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class='field-container'>
+              <div class='number-box'><span class='number'>1</span></div>
+              <div class='field'>
+                <div class='mdc-form-field'>
+                  <label for='id_group'>{{ form.group.label }}:</label>
+                  <div class='mdc-select m-right-20'>
+                    {{ form.group|add_class:"mdc-select__native-control" }}
+                    <div class="mdc-select__bottom-line"></div>
                   </div>
                 </div>
+                <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
+                  {{ form.group.help_text|safe }}
+                </p>
+                {{ form.group.errors }}
               </div>
-              {{ form.show_correct_answers.errors }}
             </div>
-          </div>
 
-          <div>
-            <input class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Assign' %}" />
-          </div>
+            <div class='field-container'>
+              <div class='number-box flush-to-textbox'><span class='number'>2</span></div>
+              <div class='field'>
+                <div class="mdc-text-field mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+                  {{ form.due_date|add_class:"mdc-text-field__input" }}
+                  {{ form.due_date.label_tag|add_class:"mdc-floating-label"|cut:":" }}
+                </div>
+                {{ form.due_date.errors }}
+              </div>
+            </div>
 
-        </form>
+            <div class='field-container'>
+              <div class='number-box'><span class='number'>3</span></div>
+              <div class='field'>
+                <div class='mdc-form-field'>
+                  <label for="id_show_correct_answers">{{ form.show_correct_answers.label }}?</label>
+                  <div class="mdc-checkbox">
+                    {{ form.show_correct_answers|add_class:'mdc-checkbox__native-control'}}
+                    <div class="mdc-checkbox__background">
+                      <svg class="mdc-checkbox__checkmark"
+                        viewBox="0 0 24 24">
+                        <path class="mdc-checkbox__checkmark-path"
+                          fill="none"
+                          stroke="white"
+                          d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                      </svg>
+                      <div class="mdc-checkbox__mixedmark"></div>
+                    </div>
+                  </div>
+                </div>
+                {{ form.show_correct_answers.errors }}
+              </div>
+            </div>
 
-    </div>
-  </section>
-</main>
+            <div>
+              <input class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Assign' %}" />
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </section>
+  </main>
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script nonce="{{ request.csp_nonce }}">
-$("#create-group-assignment").on("submit", function(event) {
-  event.preventDefault();
-  var $form = $(this);
-  var datetimeField = $form.find( "input[name='due_date']" );
-  var dueDate = datetimeField.val();
-  dueDate = dueDate.slice(0,-8).replace(/T/g, " ");
-  datetimeField.val(dueDate);
-  this.submit();
-});
-var datetimePicker = flatpickr("#id_due_date", {
-    enableTime: true,
-    dateFormat: "Z",
-    altInput: true,
-    altFormat: "Y-m-d H:i",
-    minDate: "today",
-});
-window.addEventListener('resize', function() {
-  datetimePicker.destroy();
-  datetimePicker = flatpickr("#id_due_date", {
-    enableTime: true,
-    dateFormat: "Z",
-    altInput: true,
-    altFormat: "Y-m-d H:i",
-    minDate: "today",
-  });
-});
-</script>
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    $("#create-group-assignment").on("submit", function(event) {
+      event.preventDefault();
+      var $form = $(this);
+      var datetimeField = $form.find( "input[name='due_date']" );
+      var dueDate = datetimeField.val();
+      dueDate = dueDate.slice(0,-8).replace(/T/g, " ");
+      datetimeField.val(dueDate);
+      this.submit();
+    });
+    var datetimePicker = flatpickr("#id_due_date", {
+      enableTime: true,
+      dateFormat: "Z",
+      altInput: true,
+      altFormat: "Y-m-d H:i",
+      minDate: "today",
+    });
+    window.addEventListener('resize', function() {
+      datetimePicker.destroy();
+      datetimePicker = flatpickr("#id_due_date", {
+        enableTime: true,
+        dateFormat: "Z",
+        altInput: true,
+        altFormat: "Y-m-d H:i",
+        minDate: "today",
+      });
+    });
+  </script>
 {% endblock %}

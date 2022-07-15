@@ -300,7 +300,7 @@ class StudentGroupAssignmentCreateView(
     form_class = StudentGroupAssignmentForm
 
     def get_form(self):
-        form = super(StudentGroupAssignmentCreateView, self).get_form()
+        form = super().get_form()
         teacher = get_object_or_404(Teacher, user=self.request.user)
         form.fields["group"].queryset = teacher.current_groups.filter(
             mode_created=StudentGroup.STANDALONE
@@ -320,7 +320,7 @@ class StudentGroupAssignmentCreateView(
         )
         self.object = form.save()
 
-        return super(StudentGroupAssignmentCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse(
@@ -328,9 +328,7 @@ class StudentGroupAssignmentCreateView(
         )
 
     def get_context_data(self, **kwargs):
-        context = super(
-            StudentGroupAssignmentCreateView, self
-        ).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         teacher = get_object_or_404(Teacher, user=self.request.user)
         context["assignment"] = get_object_or_404(
             Assignment, pk=self.kwargs["assignment_id"]
@@ -353,9 +351,7 @@ class StudentGroupAssignmentListView(
         return queryset
 
     def get_context_data(self, **kwargs):
-        context = super(StudentGroupAssignmentListView, self).get_context_data(
-            **kwargs
-        )
+        context = super().get_context_data(**kwargs)
         teacher = get_object_or_404(Teacher, user=self.request.user)
         context["teacher"] = teacher
         return context

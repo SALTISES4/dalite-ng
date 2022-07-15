@@ -3,81 +3,81 @@
 {% load compress static add_class i18n %}
 
 {% block stylesheets %}
-{{ block.super }}
-<!-- Self-hosted tinyMCE -->
-<script src="{% static 'peerinst/js/tinymce/js/tinymce/tinymce.min.js' %}"></script>
+  {{ block.super }}
+  <!-- Self-hosted tinyMCE -->
+  <script src="{% static 'peerinst/js/tinymce/js/tinymce/tinymce.min.js' %}"></script>
 {% endblock %}
 
 {% block extra_title %}
-<h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Step 2: Answer choices' %}</h2>
+  <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Step 2: Answer choices' %}</h2>
 {% endblock %}
 
 {% block answers %}
   {% if formset %}
-  <h3>{% trans 'Enter 2-5 answer choices' %}</h3>
+    <h3>{% trans 'Enter 2-5 answer choices' %}</h3>
 
-  <form id="answer-choice-form" method="post">
-    {% csrf_token %}
-    {{ formset.management_form }}
-    {{ formset.non_form_errors }}
-    {% for form in formset %}
-      {{ form.id }}
-      <div class='field-container'>
-        <div class='number-box flush-to-textbox'><span class='number'>{{ forloop.counter }}</span></div>
-        <div class='field'>
-          <div class="mdc-text-field mdc-text-field--textarea">
-            {{ form.text }}
+    <form id="answer-choice-form" method="post">
+      {% csrf_token %}
+      {{ formset.management_form }}
+      {{ formset.non_form_errors }}
+      {% for form in formset %}
+        {{ form.id }}
+        <div class='field-container'>
+          <div class='number-box flush-to-textbox'><span class='number'>{{ forloop.counter }}</span></div>
+          <div class='field'>
+            <div class="mdc-text-field mdc-text-field--textarea">
+              {{ form.text }}
+            </div>
+            <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent m-left-right-16" aria-hidden="true">
+              {{ form.text.help_text|safe }}
+            </p>
+            {{ form.text.errors }}
           </div>
-          <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent m-left-right-16" aria-hidden="true">
-            {{ form.text.help_text|safe }}
-          </p>
-          {{ form.text.errors }}
-        </div>
 
-        <div class='field'>
-          <div class='mdc-form-field'>
-            <label for="id_sequential_review">{{ form.correct.label }}</label>
-            <div class="mdc-checkbox">
-              {{ form.correct|add_class:'mdc-checkbox__native-control'}}
-              <div class="mdc-checkbox__background">
-                <svg class="mdc-checkbox__checkmark"
-                     viewBox="0 0 24 24">
-                  <path class="mdc-checkbox__checkmark-path"
-                        fill="none"
-                        stroke="white"
-                        d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
-                </svg>
-                <div class="mdc-checkbox__mixedmark"></div>
+          <div class='field'>
+            <div class='mdc-form-field'>
+              <label for="id_sequential_review">{{ form.correct.label }}</label>
+              <div class="mdc-checkbox">
+                {{ form.correct|add_class:'mdc-checkbox__native-control'}}
+                <div class="mdc-checkbox__background">
+                  <svg class="mdc-checkbox__checkmark"
+                    viewBox="0 0 24 24">
+                    <path class="mdc-checkbox__checkmark-path"
+                      fill="none"
+                      stroke="white"
+                      d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                  </svg>
+                  <div class="mdc-checkbox__mixedmark"></div>
+                </div>
               </div>
             </div>
-          </div>
-          {{ form.correct.errors }}
-          <div class='mdc-form-field'>
-            <label for="id_sequential_review">{{ form.DELETE.label }}?</label>
-            <div class="mdc-checkbox">
-              {{ form.DELETE|add_class:'mdc-checkbox__native-control'}}
-              <div class="mdc-checkbox__background">
-                <svg class="mdc-checkbox__checkmark"
-                     viewBox="0 0 24 24">
-                  <path class="mdc-checkbox__checkmark-path"
-                        fill="none"
-                        stroke="white"
-                        d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
-                </svg>
-                <div class="mdc-checkbox__mixedmark"></div>
+            {{ form.correct.errors }}
+            <div class='mdc-form-field'>
+              <label for="id_sequential_review">{{ form.DELETE.label }}?</label>
+              <div class="mdc-checkbox">
+                {{ form.DELETE|add_class:'mdc-checkbox__native-control'}}
+                <div class="mdc-checkbox__background">
+                  <svg class="mdc-checkbox__checkmark"
+                    viewBox="0 0 24 24">
+                    <path class="mdc-checkbox__checkmark-path"
+                      fill="none"
+                      stroke="white"
+                      d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                  </svg>
+                  <div class="mdc-checkbox__mixedmark"></div>
+                </div>
               </div>
             </div>
+            {{ form.DELETE.errors }}
           </div>
-          {{ form.DELETE.errors }}
         </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
     </form>
-    {% else %}
+  {% else %}
 
     <ul id="answer-choices">
       {% for label, choice in question.get_choices %}
-      <li class="dense-list">{{ label }}. {{ choice|safe }}</li>
+        <li class="dense-list">{{ label }}. {{ choice|safe }}</li>
       {% endfor %}
     </ul>
 
@@ -87,24 +87,24 @@
       <div class='field'>
         <p><small>
           {% blocktrans %}
-          Answer choices cannot be changed if any students have answered this question.  However, you can clone this question and create new answer choices.
+            Answer choices cannot be changed if any students have answered this question.  However, you can clone this question and create new answer choices.
           {% endblocktrans %}
         </small></p>
       </div>
     </div>
-    {% endif %}
+  {% endif %}
 
-    <div class="m-top-20">
-      <span class="padded">
-        <form class="inline" id="back" action="{% url 'question-update' pk=question.id %}" method="get">
-          <button form="back" type="submit" class="mdc-button mdc-button--raised">Back</button>
-        </form>
-      </span>
-      {% if formset %}
+  <div class="m-top-20">
+    <span class="padded">
+      <form class="inline" id="back" action="{% url 'question-update' pk=question.id %}" method="get">
+        <button form="back" type="submit" class="mdc-button mdc-button--raised">Back</button>
+      </form>
+    </span>
+    {% if formset %}
       <span class="padded">
         <input form="answer-choice-form" class="mdc-button mdc-button--raised submit_button" type="submit" value="{% trans 'Save and next' %}" />
       </span>
-      {% else %}
+    {% else %}
       <span class="padded">
         <form class="inline" id="next" action="{% url 'research-fix-expert-rationale' question_id=question.id %}" method="get">
           <button form="next" type="submit" class="mdc-button mdc-button--raised">{% trans 'Next' %}</button>
@@ -113,36 +113,36 @@
       <span class="padded">
         <button id="clone-btn" type="button" class="mdc-button mdc-button--raised">{% trans 'Clone' %}</button>
       </span>
-      {% endif %}
-    </div>
+    {% endif %}
+  </div>
 
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script nonce="{{ request.csp_nonce }}">
-  // TinyMCE bind to textarea
-  tinymce.init({
-    selector: 'textArea',
-    elementpath: false,
-    branding: false,
-    plugins: ['autolink', 'autosave', 'charmap', 'code', 'link', 'paste'],
-    menubar: false,
-    toolbar: 'undo redo | bold italic underline superscript subscript | link | charmap',
-    content_css: "{% static 'peerinst/css/tiny.min.css' %}",
-    link_assume_external_targets: true,
-    default_link_target: '_blank',
-    rel_list: [
-      {title: 'Private', value: 'noreferrer noopener nofollow'},
-    ]
-  });
-window.addEventListener("load", function() {
-  var cloneBtn = document.getElementById("clone-btn");
-  if (cloneBtn != null) {
-    cloneBtn.addEventListener("click", function() {
-      window.location.href="{% url 'question-clone' pk=question.id %}";
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    // TinyMCE bind to textarea
+    tinymce.init({
+      selector: 'textArea',
+      elementpath: false,
+      branding: false,
+      plugins: ['autolink', 'autosave', 'charmap', 'code', 'link', 'paste'],
+      menubar: false,
+      toolbar: 'undo redo | bold italic underline superscript subscript | link | charmap',
+      content_css: "{% static 'peerinst/css/tiny.min.css' %}",
+      link_assume_external_targets: true,
+      default_link_target: '_blank',
+      rel_list: [
+        {title: 'Private', value: 'noreferrer noopener nofollow'},
+      ]
     });
-  }
-});
-</script>
+    window.addEventListener("load", function() {
+      var cloneBtn = document.getElementById("clone-btn");
+      if (cloneBtn != null) {
+        cloneBtn.addEventListener("click", function() {
+          window.location.href="{% url 'question-clone' pk=question.id %}";
+        });
+      }
+    });
+  </script>
 {% endblock %}

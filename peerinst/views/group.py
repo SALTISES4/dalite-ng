@@ -165,7 +165,7 @@ def group_details_update(req, group_hash, teacher, group):
         except Teacher.DoesNotExist:
             return response_400(
                 req,
-                msg=_("There is no teacher with username {}.".format(teacher)),
+                msg=_(f"There is no teacher with username {teacher}."),
             )
         group.teacher.add(teacher)
         group.save()
@@ -282,7 +282,7 @@ def send_student_assignment(req, assignment_hash, teacher, group, assignment):
     student = Student.objects.filter(student__email=email).last()
     if student is None:
         return response_400(
-            req, msg=_('There is no student with email "{}".'.format(email))
+            req, msg=_(f'There is no student with email "{email}".')
         )
 
     student_assignment, __ = StudentAssignment.objects.get_or_create(
@@ -368,9 +368,7 @@ def get_student_reputation(req):
         return response_400(
             req,
             msg=_("The student couldn't be found."),
-            logger_msg=(
-                "The student with pk {} couldn't be found.".format(id_)
-            ),
+            logger_msg=(f"The student with pk {id_} couldn't be found."),
             log=logger.warning,
         )
     criteria = {
@@ -409,9 +407,7 @@ class StudentGroupUpdateView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
             self.request.user.teacher in self.get_object().teacher.all()
             or self.request.user.is_staff
         ):
-            return super(StudentGroupUpdateView, self).dispatch(
-                *args, **kwargs
-            )
+            return super().dispatch(*args, **kwargs)
         else:
             raise PermissionDenied
 
@@ -420,7 +416,7 @@ class StudentGroupUpdateView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
         This is a small convenience to make first available year value satisfy
         the requirement of >= 2015 (for objects with year = 0).
         """
-        form = super(StudentGroupUpdateView, self).get_form(form_class)
+        form = super().get_form(form_class)
         form.fields["year"].widget = forms.NumberInput(attrs={"min": 2015})
         return form
 
@@ -428,9 +424,7 @@ class StudentGroupUpdateView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
         return StudentGroup.get(self.kwargs["group_hash"])
 
     def get_context_data(self, **kwargs):
-        context = super(StudentGroupUpdateView, self).get_context_data(
-            **kwargs
-        )
+        context = super().get_context_data(**kwargs)
         teacher = get_object_or_404(Teacher, user=self.request.user)
         context["teacher"] = teacher
         context["teacher_list"] = list(

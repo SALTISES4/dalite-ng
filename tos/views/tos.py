@@ -44,7 +44,7 @@ def tos_consent_update(req, role, version):
         return TemplateResponse(
             req,
             "400.html",
-            context={"message": _("{} isn't a valid role.".format(role))},
+            context={"message": _(f"{role} isn't a valid role.")},
             status=400,
         )
 
@@ -66,9 +66,7 @@ def tos_consent_update(req, role, version):
         return TemplateResponse(
             req,
             "400.html",
-            context={
-                "message": _('The user "{}" doesn\'t exist.'.format(username))
-            },
+            context={"message": _(f'The user "{username}" doesn\'t exist.')},
             status=400,
         )
 
@@ -101,7 +99,7 @@ def _consent_view(req, username, role, version):
             TemplateResponse(
                 req,
                 "400.html",
-                context={"message": _("{} isn't a valid role.".format(role))},
+                context={"message": _(f"{role} isn't a valid role.")},
                 status=400,
             ),
             None,
@@ -112,9 +110,7 @@ def _consent_view(req, username, role, version):
                 req,
                 "400.html",
                 context={
-                    "message": _(
-                        'The user "{}" doesn\'t exist.'.format(username)
-                    )
+                    "message": _(f'The user "{username}" doesn\'t exist.')
                 },
                 status=400,
             ),

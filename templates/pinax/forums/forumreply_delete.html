@@ -3,58 +3,58 @@
 {% load i18n %}
 
 {% block heading %}
-{% trans 'Confirm Delete?' %}
+  {% trans 'Confirm Delete?' %}
 {% endblock %}
 
 {% block breadcrumbs %}
-<span class="links-divider">|</span><a href="{% url 'pinax_forums:thread' object.thread.id %}">{% trans 'Back to Post' %}</a>
+  <span class="links-divider">|</span><a href="{% url 'pinax_forums:thread' object.thread.id %}">{% trans 'Back to Post' %}</a>
 {% endblock %}
 
 {% block content %}
-<div class="mdc-card">
+  <div class="mdc-card">
 
-  <div class="mdc-typography--body1" >
-    {{object.content|safe}}
-  </div>
-
-  <div class="mdc-card__actions">
-    <div class="mdc-card__action-buttons">
-      <div class="mdc-typography--caption">
-        {{ object.author }} &middot; {{ object.created|date:"SHORT_DATE_FORMAT" }}
-      </div>
+    <div class="mdc-typography--body1" >
+      {{ object.content|striptags|safe }}
     </div>
-  </div>
-</div>
 
-{% if object.reply_replies.all %}
-<h4>{% trans 'The following replies will also be deleted: ' %}<h4>
-
-{% for r in object.reply_replies.all %}
-<div class="mdc-card reply-to-reply">
-
-  <div class="mdc-typography--body1">
-    {{r.content|safe}}
-  </div>
-
-  <div class="mdc-card__actions">
-    <div class="mdc-card__action-buttons">
-        <div class="mdc-typography--caption white">
-        {% if r.created|date:"d M" != right_now %}
-          {{ r.author }} &middot; {{ r.created|date:"SHORT_DATE_FORMAT" }}
-        {% else %}
-          {{ r.author }} &middot; {{ r.created|timesince }}
-        {% endif %}
+    <div class="mdc-card__actions">
+      <div class="mdc-card__action-buttons">
+        <div class="mdc-typography--caption">
+          {{ object.author }} &middot; {{ object.created|date:"SHORT_DATE_FORMAT" }}
+        </div>
       </div>
     </div>
   </div>
 
-</div>
-{% endfor %}
-{% endif %}
+  {% if object.reply_replies.all %}
+    <h4>{% trans 'The following replies will also be deleted: ' %}</h4>
 
-<form method="post">
-  {% csrf_token %}
-  <a class="padded-top mdc-button mdc-button--raised padded-top" href="{% url 'pinax_forums:thread' object.thread.id %}">{% trans 'Cancel' %}</a>
-  <input type="submit" class="padded-top mdc-button mdc-button--raised delete" value="{% trans 'Delete' %}"/>
-</form>
+    {% for r in object.reply_replies.all %}
+      <div class="mdc-card reply-to-reply">
+
+        <div class="mdc-typography--body1">
+          {{ r.content|striptags|safe }}
+        </div>
+
+        <div class="mdc-card__actions">
+          <div class="mdc-card__action-buttons">
+            <div class="mdc-typography--caption white">
+              {% if r.created|date:"d M" != right_now %}
+                {{ r.author }} &middot; {{ r.created|date:"SHORT_DATE_FORMAT" }}
+              {% else %}
+                {{ r.author }} &middot; {{ r.created|timesince }}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <a class="padded-top mdc-button mdc-button--raised padded-top" href="{% url 'pinax_forums:thread' object.thread.id %}">{% trans 'Cancel' %}</a>
+    <input type="submit" class="padded-top mdc-button mdc-button--raised delete" value="{% trans 'Delete' %}"/>
+  </form>
 {% endblock %}

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from datetime import timedelta
 from math import ceil
 
@@ -74,7 +71,7 @@ def get_teacher():
 
 
 def get_students(n_students):
-    emails = ["test-{}@test.com".format(i + 1) for i in range(n_students)]
+    emails = [f"test-{i + 1}@test.com" for i in range(n_students)]
     usernames_passwords = [
         get_student_username_and_password(email) for email in emails
     ]
@@ -93,7 +90,7 @@ def get_students(n_students):
 def get_groups(teacher, students, n_groups):
     groups = [
         StudentGroup.objects.get_or_create(
-            name="_test-{}".format(i + 1), title="Test {}".format(i + 1)
+            name=f"_test-{i + 1}", title=f"Test {i + 1}"
         )[0]
         for i in range(n_groups)
     ]
@@ -113,8 +110,8 @@ def get_groups(teacher, students, n_groups):
 def get_questions(teacher, n_questions):
     questions = [
         Question.objects.get_or_create(
-            title="_Test {}".format(i + 1),
-            text="_Test {}".format(i + 1),
+            title=f"_Test {i + 1}",
+            text=f"_Test {i + 1}",
             user=teacher.user,
         )[0]
         for i in range(n_questions)
@@ -132,7 +129,7 @@ def get_questions(teacher, n_questions):
 def get_assignments(teacher, groups, questions, n_assignments):
     assignments = [
         Assignment.objects.get_or_create(
-            identifier="_test {}".format(i + 1), title="Test {}".format(i + 1)
+            identifier=f"_test {i + 1}", title=f"Test {i + 1}"
         )[0]
         for i in range(n_assignments)
     ]

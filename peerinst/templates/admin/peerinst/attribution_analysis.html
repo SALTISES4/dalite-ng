@@ -4,33 +4,33 @@
 {% load attribution_stats %}
 
 {% block extrastyle %}
-<link href="{% static 'peerinst/css/admin.min.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'peerinst/css/admin.min.css' %}" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block content %}
-<h1>{% trans 'Attribution bias analysis' %}</h1>
-<div class="g-d-c-fluid">
-  <form action="" method="get">
-    <fieldset class="grp-module">
-      <div class="grp-row">
-        {{ form.as_p }}
-      </div>
-      <div class="grp-row">
-        <input type="submit" value="{% trans 'Run analysis' %}" />
-      </div>
-    </fieldset>
-  </form>
-</div>
-{% if username_data %}
-<div class="g-d-c-fluid attribution-stats-container">
-  <h2>{% trans 'Statistics by username' %}</h2>
-  {% attribution_stats username_data %}
-</div>
-{% endif %}
-{% if country_data %}
-<div class="g-d-c-fluid attribution-stats-container">
-  <h2>{% trans 'Statistics by country' %}</h2>
-  {% attribution_stats country_data %}
-</div>
-{% endif %}
+  <h1>{% trans 'Attribution bias analysis' %}</h1>
+  <div class="g-d-c-fluid">
+    <form action="" method="get">
+      <fieldset class="grp-module">
+        <div class="grp-row">
+          {{ form.as_p }}
+        </div>
+        <div class="grp-row">
+          <input type="submit" value="{% trans 'Run analysis' %}" />
+        </div>
+      </fieldset>
+    </form>
+  </div>
+  {% if username_data %}
+    <div class="g-d-c-fluid attribution-stats-container">
+      <h2>{% trans 'Statistics by username' %}</h2>
+      {% attribution_stats username_data %}
+    </div>
+  {% endif %}
+  {% if country_data %}
+    <div class="g-d-c-fluid attribution-stats-container">
+      <h2>{% trans 'Statistics by country' %}</h2>
+      {% attribution_stats country_data %}
+    </div>
+  {% endif %}
 {% endblock %}

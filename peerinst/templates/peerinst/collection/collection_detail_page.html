@@ -1,37 +1,37 @@
 {% load get_value bleach_html i18n %}
 {% if is_multiple_pages %}
-<div class="pagination">
+  <div class="pagination">
     <span>
-        {% if paginator.has_previous %}
-            <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
-        {% endif %}
+      {% if paginator.has_previous %}
+        <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
+      {% endif %}
 
-        <span class="current">
-            {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
-        </span>
+      <span class="current">
+        {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
+      </span>
 
-        {% if paginator.has_next %}
-            <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
-        {% endif %}
+      {% if paginator.has_next %}
+        <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
+      {% endif %}
     </span>
-</div>
+  </div>
 {% endif %}
 {% for obj in paginator %}
-    <div class="mdc-card" id="card-assign">
-      <div class="mdc-typography--title bold">
-        {{ obj.title|bleach_html|safe }}
-      </div>
-    {% if obj.owner %}
-    <div class="mdc-typography--caption">
-      {% trans 'Created by' %} {% for c in obj.owner.all %}
-      {{ c }}{% if not forloop.last %}, {% endif %}
-      {% endfor %}
+  <div class="mdc-card" id="card-assign">
+    <div class="mdc-typography--title bold">
+      {{ obj.title|bleach_html|safe }}
     </div>
+    {% if obj.owner %}
+      <div class="mdc-typography--caption">
+        {% trans 'Created by' %} {% for c in obj.owner.all %}
+          {{ c }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      </div>
     {% endif %}
     <div class="mdc-typography--body1">
       <div class="mdc-card" id="desciption">
         <div class="mdc-typography--body1">
-            <b>{% trans 'Assignment Statistics' %}</b>
+          <b>{% trans 'Assignment Statistics' %}</b>
         </div>
         <div class="mdc-card__actions">
           <div class="mdc-card__action-buttons">
@@ -69,185 +69,185 @@
         <div class="foldable--body">
           <ul>
             {% for question in obj.questions.all %}
-            <li class="dense-list searchable">
-              <div class="mdc-card"
-                   id="{{ question.id|safe }}"
-                   discipline="'{{ question.discipline|safe }}'"
-                   category="{% for c in question.category.all %}{{ c.title|safe }} {% endfor %}"
-                   matrix="{{ question.get_matrix|safe }}">
-                <div class="mdc-typography--title bold">
-                  {{ question.title|bleach_html|safe }}
-                </div>
-                <div class="mdc-typography--caption">
-                  #{{ question.id }} {% if question.user %}{% trans 'by' %}
-                  {{ question.user.username }}{% endif %}
-                </div>
-                <div class="mdc-typography--body1">
-                  {{ question.text|bleach_html|safe  }}
-                </div>
-
-                {% if question.image %}
-                  <img class="question-image"
-                       src="{{ question.image.url|safe }}"
-                       alt="question.image_alt_text">
-                {% endif %}
-
-                {% if question.video_url %}
-                <div id="question-video">
-                  <object class="question-image"
-                          width="640"
-                          height="390"
-                          data="{{ question.video_url|safe }}">
-                  </object>
-                </div>
-                {% endif %}
-
-                <div class="question-answers">
-                  <ul>
-                    {% for label, choice in question.get_choices %}
-                      <li class="dense-list">{{ label }}. {{ choice|bleach_html|safe }}
-                      {% for c in question.answerchoice_set.all %}
-                        {% if forloop.counter == forloop.parentloop.counter %}
-                          {% if c.correct %}
-                            <i class="check material-icons">check</i>
-                          {% endif %}
-                        {% endif %}
-                      {% endfor %}
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </div>
-
-                <div class="mdc-card__actions">
-                  <div class="mdc-card__action-buttons">
-                    <div class="mdc-typography--caption">
-                      <div>
-                        {% trans 'Discipline' %}: {{ question.discipline|bleach_html|safe }}
-                      </div>
-                      <div>
-                        {% trans 'Categories' %}:
-                        {% for c in question.category.all %}
-                        {{ c.title|bleach_html|safe }}{% if not forloop.last %}, {% endif %}
-                        {% empty %}
-                        {% trans 'Uncategorized' %}
-                        {% endfor %}
-                      </div>
-                      <div>
-                        {% trans 'Student answers' %}: {{ question.answer_set.all.count }}
-                      </div>
-                    </div>
+              <li class="dense-list searchable">
+                <div class="mdc-card"
+                  id="{{ question.id|safe }}"
+                  discipline="'{{ question.discipline|safe }}'"
+                  category="{% for c in question.category.all %}{{ c.title|safe }} {% endfor %}"
+                  matrix="{{ question.get_matrix|safe }}">
+                  <div class="mdc-typography--title bold">
+                    {{ question.title|bleach_html|safe }}
                   </div>
-                  <div class="mdc-card__action-icons">
-                    <div id="stats-{{ question.id|safe }}" class="stats">
-                      <i id="activate-dialog-analytics-{{ question.id|safe }}"
-                      ref_id="{{ question.id|safe }}" class="material-icons md-24{% if not question.answer_set.all.count == 0 %} analytics-tags{% endif %}">info</i>
-                      <span id="rating-{{ question.id|safe }}"></span>
+                  <div class="mdc-typography--caption">
+                    #{{ question.id }} {% if question.user %}{% trans 'by' %}
+                      {{ question.user.username }}{% endif %}
+                  </div>
+                  <div class="mdc-typography--body1">
+                    {{ question.text|bleach_html|safe  }}
+                  </div>
+
+                  {% if question.image %}
+                    <img class="question-image"
+                      src="{{ question.image.url|safe }}"
+                      alt="question.image_alt_text">
+                  {% endif %}
+
+                  {% if question.video_url %}
+                    <div id="question-video">
+                      <object class="question-image"
+                        width="640"
+                        height="390"
+                        data="{{ question.video_url|safe }}">
+                      </object>
                     </div>
-                    <div class="flag-question" data-id="{{ question.pk }}">
-                      <i class="mdc-icon-toggle material-icons mdc-theme--primary flag-question__btn"
-                         role="button"
-                         aria-pressed="false"
-                         aria-label="{% trans 'Flag question' %}"
-                         tabindex="0"
-                         title="{% trans 'Flag question' %}">
-                         outlined_flag
-                      </i>
-                      <div class="flag-question__form" hidden>
-                        <h3>{% trans 'Flag question' %}</h3>
-                        <form>
-                          <select class="flag-question__form__select"
-                                  title="{% trans 'Possible reasons' %}"
-                                  aria-label="{% trans 'Possible reasons' %}">
-                          </select>
-                          <input type="submit"
-                                 class="mdc-button mdc-button--raised"
-                                 value="{% trans 'Flag' %}">
-                        </form>
-                        <svg class="icon flag-question__close">
-                          <use xlink:href="#close"></use>
-                        </svg>
+                  {% endif %}
+
+                  <div class="question-answers">
+                    <ul>
+                      {% for label, choice in question.get_choices %}
+                        <li class="dense-list">{{ label }}. {{ choice|bleach_html|safe }}
+                          {% for c in question.answerchoice_set.all %}
+                            {% if forloop.counter == forloop.parentloop.counter %}
+                              {% if c.correct %}
+                                <i class="check material-icons">check</i>
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+
+                  <div class="mdc-card__actions">
+                    <div class="mdc-card__action-buttons">
+                      <div class="mdc-typography--caption">
+                        <div>
+                          {% trans 'Discipline' %}: {{ question.discipline|bleach_html|safe }}
+                        </div>
+                        <div>
+                          {% trans 'Categories' %}:
+                          {% for c in question.category.all %}
+                            {{ c.title|bleach_html|safe }}{% if not forloop.last %}, {% endif %}
+                          {% empty %}
+                            {% trans 'Uncategorized' %}
+                          {% endfor %}
+                        </div>
+                        <div>
+                          {% trans 'Student answers' %}: {{ question.answer_set.all.count }}
+                        </div>
                       </div>
                     </div>
-                    <i class="mdc-icon-toggle material-icons mdc-theme--primary favourite-btn"
+                    <div class="mdc-card__action-icons">
+                      <div id="stats-{{ question.id|safe }}" class="stats">
+                        <i id="activate-dialog-analytics-{{ question.id|safe }}"
+                          ref_id="{{ question.id|safe }}" class="material-icons md-24{% if not question.answer_set.all.count == 0 %} analytics-tags{% endif %}">info</i>
+                        <span id="rating-{{ question.id|safe }}"></span>
+                      </div>
+                      <div class="flag-question" data-id="{{ question.pk }}">
+                        <i class="mdc-icon-toggle material-icons mdc-theme--primary flag-question__btn"
+                          role="button"
+                          aria-pressed="false"
+                          aria-label="{% trans 'Flag question' %}"
+                          tabindex="0"
+                          title="{% trans 'Flag question' %}">
+                          outlined_flag
+                        </i>
+                        <div class="flag-question__form" hidden>
+                          <h3>{% trans 'Flag question' %}</h3>
+                          <form>
+                            <select class="flag-question__form__select"
+                              title="{% trans 'Possible reasons' %}"
+                              aria-label="{% trans 'Possible reasons' %}">
+                            </select>
+                            <input type="submit"
+                              class="mdc-button mdc-button--raised"
+                              value="{% trans 'Flag' %}">
+                          </form>
+                          <svg class="icon flag-question__close">
+                            <use xlink:href="#close"></use>
+                          </svg>
+                        </div>
+                      </div>
+                      <i class="mdc-icon-toggle material-icons mdc-theme--primary favourite-btn"
                         role="button"
                         aria-pressed="false"
                         aria-label="Add to favorites" tabindex="0"
                         {% if question in request.user.teacher.favourite_questions.all %}
-                        data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
-                        data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
+                          data-toggle-off='{"label": "Remove from favourites", "content": "favorite"}'
+                          data-toggle-on='{"label": "Add to favourites", "content": "favorite_border"}'
                         {% else %}
-                        data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
-                        data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
+                          data-toggle-on='{"label": "Remove from favourites", "content": "favorite"}'
+                          data-toggle-off='{"label": "Add to favourites", "content": "favorite_border"}'
                         {% endif %}
                         pk="{{ question.pk|safe }}">
                         favorite_border
-                    </i>
+                      </i>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <aside id="dialog-analytics-{{question.id}}"
-                class="mdc-dialog plot-dialog"
-                role="alertdialog"
-                aria-labelledby="label"
-                aria-describedby="description"
-                data-get-matrix="{{ question.get_matrix|safe }}"
-                data-get-frequency="{{ question.get_frequency|striptags }}"
-                data-id="{{ question.id }}">
-                <div class="mdc-dialog__surface">
-                  <header class="mdc-dialog__header">
-                    <h2 id="label" class="mdc-dialog__header__title">
-                      {{ question.title }}
-                    </h2>
-                  </header>
-                  <section id="description-{{ question.id }}" class="mdc-dialog__body mdc-dialog__body--scrollable">
-                    <h2 id="label" class="mdc-dialog__header__title">
-                      {% trans 'Analytics' %}
-                    </h2>
-                    <div id="{{ question.id }}" name="analytics" class="items-for-question">
-                      <svg id="first-frequency-{{ question.id }}" width="300" height="80" class="vertical-align"></svg>
-                      <svg id="matrix-{{ question.id }}" width="60" height="60" class="vertical-align"></svg>
-                      <svg id="second-frequency-{{ question.id }}" width="300" height="80" class="vertical-align"></svg>
-                    </div>
-                    <h2 id="label" class="mdc-dialog__header__title">
-                      {% trans 'Rationales' %}
-                    </h2>
-                    <div class='field-container'>
-                      <div class='number-box'><span class='number'>?</span></div>
-                      <div class='field'>
-                        <p class="dialog-help-text"><small>
-                          {% blocktrans %}
-                          The following rationales consist of the most popular, while the preceding fraction indicates, of those that have viewed the rationale, how many have chosen it.
-                          {% endblocktrans %}
-                        </small></p>
+                <aside id="dialog-analytics-{{question.id}}"
+                  class="mdc-dialog plot-dialog"
+                  role="alertdialog"
+                  aria-labelledby="label"
+                  aria-describedby="description"
+                  data-get-matrix="{{ question.get_matrix|safe }}"
+                  data-get-frequency="{{ question.get_frequency|striptags }}"
+                  data-id="{{ question.id }}">
+                  <div class="mdc-dialog__surface">
+                    <header class="mdc-dialog__header">
+                      <h2 id="label" class="mdc-dialog__header__title">
+                        {{ question.title }}
+                      </h2>
+                    </header>
+                    <section id="description-{{ question.id }}" class="mdc-dialog__body mdc-dialog__body--scrollable">
+                      <h2 id="label" class="mdc-dialog__header__title">
+                        {% trans 'Analytics' %}
+                      </h2>
+                      <div id="{{ question.id }}" name="analytics" class="items-for-question">
+                        <svg id="first-frequency-{{ question.id }}" width="300" height="80" class="vertical-align"></svg>
+                        <svg id="matrix-{{ question.id }}" width="60" height="60" class="vertical-align"></svg>
+                        <svg id="second-frequency-{{ question.id }}" width="300" height="80" class="vertical-align"></svg>
                       </div>
-                    </div>
-                    <ul>
-                      {% for answer_choice in question.get_most_convincing_rationales %}
-                        <li id="{{ question.id }}" name="rationale" class="items-for-question">{{ answer_choice.label }}. {{ answer_choice.text|safe|striptags }}</li>
-                        <ul>
-                          {% for rationale in answer_choice.most_convincing %}
+                      <h2 id="label" class="mdc-dialog__header__title">
+                        {% trans 'Rationales' %}
+                      </h2>
+                      <div class='field-container'>
+                        <div class='number-box'><span class='number'>?</span></div>
+                        <div class='field'>
+                          <p class="dialog-help-text"><small>
+                            {% blocktrans %}
+                              The following rationales consist of the most popular, while the preceding fraction indicates, of those that have viewed the rationale, how many have chosen it.
+                            {% endblocktrans %}
+                          </small></p>
+                        </div>
+                      </div>
+                      <ul>
+                        {% for answer_choice in question.get_most_convincing_rationales %}
+                          <li id="{{ question.id }}" name="rationale" class="items-for-question">{{ answer_choice.label }}. {{ answer_choice.text|safe|striptags }}</li>
+                          <ul>
+                            {% for rationale in answer_choice.most_convincing %}
                               <li id="{{ question.id }}" data-id="{{ rationale.id }}" name="rationale" class="items-for-question"><span class="rationale-stats">({{ rationale.times_chosen }}/{{ rationale.times_shown }})</span> {{ rationale.rationale|safe|striptags }}</li>
-                          {% endfor %}
-                        </ul>
+                            {% endfor %}
+                          </ul>
 
+                        {% endfor %}
+                      </ul>
+                      <h2 id="label" class="mdc-dialog__header__title">
+                        {% trans 'Assignments using ' %}{{ question.title }}
+                      </h2>
+                      {% for assignment in question.assignment_set.all %}
+                        <p id="{{ question.id }}" name="assignment" class="items-for-question"><a class="assignment-link" href="{% url 'question-list' assignment_id=assignment.pk %}">{{ assignment.title }}</a></p>
                       {% endfor %}
-                    </ul>
-                    <h2 id="label" class="mdc-dialog__header__title">
-                      {% trans 'Assignments using ' %}{{ question.title }}
-                    </h2>
-                    {% for assignment in question.assignment_set.all %}
-                      <p id="{{ question.id }}" name="assignment" class="items-for-question"><a class="assignment-link" href="{% url 'question-list' assignment_id=assignment.pk %}">{{ assignment.title }}</a></p>
-                    {% endfor %}
-                  </section>
-                  <footer class="mdc-dialog__footer">
-                    <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
-                  </footer>
-                </div>
-                <div class="mdc-dialog__backdrop"></div>
-              </aside>
-              {% endfor %}
-            </li>
+                    </section>
+                    <footer class="mdc-dialog__footer">
+                      <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">Ok</button>
+                    </footer>
+                  </div>
+                  <div class="mdc-dialog__backdrop"></div>
+                </aside>
+              </li>
+            {% endfor %}
           </ul>
         </div>
       </div>
@@ -262,25 +262,25 @@
           </div>
         </div>
       </div>
-  </div>
     </div>
+  </div>
 {% empty %}
-{% trans 'No assignments available.' %}
+  {% trans 'No assignments available.' %}
 {% endfor %}
 {% if is_multiple_pages %}
-<div class="pagination">
+  <div class="pagination">
     <span>
-        {% if paginator.has_previous %}
-            <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
-        {% endif %}
+      {% if paginator.has_previous %}
+        <span class="search-nav search-nav--back" data-page="{{ paginator.previous_page_number }}"><i class="icon ion-ios-arrow-back"></i></span>
+      {% endif %}
 
-        <span class="current">
-            {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
-        </span>
+      <span class="current">
+        {% trans 'Page' %} {{ paginator.number }} / {{ paginator.paginator.num_pages }}
+      </span>
 
-        {% if paginator.has_next %}
-            <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
-        {% endif %}
+      {% if paginator.has_next %}
+        <span class="search-nav search-nav--forward" data-page="{{ paginator.next_page_number }}"><i class="icon ion-ios-arrow-forward"></i></span>
+      {% endif %}
     </span>
-</div>
+  </div>
 {% endif %}

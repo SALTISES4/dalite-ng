@@ -4,47 +4,47 @@
 {% block title %}{% trans 'Flagged rationales' %} | myDalite{% endblock %}
 
 {% block extrastyle %}
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<link rel="stylesheet" href="//cdn.datatables.net/1.10.19/css/dataTables.jqueryui.min.css">
-<link rel="stylesheet" href="//cdn.datatables.net/buttons/1.5.2/css/buttons.jqueryui.min.css">
-<link href="{% static 'peerinst/css/admin.min.css' %}" rel="stylesheet" type="text/css" />
-<style nonce="{{ request.csp_nonce }}">
-  tr{
-    cursor: pointer;
-  }
-</style>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="//cdn.datatables.net/1.10.19/css/dataTables.jqueryui.min.css">
+  <link rel="stylesheet" href="//cdn.datatables.net/buttons/1.5.2/css/buttons.jqueryui.min.css">
+  <link href="{% static 'peerinst/css/admin.min.css' %}" rel="stylesheet" type="text/css" />
+  <style nonce="{{ request.csp_nonce }}">
+    tr{
+      cursor: pointer;
+    }
+  </style>
 {% endblock %}
 
 {% block extrahead %}
-{{ block.super }}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/dataTables.jqueryui.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.jqueryui.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
-<script src="{% static 'peerinst/js/admin.min.js' %}"></script>
-<script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", () => {
-    admin.initFlaggedRationales({
-      urls: {
-        getRationales: "{% url 'saltise-admin:get-flagged-rationales' %}"
-      }
-    }, "{% url 'admin:peerinst_answer_changelist' %}");
-  });
-</script>
+  {{ block.super }}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/dataTables.jqueryui.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.jqueryui.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+  <script src="{% static 'peerinst/js/admin.min.js' %}"></script>
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", () => {
+      admin.initFlaggedRationales({
+        urls: {
+          getRationales: "{% url 'saltise-admin:get-flagged-rationales' %}"
+        }
+      }, "{% url 'admin:peerinst_answer_changelist' %}");
+    });
+  </script>
 {% endblock %}
 
 {% block breadcrumbs %}
-<ul>
-  <li><a href="{% url 'saltise-admin:index' %}">{% trans 'Home' %}</a></li>
-  <li>{% trans 'Flagged rationales' %}</li>
-</ul>
+  <ul>
+    <li><a href="{% url 'saltise-admin:index' %}">{% trans 'Home' %}</a></li>
+    <li>{% trans 'Flagged rationales' %}</li>
+  </ul>
 {% endblock %}
 
 {% block content_title %}
-<h1>{% trans 'Flagged rationales' %}</h1>
+  <h1>{% trans 'Flagged rationales' %}</h1>
 {% endblock %}
 
 {% block content %}

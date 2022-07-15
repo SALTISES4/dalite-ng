@@ -10,7 +10,12 @@ logger = logging.getLogger("performance")
 pp = pprint.PrettyPrinter()
 
 
-def question_search(search_string, filters=[], flagged=[]):
+def question_search(search_string, filters=None, flagged=None):
+
+    if filters is None:
+        filters = []
+    if flagged is None:
+        flagged = []
 
     start = time.perf_counter()
 

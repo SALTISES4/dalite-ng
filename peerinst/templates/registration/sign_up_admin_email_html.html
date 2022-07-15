@@ -4,23 +4,23 @@
 
 {% block body %}
 
-<h1>{% trans "New User Request" %}</h1>
+  <h1>{% trans "New User Request" %}</h1>
 
-<p>{% trans "Dear administrator" %},</p>
+  <p>{% trans "Dear administrator" %},</p>
 
-<p>{% trans "A new user was created on " %}{{ date }}</p>
+  <p>{% trans "A new user was created on " %}{{ date }}</p>
 
-<ul>
-  <li>{% trans "Email" %}: {{ email }} </li>
-  <li>{% trans "Verification url" %}: {{ url }} </li>
-</ul>
+  <ul>
+    <li>{% trans "Email" %}: {{ email }} </li>
+    <li>{% trans "Verification url" %}: {{ url }} </li>
+  </ul>
 
-<p>{% trans "Access your administrator account to activate this new user at:" %}</p>
+  <p>{% trans "Access your administrator account to activate this new user at:" %}</p>
 
-<p>{{ request.scheme }}://{{ request.get_host }}{% url 'saltise-admin:new-user-approval' %}</p>
+  <p>{{ request.scheme }}://{{ request.get_host }}{% url 'saltise-admin:new-user-approval' %}</p>
 
-<p>{% trans 'Cheers'%},</p>
+  <p>{% trans 'Cheers'%},</p>
 
-<p>{% blocktrans %}The {{ site_name }} team{% endblocktrans %}</p>
+  <p>{% blocktrans %}The {{ site_name }} team{% endblocktrans %}</p>
 
 {% endblock %}

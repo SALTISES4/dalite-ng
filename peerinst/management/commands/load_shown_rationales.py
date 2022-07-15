@@ -1,8 +1,8 @@
 import datetime
 import logging
 import time
-import pytz
 
+import pytz
 from django.core.management.base import BaseCommand
 
 from peerinst.util import (
@@ -36,4 +36,4 @@ class Command(BaseCommand):
             load_shown_rationales_from_ltievent_logs(day_of_logs)
 
         print("Completed loading shown rationales")
-        print("Took {:.2f} seconds".format(time.time() - start))
+        print(f"Took {time.time() - start:.2f} seconds")

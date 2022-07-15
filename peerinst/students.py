@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import base64
 import hashlib
 import logging
@@ -15,9 +12,10 @@ from django.utils.translation import ugettext_lazy as _
 from .utils import create_token, verify_token
 
 logger = logging.getLogger("peerinst-auth")
+DELTA = timedelta(weeks=16)
 
 
-def create_student_token(username, email, exp=timedelta(weeks=16)):
+def create_student_token(username, email, exp=DELTA):
     payload = {"username": username, "email": email}
     return create_token(payload, exp=exp)
 
@@ -135,9 +133,7 @@ def get_student_username_and_password(email, max_username_length=30):
     key = settings.SECRET_KEY
 
     username = hashlib.md5(email.encode()).hexdigest()[:max_username_length]
-    password = hashlib.md5(
-        ("{}:{}".format(username, key)).encode()
-    ).hexdigest()
+    password = hashlib.md5((f"{username}:{key}").encode()).hexdigest()
 
     return username, password
 

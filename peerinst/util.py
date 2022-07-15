@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import datetime
 import itertools
 import logging
@@ -58,7 +55,7 @@ def make_percent_function(total):
     if total:
 
         def percent(enum):
-            return mark_safe("{:.1f}&nbsp;%".format(100 * enum / total))
+            return mark_safe(f"{100 * enum / total:.1f}&nbsp;%")
 
     else:
 
@@ -68,7 +65,7 @@ def make_percent_function(total):
     return percent
 
 
-class SessionStageData(object):
+class SessionStageData:
     """
     Manages data to be kept in the session between different question stages
     """
@@ -165,7 +162,7 @@ def load_log_archive(json_log_archive):
 
     path_to_json = os.path.join(settings.BASE_DIR, "log", json_log_archive)
 
-    with open(path_to_json, "r") as f:
+    with open(path_to_json) as f:
         test = json.load(f)
 
     new_students = 0
@@ -189,8 +186,8 @@ def load_log_archive(json_log_archive):
             student.groups.add(group)
             student.save()
 
-    print(("{} new students loaded into db".format(new_students)))
-    print(("{} new groups loaded into db".format(new_groups)))
+    print(f"{new_students} new students loaded into db")
+    print(f"{new_groups} new groups loaded into db")
 
     return
 
@@ -219,11 +216,11 @@ def load_timestamps_from_logs(log_filename_list):
     logs = []
     for name in log_filename_list:
         fname = os.path.join(settings.BASE_DIR, "log", name)
-        for line in open(fname, "r"):
+        for line in open(fname):
             log_event = json.loads(line)
             if log_event["event_type"] == "save_problem_success":
                 logs.append(log_event)
-    print(("{} save_problem_success log events".format(len(logs))))
+    print(f"{len(logs)} save_problem_success log events")
 
     # get records that don't have a timestamp
     answer_qs = Answer.objects.filter(time__isnull=True)
@@ -232,8 +229,8 @@ def load_timestamps_from_logs(log_filename_list):
     records_not_in_logs = 0
 
     # iterate through each record, find its log entry, and save the timestamp
-    print(("{} records to parse".format(len(answer_qs))))
-    print(("start time: {}".format(timezone.now())))
+    print(f"{len(answer_qs)} records to parse")
+    print(f"start time: {timezone.now()}")
     records_parsed = 0
     for a in answer_qs:
         for log in logs:
@@ -252,23 +249,19 @@ def load_timestamps_from_logs(log_filename_list):
             records_not_in_logs += 1
         records_parsed += 1
         if records_parsed % 1000 == 0:
-            print(("{} db records parsed".format(records_parsed)))
-            print(("{} db records updated".format(records_updated)))
-            print(("time: {}".format(timezone.now())))
+            print(f"{records_parsed} db records parsed")
+            print(f"{records_updated} db records updated")
+            print(f"time: {timezone.now()}")
 
-    print(("End time: {}".format(timezone.now())))
+    print(f"End time: {timezone.now()}")
     print(
-        (
-            "{} total answer table records in db updated with time field from logs".format(  # noqa
-                records_updated
-            )
+        "{} total answer table records in db updated with time field from logs".format(  # noqa
+            records_updated
         )
     )
     print(
-        (
-            "{} total answer table records in db not found in logs; likely seed rationales from teacher backend".format(  # noqa
-                records_updated
-            )
+        "{} total answer table records in db not found in logs; likely seed rationales from teacher backend".format(  # noqa
+            records_updated
         )
     )
     return
@@ -317,10 +310,10 @@ def rename_groups():
         try:
             if id_title_dict[g.name]:
                 print("** adding title **")
-                print((g.name))
+                print(g.name)
                 g.title = id_title_dict[g.name]
                 g.save()
-                print((g.title))
+                print(g.title)
         except KeyError as e:
             print(e)
             pass
@@ -981,14 +974,15 @@ def report_data_by_question(assignment_list, student_groups):
     return gradebook_question
 
 
-def filter_ltievents(
-    start_date, stop_date=datetime.datetime.now(), username=None
-):
+def filter_ltievents(start_date, stop_date=None, username=None):
     """
     given a start date and stop date (as datetime objects), and optional
     username return all LtiEvents that match the criteria
     """
     from peerinst.models import LtiEvent
+
+    if not stop_date:
+        stop_date = datetime.datetime.now()
 
     events = LtiEvent.objects.filter(
         timestamp__gte=start_date, timestamp__lte=stop_date
@@ -1072,7 +1066,7 @@ def get_lti_data_as_csv(weeks_ago_start, weeks_ago_stop=0, username=None):
     from django.conf import settings
 
     print("start")
-    print((datetime.datetime.now()))
+    print(datetime.datetime.now())
 
     start = datetime.datetime.now() - datetime.timedelta(weeks=weeks_ago_start)
     end = datetime.datetime.now() - datetime.timedelta(weeks=weeks_ago_stop)
@@ -1081,12 +1075,12 @@ def get_lti_data_as_csv(weeks_ago_start, weeks_ago_stop=0, username=None):
         start_date=start, stop_date=end, username=username
     )
     print("events filtered")
-    print((datetime.datetime.now()))
+    print(datetime.datetime.now())
 
     df = serialize_events_to_dataframe(events)
 
     print("serialied df")
-    print((datetime.datetime.now()))
+    print(datetime.datetime.now())
 
     fname = os.path.join(settings.BASE_DIR, "data.csv")
     with open(fname, "w") as f:
@@ -1289,7 +1283,7 @@ def populate_answer_start_time_from_ltievent_logs(day_of_logs, event_type):
                     e_json["event"]["assignment_id"],
                 )
 
-    logger.info("{} answer {} times updated".format(i, field))
+    logger.info(f"{i} answer {field} times updated")
     return
 
 
@@ -1358,7 +1352,7 @@ def get_student_activity_data(teacher):
     )
     # if in between semesters, simply get assignment of most recent answer
     if len(recent_assignments) == 0 and lti_answers.count() > 0:
-        print((lti_answers.count()))
+        print(lti_answers.count())
         most_recent_lti_assignment = lti_answers.latest(
             "datetime_second"
         ).assignment

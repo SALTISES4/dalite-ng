@@ -102,7 +102,7 @@ function messageView(message) {
 
   const text = document.createElement("div");
   text.classList.add("mdc-typography--body1");
-  text.innerHTML = message.text;
+  text.textContent = message.text;
   content.appendChild(text);
 
   container.appendChild(content);

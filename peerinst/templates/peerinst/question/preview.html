@@ -3,155 +3,155 @@
 {% load static compress i18n add_class %}
 
 {% block extra_title %}
-<h2 class="mdc-typography--display1 mdc-theme--secondary">
-  {% if question.type == "PI" %}
-    {% trans 'Step 4: Sample answers' %}
-  {% else %}
-    {% trans 'Step 2: Preview' %}
+  <h2 class="mdc-typography--display1 mdc-theme--secondary">
+    {% if question.type == "PI" %}
+      {% trans 'Step 4: Sample answers' %}
+    {% else %}
+      {% trans 'Step 2: Preview' %}
+    {% endif %}
+  </h2>
+
+  {% if request.session.assignment_id %}
+    <div class="admin-link">
+      <a href="{% url 'research-assignment-question-index-by-assignment' assignment_id=request.session.assignment_id %}">Back to Quality Control</a>
+    </div>
   {% endif %}
-</h2>
 
-{% if request.session.assignment_id %}
-<div class="admin-link">
-  <a href="{% url 'research-assignment-question-index-by-assignment' assignment_id=request.session.assignment_id %}">Back to Quality Control</a>
-</div>
-{% endif %}
-
-<div class='field-container'>
-  <div class='number-box' title="{% trans 'What might a confused student say to justify these answer choices?' %}">
-  <span class='number'>?</span></div>
-  <div class='field'>
-    <p class="mdc-typography--body1"><small>
-      {% if question.type == "PI" %}
-      {% blocktrans %}
-      This is a preview of how the question will look in the student interface.  You can add sample
-      rationales here that will be shown as choices to the first students who answer this question.
-      All new questions need at least one sample rationale for each answer choice.
-      You should include <em>distractor</em> rationales, especially for correct answer choices.
-      {% endblocktrans %}
-      {% else %}
-      {% blocktrans %}
-      This is a preview of how the question will look in the student interface.
-      {% endblocktrans %}
-      {% endif %}
-    </small></p>
+  <div class='field-container'>
+    <div class='number-box' title="{% trans 'What might a confused student say to justify these answer choices?' %}">
+      <span class='number'>?</span></div>
+    <div class='field'>
+      <p class="mdc-typography--body1"><small>
+        {% if question.type == "PI" %}
+          {% blocktrans %}
+            This is a preview of how the question will look in the student interface.  You can add sample
+            rationales here that will be shown as choices to the first students who answer this question.
+            All new questions need at least one sample rationale for each answer choice.
+            You should include <em>distractor</em> rationales, especially for correct answer choices.
+          {% endblocktrans %}
+        {% else %}
+          {% blocktrans %}
+            This is a preview of how the question will look in the student interface.
+          {% endblocktrans %}
+        {% endif %}
+      </small></p>
+    </div>
   </div>
-</div>
 {% endblock %}
 
 {% block messages %}
-{% for message in messages %}
-<div class="message-box">
-  <div class="message">{{ message }}</div>
-  <i id="clear_message" class="clear mdc-theme--secondary material-icons md-24 mdc-ripple-surface icon-list">
-      clear
-  </i>
-</div>
-{% endfor %}
+  {% for message in messages %}
+    <div class="message-box">
+      <div class="message">{{ message }}</div>
+      <i id="clear_message" class="clear mdc-theme--secondary material-icons md-24 mdc-ripple-surface icon-list">
+        clear
+      </i>
+    </div>
+  {% endfor %}
 {% endblock %}
 
 {% block submit_button %}{% trans 'Submit sample rationales' %}{% endblock %}
 {% block extra_content %}
-{% if question.type == "PI" %}
-  {{ form.errors }}
-  <hr class="simple-hr">
-  <h3>{% trans 'Existing sample answers' %}</h3>
-  {% if not save_allowed %}
-    <p class="errorlist">{% trans 'At least one sample rationale is required for each answer choice.' %}</p>
+  {% if question.type == "PI" %}
+    {{ form.errors }}
+    <hr class="simple-hr">
+    <h3>{% trans 'Existing sample answers' %}</h3>
+    {% if not save_allowed %}
+      <p class="errorlist">{% trans 'At least one sample rationale is required for each answer choice.' %}</p>
+    {% endif %}
+    <ul class="mdc-list">
+      {% for sample in sample_answers %}
+        <li><span class='mdc-theme--primary bold'>{{ sample.first_answer_choice_label }}</span>: {{ sample.text|safe|striptags }}</li>
+      {% endfor %}
+    </ul>
+
+    <hr class="simple-hr">
+    <h3>{% trans 'Existing expert rationales' %}</h3>
+    <ul class="mdc-list">
+      {% for sample in question.answer_set.all|dictsort:'first_answer_choice' %}
+        {% if sample.expert %}
+          <li><span class='mdc-theme--primary bold'>{{ sample.first_answer_choice_label }}</span>: {{ sample.rationale|safe|striptags }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+
   {% endif %}
-  <ul class="mdc-list">
-    {% for sample in sample_answers %}
-      <li><span class='mdc-theme--primary bold'>{{ sample.first_answer_choice_label }}</span>: {{ sample.text|safe|striptags }}</li>
-    {% endfor %}
-  </ul>
 
   <hr class="simple-hr">
-  <h3>{% trans 'Existing expert rationales' %}</h3>
-  <ul class="mdc-list">
-    {% for sample in question.answer_set.all|dictsort:'first_answer_choice' %}
-      {% if sample.expert %}
-        <li><span class='mdc-theme--primary bold'>{{ sample.first_answer_choice_label }}</span>: {{ sample.rationale|safe|striptags }}</li>
-      {% endif %}
-    {% endfor %}
-  </ul>
 
-{% endif %}
-
-<hr class="simple-hr">
-
-{% if user.teacher %}
-{% if save_allowed or question.type == "RO" %}
-<h3>{% trans 'Auto add to assignments' %}</h3>
-<form id="add_question_to_assignment" action="{% url 'sample-answer-form-done' question_id=question.id %}" method="post">
-  {% csrf_token %}
-  <div class='field-container'>
-    <div class='number-box'><span class='number'><i class="material-icons">add</i></span></div>
-    {% if assignment_count > 0 %}
-    <div class='field'>
-      <div class='mdc-form-field'>
-        <label for='id_assignments'>{{ assignment_form.assignments.label }}:</label>
-        {{ assignment_form.assignments|add_class:'multiple-select mdc-theme--background' }}
-      </div>
-      <p class="form-helper-text" aria-hidden="true">
-        {{ assignment_form.assignments.help_text|safe }}
-      </p>
-      {{ assignment_form.assignments.errors }}
-    </div>
-    {% else %}
-    <div class='field'>
-      {% trans 'You currently do not have any assignments.  You can create one from your account page.' %}
-    </div>
+  {% if user.teacher %}
+    {% if save_allowed or question.type == "RO" %}
+      <h3>{% trans 'Auto add to assignments' %}</h3>
+      <form id="add_question_to_assignment" action="{% url 'sample-answer-form-done' question_id=question.id %}" method="post">
+        {% csrf_token %}
+        <div class='field-container'>
+          <div class='number-box'><span class='number'><i class="material-icons">add</i></span></div>
+          {% if assignment_count > 0 %}
+            <div class='field'>
+              <div class='mdc-form-field'>
+                <label for='id_assignments'>{{ assignment_form.assignments.label }}:</label>
+                {{ assignment_form.assignments|add_class:'multiple-select mdc-theme--background' }}
+              </div>
+              <p class="form-helper-text" aria-hidden="true">
+                {{ assignment_form.assignments.help_text|safe }}
+              </p>
+              {{ assignment_form.assignments.errors }}
+            </div>
+          {% else %}
+            <div class='field'>
+              {% trans 'You currently do not have any assignments.  You can create one from your account page.' %}
+            </div>
+          {% endif %}
+        </div>
+      </form>
+      <hr class="simple-hr">
     {% endif %}
+  {% endif %}
+
+  <div class="m-top-20">
+    <span class="padded">
+      {% if question.type == "PI" %}
+        <form class="inline" id="back" action="{% url 'research-fix-expert-rationale' question_id=question.id %}" method="get">
+          <button form="back" type="submit" class="mdc-button mdc-button--raised">{% trans 'Back' %}</button>
+        </form>
+      {% else %}
+        <form class="inline" id="back" action="{% url 'question-update' pk=question.id %}" method="get">
+          <button form="back" type="submit" class="mdc-button mdc-button--raised">{% trans 'Back' %}</button>
+        </form>
+      {% endif %}
+    </span>
+    <span class="padded">
+      {% if user.teacher %}
+        {% if save_allowed or question.type == "RO" %}
+          <input id="done" form="add_question_to_assignment" type="submit" class="mdc-button mdc-button--raised submit_button" value="{% trans 'Done' %}">
+        {% endif %}
+      {% else %}
+        <form class="inline" id="done" action="{% url 'welcome' %}" method="get">
+          <button form="done" type="submit" class="mdc-button mdc-button--raised">{% trans 'Done' %}</button>
+        </form>
+      {% endif %}
+    </span>
   </div>
-</form>
-<hr class="simple-hr">
-{% endif %}
-{% endif %}
-
-<div class="m-top-20">
-  <span class="padded">
-    {% if question.type == "PI" %}
-      <form class="inline" id="back" action="{% url 'research-fix-expert-rationale' question_id=question.id %}" method="get">
-        <button form="back" type="submit" class="mdc-button mdc-button--raised">{% trans 'Back' %}</button>
-      </form>
-    {% else %}
-      <form class="inline" id="back" action="{% url 'question-update' pk=question.id %}" method="get">
-        <button form="back" type="submit" class="mdc-button mdc-button--raised">{% trans 'Back' %}</button>
-      </form>
-    {% endif %}
-  </span>
-  <span class="padded">
-    {% if user.teacher %}
-      {% if save_allowed or question.type == "RO" %}
-        <input id="done" form="add_question_to_assignment" type="submit" class="mdc-button mdc-button--raised submit_button" value="{% trans 'Done' %}">
-      {% endif %}
-    {% else %}
-      <form class="inline" id="done" action="{% url 'welcome' %}" method="get">
-        <button form="done" type="submit" class="mdc-button mdc-button--raised">{% trans 'Done' %}</button>
-      </form>
-    {% endif %}
-  </span>
-</div>
 
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
+  {{ block.super }}
 
-{% if question.type == "RO" %}
-<script nonce="{{ request.csp_nonce }}">
-$('#submit-answer-form').remove();
-</script>
-{% endif %}
+  {% if question.type == "RO" %}
+    <script nonce="{{ request.csp_nonce }}">
+      $('#submit-answer-form').remove();
+    </script>
+  {% endif %}
 
-<script nonce="{{ request.csp_nonce }}">
-window.addEventListener("load", function() {
-  const clearButton = document.getElementById("clear_message");
-  if (clearButton) {
-    clearButton.addEventListener("click", function() {
-      $(this).parent().remove();
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function() {
+      const clearButton = document.getElementById("clear_message");
+      if (clearButton) {
+        clearButton.addEventListener("click", function() {
+          $(this).parent().remove();
+        });
+      }
     });
-  }
-});
-</script>
+  </script>
 {% endblock %}
