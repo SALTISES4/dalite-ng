@@ -6,7 +6,7 @@
 #
 --index-url https://pypi.python.org/simple
 
--e git+https://github.com/SALTISES4/django-lti-tool-provider@dev#egg=django_lti_tool_provider
+-e git+https://github.com/SALTISES4/django-lti-tool-provider@master#egg=django-lti-tool-provider
     # via -r requirements/requirements-base.txt
 -e git+https://github.com/SALTISES4/pinax-forums@dev#egg=pinax_forums
     # via -r requirements/requirements-base.txt
