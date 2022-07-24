@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     "channels",
     "REST",
     "django_elasticsearch_dsl",
+    "lti_provider",
     "cookielaw",
     "csp",
     "django.contrib.admin",
@@ -126,6 +127,8 @@ CACHES = {
 AUTHENTICATION_BACKENDS = (
     "axes.backends.AxesBackend",
     "peerinst.backends.CustomPermissionsBackend",
+    "django.contrib.auth.backends.ModelBackend",
+    "lti_provider.auth.LTIBackend",
 )
 
 # Password validators through django-password-validation (backport from 1.9)

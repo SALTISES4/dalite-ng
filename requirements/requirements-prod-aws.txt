@@ -165,6 +165,7 @@ django==2.2.28
     #   django-csp
     #   django-decorator-include
     #   django-inlinecss
+    #   django-lti-provider
     #   django-lti-tool-provider
     #   django-model-utils
     #   django-permissions-policy
@@ -218,6 +219,8 @@ django-ipware==2.1.0
     # via
     #   -r requirements/requirements-base.txt
     #   django-axes
+django-lti-provider==1.0.0
+    # via -r requirements/requirements-base.txt
 django-model-utils==4.1.1
     # via
     #   -r requirements/requirements-base.txt
@@ -291,6 +294,12 @@ html5lib==1.0.1
     # via
     #   -r requirements/requirements-base.txt
     #   django-htmlmin
+httplib2==0.20.4
+    # via
+    #   -r requirements/requirements-base.txt
+    #   django-lti-provider
+    #   oauth2
+    #   pylti
 huggingface-hub==0.0.12
     # via
     #   -r requirements/requirements-base.txt
@@ -358,6 +367,10 @@ murmurhash==1.0.5
     #   thinc
 mysqlclient==1.4.6
     # via -r requirements/requirements-base.txt
+nameparser==1.1.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   django-lti-provider
 numpy==1.22.4
     # via
     #   -r requirements/requirements-base.txt
@@ -366,9 +379,15 @@ numpy==1.22.4
     #   spacy
     #   thinc
     #   transformers
+oauth2==1.9.0.post1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   django-lti-provider
+    #   pylti
 oauthlib==3.1.0
     # via
     #   -r requirements/requirements-base.txt
+    #   django-lti-provider
     #   django-lti-tool-provider
     #   lti
     #   requests-oauthlib
@@ -428,6 +447,10 @@ pydantic==1.8.2
     #   thinc
 pyjwt==2.4.0
     # via -r requirements/requirements-base.txt
+pylti==0.7.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   django-lti-provider
 pymongo==3.10.1
     # via
     #   -r requirements/requirements-base.txt
@@ -443,6 +466,7 @@ pyopenssl==19.1.0
 pyparsing==2.4.6
     # via
     #   -r requirements/requirements-base.txt
+    #   httplib2
     #   packaging
 python-crontab==2.4.0
     # via
@@ -530,6 +554,7 @@ six==1.15.0
     #   django-lti-tool-provider
     #   elasticsearch-dsl
     #   html5lib
+    #   pylti
     #   pyopenssl
     #   python-dateutil
     #   python-memcached

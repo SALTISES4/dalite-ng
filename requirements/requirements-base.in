@@ -20,6 +20,7 @@ django-permissions-policy
 django-referrer-policy
 django-samesite-none
 django < 3.0.0
+django-lti-provider
 djangorestframework >= 3.11.2  # Reqd by safety
 edx-opaque-keys
 lxml >= 4.6.2  # Reqd by safety
