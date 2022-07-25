@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     "REST",
     "django_elasticsearch_dsl",
     "cookielaw",
+    "tinymce",
     "csp",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -280,6 +281,19 @@ CELERY_BROKER_URL = os.environ.get(
 CELERY_RESULT_BACKEND = os.environ.get(
     "CELERY_RESULT_BACKEND", "redis://localhost:6379/0"
 )
+
+# Tinymce config
+TINYMCE_DEFAULT_CONFIG = {
+    "theme": "silver",
+    "height": 300,
+    "menubar": False,
+    "plugins": "advlist,autolink,lists,charmap,preview,help,wordcount",
+    "toolbar": "undo redo | charmap | bold italic underline subscript superscript"
+    "bullist numlist | "
+    "removeformat",
+    "referrer_policy": "strict-origin-when-cross-origin",
+    "help_tabs": ["shortcuts"],
+}
 
 # CSP
 CSP_DEFAULT_SRC = [

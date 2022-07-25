@@ -9,6 +9,7 @@ from django.db.models import Count, Q
 from django.forms import ModelForm
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from tinymce.widgets import TinyMCE
 
 from .models import (
     Assignment,
@@ -44,9 +45,7 @@ class FirstAnswerForm(forms.Form):
             "required": _("Please make sure to select an answer choice.")
         },
     )
-    rationale = forms.CharField(
-        widget=forms.Textarea(attrs={"cols": 100, "rows": 7})
-    )
+    rationale = forms.CharField(widget=TinyMCE(attrs={"cols": 100, "rows": 7}))
 
     def __init__(self, answer_choices, *args, **kwargs):
         choice_texts = [

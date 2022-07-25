@@ -180,6 +180,8 @@ django-samesite-none==0.0.2
     # via -r requirements/requirements-base.in
 django-timezone-field==4.2.1
     # via django-celery-beat
+django-tinymce==3.4.0
+    # via -r requirements/requirements-base.in
 djangorestframework==3.12.2
     # via
     #   -r requirements/../REST/requirements.in
