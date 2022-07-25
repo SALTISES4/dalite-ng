@@ -338,6 +338,11 @@ CSP_OBJECT_SRC = [
     "www.geogebra.org",
 ]
 
+CSP_FRAME_ANCESTORS = [
+    "'self'",
+    "moodle.dawsoncollege.qc.ca",
+]
+
 ELASTICSEARCH_DSL = {
     "default": {"hosts": "localhost:9200"},
 }
