@@ -20,7 +20,7 @@ from .models import (
     StudentGroupAssignment,
     Teacher,
 )
-from .validators import MinWordsValidator
+from .validators import MinWordsValidator, NoProfanityValidator
 
 
 class NonStudentPasswordResetForm(PasswordResetForm):
@@ -56,6 +56,7 @@ class FirstAnswerForm(forms.Form):
                 4,
                 _("Please provide a more detailed rationale for your choice."),
             ),
+            NoProfanityValidator(0.10, _("Please rephrase your rationale.")),
         ],
     )
 
@@ -81,7 +82,17 @@ class FirstAnswerForm(forms.Form):
 
 class RationaleOnlyForm(forms.Form):
     rationale = forms.CharField(
-        widget=forms.Textarea(attrs={"cols": 100, "rows": 7})
+        widget=TinyMCE(attrs={"cols": 100, "rows": 7}),
+        error_messages={
+            "required": _("Please provide a rationale for your choice.")
+        },
+        validators=[
+            MinWordsValidator(
+                4,
+                _("Please provide a more detailed rationale for your choice."),
+            ),
+            NoProfanityValidator(0.10, _("Please rephrase your rationale.")),
+        ],
     )
     datetime_start = forms.CharField(
         widget=forms.HiddenInput(), initial=datetime.now(pytz.utc)

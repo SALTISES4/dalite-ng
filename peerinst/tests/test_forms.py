@@ -58,7 +58,20 @@ def test_FirstAnswerForm_rationale_no_profanity():
         answer_choices=["A. Choice A", "B. Choice B"],
         data={
             "first_answer_choice": 1,
-            "rationale": "Long rationale with bad words in it",
+            "rationale": "F&cking rationale with bad words in it",
+        },
+    )
+
+    assert len(form.errors) == 1
+    assert "Please rephrase your rationale." in form.errors["rationale"]
+
+
+def test_FirstAnswerForm_rationale_no_profanity_variants():
+    form = FirstAnswerForm(
+        answer_choices=["A. Choice A", "B. Choice B"],
+        data={
+            "first_answer_choice": 1,
+            "rationale": "Sh1tty rationale with bad a sneaky variant",
         },
     )
 

@@ -12,6 +12,8 @@
     # via -r requirements/requirements-base.in
 aioredis==1.3.1
     # via channels-redis
+alt-profanity-check==1.1.1
+    # via -r requirements/requirements-base.in
 amqp==5.0.9
     # via kombu
 asgiref==3.2.10
@@ -35,6 +37,8 @@ beautifulsoup4==4.8.2
     # via
     #   django-htmlmin
     #   pynliner
+better-profanity==0.7.0
+    # via -r requirements/requirements-base.in
 billiard==3.6.4.0
     # via celery
 bleach==4.1.0
@@ -227,8 +231,11 @@ incremental==21.3.0
     # via twisted
 jinja2==3.0.1
     # via spacy
-joblib==1.0.1
-    # via sacremoses
+joblib==1.1.0
+    # via
+    #   alt-profanity-check
+    #   sacremoses
+    #   scikit-learn
 jsonfield==3.1.0
     # via django-lti-tool-provider
 kombu==5.2.3
@@ -256,6 +263,8 @@ numpy==1.22.4
     # via
     #   blis
     #   pandas
+    #   scikit-learn
+    #   scipy
     #   spacy
     #   thinc
     #   transformers
@@ -360,6 +369,10 @@ saltise-user-feedback==1.1.1
     # via
     #   -r requirements/requirements-base.in
     #   saltise-course-flow
+scikit-learn==1.1.1
+    # via alt-profanity-check
+scipy==1.8.1
+    # via scikit-learn
 service-identity==18.1.0
     # via twisted
 six==1.15.0
@@ -400,6 +413,8 @@ stevedore==1.32.0
     # via edx-opaque-keys
 thinc==8.0.13
     # via spacy
+threadpoolctl==3.1.0
+    # via scikit-learn
 tokenizers==0.10.3
     # via transformers
 torch==1.9.0

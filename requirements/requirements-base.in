@@ -1,6 +1,8 @@
 -r ../blink/requirements.in
 -r ../REST/requirements.in
 
+alt-profanity-check
+better-profanity
 bleach
 celery[redis]
 contextualSpellCheck
