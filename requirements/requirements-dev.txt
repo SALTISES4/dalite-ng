@@ -476,6 +476,10 @@ langcodes==3.3.0
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   spacy
+langdetect==1.0.9
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
 lti==0.9.4
     # via
     #   -r requirements/requirements-base.txt
@@ -812,6 +816,7 @@ six==1.15.0
     #   elasticsearch-dsl
     #   faker
     #   html5lib
+    #   langdetect
     #   pyopenssl
     #   python-dateutil
     #   python-memcached

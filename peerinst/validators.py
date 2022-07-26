@@ -1,7 +1,10 @@
 from better_profanity import profanity
 from django.core.validators import BaseValidator, MinLengthValidator
 from django.utils.translation import ngettext_lazy
+from langdetect import DetectorFactory, detect_langs
 from profanity_check import predict_prob
+
+DetectorFactory.seed = 0
 
 
 class MinWordsValidator(MinLengthValidator):
@@ -32,6 +35,8 @@ class NoProfanityValidator(BaseValidator):
     The better-profanity wordlist is quite conservative and some terms may need to be
     whitelisted.
 
+    Both packages are English only.  Extended supported for other languages is required.
+
     The limit_value arg defines the probability threshold below which the passed text
     must be to pass.
     """
@@ -40,12 +45,39 @@ class NoProfanityValidator(BaseValidator):
     code = "no_profanity"
 
     def compare(self, a, b):
-        # True values result in a ValidationError
+        # True results in a ValidationError
         return a[0] > b or a[1]
 
     def clean(self, text):
+        # TODO: Strip any tags and replace with whitespace
         # Return a tuple with results from both models
         return (
             predict_prob([text])[0],
             profanity.contains_profanity(text),
+        )
+
+
+class EnglishFrenchValidator(BaseValidator):
+    """
+    The language check asserts that the probability of a string belonging to either
+    French or English is above the required limit value.
+    """
+
+    message = ngettext_lazy("", "")
+    code = "english_or_french"
+
+    def compare(self, a, b):
+        # True results in a ValidationError
+        return a[0] < b and a[1] < b
+
+    def clean(self, text):
+        # TODO: Strip any tags and replace with whitespace
+        # Return a tuple with results English and French
+        detected_languages = detect_langs(text)
+        dl_as_dict = {
+            result.lang: result.prob for result in detected_languages
+        }
+        return (
+            dl_as_dict.get("en", 0),
+            dl_as_dict.get("fr", 0),
         )

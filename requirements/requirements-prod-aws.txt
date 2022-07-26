@@ -342,6 +342,8 @@ langcodes==3.3.0
     # via
     #   -r requirements/requirements-base.txt
     #   spacy
+langdetect==1.0.9
+    # via -r requirements/requirements-base.txt
 lti==0.9.4
     # via
     #   -r requirements/requirements-base.txt
@@ -548,6 +550,7 @@ six==1.15.0
     #   django-lti-tool-provider
     #   elasticsearch-dsl
     #   html5lib
+    #   langdetect
     #   pyopenssl
     #   python-dateutil
     #   python-memcached

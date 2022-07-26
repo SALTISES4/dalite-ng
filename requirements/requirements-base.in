@@ -25,6 +25,7 @@ django-tinymce
 django < 3.0.0
 djangorestframework >= 3.11.2  # Reqd by safety
 edx-opaque-keys
+langdetect
 lxml >= 4.6.2  # Reqd by safety
 mysqlclient
 packaging

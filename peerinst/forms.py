@@ -20,7 +20,11 @@ from .models import (
     StudentGroupAssignment,
     Teacher,
 )
-from .validators import MinWordsValidator, NoProfanityValidator
+from .validators import (
+    EnglishFrenchValidator,
+    MinWordsValidator,
+    NoProfanityValidator,
+)
 
 
 class NonStudentPasswordResetForm(PasswordResetForm):
@@ -57,6 +61,12 @@ class FirstAnswerForm(forms.Form):
                 _("Please provide a more detailed rationale for your choice."),
             ),
             NoProfanityValidator(0.10, _("Please rephrase your rationale.")),
+            EnglishFrenchValidator(
+                0.9,
+                _(
+                    "Hmm... don't understand what you've written.  Could you elaborate?"
+                ),
+            ),
         ],
     )
 
@@ -92,6 +102,12 @@ class RationaleOnlyForm(forms.Form):
                 _("Please provide a more detailed rationale for your choice."),
             ),
             NoProfanityValidator(0.10, _("Please rephrase your rationale.")),
+            EnglishFrenchValidator(
+                0.9,
+                _(
+                    "Hmm... don't understand what you've written.  Could you elaborate?"
+                ),
+            ),
         ],
     )
     datetime_start = forms.CharField(

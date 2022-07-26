@@ -77,3 +77,31 @@ def test_FirstAnswerForm_rationale_no_profanity_variants():
 
     assert len(form.errors) == 1
     assert "Please rephrase your rationale." in form.errors["rationale"]
+
+
+def test_FirstAnswerForm_rationale_valid_language():
+    form = FirstAnswerForm(
+        answer_choices=["A. Choice A", "B. Choice B"],
+        data={
+            "first_answer_choice": 1,
+            "rationale": "asfds asd  asdjklasdlk  sdfas;dlk asdf;sd",
+        },
+    )
+
+    assert len(form.errors) == 1
+    assert (
+        "Hmm... don't understand what you've written.  Could you elaborate?"
+        in form.errors["rationale"]
+    )
+
+
+def test_FirstAnswerForm_rationale_valid_language_equation():
+    form = FirstAnswerForm(
+        answer_choices=["A. Choice A", "B. Choice B"],
+        data={
+            "first_answer_choice": 1,
+            "rationale": "Je pense que la réponse est y = mx + b",
+        },
+    )
+
+    assert len(form.errors) == 0
