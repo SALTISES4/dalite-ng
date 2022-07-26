@@ -20,6 +20,7 @@ from .models import (
     StudentGroupAssignment,
     Teacher,
 )
+from .validators import MinWordsValidator
 
 
 class NonStudentPasswordResetForm(PasswordResetForm):
@@ -45,7 +46,18 @@ class FirstAnswerForm(forms.Form):
             "required": _("Please make sure to select an answer choice.")
         },
     )
-    rationale = forms.CharField(widget=TinyMCE(attrs={"cols": 100, "rows": 7}))
+    rationale = forms.CharField(
+        widget=TinyMCE(attrs={"cols": 100, "rows": 7}),
+        error_messages={
+            "required": _("Please provide a rationale for your choice.")
+        },
+        validators=[
+            MinWordsValidator(
+                4,
+                _("Please provide a more detailed rationale for your choice."),
+            ),
+        ],
+    )
 
     def __init__(self, answer_choices, *args, **kwargs):
         choice_texts = [
@@ -61,8 +73,6 @@ class FirstAnswerForm(forms.Form):
             )
             for pair in answer_choices
         ]
-        #  choice_texts = [mark_safe(". ".join(pair)) for pair in
-        #  answer_choices]
         self.base_fields["first_answer_choice"].choices = enumerate(
             choice_texts, 1
         )
