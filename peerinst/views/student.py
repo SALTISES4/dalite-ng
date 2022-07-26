@@ -453,7 +453,9 @@ def index_page_LTI(req):
         "group_student_id_needed": "",
     }
 
-    logger.info(f"Moodle session data : {req.session}")
+    session_data = {k: v for k, v in req.session.items()}
+
+    logger.info(f"Moodle session data : {session_data}")
 
     return render(req, "peerinst/student/index.html", context)
 
