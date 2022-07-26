@@ -379,6 +379,11 @@ def student_patterns():
         ),
         path("student/", views.student.index_page, name="student-page"),
         path(
+            "student_lti/",
+            views.student.index_page_LTI,
+            name="student-page-LTI",
+        ),
+        path(
             "student/join-group/",
             views.student.join_group,
             name="student-join-group",

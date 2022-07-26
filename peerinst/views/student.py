@@ -223,19 +223,7 @@ def login_student(req, token=None):
     return student, new_student
 
 
-@require_safe
-def index_page(req):
-    """
-    Main student page. Accessed through a link sent by email containing
-    a token or without the token for a logged in student.
-    """
-
-    token = req.GET.get("token")
-    group_student_id_needed = req.GET.get("group-student-id-needed", "")
-
-    student, new_student = login_student(req, token)
-    if isinstance(student, HttpResponse):
-        return student
+def get_context_data_index_page(req, student, new_student):
 
     token = create_student_token(
         student.student.username, student.student.email
@@ -403,9 +391,57 @@ def index_page(req):
         },
     }
 
+    return data
+
+
+@require_safe
+def index_page(req):
+    """
+    Main student page. Accessed through a link sent by email containing
+    a token or without the token for a logged in student.
+    """
+
+    token = req.GET.get("token")
+    group_student_id_needed = req.GET.get("group-student-id-needed", "")
+
+    student, new_student = login_student(req, token)
+    if isinstance(student, HttpResponse):
+        return student
+
+    data = get_context_data_index_page(req, student, new_student)
+
     context = {
         "data": json.dumps(data),
         "group_student_id_needed": group_student_id_needed,
+    }
+
+    return render(req, "peerinst/student/index.html", context)
+
+
+def index_page_LTI(req):
+    """
+    Main student page  when accessed via LTI
+    """
+
+    user = req.user
+
+    try:
+        student = Student.objects.get(student=user)
+        new_student = False
+    except Student.DoesNotExist:
+        student = Student.objects.create(student=user)
+        new_student = True
+
+    if not user.is_active or new_student:
+        user.is_active = True
+        user.save()
+        new_student = True
+
+    data = get_context_data_index_page(req, student, new_student)
+
+    context = {
+        "data": json.dumps(data),
+        "group_student_id_needed": "",
     }
 
     return render(req, "peerinst/student/index.html", context)

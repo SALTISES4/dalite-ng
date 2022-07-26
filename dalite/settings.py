@@ -127,7 +127,6 @@ CACHES = {
 AUTHENTICATION_BACKENDS = (
     "axes.backends.AxesBackend",
     "peerinst.backends.CustomPermissionsBackend",
-    "django.contrib.auth.backends.ModelBackend",
     "lti_provider.auth.LTIBackend",
 )
 
