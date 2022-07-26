@@ -275,15 +275,6 @@ def get_context_data_index_page(req, student, new_student):
         for group, assignments in list(assignments.items())
     }
 
-    if not Consent.objects.filter(
-        user=student.student, tos__role__role="student"
-    ).exists():
-        return HttpResponseRedirect(
-            reverse("tos:tos_consent", kwargs={"role": "student"})
-            + "?next="
-            + req.path
-        )
-
     latest_student_consent = (
         Consent.objects.filter(
             user__username=student.student.username, tos__role="student"
@@ -408,6 +399,15 @@ def index_page(req):
     if isinstance(student, HttpResponse):
         return student
 
+    if not Consent.objects.filter(
+        user=student.student, tos__role__role="student"
+    ).exists():
+        return HttpResponseRedirect(
+            reverse("tos:tos_consent", kwargs={"role": "student"})
+            + "?next="
+            + req.path
+        )
+
     data = get_context_data_index_page(req, student, new_student)
 
     context = {
@@ -436,6 +436,15 @@ def index_page_LTI(req):
         user.is_active = True
         user.save()
         new_student = True
+
+    if not Consent.objects.filter(
+        user=student.student, tos__role__role="student"
+    ).exists():
+        return HttpResponseRedirect(
+            reverse("tos:tos_consent", kwargs={"role": "student"})
+            + "?next="
+            + req.path
+        )
 
     data = get_context_data_index_page(req, student, new_student)
 
