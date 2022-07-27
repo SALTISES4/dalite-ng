@@ -283,17 +283,15 @@ CELERY_RESULT_BACKEND = os.environ.get(
 )
 
 # Tinymce config
-TINYMCE_DEFAULT_CONFIG = {
-    "theme": "silver",
-    "height": 300,
-    "menubar": False,
-    "plugins": "advlist,autolink,lists,charmap,preview,help,wordcount",
-    "toolbar": "undo redo | charmap | bold italic underline subscript superscript"
-    "bullist numlist | "
-    "removeformat",
-    "referrer_policy": "strict-origin-when-cross-origin",
-    "help_tabs": ["shortcuts"],
-}
+try:
+    from .tinymce_settings import *  # noqa F403
+except ImportError:
+    warnings.warn(
+        """
+        File tinymce_settings.py not found.
+        You probably want to add it.
+        """
+    )
 
 # CSP
 CSP_DEFAULT_SRC = [
@@ -482,6 +480,12 @@ LOGGING = {
             "formatter": "complete",
             "stream": "ext://sys.stdout",
         },
+        "validation_console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
     },
     "loggers": {
         "django.request": {
@@ -556,6 +560,11 @@ LOGGING = {
         },
         "performance": {
             "handlers": ["performance_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "validation": {
+            "handlers": ["validation_console_log"],
             "level": "DEBUG" if DEBUG else "INFO",
             "propagate": True,
         },

@@ -1,6 +1,7 @@
 import re
 from datetime import date, datetime
 
+import bleach
 import pytz
 from django import forms
 from django.contrib.auth.forms import PasswordResetForm
@@ -10,6 +11,8 @@ from django.forms import ModelForm
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from tinymce.widgets import TinyMCE
+
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 
 from .models import (
     Assignment,
@@ -38,6 +41,33 @@ class NonStudentPasswordResetForm(PasswordResetForm):
         )
 
 
+class RichTextRationaleField(forms.CharField):
+    widget = TinyMCE(attrs={"cols": 100, "rows": 7})
+    default_error_messages = {
+        "required": _("Please provide a rationale for your choice.")
+    }
+    default_validators = [
+        MinWordsValidator(
+            4,
+            _("Please provide a more detailed rationale for your choice."),
+        ),
+        NoProfanityValidator(0.10, _("Please rephrase your rationale.")),
+        EnglishFrenchValidator(
+            0.9,
+            _("Please clarify what you've written."),
+        ),
+    ]
+
+    def to_python(self, value):
+        """Remove all unsafe input"""
+        return bleach.clean(
+            super().to_python(value),
+            tags=ALLOWED_TAGS,
+            styles=[],
+            strip=True,
+        )
+
+
 class FirstAnswerForm(forms.Form):
     """Form to select one of the answer choices and enter a rationale."""
 
@@ -50,25 +80,7 @@ class FirstAnswerForm(forms.Form):
             "required": _("Please make sure to select an answer choice.")
         },
     )
-    rationale = forms.CharField(
-        widget=TinyMCE(attrs={"cols": 100, "rows": 7}),
-        error_messages={
-            "required": _("Please provide a rationale for your choice.")
-        },
-        validators=[
-            MinWordsValidator(
-                4,
-                _("Please provide a more detailed rationale for your choice."),
-            ),
-            NoProfanityValidator(0.10, _("Please rephrase your rationale.")),
-            EnglishFrenchValidator(
-                0.9,
-                _(
-                    "Hmm... don't understand what you've written.  Could you elaborate?"
-                ),
-            ),
-        ],
-    )
+    rationale = RichTextRationaleField()
 
     def __init__(self, answer_choices, *args, **kwargs):
         choice_texts = [
@@ -91,25 +103,10 @@ class FirstAnswerForm(forms.Form):
 
 
 class RationaleOnlyForm(forms.Form):
-    rationale = forms.CharField(
-        widget=TinyMCE(attrs={"cols": 100, "rows": 7}),
-        error_messages={
-            "required": _("Please provide a rationale for your choice.")
-        },
-        validators=[
-            MinWordsValidator(
-                4,
-                _("Please provide a more detailed rationale for your choice."),
-            ),
-            NoProfanityValidator(0.10, _("Please rephrase your rationale.")),
-            EnglishFrenchValidator(
-                0.9,
-                _(
-                    "Hmm... don't understand what you've written.  Could you elaborate?"
-                ),
-            ),
-        ],
-    )
+
+    error_css_class = "validation-error"
+
+    rationale = RichTextRationaleField()
     datetime_start = forms.CharField(
         widget=forms.HiddenInput(), initial=datetime.now(pytz.utc)
     )

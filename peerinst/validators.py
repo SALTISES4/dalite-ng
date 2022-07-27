@@ -1,3 +1,7 @@
+import logging
+from html import unescape
+
+import bleach
 from better_profanity import profanity
 from django.core.validators import BaseValidator, MinLengthValidator
 from django.utils.translation import ngettext_lazy
@@ -5,6 +9,14 @@ from langdetect import DetectorFactory, detect_langs
 from profanity_check import predict_prob
 
 DetectorFactory.seed = 0
+validation_logger = logging.getLogger("validation")
+
+
+def html_to_text(value):
+    """Remove all tags and unescape HTML entities"""
+    return unescape(
+        " ".join(bleach.clean(value, tags=[], strip=True).strip().split())
+    )
 
 
 class MinWordsValidator(MinLengthValidator):
@@ -15,8 +27,11 @@ class MinWordsValidator(MinLengthValidator):
     )
     code = "min_words"
 
-    def clean(self, x):
-        return len(str(x).split())
+    def clean(self, text):
+        cleaned_text = html_to_text(text)
+        result = len(str(cleaned_text).split())
+        validation_logger.info(f"Word count: {result} for '{text}'")
+        return result
 
 
 class NoProfanityValidator(BaseValidator):
@@ -46,14 +61,20 @@ class NoProfanityValidator(BaseValidator):
 
     def compare(self, a, b):
         # True results in a ValidationError
-        return a[0] > b or a[1]
+        result = a[0] > b or a[1]
+        if result:
+            validation_logger.info(
+                f"Profanity scores: [{a[0]}, {a[1]}] for '{a[2]}'"
+            )
+        return result
 
     def clean(self, text):
-        # TODO: Strip any tags and replace with whitespace
         # Return a tuple with results from both models
+        cleaned_text = html_to_text(text)
         return (
-            predict_prob([text])[0],
-            profanity.contains_profanity(text),
+            predict_prob([cleaned_text])[0],
+            profanity.contains_profanity(cleaned_text),
+            text,
         )
 
 
@@ -68,16 +89,19 @@ class EnglishFrenchValidator(BaseValidator):
 
     def compare(self, a, b):
         # True results in a ValidationError
-        return a[0] < b and a[1] < b
+        result = a[0] < b and a[1] < b
+        if result:
+            validation_logger.info(
+                f"Language probabilities: [{a[0]}, {a[1]}] for '{a[2]}'"
+            )
+        return result
 
     def clean(self, text):
-        # TODO: Strip any tags and replace with whitespace
         # Return a tuple with results English and French
-        detected_languages = detect_langs(text)
+        cleaned_text = html_to_text(text)
+        validation_logger.info(cleaned_text)
+        detected_languages = detect_langs(cleaned_text)
         dl_as_dict = {
             result.lang: result.prob for result in detected_languages
         }
-        return (
-            dl_as_dict.get("en", 0),
-            dl_as_dict.get("fr", 0),
-        )
+        return (dl_as_dict.get("en", 0), dl_as_dict.get("fr", 0), text)

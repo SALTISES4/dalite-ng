@@ -89,10 +89,7 @@ def test_FirstAnswerForm_rationale_valid_language():
     )
 
     assert len(form.errors) == 1
-    assert (
-        "Hmm... don't understand what you've written.  Could you elaborate?"
-        in form.errors["rationale"]
-    )
+    assert "Please clarify what you've written." in form.errors["rationale"]
 
 
 def test_FirstAnswerForm_rationale_valid_language_equation():
@@ -105,3 +102,52 @@ def test_FirstAnswerForm_rationale_valid_language_equation():
     )
 
     assert len(form.errors) == 0
+
+
+def test_FirstAnswerForm_rationale_html_entities():
+    form = FirstAnswerForm(
+        answer_choices=["A. Choice A", "B. Choice B"],
+        data={
+            "first_answer_choice": 1,
+            "rationale": "Je pense que la réponse est &#8749;",
+        },
+    )
+
+    form.is_valid()
+
+    assert (
+        form.cleaned_data["rationale"] == "Je pense que la réponse est &#8749;"
+    )
+
+
+def test_FirstAnswerForm_rationale_strip_unsafe_tags():
+    form = FirstAnswerForm(
+        answer_choices=["A. Choice A", "B. Choice B"],
+        data={
+            "first_answer_choice": 1,
+            "rationale": "<script>Je pense que la réponse est &#8749;</script>",
+        },
+    )
+
+    form.is_valid()
+
+    assert (
+        form.cleaned_data["rationale"] == "Je pense que la réponse est &#8749;"
+    )
+
+
+def test_FirstAnswerForm_rationale_escaped_unsafe_tags():
+    form = FirstAnswerForm(
+        answer_choices=["A. Choice A", "B. Choice B"],
+        data={
+            "first_answer_choice": 1,
+            "rationale": "&lt;script&gt;This has escaped unsafe tags in it&lt;/script&gt;",
+        },
+    )
+
+    form.is_valid()
+
+    assert (
+        form.cleaned_data["rationale"]
+        == "&lt;script&gt;This has escaped unsafe tags in it&lt;/script&gt;"
+    )

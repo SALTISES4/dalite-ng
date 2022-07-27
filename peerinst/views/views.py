@@ -1201,10 +1201,7 @@ class QuestionReviewBaseView(QuestionFormView):
         self.stage_data.update(rationale_choices=self.rationale_choices)
 
     def mark_rationales_safe(self, escape_html):
-        if escape_html:
-            processor = escape
-        else:
-            processor = mark_safe
+        processor = escape if escape_html else mark_safe
         for _choice, _label, rationales in self.rationale_choices:
             rationales[:] = [(id, processor(text)) for id, text in rationales]
 
