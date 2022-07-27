@@ -452,7 +452,7 @@ def index_page_LTI(req):
         )
 
     teacher_hash = req.session.get("custom_teacher_id", None)
-    course_id = req.session.get("context_label", "")
+    course_id = req.session.get("context_id", "")
     course_title = req.session.get("context_title", None)
 
     try:
@@ -465,6 +465,7 @@ def index_page_LTI(req):
         group.semester = current_semester()
         group.year = current_year()
         group.mode_created = StudentGroup.LTI
+        group.save()
 
         lms_url_raw = req.session.get("launch_presentation_return_url", None)
         if lms_url_raw:
@@ -480,6 +481,7 @@ def index_page_LTI(req):
                 institutional_lms.institution = institution
 
             group.institution = institutional_lms.institution
+            group.save()
         else:
             session_data = {k: v for k, v in req.session.items()}
             logger.info("No LMS URL found in session data: {session_data}")
