@@ -432,11 +432,13 @@ def index_page_LTI(req):
 
     if assignment_id and question_id:
         return HttpResponseRedirect(
-            reverse("question-LTI"),
-            kwargs={
-                "assignment_id": assignment_id,
-                "question_id": question_id,
-            },
+            reverse(
+                "question-LTI",
+                kwargs={
+                    "assignment_id": assignment_id,
+                    "question_id": question_id,
+                },
+            ),
         )
 
     user = req.user
