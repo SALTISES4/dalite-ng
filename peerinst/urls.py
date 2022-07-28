@@ -384,6 +384,11 @@ def student_patterns():
             name="student-page-LTI",
         ),
         path(
+            "lti_dalite/student_lti/<assignment_id>/<question_id>/",
+            lti_access_allowed(views.question),
+            name="question-LTI",
+        ),
+        path(
             "student/join-group/",
             views.student.join_group,
             name="student-join-group",

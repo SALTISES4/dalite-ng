@@ -427,6 +427,17 @@ def index_page_LTI(req):
     """
     Main student page  when accessed via LTI
     """
+    assignment_id = req.session.get("custom_assignment_id", None)
+    question_id = req.session.get("custom_question_id", None)
+
+    if assignment_id and question_id:
+        return HttpResponseRedirect(
+            reverse("question-LTI"),
+            kwargs={
+                "assignment_id": assignment_id,
+                "question_id": question_id,
+            },
+        )
 
     user = req.user
 
