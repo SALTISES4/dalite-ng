@@ -125,13 +125,22 @@ TINYMCE_DEFAULT_CONFIG = {
     "theme": "silver",
     "height": 300,
     "menubar": False,
-    "plugins": "advlist,autolink,lists,charmap,preview,help,wordcount",
+    "plugins": "advlist,autolink,lists,charmap,preview,wordcount,link",
     "toolbar": "undo redo | charmap | bold italic underline subscript superscript | "
-    "bullist numlist | "
+    "bullist numlist | link |"
     "removeformat",
     "referrer_policy": "strict-origin-when-cross-origin",
-    "help_tabs": ["shortcuts"],
     "entity_encoding": "numeric",
     "entities": ENTITIES,
     "charmap": CHARMAP,
+    "elementpath": False,
+    "link_assume_external_targets": "https",
+    "default_link_target": "_blank",
+    "rel_list": [
+        {"title": "Private", "value": "noreferrer noopener nofollow"},
+    ],
+    "target_list": [
+        {"text": "New window", "value": "_blank"},
+    ],
+    "link_title": False,
 }

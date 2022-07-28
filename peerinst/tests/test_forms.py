@@ -120,12 +120,28 @@ def test_FirstAnswerForm_rationale_html_entities():
     )
 
 
-def test_FirstAnswerForm_rationale_strip_unsafe_tags():
+def test_FirstAnswerForm_rationale_strip_script_tags():
     form = FirstAnswerForm(
         answer_choices=["A. Choice A", "B. Choice B"],
         data={
             "first_answer_choice": 1,
             "rationale": "<script>Je pense que la réponse est &#8749;</script>",
+        },
+    )
+
+    form.is_valid()
+
+    assert (
+        form.cleaned_data["rationale"] == "Je pense que la réponse est &#8749;"
+    )
+
+
+def test_FirstAnswerForm_rationale_strip_anchor_tags():
+    form = FirstAnswerForm(
+        answer_choices=["A. Choice A", "B. Choice B"],
+        data={
+            "first_answer_choice": 1,
+            "rationale": "<a href='#'>Je pense que la réponse est &#8749;</a>",
         },
     )
 

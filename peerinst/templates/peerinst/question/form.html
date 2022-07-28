@@ -4,8 +4,7 @@
 
 {% block stylesheets %}
   {{ block.super }}
-  <!-- Self-hosted tinyMCE -->
-  <script src="{% static 'peerinst/js/tinymce/js/tinymce/tinymce.min.js' %}"></script>
+  {{ form.media }}
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <style nonce="{{ request.csp_nonce }}">
     .spinning {
@@ -86,9 +85,7 @@
                   <div class='mdc-form-field id-text-field'>
                     <label for="id_text" class='p-bottom-10'> {{ form.text.label }}</label>
                   </div>
-                  <div class="mdc-text-field mdc-text-field--textarea">
-                    {{ form.text }}
-                  </div>
+                  {{ form.text }}
                   <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent id-text-field-helper" aria-hidden="true">
                     {{ form.text.help_text|safe }}
                   </p>
@@ -187,15 +184,6 @@
               </div>
 
               <h3>{% trans 'Indexing' %}</h3>
-
-              <!--
-          <div class='field-container'>
-            <div class='number-box'><span class='number'></span></div>
-            <div class='field'>
-              <div id='subject_form'></div>
-            </div>
-          </div>
-          -->
 
               <div class='field-container'>
                 <div class='number-box'><span class='number'></span></div>
@@ -466,7 +454,7 @@
       }
 
 
-      // Update form is question type changes
+      // Update form if question type changes
       function updateForm(){
         if ($('#id_type').val() == "RO") {
           $('.peerinst').toggle(false);
@@ -609,23 +597,6 @@
       });
 
       bundle.bindCategoryAutofill("{% url 'search-categories' %}");
-
-      // TinyMCE bind to textarea
-      $('#id_text').prop('required', false);
-      tinymce.init({
-        selector: 'textArea',
-        elementpath: false,
-        branding: false,
-        plugins: ['autolink', 'autosave', 'charmap', 'code', 'link', 'paste'],
-        menubar: false,
-        toolbar: 'undo redo | bold italic underline superscript subscript | link | charmap',
-        content_css: "{% static 'peerinst/css/tiny.min.css' %}",
-        link_assume_external_targets: true,
-        default_link_target: '_blank',
-        rel_list: [
-          {title: 'Private', value: 'noreferrer noopener nofollow'},
-        ]
-      });
 
       // Listeners
       window.addEventListener("load", function() {

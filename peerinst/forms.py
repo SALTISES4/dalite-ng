@@ -12,7 +12,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from tinymce.widgets import TinyMCE
 
-from peerinst.templatetags.bleach_html import ALLOWED_TAGS
+from peerinst.templatetags.bleach_html import STRICT_TAGS
 
 from .models import (
     Assignment,
@@ -42,7 +42,14 @@ class NonStudentPasswordResetForm(PasswordResetForm):
 
 
 class RichTextRationaleField(forms.CharField):
-    widget = TinyMCE(attrs={"cols": 100, "rows": 7})
+    widget = TinyMCE(
+        attrs={"cols": 100, "rows": 7},
+        mce_attrs={
+            "plugins": "advlist,lists,charmap,preview,wordcount",
+            "toolbar": "undo redo | charmap | bold italic underline subscript "
+            "superscript | bullist numlist | removeformat",
+        },
+    )
     default_error_messages = {
         "required": _("Please provide a rationale for your choice.")
     }
@@ -62,7 +69,7 @@ class RichTextRationaleField(forms.CharField):
         """Remove all unsafe input"""
         return bleach.clean(
             super().to_python(value),
-            tags=ALLOWED_TAGS,
+            tags=STRICT_TAGS,
             styles=[],
             strip=True,
         )
@@ -152,7 +159,7 @@ class ReviewAnswerForm(forms.Form):
                 widget=forms.RadioSelect,
                 choices=rationales,
             )
-            show_more_field_name = "show-more-counter-" + str(i + 1)
+            show_more_field_name = f"show-more-counter-{str(i + 1)}"
             self.fields[show_more_field_name] = forms.IntegerField(
                 required=False, initial=2
             )
@@ -183,17 +190,20 @@ class ReviewAnswerForm(forms.Form):
                 label,
                 rationale_ids,
             ) in self.rationale_groups:
-                for i in (
-                    range(cleaned_data[label])
-                    if cleaned_data[label]
-                    else range(min(2, len(rationale_ids)))
-                ):
+                shown_rationales.extend(
+                    rationale_ids[i]
+                    for i in (
+                        range(cleaned_data[label])
+                        if cleaned_data[label]
+                        else range(min(2, len(rationale_ids)))
+                    )
                     if (
                         rationale_ids[i] is not None
                         and rationale_ids[i] != "None"
-                    ):
-                        shown_rationales.append(rationale_ids[i])
-        self.shown_rationales = shown_rationales if shown_rationales else None
+                    )
+                )
+
+        self.shown_rationales = shown_rationales or None
         rationale_choices = [
             value
             for key, value in cleaned_data.items()
@@ -244,13 +254,11 @@ class AssignmentCreateForm(forms.ModelForm):
 class AssignmentMultiselectForm(forms.Form):
     def __init__(self, user=None, question=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if user:
-            # Remove assignments with question and assignments with student
-            # answers
-            queryset = user.assignment_set.all()
-        else:
-            queryset = Assignment.objects.all()
-
+        # Remove assignments with question and assignments with student
+        # answers
+        queryset = (
+            user.assignment_set.all() if user else Assignment.objects.all()
+        )
         num_student_rationales = Count(
             "answer", filter=~Q(answer__user_token="")
         )
@@ -393,7 +401,7 @@ class ReportSelectForm(forms.Form):
 
 
 class AnswerChoiceForm(forms.ModelForm):
-    template_name = "peerinst/question/answer_choice_form.html"
+    text = forms.CharField(widget=TinyMCE())
 
     def clean_text(self):
         if self.cleaned_data["text"].startswith("<p>"):
