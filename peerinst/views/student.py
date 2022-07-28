@@ -464,7 +464,7 @@ def index_page_LTI(req):
             group = StudentGroup(name=course_id)
         group.semester = current_semester()
         group.year = current_year()
-        group.mode_created = StudentGroup.LTI
+        group.mode_created = StudentGroup.LTI_STANDALONE
         group.save()
 
         lms_url_raw = req.session.get("launch_presentation_return_url", None)

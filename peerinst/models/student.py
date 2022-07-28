@@ -209,12 +209,11 @@ class Student(models.Model):
                 student=self, group=group
             )
             membership.current_member = True
-            membership.save()
             logger.info(
                 "Student %d added back to group %d.", self.pk, group.pk
             )
         except StudentGroupMembership.DoesNotExist:
-            StudentGroupMembership.objects.create(
+            membership = StudentGroupMembership(
                 student=self, group=group, current_member=True
             )
             logger.info(
@@ -223,7 +222,15 @@ class Student(models.Model):
                 group.pk,
             )
 
-        if group.mode_created == group.STANDALONE:
+        if group.mode_created == group.LTI or group.LTI_STANDALONE:
+            membership.send_emails = False
+
+        membership.save()
+
+        if (
+            group.mode_created == group.STANDALONE
+            or group.mode_created == group.LTI_STANDALONE
+        ):
             for assignment in StudentGroupAssignment.objects.filter(
                 group=group, distribution_date__isnull=False
             ):

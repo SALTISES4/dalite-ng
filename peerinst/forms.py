@@ -420,11 +420,12 @@ class StudentGroupUpdateForm(forms.ModelForm):
 class StudentGroupAssignmentForm(ModelForm):
     group = forms.ModelChoiceField(
         queryset=StudentGroup.objects.filter(
-            mode_created=StudentGroup.STANDALONE
+            Q(mode_created=StudentGroup.STANDALONE)
+            | Q(mode_created=StudentGroup.LTI_STANDALONE)
         ),
         empty_label=None,
         help_text=_(
-            "Note: You can only distribute assignments to groups created from within myDALITE.  To distribute assignments to groups created via an LMS (like Moodle), use the 'Distribute via LMS' option."  # noqa E501
+            "Note: You can only distribute assignments to groups created from within myDALITE, or using the LTI-Standalone launch url in your LMS.  To distribute one question at a time to your students  via an LMS (like Moodle), use the 'Distribute via LMS' option."  # noqa E501
         ),
     )
 

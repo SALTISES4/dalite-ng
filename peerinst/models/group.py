@@ -43,8 +43,13 @@ class StudentGroup(models.Model):
 
     LTI = "LTI"
     STANDALONE = "STANDALONE"
+    LTI_STANDALONE = "LTI_STANDAONE"
 
-    MODE_CREATED_CHOICES = ((LTI, "LTI"), (STANDALONE, "STANDALONE"))
+    MODE_CREATED_CHOICES = (
+        (LTI, "LTI"),
+        (STANDALONE, "STANDALONE"),
+        (LTI_STANDALONE, "LTI_STANDALONE"),
+    )
 
     name = models.CharField(max_length=100, unique=True)
     title = models.CharField(max_length=100, null=True, blank=True)
@@ -69,7 +74,7 @@ class StudentGroup(models.Model):
         Institution, blank=True, null=True, on_delete=models.SET_NULL
     )
     mode_created = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=MODE_CREATED_CHOICES,
         default=STANDALONE,
     )
