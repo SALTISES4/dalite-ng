@@ -461,6 +461,13 @@ class AssignmentEditView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
         context["teacher"] = teacher
         return context
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["description"].widget = TinyMCE()
+        form.fields["intro_page"].widget = TinyMCE()
+        form.fields["conclusion_page"].widget = TinyMCE()
+        return form
+
     def get_success_url(self):
         return reverse(
             "assignment-update", kwargs={"assignment_id": self.object.pk}

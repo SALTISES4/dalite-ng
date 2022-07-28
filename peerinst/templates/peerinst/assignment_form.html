@@ -4,8 +4,7 @@
 
 {% block stylesheets %}
   {{ block.super }}
-  <!-- Self-hosted tinyMCE -->
-  <script src="{% static 'peerinst/js/tinymce/js/tinymce/tinymce.min.js' %}" defer=true></script>
+  {{ form.media }}
 {% endblock %}
 
 {% block body %}
@@ -71,7 +70,7 @@
               <div class='mdc-form-field id-text-field'>
                 <label for="id_text" class='p-bottom-10'> {{ form.description.label }}</label>
               </div>
-              <div class="mdc-text-field mdc-text-field--textarea">
+              <div>
                 {{ form.description }}
               </div>
               <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent id-text-field-helper" aria-hidden="true">
@@ -84,7 +83,7 @@
               <div class='mdc-form-field id-text-field'>
                 <label for="id_text" class='p-bottom-10'> {{ form.intro_page.label }}</label>
               </div>
-              <div class="mdc-text-field mdc-text-field--textarea">
+              <div>
                 {{ form.intro_page }}
               </div>
               <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent id-text-field-helper" aria-hidden="true">
@@ -97,7 +96,7 @@
               <div class='mdc-form-field id-text-field'>
                 <label for="id_text" class='p-bottom-10'> {{ form.conclusion_page.label }}</label>
               </div>
-              <div class="mdc-text-field mdc-text-field--textarea">
+              <div>
                 {{ form.conclusion_page }}
               </div>
               <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent id-text-field-helper" aria-hidden="true">
@@ -111,29 +110,6 @@
         </div>
       </div>
     </section>
+    <br>
   </main>
-{% endblock %}
-
-{% block scripts %}
-  {{ block.super }}
-  <script nonce="{{ request.csp_nonce }}">
-    'use strict';
-    window.addEventListener("load", () => {
-      // TinyMCE bind to textarea
-      tinymce.init({
-        selector: 'textArea',
-        elementpath: false,
-        branding: false,
-        plugins: ['autolink', 'autosave', 'charmap', 'code', 'link', 'paste'],
-        menubar: false,
-        toolbar: 'undo redo | bold italic underline superscript subscript | link | charmap',
-        content_css: "{% static 'peerinst/css/tiny.min.css' %}",
-        link_assume_external_targets: true,
-        default_link_target: '_blank',
-        rel_list: [
-          {title: 'Private', value: 'noreferrer noopener nofollow'},
-        ]
-      });
-    });
-  </script>
 {% endblock %}

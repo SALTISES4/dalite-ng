@@ -249,6 +249,11 @@ class AssignmentCreateForm(forms.ModelForm):
             "intro_page",
             "conclusion_page",
         ]
+        widgets = {
+            "description": TinyMCE(),
+            "intro_page": TinyMCE(),
+            "conclusion_page": TinyMCE(),
+        }
 
 
 class AssignmentMultiselectForm(forms.Form):
