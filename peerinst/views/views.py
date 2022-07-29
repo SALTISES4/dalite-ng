@@ -909,6 +909,7 @@ class QuestionMixin:
         return context
 
     def send_grade(self):
+        self.request.POST = self.request.POST.copy()
         self.request.POST.update(
             {
                 "score": self.answer.grade,
