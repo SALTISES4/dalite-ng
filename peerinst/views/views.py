@@ -45,6 +45,7 @@ from django.views.generic.edit import CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
 from django_lti_tool_provider.models import LtiUserData
 from django_lti_tool_provider.signals import Signals
+from lti_provider.views import LTIPostGrade
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
@@ -908,6 +909,20 @@ class QuestionMixin:
         return context
 
     def send_grade(self):
+        self.request.POST.update(
+            {
+                "score": self.answer.grade,
+                "redirect_url": reverse(
+                    "question-LTI",
+                    kwargs={
+                        "assignment_id": self.assignment,
+                        "question_id": self.question,
+                    },
+                ),
+            }
+        )
+        LTIPostGrade.as_view().post(self.request)
+
         if not self.lti_data:
             # We are running outside of an LTI context, so we don't need to
             # send a grade.
