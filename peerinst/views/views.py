@@ -922,7 +922,7 @@ class QuestionMixin:
                 ),
             }
         )
-        LTIPostGrade.as_view().post(self.request)
+        LTIPostGrade.post(self.request)
 
         if not self.lti_data:
             # We are running outside of an LTI context, so we don't need to
