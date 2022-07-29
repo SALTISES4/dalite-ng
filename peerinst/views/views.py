@@ -45,9 +45,10 @@ from django.views.generic.edit import CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
 from django_lti_tool_provider.models import LtiUserData
 from django_lti_tool_provider.signals import Signals
-from lti_provider.views import LTIPostGrade
+from lti_provider.lti import LTI
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from pylti.common import post_message
 
 from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
@@ -909,20 +910,31 @@ class QuestionMixin:
         return context
 
     def send_grade(self):
-        self.request.POST = self.request.POST.copy()
-        self.request.POST.update(
-            {
-                "score": self.answer.grade,
-                "redirect_url": reverse(
-                    "question-LTI",
-                    kwargs={
-                        "assignment_id": self.assignment,
-                        "question_id": self.question,
-                    },
-                ),
-            }
+
+        redirect_url = reverse(
+            "question-LTI",
+            kwargs={
+                "assignment_id": self.assignment,
+                "question_id": self.question,
+            },
         )
-        LTIPostGrade.post(self.request)
+        launch_url = None
+        lti = LTI(request_type="any", role_type="any")
+
+        xml = lti.generate_request_xml(
+            f"{time.time():.0f}",
+            "replaceResult",
+            lti.lis_result_sourcedid(self.request),
+            self.answer.grade,
+            launch_url,
+        )
+
+        post_message(
+            lti.consumers(),
+            lti.oauth_consumer_key(self.request),
+            lti.lis_outcome_service_url(self.request),
+            xml,
+        )
 
         if not self.lti_data:
             # We are running outside of an LTI context, so we don't need to
