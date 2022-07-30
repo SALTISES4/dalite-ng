@@ -926,7 +926,7 @@ class QuestionMixin:
         xml = lti.generate_request_xml(
             message_identifier_id=f"{time.time():.0f}",
             operation="replaceResult",
-            lis_results_sourcedid=lti.lis_result_sourcedid(self.request),
+            lis_result_sourcedid=lti.lis_result_sourcedid(self.request),
             score=self.answer.grade,
             launch_url=launch_url,
         )
