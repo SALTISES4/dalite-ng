@@ -33,4 +33,4 @@ class DaliteLTIBackend(LTIBackend):
 
     def authenticate(self, request, lti):
         request.session["LTI"] = True
-        super().authenticate(request, lti)
+        return super().authenticate(request, lti)
