@@ -128,6 +128,7 @@ AUTHENTICATION_BACKENDS = (
     "axes.backends.AxesBackend",
     "peerinst.backends.CustomPermissionsBackend",
     "peerinst.backends.DaliteLTIBackend",
+    "lti_provider.auth.LTIBackend",
 )
 
 # Password validators through django-password-validation (backport from 1.9)
