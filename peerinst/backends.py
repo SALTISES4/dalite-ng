@@ -1,5 +1,6 @@
 from django.contrib.auth.backends import ModelBackend
 from django.core.exceptions import PermissionDenied
+from lti_provider.auth import LTIBackend
 
 
 class CustomPermissionsBackend(ModelBackend):
@@ -22,3 +23,14 @@ class CustomPermissionsBackend(ModelBackend):
                 return super().has_perm(user_obj, perm)
             else:
                 raise PermissionDenied from e
+
+
+class DaliteLTIBackend(LTIBackend):
+    """
+    Extend django-lti-provider backend by adding the session variable `LTI`
+    which serves as hint in templates for context
+    """
+
+    def authenticate(self, request, lti):
+        request.session["LTI"] = True
+        super().authenticate(request, lti)

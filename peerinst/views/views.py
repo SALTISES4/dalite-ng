@@ -921,7 +921,7 @@ class QuestionMixin:
         launch_url = None
         lti = LTI(request_type="any", role_type="any")
         user = authenticate(request=self.request, lti=lti)
-        login(self.request, user, backend="lti_provider.auth.LTIBackend")
+        login(self.request, user, backend="peerinst.backends.DaliteLTIBackend")
 
         xml = lti.generate_request_xml(
             message_identifier_id=f"{time.time():.0f}",
