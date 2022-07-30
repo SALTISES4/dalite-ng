@@ -1,5 +1,6 @@
-# To run in background with build:
-#   `docker-compose up -d --build`
+# To build and run:
+#   `docker-compose build`
+#   `docker-compose up`
 # To tear down (don't forget the -v to get rid of static folder):
 #   `docker-compose down -v`
 # To watch Chrome tests:
@@ -12,12 +13,11 @@
 # GOTCHAS:
 #   - Use `docker image prune` to avoid serving old static content or using excessive disk space
 
-version: "3.7"
-
 services:
   live_app:
-    build: .
     image: mydalite
+    build:
+      context: .
     command: gunicorn dalite.wsgi:application --bind 0.0.0.0:8000
     environment:
       DALITE_DB_HOST: ${HOST:-host.docker.internal}
@@ -33,6 +33,8 @@ services:
 
   celery:
     image: mydalite
+    depends_on:
+      - live_app
     command: celery -A dalite worker -l debug
     environment:
       ALLOWED_HOST: nginx
@@ -50,6 +52,8 @@ services:
 
   test_app:
     image: mydalite
+    depends_on:
+      - live_app
     command: gunicorn dalite.wsgi:application --bind 0.0.0.0:8000
     environment:
       ALLOWED_HOST: nginx
