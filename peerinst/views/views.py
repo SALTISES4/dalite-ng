@@ -109,6 +109,7 @@ LOGGER = logging.getLogger(__name__)
 LOGGER_teacher_activity = logging.getLogger("teacher_activity")
 performance_logger = logging.getLogger("performance")
 search_logger = logging.getLogger("search")
+logger_auth = logging.getLogger("peerinst-auth")
 
 
 # Views related to Auth
@@ -603,7 +604,7 @@ class AssignmentFixView(
             assignment=True,
             broken_by_flags=broken_by_flags,
             broken_by_answerchoices=broken_by_answerchoices,
-            load_url=f"{reverse('REST:question-list')}?q={'&q='.join(str(q.pk) for q in self.object.questions.all())}",  # noqa E501
+            load_url=f"{reverse('REST:question-list')}?q={'&q='.join(str(q.pk) for q in self.object.questions.all())}",  # noqa
             teacher=self.request.user.teacher,
         )
         return context
@@ -937,7 +938,9 @@ class QuestionMixin:
             url=lti.lis_outcome_service_url(self.request),
             body=xml,
         )
-
+        logger_auth.info(
+            f"Grade of {self.answer.grade} posted for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_result_sourcedid(self.request)}"
+        )  # noqa
         if not self.lti_data:
             # We are running outside of an LTI context, so we don't need to
             # send a grade.
@@ -1752,7 +1755,9 @@ def question(request, assignment_id, question_id):
             )
         stage_class = QuestionStartView
 
-    print(stage_class)
+    logger_auth.info(
+        f"LTI access for {user_token} to assignment {assignment} and question {question} dispatched to {stage_class}"
+    )  # noqa
     # Delegate to the view
     stage = stage_class(**view_data)
     try:

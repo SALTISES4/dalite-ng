@@ -1,6 +1,10 @@
+import logging
+
 from django.contrib.auth.backends import ModelBackend
 from django.core.exceptions import PermissionDenied
 from lti_provider.auth import LTIBackend
+
+logger = logging.getLogger("peerinst-auth")
 
 
 class CustomPermissionsBackend(ModelBackend):
@@ -33,4 +37,5 @@ class DaliteLTIBackend(LTIBackend):
 
     def authenticate(self, request, lti):
         request.session["LTI"] = True
+        logger.info("setting LTI = True in request session")
         return super().authenticate(request, lti)
