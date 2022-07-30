@@ -44,7 +44,6 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
 from django_lti_tool_provider.models import LtiUserData
-from django_lti_tool_provider.signals import Signals
 from lti_provider.lti import LTI
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -912,50 +911,44 @@ class QuestionMixin:
 
     def send_grade(self):
 
-        redirect_url = reverse(
-            "question-LTI",
-            kwargs={
-                "assignment_id": self.assignment,
-                "question_id": self.question,
-            },
-        )
-        launch_url = None
-        lti = LTI(request_type="any", role_type="any")
-        user = authenticate(request=self.request, lti=lti)
-        login(self.request, user, backend="peerinst.backends.DaliteLTIBackend")
-
-        xml = lti.generate_request_xml(
-            message_identifier_id=f"{time.time():.0f}",
-            operation="replaceResult",
-            lis_result_sourcedid=lti.lis_result_sourcedid(self.request),
-            score=self.answer.grade,
-            launch_url=launch_url,
-        )
-
-        post_message(
-            consumers=lti.consumers(),
-            lti_key=lti.oauth_consumer_key(self.request),
-            url=lti.lis_outcome_service_url(self.request),
-            body=xml,
-        )
-        logger_auth.info(
-            f"Grade of {self.answer.grade} posted for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_result_sourcedid(self.request)}"
-        )  # noqa
-        if not self.lti_data:
+        if not self.request.session.get("LTI"):
             # We are running outside of an LTI context, so we don't need to
             # send a grade.
             return
-        if not self.lti_data.edx_lti_parameters.get("lis_outcome_service_url"):
-            # edX didn't provide a callback URL for grading, so this is an
-            # unscored problem.
-            return
+        else:
+            redirect_url = reverse(
+                "question-LTI",
+                kwargs={
+                    "assignment_id": self.assignment,
+                    "question_id": self.question,
+                },
+            )
+            launch_url = None
+            lti = LTI(request_type="any", role_type="any")
+            user = authenticate(request=self.request, lti=lti)
+            login(
+                self.request,
+                user,
+                backend="peerinst.backends.DaliteLTIBackend",
+            )
 
-        Signals.Grade.updated.send(
-            __name__,
-            user=self.request.user,
-            custom_key=self.custom_key,
-            grade=self.answer.grade,
-        )
+            xml = lti.generate_request_xml(
+                message_identifier_id=f"{time.time():.0f}",
+                operation="replaceResult",
+                lis_result_sourcedid=lti.lis_result_sourcedid(self.request),
+                score=self.answer.grade,
+                launch_url=launch_url,
+            )
+
+            post_message(
+                consumers=lti.consumers(),
+                lti_key=lti.oauth_consumer_key(self.request),
+                url=lti.lis_outcome_service_url(self.request),
+                body=xml,
+            )
+            logger_auth.info(
+                f"Grade of {self.answer.grade} posted for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_result_sourcedid(self.request)}"
+            )  # noqa
 
 
 class QuestionReload(Exception):
@@ -1702,6 +1695,13 @@ def question(request, assignment_id, question_id):
     dispatcher loads the session state and relevant database objects. Based on
     the available data, it delegates to the correct view class.
     """
+    try:
+        auth_backend = request.user.backend
+        if "LTI" in auth_backend:
+            request.session["LTI"] = True
+    except AttributeError:
+        auth_backend = "standalone"
+    logger_auth.info(f"***Auth backend {auth_backend}")
     if not request.user.is_authenticated:
         return redirect_to_login_or_show_cookie_help(request)
 
