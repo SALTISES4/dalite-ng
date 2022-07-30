@@ -11,7 +11,7 @@ from datetime import datetime
 import pytz
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.views import redirect_to_login
@@ -920,20 +920,22 @@ class QuestionMixin:
         )
         launch_url = None
         lti = LTI(request_type="any", role_type="any")
+        user = authenticate(request=self.request, lti=lti)
+        login(self.request, user, backend="lti_provider.auth.LTIBackend")
 
         xml = lti.generate_request_xml(
-            f"{time.time():.0f}",
-            "replaceResult",
-            lti.lis_result_sourcedid(self.request),
-            self.answer.grade,
-            launch_url,
+            message_identifier_id=f"{time.time():.0f}",
+            operation="replaceResult",
+            lis_results_sourcedid=lti.lis_result_sourcedid(self.request),
+            score=self.answer.grade,
+            launch_url=launch_url,
         )
 
         post_message(
-            lti.consumers(),
-            lti.oauth_consumer_key(self.request),
-            lti.lis_outcome_service_url(self.request),
-            xml,
+            consumers=lti.consumers(),
+            lti_key=lti.oauth_consumer_key(self.request),
+            url=lti.lis_outcome_service_url(self.request),
+            body=xml,
         )
 
         if not self.lti_data:
