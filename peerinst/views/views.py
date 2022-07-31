@@ -1695,13 +1695,12 @@ def question(request, assignment_id, question_id):
     dispatcher loads the session state and relevant database objects. Based on
     the available data, it delegates to the correct view class.
     """
-    try:
-        auth_backend = request.user.backend
-        if "LTI" in auth_backend:
-            request.session["LTI"] = True
-    except AttributeError:
-        auth_backend = "standalone"
-    logger_auth.info(f"***Auth backend {auth_backend}")
+
+    if "LTI" in request.session.get("_auth_user_backend"):
+        request.session["LTI"] = True
+    session_data = {k: v for k, v in request.session.items()}
+    logger_auth.info(f"Session data for question view : {session_data}")
+
     if not request.user.is_authenticated:
         return redirect_to_login_or_show_cookie_help(request)
 
