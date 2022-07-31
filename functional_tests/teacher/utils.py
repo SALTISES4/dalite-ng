@@ -1,3 +1,4 @@
+import contextlib
 import time
 
 from django.urls import reverse
@@ -19,7 +20,7 @@ def go_to_account(browser):
     icon = browser.find_element_by_xpath("//i[contains(text(), 'menu')]")
     icon.click()
 
-    try:
+    with contextlib.suppress(NoSuchElementException):
         account_button = WebDriverWait(browser, MAX_WAIT).until(
             EC.element_to_be_clickable(
                 (By.XPATH, "//i[contains(text(), 'account_circle')]")
@@ -27,30 +28,37 @@ def go_to_account(browser):
         )
         time.sleep(1)
         account_button.click()
-    except NoSuchElementException:
-        pass
 
 
 def login(browser, teacher):
     username = teacher.user.username
     password = "test"
 
-    browser.get("{}{}".format(browser.server_url, reverse("login")))
+    browser.get(f'{browser.server_url}{reverse("login")}')
+
+    browser.find_element_by_id("login-teachers").click()
 
     username_input = browser.find_element_by_xpath(
-        "//input[@id=(//label[text()='Username']/@for)]"
+        "//input[@id='id_username']"
     )
     username_input.clear()
     username_input.send_keys(username)
 
     password_input = browser.find_element_by_xpath(
-        "//input[@id=(//label[text()='Password']/@for)]"
+        "//input[@id='id_password']"
     )
     password_input.clear()
     password_input.send_keys(password)
 
-    submit_button = browser.find_element_by_xpath("//input[@value='Submit']")
-    submit_button.click()
+    submit_button = browser.find_element_by_xpath(
+        "//button[@id='submit-btn']"
+    ).click()
+
+    assert browser.current_url.endswith("saltise/lobby/")
+
+    dashboard = browser.find_element_by_xpath(
+        "//a[contains(.,'My dashboard')]"
+    ).click()
 
     assert browser.current_url.endswith("teacher/dashboard/")
 
@@ -59,14 +67,13 @@ def logout(browser, assert_):
     icon = browser.find_element_by_xpath("//i[contains(text(), 'menu')]")
     icon.click()
 
-    logout_button = browser.find_element_by_link_text("Logout")
-    browser.wait_for(assert_(logout_button.is_enabled()))
-    # FIXME:
-    # Assertion shoud include logout_button.is_displayed() but throws w3c error
-    time.sleep(1)
-    logout_button.click()
+    with contextlib.suppress(NoSuchElementException):
+        logout_button = WebDriverWait(browser, 5).until(
+            EC.element_to_be_clickable(
+                (By.XPATH, "//a[contains(text(), 'Logout')]")
+            )
+        )
+        time.sleep(1)
+        logout_button.click()
 
-    assert browser.current_url == browser.server_url + "/en/"
-
-    browser.find_element_by_link_text("Login")
-    browser.find_element_by_link_text("Signup")
+    assert browser.current_url == f"{browser.server_url}/en/login/"

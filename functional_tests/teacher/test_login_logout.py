@@ -8,6 +8,13 @@ def access_logged_in_account_from_landing_page(browser, teacher):
     browser.find_element_by_link_text(
         f"Welcome back, {teacher.user.username}"
     ).click()
+
+    assert browser.current_url.endswith("saltise/lobby/")
+
+    dashboard = browser.find_element_by_xpath(
+        "//a[contains(.,'My dashboard')]"
+    ).click()
+
     assert browser.current_url.endswith("teacher/dashboard/")
 
 

@@ -122,6 +122,7 @@ def browser(live_server):
             d
             for d in logs
             if d["source"] != "network"
+            and d["level"] == "ERROR"
             and "tinymce" not in d["message"]
             and "youtube" not in d["message"]
             and "mdc-auto-init" not in d["message"]

@@ -1,8 +1,8 @@
 # To build and run:
-#   `docker-compose build`
-#   `docker-compose up`
+#   `docker compose build`
+#   `docker compose up`
 # To tear down (don't forget the -v to get rid of static folder):
-#   `docker-compose down -v`
+#   `docker compose down -v`
 # To watch Chrome tests:
 #   Open a VNC client
 #   Go to vnc://127.0.0.1:41960 and enter password "secret"
@@ -126,7 +126,7 @@ services:
     build:
       context: .
       dockerfile: ./functional_tests/Dockerfile
-    command: pytest functional_tests/teacher --reuse-db --ignore=node_modules/ -vvvv --exitfirst -s -k "test_create_collection"
+    command: pytest functional_tests/teacher/test_question_authoring.py --reuse-db --ignore=node_modules/ -vvvv --exitfirst -s
     depends_on:
       - selenium-hub
       - chrome
