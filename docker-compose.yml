@@ -126,13 +126,13 @@ services:
     build:
       context: .
       dockerfile: ./functional_tests/Dockerfile
-    command: pytest functional_tests/teacher/test_question_authoring.py --reuse-db --ignore=node_modules/ -vvvv --exitfirst -s
+    command: pytest functional_tests/new_user/test_new_user.py --reuse-db --ignore=node_modules/ -vvvv -s
     depends_on:
       - selenium-hub
       - chrome
       - firefox
     environment:
-      ALLOWED_HOST: nginx  #
+      ALLOWED_HOST: nginx
       DALITE_DB_HOST: ${HOST:-host.docker.internal}
       STAGING_SERVER: nginx:8080
       SELENIUM_HUB: selenium-hub:4444

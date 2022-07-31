@@ -56,9 +56,7 @@ def login(browser, teacher):
 
     assert browser.current_url.endswith("saltise/lobby/")
 
-    dashboard = browser.find_element_by_xpath(
-        "//a[contains(.,'My dashboard')]"
-    ).click()
+    browser.find_element_by_xpath("//a[contains(.,'My dashboard')]").click()
 
     assert browser.current_url.endswith("teacher/dashboard/")
 
