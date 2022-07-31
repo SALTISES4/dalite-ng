@@ -127,7 +127,6 @@ CACHES = {
 AUTHENTICATION_BACKENDS = (
     "axes.backends.AxesBackend",
     "peerinst.backends.CustomPermissionsBackend",
-    "peerinst.backends.DaliteLTIBackend",
     "lti_provider.auth.LTIBackend",
 )
 

@@ -929,7 +929,7 @@ class QuestionMixin:
             login(
                 self.request,
                 user,
-                backend="peerinst.backends.DaliteLTIBackend",
+                backend="lti_provider.auth.LTIBackend",
             )
 
             xml = lti.generate_request_xml(
@@ -947,7 +947,7 @@ class QuestionMixin:
                 body=xml,
             )
             logger_auth.info(
-                f"Grade of {self.answer.grade} posted for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_result_sourcedid(self.request)}"
+                f"Grade of {self.answer.grade} posted for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_outcome_service_url(self.request)}"
             )  # noqa
 
 
