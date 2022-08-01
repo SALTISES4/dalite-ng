@@ -31,12 +31,6 @@
   <script nonce="{{ request.csp_nonce }}">
     window.addEventListener("load", function() {
       teacher.initNotifications();
-      teacher.initMessages(
-        {
-          markReadUrl: "{% url 'teacher-dashboard--messages--read' %}",
-          messagesUrl: "{% url 'teacher-dashboard--messages' %}"
-        }
-      );
       teacher.initGradebooks(
         {
           requestGradebook: "{% url 'teacher-gradebook--request' %}",
@@ -57,9 +51,9 @@
             { value: 2, text: "Feature request" },
             { value: 3, text: "General feedback" }
           ],
-          menuFeedbackText: "{% trans 'Give Feedback' %}",
-          menuHelpText: "{% trans 'Tutorials and Forums' %}",
-          menuHelpUrl: "{% url 'pinax_forums:forums' %}",
+          menuFeedbackText: "{% trans 'Feedback' %}",
+          menuHelpText: "{% trans 'Help' %}",
+          menuHelpUrl: "https://www.saltise.ca/research/mydalite/",
           placeholder: "{% trans 'Let us know what is on your mind...' %}",
           snackbarError:
           "{% trans 'An error occurred.  Please try again later.' %}",
@@ -94,9 +88,6 @@
       nonce="{{ request.csp_nonce }}"
       stale="">
     </teacher-reputation-header>
-  </div>
-  <div class="header header--togglable">
-    {% include 'peerinst/teacher/header/messages.html' %}
   </div>
   <div class="header header--togglable">
     {% include 'peerinst/teacher/header/notifications.html' %}

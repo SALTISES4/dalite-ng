@@ -48,7 +48,6 @@ urlpatterns += i18n_patterns(
     path("tos/", include("tos.urls")),
     path("rest-api/", include("REST.urls", namespace="REST")),
     path(r"", include("peerinst.urls")),
-    path("forums/", include("pinax.forums.urls", namespace="pinax_forums")),
     path(
         "assignment/<assignment_id>/",
         include(

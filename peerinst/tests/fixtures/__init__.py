@@ -15,7 +15,6 @@ __all__ = [
     "discipline",
     "disciplines",
     "first_answers_no_shown",
-    "forum",
     "group",
     "inactive_user",
     "new_teacher",
@@ -34,8 +33,6 @@ __all__ = [
     "superuser",
     "teacher",
     "teachers",
-    "thread",
-    "threads",
     "tos_student",
     "tos_teacher",
     "user",
@@ -57,7 +54,6 @@ from .assignment import (
     student_group_assignments,
 )
 from .collection import collection, collections
-from .forums import forum, thread, threads
 from .group import group
 from .question import (
     add_answers,
