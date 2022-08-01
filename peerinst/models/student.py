@@ -222,7 +222,10 @@ class Student(models.Model):
                 group.pk,
             )
 
-        if group.mode_created == group.LTI or group.LTI_STANDALONE:
+        if (
+            group.mode_created == group.LTI
+            or group.mode_created == group.LTI_STANDALONE
+        ):
             membership.send_emails = False
 
         membership.save()
