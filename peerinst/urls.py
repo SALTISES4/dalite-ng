@@ -379,12 +379,12 @@ def student_patterns():
         ),
         path("student/", views.student.index_page, name="student-page"),
         path(
-            "lti_dalite/student_lti/",
+            "lti/student_lti/",
             lti_access_allowed(views.student.index_page_LTI),
             name="student-page-LTI",
         ),
         path(
-            "lti_dalite/student_lti/<assignment_id>/<question_id>/",
+            "lti/student_lti/<assignment_id>/<question_id>/",
             lti_access_allowed(views.question),
             name="question-LTI",
         ),

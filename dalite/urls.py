@@ -33,17 +33,6 @@ urlpatterns = [
             "lti_provider.urls",
         ),
     ),
-    path(
-        "lti_dalite/",
-        decorator_include(
-            (
-                csp_replace(FRAME_ANCESTORS=["*"]),
-                xframe_options_exempt,
-                lti_access_allowed,
-            ),
-            "lti_provider.urls",
-        ),
-    ),
 ]
 
 # Apps
