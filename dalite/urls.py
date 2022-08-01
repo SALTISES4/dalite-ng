@@ -30,9 +30,9 @@ urlpatterns = [
                 xframe_options_exempt,
                 lti_access_allowed,
             ),
-            "django_lti_tool_provider.urls",
+            "lti_provider.urls",
         ),
-    )
+    ),
 ]
 
 # Apps

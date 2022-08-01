@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     "channels",
     "REST",
     "django_elasticsearch_dsl",
+    "lti_provider",
     "cookielaw",
     "tinymce",
     "csp",
@@ -48,7 +49,6 @@ INSTALLED_APPS = (
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_lti_tool_provider",
     "django_celery_beat",
     "compressor",
     "analytical",
@@ -125,6 +125,7 @@ CACHES = {
 AUTHENTICATION_BACKENDS = (
     "axes.backends.AxesBackend",
     "peerinst.backends.CustomPermissionsBackend",
+    "lti_provider.auth.LTIBackend",
 )
 
 # Password validators through django-password-validation (backport from 1.9)
@@ -345,6 +346,11 @@ CSP_OBJECT_SRC = [
     "www.geogebra.org",
 ]
 
+CSP_FRAME_ANCESTORS = [
+    "'self'",
+    "moodle.dawsoncollege.qc.ca",
+]
+
 ELASTICSEARCH_DSL = {
     "default": {"hosts": "localhost:9200"},
 }
@@ -504,11 +510,6 @@ LOGGING = {
         "tos-models": {
             "handlers": ["tos_file_log", "tos_console_log"],
             "level": "INFO",
-            "propagate": True,
-        },
-        "django_lti_tool_provider.views": {
-            "handlers": ["file_debug_log"],
-            "level": "DEBUG",
             "propagate": True,
         },
         "teacher_activity": {

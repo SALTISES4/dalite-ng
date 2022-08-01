@@ -6,7 +6,11 @@ def new_groups(n):
         i = 0
         while True:
             i += 1
-            yield {"name": f"group{i}", "title": f"group{i}"}
+            yield {
+                "name": f"group{i}",
+                "title": f"group{i}",
+                "mode_created": StudentGroup.STANDALONE,
+            }
 
     gen = generator()
     return [next(gen) for _ in range(n)]

@@ -14,6 +14,7 @@ from django.views.decorators.http import require_POST, require_safe
 from dalite.views.errors import response_400, response_403
 from tos.models import Consent
 
+from ..lti import manage_LTI_studentgroup
 from ..models import (
     Student,
     StudentAssignment,
@@ -29,7 +30,7 @@ from ..students import (
 )
 from .decorators import student_required
 
-logger = logging.getLogger("peerinst-views")
+logger = logging.getLogger("peerinst-auth")
 
 
 def validate_group_data(req):
@@ -223,19 +224,7 @@ def login_student(req, token=None):
     return student, new_student
 
 
-@require_safe
-def index_page(req):
-    """
-    Main student page. Accessed through a link sent by email containing
-    a token or without the token for a logged in student.
-    """
-
-    token = req.GET.get("token")
-    group_student_id_needed = req.GET.get("group-student-id-needed", "")
-
-    student, new_student = login_student(req, token)
-    if isinstance(student, HttpResponse):
-        return student
+def get_context_data_index_page(req, student, new_student):
 
     token = create_student_token(
         student.student.username, student.student.email
@@ -286,15 +275,6 @@ def index_page(req):
         ]
         for group, assignments in list(assignments.items())
     }
-
-    if not Consent.objects.filter(
-        user=student.student, tos__role__role="student"
-    ).exists():
-        return HttpResponseRedirect(
-            reverse("tos:tos_consent", kwargs={"role": "student"})
-            + "?next="
-            + req.path
-        )
 
     latest_student_consent = (
         Consent.objects.filter(
@@ -403,11 +383,99 @@ def index_page(req):
         },
     }
 
+    return data
+
+
+@require_safe
+def index_page(req):
+    """
+    Main student page. Accessed through a link sent by email containing
+    a token or without the token for a logged in student.
+    """
+
+    token = req.GET.get("token")
+    group_student_id_needed = req.GET.get("group-student-id-needed", "")
+
+    student, new_student = login_student(req, token)
+    if isinstance(student, HttpResponse):
+        return student
+
+    if not Consent.objects.filter(
+        user=student.student, tos__role__role="student"
+    ).exists():
+        return HttpResponseRedirect(
+            reverse("tos:tos_consent", kwargs={"role": "student"})
+            + "?next="
+            + req.path
+        )
+
+    data = get_context_data_index_page(req, student, new_student)
+
     context = {
         "data": json.dumps(data),
         "group_student_id_needed": group_student_id_needed,
     }
 
+    return render(req, "peerinst/student/index.html", context)
+
+
+def index_page_LTI(req):
+    """
+    Main student page  when accessed via LTI
+    """
+
+    if "LTI" in req.session.get("_auth_user_backend"):
+        req.session["LTI"] = True
+    session_data = {k: v for k, v in req.session.items()}
+    logger.info(f"Session data for question view : {session_data}")
+
+    assignment_id = req.session.get("custom_assignment_id", None)
+    question_id = req.session.get("custom_question_id", None)
+
+    if assignment_id and question_id:
+        return HttpResponseRedirect(
+            reverse(
+                "question-LTI",
+                kwargs={
+                    "assignment_id": assignment_id,
+                    "question_id": question_id,
+                },
+            ),
+        )
+
+    user = req.user
+
+    try:
+        student = Student.objects.get(student=user)
+        new_student = False
+    except Student.DoesNotExist:
+        student = Student.objects.create(student=user)
+        new_student = True
+
+    if not user.is_active or new_student:
+        user.is_active = True
+        user.save()
+        new_student = True
+
+    if not Consent.objects.filter(
+        user=student.student, tos__role__role="student"
+    ).exists():
+        return HttpResponseRedirect(
+            reverse("tos:tos_consent", kwargs={"role": "student"})
+            + "?next="
+            + req.path
+        )
+
+    manage_LTI_studentgroup(request=req)
+
+    data = get_context_data_index_page(req, student, new_student)
+
+    context = {
+        "data": json.dumps(data),
+        "group_student_id_needed": "",
+    }
+    session_data = {k: v for k, v in req.session.items()}
+    logger.info(f"Session data for LTI-Standalone access : {session_data}")
     return render(req, "peerinst/student/index.html", context)
 
 

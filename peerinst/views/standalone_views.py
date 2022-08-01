@@ -3,6 +3,7 @@ import logging
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.response import TemplateResponse
@@ -303,7 +304,8 @@ class StudentGroupAssignmentCreateView(
         form = super().get_form()
         teacher = get_object_or_404(Teacher, user=self.request.user)
         form.fields["group"].queryset = teacher.current_groups.filter(
-            mode_created=StudentGroup.STANDALONE
+            Q(mode_created=StudentGroup.STANDALONE)
+            | Q(mode_created=StudentGroup.LTI_STANDALONE)
         )
 
         return form

@@ -267,60 +267,6 @@ def load_timestamps_from_logs(log_filename_list):
     return
 
 
-def rename_groups():
-    """
-    go through LtiUserData table and build translation dict between context_id
-    and context_title;
-    go through StudentGroup table, and rename with context_title (if not none)
-
-    Usage from shell:
-    [1]: from peerinst.util import rename_groups
-    [2]: rename_groups()
-
-    NOTE: on production server, this should be *immediately* followed by update
-    of views.py code, in QuestionFormView, at end of emit_event method, so that
-    ongoing groups are not seen as new
-
-    CURRENT:
-    group, created_group = StudentGroup.objects.get_or_create(name=course_id)
-
-    CHANGE TO:
-    course_title = self.lti_data.edx_lti_parameters.get('context_title')
-    if not course_title:
-        group, created_group =
-            StudentGroup.objects.get_or_create(name=course_id+':'+course_title)
-    else:
-        group, created_group =
-            StudentGroup.objects.get_or_create(name=course_id)
-
-    """
-    from django_lti_tool_provider.models import LtiUserData
-
-    from peerinst.models import StudentGroup
-
-    id_title_dict = {}
-
-    for r in LtiUserData.objects.all():
-        if r.edx_lti_parameters["context_id"] not in id_title_dict:
-            id_title_dict[
-                r.edx_lti_parameters["context_id"]
-            ] = r.edx_lti_parameters["context_title"]
-
-    for g in StudentGroup.objects.all():
-        try:
-            if id_title_dict[g.name]:
-                print("** adding title **")
-                print(g.name)
-                g.title = id_title_dict[g.name]
-                g.save()
-                print(g.title)
-        except KeyError as e:
-            print(e)
-            pass
-
-    return
-
-
 def student_list_from_student_groups(group_list):
     from peerinst.models import StudentGroup
 
@@ -974,37 +920,6 @@ def report_data_by_question(assignment_list, student_groups):
     return gradebook_question
 
 
-def filter_ltievents(start_date, stop_date=None, username=None):
-    """
-    given a start date and stop date (as datetime objects), and optional
-    username return all LtiEvents that match the criteria
-    """
-    from peerinst.models import LtiEvent
-
-    if not stop_date:
-        stop_date = datetime.datetime.now()
-
-    events = LtiEvent.objects.filter(
-        timestamp__gte=start_date, timestamp__lte=stop_date
-    )
-
-    if username:
-        rejected_pks, event_pks = [], []
-        for e in events:
-            try:
-                if e.event_log["username"] == username:
-                    event_pks.append(e.pk)
-            except TypeError as error:
-                print(error)
-                rejected_pks.append(e.pk)
-        events = events.filter(pk__in=event_pks)
-        rejected = events.filter(pk__in=rejected_pks)
-    else:
-        rejected = []
-
-    return rejected, events
-
-
 def build_event_dict(e, columns, event_columns):
     """
     given and LtiEvent
@@ -1055,36 +970,6 @@ def serialize_events_to_dataframe(events):
 
     for i, e in enumerate(events):
         df.loc[i] = pd.Series(build_event_dict(e, columns, event_columns))
-
-    return df
-
-
-def get_lti_data_as_csv(weeks_ago_start, weeks_ago_stop=0, username=None):
-    import datetime
-    import os
-
-    from django.conf import settings
-
-    print("start")
-    print(datetime.datetime.now())
-
-    start = datetime.datetime.now() - datetime.timedelta(weeks=weeks_ago_start)
-    end = datetime.datetime.now() - datetime.timedelta(weeks=weeks_ago_stop)
-
-    rejected, events = filter_ltievents(
-        start_date=start, stop_date=end, username=username
-    )
-    print("events filtered")
-    print(datetime.datetime.now())
-
-    df = serialize_events_to_dataframe(events)
-
-    print("serialied df")
-    print(datetime.datetime.now())
-
-    fname = os.path.join(settings.BASE_DIR, "data.csv")
-    with open(fname, "w") as f:
-        df.to_csv(path_or_buf=f, encoding="utf-8")
 
     return df
 

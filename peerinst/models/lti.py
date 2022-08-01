@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from jsonfield import JSONField
 
 
 class FakeUsername(models.Model):
@@ -24,7 +23,6 @@ class LtiEvent(models.Model):
     assignment_id = models.CharField(max_length=100, blank=True, null=True)
     username = models.CharField(max_length=100, blank=True, null=True)
     event_type = models.CharField(max_length=100)
-    event_log = JSONField(default={})
     timestamp = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
