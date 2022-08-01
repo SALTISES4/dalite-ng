@@ -300,8 +300,7 @@ class QuestionRationaleView(StaffMemberRequiredMixin, TemplateView):
         rows = []
         for item in rationale_data:
             count = item.get("count", 0)
-            rationale = item.get("rationale", None)
-            if rationale:
+            if rationale := item.get("rationale", None):
                 row = {
                     "data": [
                         count,

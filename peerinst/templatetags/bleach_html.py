@@ -24,6 +24,19 @@ ALLOWED_TAGS = [
     "sup",
 ]
 
+STRICT_TAGS = [
+    "b",
+    "em",
+    "i",
+    "li",
+    "ol",
+    "p",
+    "strong",
+    "ul",
+    "sub",
+    "sup",
+]
+
 ALLOWED_ATTR = {
     "a": ["href", "title", "target", "rel"],
     "abbr": ["title"],

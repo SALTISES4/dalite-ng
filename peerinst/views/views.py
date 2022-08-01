@@ -47,6 +47,7 @@ from django_lti_tool_provider.models import LtiUserData
 from django_lti_tool_provider.signals import Signals
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from tinymce.widgets import TinyMCE
 
 from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
@@ -460,6 +461,13 @@ class AssignmentEditView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
         context["teacher"] = teacher
         return context
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["description"].widget = TinyMCE()
+        form.fields["intro_page"].widget = TinyMCE()
+        form.fields["conclusion_page"].widget = TinyMCE()
+        return form
+
     def get_success_url(self):
         return reverse(
             "assignment-update", kwargs={"assignment_id": self.object.pk}
@@ -520,6 +528,11 @@ class QuestionCreateView(
         form.instance.user = self.request.user
         return super().form_valid(form)
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["text"].widget = TinyMCE()
+        return form
+
     def get_success_url(self):
         if self.object.type == "RO":
             return reverse(
@@ -539,7 +552,7 @@ class QuestionCloneView(QuestionCreateView):
     def get_initial(self, *args, **kwargs):
         super().get_initial(*args, **kwargs)
         question = get_object_or_404(models.Question, pk=self.kwargs["pk"])
-        initial = {
+        return {
             "text": question.text,
             "type": question.type,
             "image": question.image,
@@ -550,10 +563,9 @@ class QuestionCloneView(QuestionCreateView):
             "discipline": question.discipline,
             "fake_attributions": question.fake_attributions,
             "sequential_review": question.sequential_review,
-            "rationale_selection_algorithm": question.rationale_selection_algorithm,  # noqa
+            "rationale_selection_algorithm": question.rationale_selection_algorithm,
             "grading_scheme": question.grading_scheme,
         }
-        return initial
 
     def get_object(self, queryset=None):
         # Remove link on object to pk to dump object permissions
@@ -656,8 +668,9 @@ class QuestionUpdateView(
         # Check if student answers exist
         if not self.object.is_editable:
             return None
-        else:
-            return super().get_form(form_class)
+        form = super().get_form(form_class)
+        form.fields["text"].widget = TinyMCE()
+        return form
 
     def post(self, request, *args, **kwargs):
         # Check if student answers exist
@@ -668,7 +681,7 @@ class QuestionUpdateView(
 
     def form_valid(self, form):
         # Only owner can update collaborators
-        if not self.object.user == self.request.user:
+        if self.object.user != self.request.user:
             form.cleaned_data[
                 "collaborators"
             ] = self.object.collaborators.all()
@@ -1201,10 +1214,7 @@ class QuestionReviewBaseView(QuestionFormView):
         self.stage_data.update(rationale_choices=self.rationale_choices)
 
     def mark_rationales_safe(self, escape_html):
-        if escape_html:
-            processor = escape
-        else:
-            processor = mark_safe
+        processor = escape if escape_html else mark_safe
         for _choice, _label, rationales in self.rationale_choices:
             rationales[:] = [(id, processor(text)) for id, text in rationales]
 

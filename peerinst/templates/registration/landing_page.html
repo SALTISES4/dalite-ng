@@ -596,7 +596,7 @@
   <script nonce="{{ request.csp_nonce }}">
     // Counts
     data = {{ json|safe }};
-    labels = bundle.keys(data['All']);
+    labels = Object.keys(data['All']);
     var svg = [];
     var width = [];
     var height = [];

@@ -1,6 +1,8 @@
 -r ../blink/requirements.in
 -r ../REST/requirements.in
 
+alt-profanity-check
+better-profanity
 bleach
 celery[redis]
 contextualSpellCheck
@@ -19,9 +21,11 @@ django-ipware == 2.1.0  # Temporary pin awaiting django-axes fix
 django-permissions-policy
 django-referrer-policy
 django-samesite-none
+django-tinymce
 django < 3.0.0
 djangorestframework >= 3.11.2  # Reqd by safety
 edx-opaque-keys
+langdetect
 lxml >= 4.6.2  # Reqd by safety
 mysqlclient
 packaging

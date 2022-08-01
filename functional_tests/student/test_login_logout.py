@@ -14,10 +14,11 @@ from peerinst.students import (
 def signin(browser, student, mail_outbox, new=False):
     email = student.student.email
 
-    browser.get("{}{}".format(browser.server_url, reverse("login")))
+    browser.get(f'{browser.server_url}{reverse("login")}')
 
-    login_link = browser.find_element_by_link_text("LOGIN")
-    login_link.click()
+    browser.find_element_by_xpath(
+        "//button[contains(.,'Login via email')]"
+    ).click()
 
     input_ = browser.find_element_by_name("email")
     input_.clear()
@@ -30,7 +31,7 @@ def signin(browser, student, mail_outbox, new=False):
     m = re.search(
         r"http[s]*://.*/student/\?token=.*", mail_outbox[0].body
     )  # noqa W605
-    signin_link = m.group(0)
+    signin_link = m[0]
 
     browser.get(signin_link)
 
@@ -63,7 +64,7 @@ def logout(browser, assert_):
     time.sleep(2)
     logout_button.click()
 
-    assert browser.current_url == browser.server_url + "/en/login/"
+    assert browser.current_url == f"{browser.server_url}/en/login/"
 
 
 def consent_to_tos(browser):
@@ -78,8 +79,8 @@ def test_fake_link(browser):
     username, _ = get_student_username_and_password(email)
     token = create_student_token(username, email)
 
-    signin_link = "{}{}?token={}".format(
-        browser.server_url, reverse("student-page"), token
+    signin_link = (
+        f'{browser.server_url}{reverse("student-page")}?token={token}'
     )
 
     browser.get(signin_link)

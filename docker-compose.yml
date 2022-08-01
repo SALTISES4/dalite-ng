@@ -1,7 +1,8 @@
-# To run in background with build:
-#   `docker-compose up -d --build`
+# To build and run:
+#   `docker compose build`
+#   `docker compose up`
 # To tear down (don't forget the -v to get rid of static folder):
-#   `docker-compose down -v`
+#   `docker compose down -v`
 # To watch Chrome tests:
 #   Open a VNC client
 #   Go to vnc://127.0.0.1:41960 and enter password "secret"
@@ -12,12 +13,11 @@
 # GOTCHAS:
 #   - Use `docker image prune` to avoid serving old static content or using excessive disk space
 
-version: "3.7"
-
 services:
   live_app:
-    build: .
     image: mydalite
+    build:
+      context: .
     command: gunicorn dalite.wsgi:application --bind 0.0.0.0:8000
     environment:
       DALITE_DB_HOST: ${HOST:-host.docker.internal}
@@ -33,6 +33,8 @@ services:
 
   celery:
     image: mydalite
+    depends_on:
+      - live_app
     command: celery -A dalite worker -l debug
     environment:
       ALLOWED_HOST: nginx
@@ -50,6 +52,8 @@ services:
 
   test_app:
     image: mydalite
+    depends_on:
+      - live_app
     command: gunicorn dalite.wsgi:application --bind 0.0.0.0:8000
     environment:
       ALLOWED_HOST: nginx
@@ -122,13 +126,13 @@ services:
     build:
       context: .
       dockerfile: ./functional_tests/Dockerfile
-    command: pytest functional_tests/teacher --reuse-db --ignore=node_modules/ -vvvv --exitfirst -s -k "test_create_collection"
+    command: pytest functional_tests/student --reuse-db --ignore=node_modules/ -vvvv -s
     depends_on:
       - selenium-hub
       - chrome
       - firefox
     environment:
-      ALLOWED_HOST: nginx  #
+      ALLOWED_HOST: nginx
       DALITE_DB_HOST: ${HOST:-host.docker.internal}
       STAGING_SERVER: nginx:8080
       SELENIUM_HUB: selenium-hub:4444

@@ -1,3 +1,4 @@
+import contextlib
 import time
 
 from faker import Faker
@@ -19,29 +20,25 @@ def go_to_forums(browser, forum):
     icon = browser.find_element_by_xpath("//i[contains(text(), 'menu')]")
     icon.click()
 
-    try:
+    with contextlib.suppress(NoSuchElementException):
         forum_button = WebDriverWait(browser, 5).until(
-            EC.element_to_be_clickable((By.LINK_TEXT, "Forums"))
+            EC.element_to_be_clickable(
+                (By.XPATH, "//a[contains(text(), 'Forums')]")
+            )
         )
         time.sleep(1)
         forum_button.click()
-    except NoSuchElementException:
-        pass
-
     assert "Forums" in browser.find_element_by_tag_name("h1").text
     assert forum.title in browser.page_source
 
 
 def create_post(browser):
-    try:
+    with contextlib.suppress(NoSuchElementException):
         button = WebDriverWait(browser, 5).until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR, "#forum-list .mdc-list-item")
             )
         )
-    except NoSuchElementException:
-        pass
-
     button.click()
     assert "Posts" in browser.find_element_by_tag_name("h2").text
 
@@ -170,24 +167,18 @@ def unfollow_from_subscription_list(browser):
 
 
 def go_to_post(browser):
-    try:
+    with contextlib.suppress(NoSuchElementException):
         button = WebDriverWait(browser, 5).until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR, "#forum-list .mdc-list-item")
             )
         )
-    except NoSuchElementException:
-        pass
-
     button.click()
 
-    try:
+    with contextlib.suppress(NoSuchElementException):
         button = WebDriverWait(browser, 5).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, ".thread-link"))
         )
-    except NoSuchElementException:
-        pass
-
     button.click()
 
 
@@ -215,13 +206,10 @@ def check_notifications(browser, assert_):
     icon = browser.find_element_by_xpath("//i[contains(text(), 'menu')]")
     icon.click()
 
-    try:
+    with contextlib.suppress(NoSuchElementException):
         forum_button = WebDriverWait(browser, 5).until(
             EC.element_to_be_clickable((By.LINK_TEXT, "Forums"))
         )
-    except NoSuchElementException:
-        pass
-
     browser.wait_for(
         lambda: assert_(
             "New!" in browser.find_element_by_id("#icon-with-text-demo").text

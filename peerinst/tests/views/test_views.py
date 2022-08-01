@@ -208,7 +208,7 @@ class QuestionViewTest(QuestionViewTestCase):
         # Provide a first answer and a rationale.
         first_answer_choice = 2
         first_choice_label = self.question.get_choice_label(2)
-        rationale = "my rationale text"
+        rationale = "My rationale text that meets minimum word requirement"
         response = self.question_post(
             first_answer_choice=first_answer_choice, rationale=rationale
         )
@@ -333,7 +333,7 @@ class QuestionViewTest(QuestionViewTestCase):
         # Provide a first answer and a rationale.
         first_answer_choice = 2
         first_choice_label = self.question.get_choice_label(2)
-        rationale = "my rationale text"
+        rationale = "My rationale text that meets minimum word requirement"
         response = self.question_post(
             first_answer_choice=first_answer_choice, rationale=rationale
         )
@@ -509,7 +509,7 @@ class QuestionViewTest(QuestionViewTestCase):
         # Provide a first answer and a rationale.
         first_answer_choice = 2
         first_choice_label = self.question.get_choice_label(2)
-        rationale = "my rationale text"
+        rationale = "My rationale text that meets minimum word requirement"
         response = self.question_post(
             first_answer_choice=first_answer_choice, rationale=rationale
         )
@@ -645,7 +645,8 @@ class EventLogTest(QuestionViewTestCase):
 
         # Provide a first answer and a rationale, and verify the logged event.
         self.question_post(
-            first_answer_choice=2, rationale="my rationale text"
+            first_answer_choice=2,
+            rationale="My rationale text that meets minimum word requirement",
         )
         event = self.verify_event(
             logger,
@@ -655,7 +656,10 @@ class EventLogTest(QuestionViewTestCase):
         self.assertEqual(event["event_type"], "problem_check")
         self.assertEqual(event["event"]["first_answer_choice"], 2)
         self.assertEqual(event["event"]["success"], "correct")
-        self.assertEqual(event["event"]["rationale"], "my rationale text")
+        self.assertEqual(
+            event["event"]["rationale"],
+            "My rationale text that meets minimum word requirement",
+        )
         logger.reset_mock()
 
         # Provide a first answer and a rationale.
