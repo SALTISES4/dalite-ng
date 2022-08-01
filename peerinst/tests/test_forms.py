@@ -63,7 +63,10 @@ def test_FirstAnswerForm_rationale_no_profanity():
     )
 
     assert len(form.errors) == 1
-    assert "Please rephrase your rationale." in form.errors["rationale"]
+    assert (
+        "The language filter has labeled this as possibly toxic or profane; please rephrase your rationale."
+        in form.errors["rationale"]
+    )
 
 
 def test_FirstAnswerForm_rationale_no_profanity_variants():
@@ -76,7 +79,10 @@ def test_FirstAnswerForm_rationale_no_profanity_variants():
     )
 
     assert len(form.errors) == 1
-    assert "Please rephrase your rationale." in form.errors["rationale"]
+    assert (
+        "The language filter has labeled this as possibly toxic or profane; please rephrase your rationale."
+        in form.errors["rationale"]
+    )
 
 
 def test_FirstAnswerForm_rationale_valid_language():
