@@ -190,7 +190,7 @@ class QuestionViewTest(QuestionViewTestCase):
         # Provide a first answer and a rationale.
         first_answer_choice = 2
         first_choice_label = self.question.get_choice_label(2)
-        rationale = "my rationale text"
+        rationale = "My rationale text that meets minimum word requirement"
         response = self.question_post(
             first_answer_choice=first_answer_choice, rationale=rationale
         )
@@ -315,7 +315,7 @@ class QuestionViewTest(QuestionViewTestCase):
         # Provide a first answer and a rationale.
         first_answer_choice = 2
         first_choice_label = self.question.get_choice_label(2)
-        rationale = "my rationale text"
+        rationale = "My rationale text that meets minimum word requirement"
         response = self.question_post(
             first_answer_choice=first_answer_choice, rationale=rationale
         )
@@ -488,7 +488,7 @@ class QuestionViewTest(QuestionViewTestCase):
         # Provide a first answer and a rationale.
         first_answer_choice = 2
         first_choice_label = self.question.get_choice_label(2)
-        rationale = "my rationale text"
+        rationale = "My rationale text that meets minimum word requirement"
         response = self.question_post(
             first_answer_choice=first_answer_choice, rationale=rationale
         )

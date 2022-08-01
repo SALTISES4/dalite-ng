@@ -285,9 +285,7 @@ def prefer_expert_and_highly_voted(
     def callback(rng, rationales):
         chosen = []
 
-        # Add an expert rationale if one exists.
-        expert_rationales = rationales.filter(expert=True)
-        if expert_rationales:
+        if expert_rationales := rationales.filter(expert=True):
             chosen.append(rng.choice(expert_rationales))
             rationales = rationales.exclude(pk=chosen[-1].pk)
             if not rationales:
@@ -296,10 +294,9 @@ def prefer_expert_and_highly_voted(
         # Add a highly voted rationale if one exists.
         rationales_with_votes = rationales.annotate(votes=Count("answer"))
         max_votes = rationales_with_votes.aggregate(Max("votes"))["votes__max"]
-        highly_voted_rationales = rationales_with_votes.filter(
+        if highly_voted_rationales := rationales_with_votes.filter(
             votes__gt=max_votes // 2
-        )
-        if highly_voted_rationales:
+        ):
             chosen.append(rng.choice(highly_voted_rationales))
             rationales = rationales.exclude(pk=chosen[-1].pk)
 

@@ -124,11 +124,13 @@ class Answer(models.Model):
             _("{} for question {}").format(self.id, self.question.title)
         )
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
     def show_chosen_rationale(self):
-        if self.chosen_rationale:
-            return self.chosen_rationale.rationale
-        else:
-            return None
+        return (
+            self.chosen_rationale.rationale if self.chosen_rationale else None
+        )
 
     show_chosen_rationale.short_description = "Display chosen rationale"
 
@@ -287,7 +289,7 @@ class RationaleOnlyQuestion(Question):
         self.question.save()
         super().save(*args, **kwargs)
 
-    def start_form_valid(request, view, form):
+    def start_form_valid(self, view, form):
         rationale = form.cleaned_data["rationale"]
         datetime_start = form.cleaned_data["datetime_start"]
 

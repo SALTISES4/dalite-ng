@@ -642,7 +642,7 @@ class Question(models.Model):
 
         return FirstAnswerForm
 
-    def start_form_valid(request, view, form):
+    def start_form_valid(self, view, form):
         first_answer_choice = int(form.cleaned_data["first_answer_choice"])
         correct = view.question.is_correct(first_answer_choice)
         rationale = form.cleaned_data["rationale"]
@@ -671,13 +671,13 @@ class Question(models.Model):
             msg = _(
                 "You can only specify one of the image and video URL fields."
             )
-            errors.update({f: msg for f in fields})
+            errors |= {f: msg for f in fields}
         if self.image and not self.image_alt_text:
             msg = _(
                 "You must provide alternative text for accessibility if "
                 "providing an image."
             )
-            errors.update({"image_alt_text": msg})
+            errors["image_alt_text"] = msg
         if errors:
             raise exceptions.ValidationError(errors)
 

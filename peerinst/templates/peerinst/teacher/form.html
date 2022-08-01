@@ -59,28 +59,3 @@
     </section>
   </main>
 {% endblock %}
-
-{% block scripts %}
-  {{ block.super }}
-  <script nonce="{{ request.csp_nonce }}">
-
-    function hook() {
-      form = document.getElementById("id_disciplines");
-      if (form) {
-        document.getElementById("update-identity").disabled = false;
-        $("#show_discipline_form").on("click", function() {
-          document.getElementById("update-identity").disabled = true;
-        });
-      }
-    }
-
-    window.addEventListener("load", function() {
-      $("#show_discipline_form").on("click", function() {
-        document.getElementById("update-identity").disabled = true;
-      });
-
-      bundle.bindAjaxTextInputForm('show_discipline_form', 'discipline_form', "{% url 'discipline-create' %}?multiselect=true", "{% url 'disciplines-form' %}", bundle.disciplineForm, null, hook);
-    });
-
-  </script>
-{% endblock %}

@@ -2,12 +2,6 @@
 
 {% load compress static add_class i18n %}
 
-{% block stylesheets %}
-  {{ block.super }}
-  <!-- Self-hosted tinyMCE -->
-  <script src="{% static 'peerinst/js/tinymce/js/tinymce/tinymce.min.js' %}"></script>
-{% endblock %}
-
 {% block extra_title %}
   <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Step 2: Answer choices' %}</h2>
 {% endblock %}
@@ -25,9 +19,7 @@
         <div class='field-container'>
           <div class='number-box flush-to-textbox'><span class='number'>{{ forloop.counter }}</span></div>
           <div class='field'>
-            <div class="mdc-text-field mdc-text-field--textarea">
-              {{ form.text }}
-            </div>
+            {{ form.text }}
             <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent m-left-right-16" aria-hidden="true">
               {{ form.text.help_text|safe }}
             </p>
@@ -115,27 +107,11 @@
       </span>
     {% endif %}
   </div>
-
 {% endblock %}
 
 {% block scripts %}
   {{ block.super }}
   <script nonce="{{ request.csp_nonce }}">
-    // TinyMCE bind to textarea
-    tinymce.init({
-      selector: 'textArea',
-      elementpath: false,
-      branding: false,
-      plugins: ['autolink', 'autosave', 'charmap', 'code', 'link', 'paste'],
-      menubar: false,
-      toolbar: 'undo redo | bold italic underline superscript subscript | link | charmap',
-      content_css: "{% static 'peerinst/css/tiny.min.css' %}",
-      link_assume_external_targets: true,
-      default_link_target: '_blank',
-      rel_list: [
-        {title: 'Private', value: 'noreferrer noopener nofollow'},
-      ]
-    });
     window.addEventListener("load", function() {
       var cloneBtn = document.getElementById("clone-btn");
       if (cloneBtn != null) {

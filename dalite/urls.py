@@ -103,6 +103,7 @@ urlpatterns += i18n_patterns(
         name="admin_index_wrapper",
     ),
     path("admin/", admin.site.urls),
+    path("tinymce/", include("tinymce.urls")),
 )
 
 # Set language view

@@ -49,23 +49,27 @@ def test_change_password(browser, assert_, teacher):
 
     logout(browser, assert_)
 
-    browser.get("{}{}".format(browser.server_url, reverse("login")))
+    browser.get(f'{browser.server_url}{reverse("login")}')
+
+    browser.find_element_by_id("login-teachers").click()
+
     username_input = browser.find_element_by_xpath(
-        "//input[@id=(//label[text()='Username']/@for)]"
+        "//input[@id='id_username']"
     )
     username_input.clear()
     username_input.send_keys(teacher.user.username)
 
     password_input = browser.find_element_by_xpath(
-        "//input[@id=(//label[text()='Password']/@for)]"
+        "//input[@id='id_password']"
     )
     password_input.clear()
     password_input.send_keys("retest&987")
 
-    submit_button = browser.find_element_by_xpath("//input[@value='Submit']")
-    submit_button.click()
+    submit_button = browser.find_element_by_xpath(
+        "//button[@id='submit-btn']"
+    ).click()
 
-    assert browser.current_url.endswith("dashboard/")
+    assert browser.current_url.endswith("saltise/lobby/")
 
 
 def test_email_address_change(browser, assert_, teacher):
@@ -107,7 +111,7 @@ def test_email_notification_change(browser, teacher):
 
 
 def test_change_discipline_and_institution(
-    browser, assert_, teacher, institution
+    browser, assert_, teacher, institution, discipline
 ):
     start(browser, teacher)
     browser.find_element_by_class_name("edit-identity-btn").click()
@@ -118,44 +122,14 @@ def test_change_discipline_and_institution(
 
     Select(browser.find_element_by_id("id_institutions")).select_by_value("1")
 
-    browser.find_element_by_id("show_discipline_form").click()
+    Select(browser.find_element_by_id("id_disciplines")).select_by_value("1")
 
-    browser.wait_for(
-        lambda: assert_(
-            "Enter the name of a new discipline." in browser.page_source
-        )
-    )
-
-    assert not browser.find_element_by_id("update-identity").is_enabled()
-
-    input = browser.find_element_by_xpath(
-        "//div[@id='discipline_create_form']/input[@id='id_title']"
-    )
-    # ENTER on a blank field throws form error
-    input.send_keys(Keys.ENTER)
-    browser.wait_for(
-        lambda: assert_("This field is required" in browser.page_source)
-    )
-
-    # New discipline is accepted and switches to select form
-    time.sleep(1)
-    input = browser.find_element_by_xpath(
-        "//div[@id='discipline_create_form']/input[@id='id_title']"
-    )
-    input.send_keys("My discipline")
-    browser.find_element_by_id("submit_discipline_form").click()
-
-    browser.wait_for(
-        lambda: assert_(
-            browser.find_element_by_id("update-identity").is_enabled()
-        )
-    )
     browser.find_element_by_id("update-identity").click()
 
     browser.find_element_by_id("identity-section").click()
     browser.wait_for(
         lambda: assert_(
-            "My discipline"
+            discipline.name
             in browser.find_element_by_class_name("edit-identity-btn").text
         )
     )

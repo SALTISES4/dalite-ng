@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     "django_elasticsearch_dsl",
     "lti_provider",
     "cookielaw",
+    "tinymce",
     "csp",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -282,6 +283,17 @@ CELERY_RESULT_BACKEND = os.environ.get(
     "CELERY_RESULT_BACKEND", "redis://localhost:6379/0"
 )
 
+# Tinymce config
+try:
+    from .tinymce_settings import *  # noqa F403
+except ImportError:
+    warnings.warn(
+        """
+        File tinymce_settings.py not found.
+        You probably want to add it.
+        """
+    )
+
 # CSP
 CSP_DEFAULT_SRC = [
     "'self'",
@@ -474,6 +486,12 @@ LOGGING = {
             "formatter": "complete",
             "stream": "ext://sys.stdout",
         },
+        "validation_console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
     },
     "loggers": {
         "django.request": {
@@ -543,6 +561,11 @@ LOGGING = {
         },
         "performance": {
             "handlers": ["performance_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "validation": {
+            "handlers": ["validation_console_log"],
             "level": "DEBUG" if DEBUG else "INFO",
             "propagate": True,
         },

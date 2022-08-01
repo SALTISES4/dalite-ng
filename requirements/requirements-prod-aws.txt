@@ -12,6 +12,8 @@ aioredis==1.3.1
     # via
     #   -r requirements/requirements-base.txt
     #   channels-redis
+alt-profanity-check==1.1.1
+    # via -r requirements/requirements-base.txt
 amqp==5.0.9
     # via
     #   -r requirements/requirements-base.txt
@@ -46,6 +48,8 @@ beautifulsoup4==4.8.2
     #   -r requirements/requirements-base.txt
     #   django-htmlmin
     #   pynliner
+better-profanity==0.7.0
+    # via -r requirements/requirements-base.txt
 billiard==3.6.4.0
     # via
     #   -r requirements/requirements-base.txt
@@ -172,7 +176,6 @@ django==2.2.28
     #   django-storages
     #   django-timezone-field
     #   djangorestframework
-    #   jsonfield
     #   pinax-forums
     #   saltise-course-flow
     #   saltise-user-feedback
@@ -240,6 +243,8 @@ django-timezone-field==4.2.1
     # via
     #   -r requirements/requirements-base.txt
     #   django-celery-beat
+django-tinymce==3.4.0
+    # via -r requirements/requirements-base.txt
 djangorestframework==3.12.2
     # via
     #   -r requirements/requirements-base.txt
@@ -324,12 +329,12 @@ jmespath==0.9.5
     # via
     #   boto3
     #   botocore
-joblib==1.0.1
+joblib==1.1.0
     # via
     #   -r requirements/requirements-base.txt
+    #   alt-profanity-check
     #   sacremoses
-jsonfield==3.1.0
-    # via -r requirements/requirements-base.txt
+    #   scikit-learn
 kombu==5.2.3
     # via
     #   -r requirements/requirements-base.txt
@@ -338,6 +343,8 @@ langcodes==3.3.0
     # via
     #   -r requirements/requirements-base.txt
     #   spacy
+langdetect==1.0.9
+    # via -r requirements/requirements-base.txt
 lxml==4.7.1
     # via -r requirements/requirements-base.txt
 markupsafe==2.0.1
@@ -365,6 +372,8 @@ numpy==1.22.4
     #   -r requirements/requirements-base.txt
     #   blis
     #   pandas
+    #   scikit-learn
+    #   scipy
     #   spacy
     #   thinc
     #   transformers
@@ -515,6 +524,14 @@ saltise-user-feedback==1.1.1
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
+scikit-learn==1.1.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   alt-profanity-check
+scipy==1.8.1
+    # via
+    #   -r requirements/requirements-base.txt
+    #   scikit-learn
 sentry-sdk==1.5.8
     # via -r requirements/requirements-prod-aws.in
 service-identity==18.1.0
@@ -534,6 +551,7 @@ six==1.15.0
     #   django-grappelli
     #   elasticsearch-dsl
     #   html5lib
+    #   langdetect
     #   pylti
     #   pyopenssl
     #   python-dateutil
@@ -577,6 +595,10 @@ thinc==8.0.13
     # via
     #   -r requirements/requirements-base.txt
     #   spacy
+threadpoolctl==3.1.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   scikit-learn
 tokenizers==0.10.3
     # via
     #   -r requirements/requirements-base.txt

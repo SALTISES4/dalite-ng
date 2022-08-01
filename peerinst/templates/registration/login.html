@@ -12,7 +12,7 @@
       <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Students' %}
         <span class="material-icons">arrow_forward_ios</span>
         <a href="{% url 'student-login' %}">
-          <button class="mdc-button mdc-button--raised">
+          <button class="mdc-button mdc-button--raised" id="login-students">
             {% trans 'Login via email' %}
           </button>
         </a>
@@ -22,7 +22,7 @@
         <span class="material-icons">arrow_forward_ios</span>
         {% with next=request.GET.next %}
           <a href="{% url 'saltise:login' %}{% if next %}?next={{ next }}{% endif %}">
-            <button class="mdc-button mdc-button--raised">
+            <button class="mdc-button mdc-button--raised" id="login-teachers">
               {% trans 'Login via SALTISE' %}
             </button>
           </a>
