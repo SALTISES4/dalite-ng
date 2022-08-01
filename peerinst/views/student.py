@@ -1,7 +1,6 @@
 import json
 import logging
 import re
-from urllib.parse import urlparse
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
@@ -15,18 +14,15 @@ from django.views.decorators.http import require_POST, require_safe
 from dalite.views.errors import response_400, response_403
 from tos.models import Consent
 
+from ..lti import manage_LTI_studentgroup
 from ..models import (
-    Institution,
-    InstitutionalLMS,
     Student,
     StudentAssignment,
     StudentGroup,
     StudentGroupAssignment,
     StudentGroupMembership,
     StudentNotification,
-    Teacher,
 )
-from ..models.group import current_semester, current_year
 from ..students import (
     authenticate_student,
     create_student_token,
@@ -470,52 +466,7 @@ def index_page_LTI(req):
             + req.path
         )
 
-    teacher_hash = req.session.get("custom_teacher_id", None)
-    course_id = req.session.get("context_id", "")
-    course_title = req.session.get("context_title", None)
-
-    try:
-        group = StudentGroup.objects.get(name=course_id)
-    except StudentGroup.DoesNotExist:
-        if course_title:
-            group = StudentGroup(name=course_id, title=course_title)
-        else:
-            group = StudentGroup(name=course_id)
-        group.semester = current_semester()
-        group.year = current_year()
-        group.mode_created = StudentGroup.LTI_STANDALONE
-        group.save()
-
-        lms_url_raw = req.session.get("launch_presentation_return_url", None)
-        if lms_url_raw:
-            lms_url = urlparse(lms_url_raw).hostname
-            (
-                institutional_lms,
-                created,
-            ) = InstitutionalLMS.objects.get_or_create(url=lms_url)
-            if created:
-                institution = Institution.objects.create(
-                    name=institutional_lms.url
-                )
-                institutional_lms.institution = institution
-
-            group.institution = institutional_lms.institution
-            group.save()
-        else:
-            session_data = {k: v for k, v in req.session.items()}
-            logger.info("No LMS URL found in session data: {session_data}")
-
-    # add group to student
-    if group not in student.groups.all():
-        student.join_group(group=group)
-
-    # If teacher_id specified, add teacher to group
-    if teacher_hash is not None:
-        teacher = Teacher.get(teacher_hash)
-        if teacher not in group.teacher.all():
-            group.teacher.add(teacher)
-            teacher.current_groups.add(group)
-            teacher.save()
+    manage_LTI_studentgroup(request=req)
 
     data = get_context_data_index_page(req, student, new_student)
 

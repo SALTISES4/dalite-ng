@@ -1,7 +1,6 @@
 import json
 import logging
 import random
-import re
 import time
 import urllib.error
 import urllib.parse
@@ -43,10 +42,7 @@ from django.views.generic import DetailView
 from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
-from django_lti_tool_provider.models import LtiUserData
 from lti_provider.lti import LTI
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
 from pylti.common import post_message
 
 from blink.models import BlinkRound
@@ -58,6 +54,7 @@ from tos.models import Consent, Tos
 
 from .. import admin, forms, models, rationale_choice
 from ..admin_views import get_question_rationale_aggregates
+from ..lti import manage_LTI_studentgroup
 from ..mixins import (
     LoginRequiredMixin,
     NoStudentsMixin,
@@ -74,8 +71,6 @@ from ..models import (
     Category,
     Collection,
     Discipline,
-    Institution,
-    InstitutionalLMS,
     NewUserRequest,
     Question,
     RationaleOnlyQuestion,
@@ -88,7 +83,6 @@ from ..models import (
     UserType,
     UserUrl,
 )
-from ..models.group import current_semester, current_year
 from ..stopwords import en, fr
 from ..tasks import mail_managers_async
 from ..util import (
@@ -992,50 +986,13 @@ class QuestionFormView(QuestionMixin, FormView):
 
     def emit_event(self, name, **data):
         """
-        Log an event in a JSON format similar to the edx-platform tracking
-        logs.
+        Log an event in a JSON format for each step in problem
         """
-        if self.lti_data:
-            # Extract information from LTI parameters.
-            course_id = self.lti_data.edx_lti_parameters.get("context_id")
-
-            try:
-                edx_org = CourseKey.from_string(course_id).org
-            except InvalidKeyError:
-                # The course_id is not from edX. Don't place the org in the
-                # logs.
-                edx_org = None
-
-            grade_handler_re = re.compile(
-                f"https?://[^/]+/courses/{re.escape(course_id)}"
-                + "/xblock/(?P<usage_key>[^/]+)/"
-            )
-            usage_key = None
-            outcome_service_url = self.lti_data.edx_lti_parameters.get(
-                "lis_outcome_service_url"
-            )
-            if outcome_service_url:
-                usage_key = grade_handler_re.match(outcome_service_url)
-                if usage_key:
-                    usage_key = usage_key.group("usage_key")
-                # Grading is enabled, so include information about max grade in
-                # event data
-                data["max_grade"] = 1.0
-            else:
-                # Grading is not enabled, so remove information about grade
-                # from event data
-                if "grade" in data:
-                    del data["grade"]
-        else:
-            edx_org = None
-            course_id = "standalone"
-            usage_key = None
 
         # Add common fields to event data
         data.update(
             assignment_id=self.assignment.pk,
             assignment_title=self.assignment.title,
-            problem=usage_key,
             question_id=self.question.pk,
             question_text=self.question.text,
         )
@@ -1045,14 +1002,8 @@ class QuestionFormView(QuestionMixin, FormView):
         event = {
             "accept_language": META.get("HTTP_ACCEPT_LANGUAGE"),
             "agent": META.get("HTTP_USER_AGENT"),
-            "context": {
-                "course_id": course_id,
-                "module": {"usage_key": usage_key},
-                "username": self.user_token,
-            },
-            "course_id": course_id,
+            "course_id": self.request.session.get("context_id", ""),
             "event": data,
-            "event_source": "server",
             "event_type": name,
             "host": META.get("SERVER_NAME"),
             "ip": META.get("HTTP_X_REAL_IP", META.get("REMOTE_ADDR")),
@@ -1061,84 +1012,8 @@ class QuestionFormView(QuestionMixin, FormView):
             "username": self.user_token,
         }
 
-        if edx_org is not None:
-            event["context"]["org_id"] = edx_org
-
         # Write JSON to log file
         LOGGER.info(json.dumps(event))
-        # lti_event = LtiEvent(
-        #     event_type=name,
-        #     event_log=json.dumps(event),
-        #     username=self.user_token,
-        #     assignment_id=self.assignment.identifier,
-        #     question_id=self.question.pk,
-        # )
-        # lti_event.save()
-
-        if self.lti_data:
-            course_title = self.lti_data.edx_lti_parameters.get(
-                "context_title"
-            )
-
-            try:
-                group = StudentGroup.objects.get(name=course_id)
-            except StudentGroup.DoesNotExist:
-                if course_title:
-                    group = StudentGroup(name=course_id, title=course_title)
-                else:
-                    group = StudentGroup(name=course_id)
-                group.semester = current_semester()
-                group.year = current_year()
-                group.mode_created = StudentGroup.LTI
-
-                lms_url = self.lti_data.edx_lti_parameters.get(
-                    "tool_consumer_instance_guid"
-                )
-                if lms_url:
-                    (
-                        institutional_lms,
-                        created,
-                    ) = InstitutionalLMS.objects.get_or_create(url=lms_url)
-                    if created:
-                        institution = Institution.objects.create(
-                            name=institutional_lms.url
-                        )
-                        institutional_lms.institution = institution
-
-                    group.institution = institutional_lms.institution
-
-                # since teachers do not necessarily set discipline for
-                # themselves, take discipline of first question seen
-                # by this group and set for group
-                if self.question.discipline:
-                    group.discipline = self.question.discipline
-                group.save()
-
-            # If this user is a student, add group to student
-            if hasattr(self.request.user, "student"):
-                if group not in self.request.user.student.groups.all():
-                    self.request.user.student.join_group(group=group)
-
-            # Create StudentGroupAssignment instance, if none exist
-            if not StudentGroupAssignment.objects.filter(
-                group=group,
-                assignment=self.assignment,
-            ).exists():
-                StudentGroupAssignment.objects.create(
-                    group=group,
-                    assignment=self.assignment,
-                )
-
-            # If teacher_id specified, add teacher to group
-            teacher_hash = self.lti_data.edx_lti_parameters.get(
-                "custom_teacher_id"
-            )
-            if teacher_hash is not None:
-                teacher = Teacher.get(teacher_hash)
-                if teacher not in group.teacher.all():
-                    group.teacher.add(teacher)
-                    teacher.current_groups.add(group)
-                    teacher.save()
 
     def submission_error(self):
         messages.error(
@@ -1698,6 +1573,8 @@ def question(request, assignment_id, question_id):
 
     if "LTI" in request.session.get("_auth_user_backend"):
         request.session["LTI"] = True
+        manage_LTI_studentgroup(request=request)
+
     session_data = {k: v for k, v in request.session.items()}
     logger_auth.info(f"Session data for question view : {session_data}")
 
@@ -1723,9 +1600,6 @@ def question(request, assignment_id, question_id):
         "answer_choices": question.get_choices(),
         "custom_key": custom_key,
         "stage_data": stage_data,
-        "lti_data": get_object_or_none(
-            LtiUserData, user=request.user, custom_key=custom_key
-        ),
         "answer": models.Answer.objects.filter(
             assignment=assignment,
             question=question,

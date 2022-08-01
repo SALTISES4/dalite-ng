@@ -48,7 +48,6 @@ INSTALLED_APPS = (
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_lti_tool_provider",
     "django_celery_beat",
     "compressor",
     "analytical",
@@ -495,11 +494,6 @@ LOGGING = {
         "tos-models": {
             "handlers": ["tos_file_log", "tos_console_log"],
             "level": "INFO",
-            "propagate": True,
-        },
-        "django_lti_tool_provider.views": {
-            "handlers": ["file_debug_log"],
-            "level": "DEBUG",
             "propagate": True,
         },
         "teacher_activity": {

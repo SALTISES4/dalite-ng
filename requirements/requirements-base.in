@@ -23,6 +23,7 @@ django < 3.0.0
 django-lti-provider
 djangorestframework >= 3.11.2  # Reqd by safety
 edx-opaque-keys
+jsonfield # required in peerinst migration 0041
 lxml >= 4.6.2  # Reqd by safety
 mysqlclient
 packaging
@@ -37,5 +38,4 @@ requests
 SALTISE_course_flow == 0.7.3
 SALTISE_user_feedback >= 1.1.1
 
--e git+https://github.com/SALTISES4/django-lti-tool-provider@master#egg=django-lti-tool-provider
 -e git+https://github.com/SALTISES4/pinax-forums@dev#egg=pinax_forums
