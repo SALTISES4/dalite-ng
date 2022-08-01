@@ -25,7 +25,7 @@ django-tinymce
 django < 3.0.0
 django-lti-provider
 djangorestframework >= 3.11.2  # Reqd by safety
-edx-opaque-keys
+jsonfield # required by peerinst migration 0041
 langdetect
 lxml >= 4.6.2  # Reqd by safety
 mysqlclient

@@ -231,6 +231,7 @@ django==2.2.28
     #   django-sslserver
     #   django-timezone-field
     #   djangorestframework
+    #   jsonfield
     #   pinax-forums
     #   saltise-course-flow
     #   saltise-user-feedback
@@ -347,10 +348,6 @@ editdistance==0.5.3
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   contextualspellcheck
-edx-opaque-keys==2.3.0
-    # via
-    #   -r requirements/requirements-base.txt
-    #   -r requirements/requirements-test.txt
 elasticsearch==7.13.1
     # via
     #   -r requirements/requirements-base.txt
@@ -465,6 +462,10 @@ joblib==1.1.0
     #   alt-profanity-check
     #   sacremoses
     #   scikit-learn
+jsonfield==3.1.0
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-test.txt
 kombu==5.2.3
     # via
     #   -r requirements/requirements-base.txt
@@ -576,10 +577,7 @@ pathy==0.6.0
     #   -r requirements/requirements-test.txt
     #   spacy
 pbr==5.4.4
-    # via
-    #   -r requirements/requirements-base.txt
-    #   -r requirements/requirements-test.txt
-    #   stevedore
+    # via stevedore
 pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
@@ -657,11 +655,6 @@ pylti==0.7.0
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   django-lti-provider
-pymongo==3.10.1
-    # via
-    #   -r requirements/requirements-base.txt
-    #   -r requirements/requirements-test.txt
-    #   edx-opaque-keys
 pynliner==0.8.0
     # via
     #   -r requirements/requirements-base.txt
@@ -865,11 +858,7 @@ srsly==2.4.1
     #   spacy
     #   thinc
 stevedore==1.32.0
-    # via
-    #   -r requirements/requirements-base.txt
-    #   -r requirements/requirements-test.txt
-    #   bandit
-    #   edx-opaque-keys
+    # via bandit
 text-unidecode==1.2
     # via
     #   -r requirements/requirements-test.txt
