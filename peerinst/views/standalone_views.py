@@ -107,6 +107,8 @@ def live(request, token, assignment_hash):
 
         # Register access type
         request.session["LTI"] = False
+    else:
+        user = request.user
 
     # Get assignment for this token and current question
     group_assignment = StudentGroupAssignment.get(assignment_hash)
