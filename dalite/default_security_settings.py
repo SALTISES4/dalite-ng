@@ -47,5 +47,4 @@ PERMISSIONS_POLICY = {
     "usb": [],
 }
 
-# django-referrer-policy
-REFERRER_POLICY = "strict-origin-when-cross-origin"
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"

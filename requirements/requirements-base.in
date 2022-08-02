@@ -19,7 +19,6 @@ django-htmlmin
 django-inlinecss
 django-ipware == 2.1.0  # Temporary pin awaiting django-axes fix
 django-permissions-policy
-django-referrer-policy
 django-samesite-none
 django-tinymce
 django < 3.1

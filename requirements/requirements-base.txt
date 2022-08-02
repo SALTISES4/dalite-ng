@@ -245,7 +245,6 @@ django==3.0.14 \
     #   django-model-utils
     #   django-permissions-policy
     #   django-redis
-    #   django-referrer-policy
     #   django-timezone-field
     #   djangorestframework
     #   jsonfield
@@ -328,9 +327,6 @@ django-redis==5.2.0 \
     --hash=sha256:1d037dc02b11ad7aa11f655d26dac3fb1af32630f61ef4428860a2e29ff92026 \
     --hash=sha256:8a99e5582c79f894168f5865c52bd921213253b7fd64d16733ae4591564465de
     # via saltise-course-flow
-django-referrer-policy==1.0 \
-    --hash=sha256:09e134324fa08c10efc12244a4bae7aee5defa7d332b92c603b09258c854615a
-    # via -r requirements/requirements-base.in
 django-samesite-none==0.0.2 \
     --hash=sha256:340fcc2ef83226896261a2f7b1d216124408bdad7959e166b3e697b33f61a709 \
     --hash=sha256:57863ff8e5ff081e93543dbf2b5382f4b26b8a7e1b6850909649f6701ef3a115
