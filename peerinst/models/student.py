@@ -435,7 +435,7 @@ class StudentAssignment(models.Model):
         """
         err = None
 
-        if not self.student.student.email.endswith("localhost"):
+        if self.group_assignment.group.mode_created == StudentGroup.STANDALONE:
 
             username = self.student.student.username
             user_email = self.student.student.email
