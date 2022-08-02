@@ -52,7 +52,6 @@ INSTALLED_APPS = (
     "django_celery_beat",
     "compressor",
     "analytical",
-    "pinax.forums",
     "axes",
     "django_inlinecss",
 )
@@ -71,7 +70,6 @@ MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "peerinst.middleware.NotificationMiddleware",
     "dalite.custom_middleware.resp_405_middleware",
     "dalite.custom_middleware.resp_503_middleware",
     # Minify html

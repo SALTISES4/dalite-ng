@@ -641,11 +641,6 @@ def teacher_patterns():
             name="teacher-dashboard--collections",
         ),
         path(
-            "teacher/dashboard/messages/",
-            views.teacher.messages,
-            name="teacher-dashboard--messages",
-        ),
-        path(
             "teacher/dashboard/dalite-messages/",
             views.teacher.dalite_messages,
             name="teacher-dashboard--dalite-messages",
@@ -654,16 +649,6 @@ def teacher_patterns():
             "teacher/dashboard/dalite-messages/remove",
             views.teacher.remove_dalite_message,
             name="teacher-dashboard--dalite-messages--remove",
-        ),
-        path(
-            "teacher/dashboard/messages/read",
-            views.teacher.mark_message_read,
-            name="teacher-dashboard--messages--read",
-        ),
-        path(
-            "teacher/dashboard/unsubscribe-thread/",
-            views.teacher.unsubscribe_from_thread,
-            name="teacher-dashboard--unsubscribe-thread",
         ),
         path(
             "teacher/gradebook/request/",

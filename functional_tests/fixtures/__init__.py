@@ -6,8 +6,6 @@ __all__ = [
     "browser",
     "category",
     "discipline",
-    "forum",
-    "forums",
     "group",
     "inactive_user",
     "institution",
@@ -32,7 +30,6 @@ __all__ = [
 ]
 
 from .emails_ import mail_outbox
-from .forums_ import forum, forums
 from .peerinst_ import (
     admin,
     assignment,

@@ -40,5 +40,3 @@ requests
 
 SALTISE_course_flow == 0.7.3
 SALTISE_user_feedback >= 1.1.1
-
--e git+https://github.com/SALTISES4/pinax-forums@dev#egg=pinax_forums
