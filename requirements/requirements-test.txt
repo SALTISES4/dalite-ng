@@ -374,9 +374,6 @@ django-elasticsearch-dsl==7.2.0 \
     --hash=sha256:865f9f0d6aa24c923c2cc791b35f608c85cfe766edc8920d00854ced452c326a \
     --hash=sha256:f9163ffe314a0562f00789d34cc923332e1d51236bf7d5a38bfa8ea72399ceac
     # via -r requirements/requirements-base.txt
-django-grappelli==2.14.1 \
-    --hash=sha256:1ac962129025bec8cca4647c87d2a538ddb4d481cb218b88042d676d1c726825
-    # via -r requirements/requirements-base.txt
 django-htmlmin==0.11.0 \
     --hash=sha256:e41b2a2157570846645cc636a9bddde8aa3e03f6834a9211e61a17f2ed42b87e
     # via -r requirements/requirements-base.txt
@@ -1356,7 +1353,6 @@ six==1.15.0 \
     #   django-classy-tags
     #   django-compressor
     #   django-elasticsearch-dsl
-    #   django-grappelli
     #   elasticsearch-dsl
     #   faker
     #   html5lib

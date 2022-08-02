@@ -10,6 +10,7 @@ SECURE_HSTS_SECONDS = 183 * 24 * 60 * 60  # 6-month default
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 # Sample Django-CSP settings
 CSP_BASE_URI = ["'none'"]
@@ -46,5 +47,3 @@ PERMISSIONS_POLICY = {
     "payment": [],
     "usb": [],
 }
-
-SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"

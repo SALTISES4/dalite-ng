@@ -228,8 +228,6 @@ AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = datetime.timedelta(minutes=5)
 AXES_LOCKOUT_TEMPLATE = "registration/lockout.html"
 
-GRAPPELLI_ADMIN_TITLE = "Dalite NG administration"
-
 # LTI integration
 # these are sensitive settings, so it is better to fail early than use some
 # defaults visible on public repo

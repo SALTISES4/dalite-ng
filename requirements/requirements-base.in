@@ -14,7 +14,6 @@ django-cookie-law
 django-csp
 django-decorator-include
 django-elasticsearch-dsl
-django-grappelli
 django-htmlmin
 django-inlinecss
 django-ipware == 2.1.0  # Temporary pin awaiting django-axes fix

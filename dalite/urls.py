@@ -94,7 +94,6 @@ urlpatterns += i18n_patterns(
             ]
         ),
     ),
-    path("grappelli/", include("grappelli.urls")),
     path(
         r"admin_index_wrapper/",
         views.admin_index_wrapper,
