@@ -92,17 +92,21 @@ def signup_through_link(request, group_hash):
 @require_safe
 def live(request, token, assignment_hash):
 
-    # Call logout to ensure a clean session
-    logout(request)
+    if "LTI" not in request.session.get("_auth_user_backend"):
 
-    # Login through token
-    user, __ = authenticate_student(request, token)
-    if isinstance(user, HttpResponse):
-        return user
-    login(request, user, backend="peerinst.backends.CustomPermissionsBackend")
+        # Call logout to ensure a clean session
+        logout(request)
 
-    # Register access type
-    request.session["LTI"] = False
+        # Login through token
+        user, __ = authenticate_student(request, token)
+        if isinstance(user, HttpResponse):
+            return user
+        login(
+            request, user, backend="peerinst.backends.CustomPermissionsBackend"
+        )
+
+        # Register access type
+        request.session["LTI"] = False
 
     # Get assignment for this token and current question
     group_assignment = StudentGroupAssignment.get(assignment_hash)
