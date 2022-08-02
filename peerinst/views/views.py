@@ -36,7 +36,7 @@ from django.utils import timezone
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_safe
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView, View
@@ -954,8 +954,8 @@ class QuestionMixin:
                 body=xml,
             )
             logger_auth.info(
-                f"Grade of {self.answer.grade} posted for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_outcome_service_url(self.request)}"
-            )  # noqa
+                f"Grade of {self.answer.grade} posted for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_outcome_service_url(self.request)}"  # noqa
+            )
 
 
 class QuestionReload(Exception):
@@ -1564,7 +1564,7 @@ def redirect_to_login_or_show_cookie_help(request):
     the HTTP Referer header is set. This isn't entirely accurate, but should
     be good enough.
     """
-    if request.META.get("HTTP_REFERER"):
+    if request.headers.get("Referer"):
         # We probably got here from within the LMS, and the user has
         # third-party cookies disabled, so we show help on enabling cookies for
         # this site.
@@ -1639,8 +1639,8 @@ def question(request, assignment_id, question_id):
         stage_class = QuestionStartView
 
     logger_auth.info(
-        f"LTI access for {user_token} to assignment {assignment} and question {question} dispatched to {stage_class}"
-    )  # noqa
+        f"LTI access for {user_token} to assignment {assignment} and question {question} dispatched to {stage_class}"  # noqa
+    )
     # Delegate to the view
     stage = stage_class(**view_data)
     try:

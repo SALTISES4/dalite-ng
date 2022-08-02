@@ -14,4 +14,3 @@ pytest-django
 pytest-mock
 pytest-rerunfailures
 safety
--e git+https://github.com/jsumnerPhD/http-observatory#egg=httpobs

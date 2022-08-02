@@ -6,10 +6,6 @@
 #
 --index-url https://pypi.python.org/simple
 
-# WARNING: pip install will require the following package to be hashed.
-# Consider using a hashable URL like https://github.com/jazzband/pip-tools/archive/SOMECOMMIT.zip
--e git+https://github.com/jsumnerPhD/http-observatory#egg=httpobs
-    # via -r requirements/requirements-dev.in
 aioredis==1.3.1 \
     --hash=sha256:15f8af30b044c771aee6787e5ec24694c048184c7b9e54c3b60c750a4b93273a \
     --hash=sha256:b61808d7e97b7cd5a92ed574937a079c9387fdadd22bfbfa7ad2fd319ecc26e3
@@ -37,15 +33,16 @@ appnope==0.1.3 \
     --hash=sha256:02bd91c4de869fbb1e1c50aafc4098827a7a54ab2f39d9dcba6c9547ed920e24 \
     --hash=sha256:265a455292d0bd8a72453494fa24df5a11eb18373a60c7c0430889f22548605e
     # via ipython
-asgiref==3.2.10 \
-    --hash=sha256:7e51911ee147dd685c3c8b805c0ad0cb58d360987b56953878f8c06d2d1c6f1a \
-    --hash=sha256:9fc6fb5d39b8af147ba40765234fa822b39818b12cc80b35ad9b0cef3a476aed
+asgiref==3.5.2 \
+    --hash=sha256:1d2880b792ae8757289136f1db2b7b99100ce959b2aa57fd69dab783d05afac4 \
+    --hash=sha256:4a29362a6acebe09bf1d6640db38c1dc3d9217c68e6f9f6204d72667fc19a424
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   channels
     #   channels-redis
     #   daphne
+    #   django
     #   saltise-course-flow
 async-timeout==3.0.1 \
     --hash=sha256:0c3c816a028d47f659d6ff5c745cb2acf1f966da1fe5c19c77a70282b25f4c5f \
@@ -94,7 +91,6 @@ beautifulsoup4==4.8.2 \
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   django-htmlmin
-    #   httpobs
     #   pynliner
 better-profanity==0.7.0 \
     --hash=sha256:8a6fdc8606d7471e7b5f6801917eca98ec211098262e82f62da4f5de3a73145b \
@@ -177,7 +173,6 @@ celery[redis]==5.2.3 \
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
     #   django-celery-beat
-    #   httpobs
     #   pytest-celery
     #   saltise-course-flow
 certifi==2019.11.28 \
@@ -396,9 +391,9 @@ distlib==0.3.2 \
     --hash=sha256:106fef6dc37dd8c0e2c0a60d3fca3e77460a48907f335fa28420463a6f799736 \
     --hash=sha256:23e223426b28491b1ced97dc3bbe183027419dfc7982b4fa2f05d5f3ff10711c
     # via virtualenv
-django==2.2.28 \
-    --hash=sha256:0200b657afbf1bc08003845ddda053c7641b9b24951e52acd51f6abda33a7413 \
-    --hash=sha256:365429d07c1336eb42ba15aa79f45e1c13a0b04d5c21569e7d596696418a6a45
+django==3.0.14 \
+    --hash=sha256:9bc7aa619ed878fedba62ce139abe663a147dccfd20e907725ec11e02a1ca225 \
+    --hash=sha256:d58d8394036db75a81896037d757357e79406e8f68816c3e8a28721c1d9d4c11
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
@@ -1288,10 +1283,6 @@ ptyprocess==0.6.0 \
     --hash=sha256:923f299cc5ad920c68f2bc0bc98b75b9f838b93b599941a6b63ddbc2476394c0 \
     --hash=sha256:d7cc528d76e76342423ca640335bd3633420dc1366f258cb31d05e865ef5ca1f
     # via pexpect
-publicsuffixlist==0.6.12 \
-    --hash=sha256:3fd5b10fe464b5322f065f30826b94755fcf58f0c8682580a61fa4bbd86ce401 \
-    --hash=sha256:f8f4e5925564f0711044e64362022b49450e9d3bcfdd4d08b83e2d53137e151e
-    # via httpobs
 py==1.10.0 \
     --hash=sha256:21b81bda15b66ef5e1a777a21c4dcd9c20ad3efd0b3f817e7a809035269e1bd3 \
     --hash=sha256:3b80836aa6d1feeaa108e046da6423ab8f6ceda6468545ae8d02d9d58d18818a
@@ -1581,7 +1572,6 @@ requests==2.28.0 \
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
-    #   httpobs
     #   huggingface-hub
     #   safety
     #   spacy
@@ -1646,13 +1636,13 @@ safety==2.0.0 \
     --hash=sha256:77cebdd128ce47b941e68a1b3bbc29fbbd2b9e98d11f179c5def64c1d05da295 \
     --hash=sha256:d739d00a9e4203cfaba34540c822a73ca1d327159ed7776b3dce09391f81c35d
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.7.3 \
-    --hash=sha256:adceb1a6616f86e778772eb656d1937ed72c8c9b9385f83e315d6b44f1b472ed
+saltise-course-flow==0.7.5 \
+    --hash=sha256:cc1d6984c1e876633feee1c0d6631a2ce7ad7218b131eb6427700eebc806f7c4
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt
-saltise-user-feedback==1.1.1 \
-    --hash=sha256:4fb35db0e6431d5be6616c95d6130323c87edc02cfc7e212150b20e85c110d98
+saltise-user-feedback==1.1.2 \
+    --hash=sha256:c57647cb83ab8bcee43f2ddc5db586f5fc20db3fb9f7a6a09b9be01de2005303
     # via
     #   -r requirements/requirements-base.txt
     #   -r requirements/requirements-test.txt

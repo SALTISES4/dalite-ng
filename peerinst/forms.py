@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.db.models import Count, Q
 from django.forms import ModelForm
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from tinymce.widgets import TinyMCE
 
 from peerinst.templatetags.bleach_html import STRICT_TAGS

@@ -22,7 +22,7 @@ django-permissions-policy
 django-referrer-policy
 django-samesite-none
 django-tinymce
-django < 3.0.0
+django < 3.1
 django-lti-provider
 djangorestframework >= 3.11.2  # Reqd by safety
 jsonfield # required by peerinst migration 0041
@@ -38,5 +38,5 @@ python-memcached == 1.59
 pytz
 requests
 
-SALTISE_course_flow == 0.7.3
-SALTISE_user_feedback >= 1.1.1
+SALTISE_course_flow == 0.7.5
+SALTISE_user_feedback

@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils.translation import ugettext
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST, require_safe
 
 from dalite.views.errors import response_400, response_403
@@ -324,7 +324,7 @@ def get_context_data_index_page(req, student, new_student):
             {
                 "link": notification.link,
                 "icon": notification.notification.icon,
-                "text": ugettext(notification.text),
+                "text": gettext(notification.text),
                 "pk": notification.pk,
             }
             for notification in student.notifications.order_by("-created_on")
@@ -343,40 +343,40 @@ def get_context_data_index_page(req, student, new_student):
             ),
         },
         "translations": {
-            "assignment_about_to_expire": ugettext(
+            "assignment_about_to_expire": gettext(
                 "This assignment is about to expire"
             ),
-            "assignment_expired": ugettext("Past due date"),
-            "cancel": ugettext("Cancel"),
-            "course_flow_button": ugettext("Visit this group's CourseFlow"),
-            "completed": ugettext("Completed"),
-            "day": ugettext("day"),
-            "days": ugettext("days"),
-            "due_on": ugettext("Due on"),
-            "edit_student_id": ugettext("Edit student id"),
-            "expired": ugettext("Expired"),
-            "go_to_assignment": ugettext("Go to assignment"),
-            "grade": ugettext("Grade"),
-            "hour": ugettext("hour"),
-            "hours": ugettext("hours"),
-            "leave": ugettext("Leave"),
-            "leave_group_question": ugettext("Are you sure?"),
-            "leave_group_text": ugettext(
+            "assignment_expired": gettext("Past due date"),
+            "cancel": gettext("Cancel"),
+            "course_flow_button": gettext("Visit this group's CourseFlow"),
+            "completed": gettext("Completed"),
+            "day": gettext("day"),
+            "days": gettext("days"),
+            "due_on": gettext("Due on"),
+            "edit_student_id": gettext("Edit student id"),
+            "expired": gettext("Expired"),
+            "go_to_assignment": gettext("Go to assignment"),
+            "grade": gettext("Grade"),
+            "hour": gettext("hour"),
+            "hours": gettext("hours"),
+            "leave": gettext("Leave"),
+            "leave_group_question": gettext("Are you sure?"),
+            "leave_group_text": gettext(
                 "This will remove you from the group. All your answers will "
                 "be saved, but you won't appear as a member of the group to "
                 "your teacher.  "
             ),
-            "leave_group_title": ugettext("Leave group"),
-            "minute": ugettext("minute"),
-            "minutes": ugettext("minutes"),
-            "no_assignments": ugettext("No assignments yet"),
-            "notifications_bell": ugettext(
+            "leave_group_title": gettext("Leave group"),
+            "minute": gettext("minute"),
+            "minutes": gettext("minutes"),
+            "no_assignments": gettext("No assignments yet"),
+            "notifications_bell": gettext(
                 "Toggle email reminders for this group"
             ),
-            "not_sharing": ugettext("Not sharing"),
-            "sharing": ugettext("Sharing"),
-            "student_id": ugettext("Student id"),
-            "student_id_needed": ugettext(
+            "not_sharing": gettext("Not sharing"),
+            "sharing": gettext("Sharing"),
+            "student_id": gettext("Student id"),
+            "student_id_needed": gettext(
                 "You need to add your school's student id to do assignments "
                 "for this group."
             ),
@@ -812,7 +812,7 @@ def get_notifications(req, student):
             {
                 "link": notification.link,
                 "icon": notification.notification.icon,
-                "text": ugettext(notification.text),
+                "text": gettext(notification.text),
                 "pk": notification.pk,
             }
             for notification in student.notifications.order_by("-created_on")

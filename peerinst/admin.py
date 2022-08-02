@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core import exceptions
 from django.urls import reverse
 from django.utils.html import escape, format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from . import models
 from .models import (
