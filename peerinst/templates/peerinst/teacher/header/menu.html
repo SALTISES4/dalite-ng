@@ -51,23 +51,6 @@
         </i>
         {% trans 'My account' %}
       </a>
-      {% if request.session.forum_notifications %}
-        <a class="mdc-list-item" href="{% url 'pinax_forums:thread_updates' %}">
-          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-            aria-hidden="true">
-            help
-          </i>
-          {% trans 'Forums' %}<span class="mdc-theme--primary new-feature">{% trans 'New!' %}</span>
-        </a>
-      {% else %}
-        <a class="mdc-list-item" href="{% url 'pinax_forums:forums' %}">
-          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-            aria-hidden="true">
-            help
-          </i>
-          {% trans 'Forums' %}
-        </a>
-      {% endif %}
       <a class="mdc-list-item" href="{% url 'course_flow:home' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
           aria-hidden="true">
