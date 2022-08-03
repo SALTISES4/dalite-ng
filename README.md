@@ -329,23 +329,6 @@ with Dalite.
 
 # Release notes
 
-## v0.0.2 (released at 2016-05-02)
-
-A backward-incompatible change have been introduced in this version, this change allows
-users to run dalite on mysql 5.5, which has maximal key length of 767 bytes.
-
-If you have a running dalite instance, you'll need to run following command manually
-(this command assumes dalite uses schema  `dalite_ng`):
-
-     ALTER TABLE `dalite_ng`.`django_lti_tool_provider_ltiuserdata`
-     CHANGE COLUMN `custom_key` `custom_key` VARCHAR(190) NOT NULL ;
-
-Before running that command check that no row in
-`django_lti_tool_provider_ltiuserdata` table contains more than
-190 characters. You can the use following query:
-
-     SELECT MAX(char_length(custom_key)) FROM django_lti_tool_provider_ltiuserdata;
-
 
 Attributions
 ------------

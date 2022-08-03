@@ -162,7 +162,7 @@ def old_patterns():
         ),
         path(
             "live/navigate/<assignment_id>/<question_id>/<direction>/<index>",  # noqa
-            views.navigate_assignment,
+            lti_access_allowed(views.navigate_assignment),
             name="navigate-assignment",
         ),
         path(
@@ -374,10 +374,20 @@ def student_patterns():
     return [
         path(
             "assignment-complete/",
-            views.finish_assignment,
+            lti_access_allowed(views.finish_assignment),
             name="finish-assignment",
         ),
         path("student/", views.student.index_page, name="student-page"),
+        path(
+            "lti/student_lti/",
+            lti_access_allowed(views.student.index_page_LTI),
+            name="student-page-LTI",
+        ),
+        path(
+            "lti/student_lti/<assignment_id>/<question_id>/",
+            lti_access_allowed(views.question),
+            name="question-LTI",
+        ),
         path(
             "student/join-group/",
             views.student.join_group,

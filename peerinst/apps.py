@@ -16,14 +16,10 @@ class PeerinstConfig(AppConfig):
     ]
 
     def ready(self):
-        from django_lti_tool_provider.views import LTIView  # noqa
 
         import peerinst.signals  # noqa
 
-        from .lti import ApplicationHookManager  # noqa
         from .scheduled import start_scheduled_events
-
-        LTIView.register_authentication_manager(ApplicationHookManager())
 
         try:
             start_scheduled_events()

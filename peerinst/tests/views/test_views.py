@@ -9,8 +9,6 @@ import pytz
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
-from django_lti_tool_provider.models import LtiUserData
-from django_lti_tool_provider.views import LTIView
 
 from peerinst.forms import SignUpForm
 from peerinst.models import (
@@ -96,10 +94,7 @@ class QuestionViewTestCase(TestCase):
         )
         self.add_user_to_even_answers()
         self.addCleanup(mock.patch.stopall)
-        signal_patcher = mock.patch(
-            "django_lti_tool_provider.signals.Signals.Grade.updated.send"
-        )
-        self.mock_send_grade_signal = signal_patcher.start()
+
         grade_patcher = mock.patch(
             "peerinst.models.Answer.grade", new_callable=mock.PropertyMock
         )
@@ -160,9 +155,7 @@ class QuestionViewTestCase(TestCase):
         lti_params["lis_person_contact_email_primary"] = user.email
         lti_params["custom_assignment_id"] = str(self.assignment.pk)
         lti_params["custom_question_id"] = str(self.question.pk)
-        LtiUserData.store_lti_parameters(
-            user, LTIView.authentication_manager, lti_params
-        )
+
         self.client.login(username=user.username, password=password or "test")
 
     def question_get(self):
@@ -185,17 +178,6 @@ class QuestionViewTestCase(TestCase):
 
 
 class QuestionViewTest(QuestionViewTestCase):
-    def assert_grade_signal(self, grade=Grade.INCORRECT):
-        send = mock.call(
-            "peerinst.views.views",
-            user=self.user,
-            custom_key=self.custom_key,
-            grade=grade,
-        )
-        self.assertEqual(
-            self.mock_send_grade_signal.call_args_list, [send] * 2
-        )
-
     def run_standard_review_mode_extra_rationales(self):
         response = self.question_get()
         self.assertTemplateUsed(response, "peerinst/question/start.html")
@@ -432,7 +414,6 @@ class QuestionViewTest(QuestionViewTestCase):
         """Test answering questions in default mode, with scoring enabled."""
         self.mock_grade.return_value = Grade.INCORRECT
         self.run_standard_review_mode()
-        self.assert_grade_signal()
         self.assertTrue(self.mock_grade.called)
 
     def test_standard_review_mode_extra_rationales(self):
@@ -449,7 +430,6 @@ class QuestionViewTest(QuestionViewTestCase):
         )
         self.mock_grade.return_value = Grade.INCORRECT
         self.run_standard_review_mode_extra_rationales()
-        self.assert_grade_signal()
         self.assertTrue(self.mock_grade.called)
 
     def test_numeric_answer_labels(self):
@@ -478,7 +458,6 @@ class QuestionViewTest(QuestionViewTestCase):
         """Test answering questions in default mode, with scoring disabled."""
         self.log_in_with_scoring_disabled()
         self.run_standard_review_mode()
-        self.assertFalse(self.mock_send_grade_signal.called)
         self.assertTrue(
             self.mock_grade.called
         )  # "emit_check_events" still uses "grade" to obtain grade data
@@ -594,122 +573,7 @@ class QuestionViewTest(QuestionViewTestCase):
             except ShownRationale.DoesNotExist:
                 assert False
 
-        self.assert_grade_signal()
         self.assertTrue(self.mock_grade.called)
-
-
-@ddt.ddt
-class EventLogTest(QuestionViewTestCase):
-    def verify_event(
-        self, logger, scoring_disabled=False, is_edx_course_id=True
-    ):
-        self.assertTrue(logger.info.called)
-        event = json.loads(logger.info.call_args[0][0])
-        self.assertEqual(event["context"]["course_id"], self.COURSE_ID)
-        self.assertEqual(
-            event["context"]["module"]["usage_key"],
-            None if scoring_disabled else self.USAGE_ID,
-        )
-        if is_edx_course_id:
-            self.assertEqual(event["context"]["org_id"], self.ORG)
-        else:
-            self.assertIsNone(event["context"].get("org_id"))
-        self.assertEqual(event["event"]["assignment_id"], self.assignment.pk)
-        self.assertEqual(event["event"]["question_id"], self.question.pk)
-        self.assertEqual(event["username"], self.user.username)
-        if scoring_disabled:
-            self.assertIsNone(event["event"].get("grade"))
-            self.assertIsNone(event["event"].get("max_grade"))
-        return event
-
-    def _test_events(
-        self,
-        logger,
-        scoring_disabled=False,
-        grade=Grade.CORRECT,
-        is_edx_course_id=True,
-    ):
-        # Show the question and verify the logged event.
-        self.question_get()
-        event = self.verify_event(
-            logger,
-            scoring_disabled=scoring_disabled,
-            is_edx_course_id=is_edx_course_id,
-        )
-        lti_event = LtiEvent.objects.create(
-            event_type=event["event_type"], event_log=event
-        )
-        self.assertEqual(event["event_type"], "problem_show")
-        self.assertEqual(lti_event.event_type, "problem_show")
-        logger.reset_mock()
-
-        # Provide a first answer and a rationale, and verify the logged event.
-        self.question_post(
-            first_answer_choice=2,
-            rationale="My rationale text that meets minimum word requirement",
-        )
-        event = self.verify_event(
-            logger,
-            scoring_disabled=scoring_disabled,
-            is_edx_course_id=is_edx_course_id,
-        )
-        self.assertEqual(event["event_type"], "problem_check")
-        self.assertEqual(event["event"]["first_answer_choice"], 2)
-        self.assertEqual(event["event"]["success"], "correct")
-        self.assertEqual(
-            event["event"]["rationale"],
-            "My rationale text that meets minimum word requirement",
-        )
-        logger.reset_mock()
-
-        # Provide a first answer and a rationale.
-        # Select our own rationale and verify the logged event
-        self.question_post(second_answer_choice=2, rationale_choice_0="None")
-
-        # Select a rationale and verify the logged event
-        event = self.verify_event(
-            logger,
-            scoring_disabled=scoring_disabled,
-            is_edx_course_id=is_edx_course_id,
-        )
-        self.assertEqual(logger.info.call_count, 2)
-        self.assertEqual(event["event_type"], "save_problem_success")
-        self.assertEqual(
-            event["event"]["success"],
-            "correct" if grade == Grade.CORRECT else "incorrect",
-        )
-
-        if not scoring_disabled:
-            self.assertEqual(event["event"]["grade"], grade)
-            self.assertEqual(event["event"]["max_grade"], Grade.CORRECT)
-
-    @ddt.data(Grade.CORRECT, Grade.INCORRECT, Grade.PARTIAL)
-    @mock.patch("peerinst.views.views.LOGGER")
-    def test_events_scoring_enabled(self, grade, logger):
-        self.mock_grade.return_value = grade
-        self._test_events(logger, grade=grade)
-
-    @mock.patch("peerinst.views.views.LOGGER")
-    def test_events_scoring_disabled(self, logger):
-        self.log_in_with_scoring_disabled()
-        self._test_events(logger, scoring_disabled=True)
-
-    @mock.patch("peerinst.views.views.LOGGER")
-    def test_events_arbitrary_course_id(self, logger):
-        # Try using a non-edX compatible number as the course_id (just like
-        # Moodle does).
-        self.COURSE_ID = "504"
-        # This piece is edx-specific and cannot be extracted from an arbitrary
-        # non-edX course_id, so we expect this to be None.
-        self.ORG = None
-        # This is also edx-specific and cannot be extracted from non-edx
-        # callback URLs, so we expect this to be None.
-        self.USAGE_ID = None
-
-        lti_params = self.LTI_PARAMS.copy()
-        lti_params["context_id"] = self.COURSE_ID
-        self.log_in_with_lti(lti_params=lti_params)
-        self._test_events(logger, is_edx_course_id=False)
 
 
 def test_signup__get(client):
