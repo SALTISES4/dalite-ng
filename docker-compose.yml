@@ -52,8 +52,6 @@ services:
 
   test_app:
     image: mydalite
-    depends_on:
-      - live_app
     command: gunicorn dalite.wsgi:application --bind 0.0.0.0:8000
     environment:
       ALLOWED_HOST: nginx
@@ -126,7 +124,7 @@ services:
     build:
       context: .
       dockerfile: ./functional_tests/Dockerfile
-    command: pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s -x
+    command: python -Wa -m pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s -k test_question_answering
     depends_on:
       - selenium-hub
       - chrome

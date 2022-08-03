@@ -112,6 +112,8 @@ DATABASES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 # Caching
 CACHES = {
     "default": {
@@ -145,8 +147,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.8/topics/i18n/
-
 LANGUAGE_CODE = "en"
 LANGUAGES = (("fr", "FR"), ("en", "EN"))
 

@@ -301,9 +301,9 @@ ddt==1.2.2 \
     --hash=sha256:9f79cf234064cf9b43492b72da35c473de3f03163d37bd13cec5bd8d200dda6b \
     --hash=sha256:d94107babb0f01c8d69fd2651342c2f7ccaf1a5c3199b4cccba308aa2252453e
     # via -r requirements/requirements-test.in
-django==3.1.14 \
-    --hash=sha256:0fabc786489af16ad87a8c170ba9d42bfd23f7b699bd5ef05675864e8d012859 \
-    --hash=sha256:72a4a5a136a214c39cf016ccdd6b69e2aa08c7479c66d93f3a9b5e4bb9d8a347
+django==3.2.14 \
+    --hash=sha256:677182ba8b5b285a4e072f3ac17ceee6aff1b5ce77fd173cc5b6a2d3dc022fcf \
+    --hash=sha256:a8681e098fa60f7c33a4b628d6fcd3fe983a0939ff1301ecacac21d0b38bad56
     # via
     #   -r requirements/requirements-base.txt
     #   channels
@@ -335,11 +335,10 @@ django-appconf==1.0.3 \
     --hash=sha256:c98a7af40062e996b921f5962a1c4f3f0c979fa7885f7be4710cceb90ebe13a6
     # via
     #   -r requirements/requirements-base.txt
-    #   django-axes
     #   django-compressor
-django-axes==5.3.4 \
-    --hash=sha256:2e1a9bdadfa0ef3ed2347e3a6ba5ba1f0a5af4d4c070d4b5b3d8888a4c452ae0 \
-    --hash=sha256:d4d8b5bb9ce2cc2e1ff9f8c0ec80853abe52721ce90b4e4dc9497281ca20e600
+django-axes==5.36.0 \
+    --hash=sha256:466e6ed1affd0866c78f245ee658d2619f74250aca5856852d86e61dba400eda \
+    --hash=sha256:bac08a7047fde26ffb54813c971fd40eeadb4ecb8d342a6e47d53de666d1a792
     # via -r requirements/requirements-base.txt
 django-celery-beat==2.2.1 \
     --hash=sha256:97ae5eb309541551bdb07bf60cc57cadacf42a74287560ced2d2c06298620234 \
@@ -370,9 +369,9 @@ django-decorator-include==3.0 \
     --hash=sha256:18db98e0e48dbb3977ab79b5520dbf5ecbb35f0bced8e15ed62dc66762345856 \
     --hash=sha256:fe7a96afb23f66dcbc6227d3c48430e53cc5704eab30841ddb8bd940e5ea8a5a
     # via -r requirements/requirements-base.txt
-django-elasticsearch-dsl==7.2.0 \
-    --hash=sha256:865f9f0d6aa24c923c2cc791b35f608c85cfe766edc8920d00854ced452c326a \
-    --hash=sha256:f9163ffe314a0562f00789d34cc923332e1d51236bf7d5a38bfa8ea72399ceac
+django-elasticsearch-dsl==7.2.2 \
+    --hash=sha256:3c58a254a6318b169eb904d41d802924b99ea8e53ddc2c596ebba90506cf47fa \
+    --hash=sha256:811d3909b3387fd55c19d9bbcf0e9a9b234f085df3f8422d59e7519a5f733e0e
     # via -r requirements/requirements-base.txt
 django-htmlmin==0.11.0 \
     --hash=sha256:e41b2a2157570846645cc636a9bddde8aa3e03f6834a9211e61a17f2ed42b87e
@@ -381,8 +380,9 @@ django-inlinecss==0.3.0 \
     --hash=sha256:5a014278b017a07d9d0babe2bf1bc75a52e184fb0ed26e333e8ff0d8e777b9e2 \
     --hash=sha256:eddcb295a35fcddf4fce26f9c232c472a9283b954aaf084641d0718415bd694b
     # via -r requirements/requirements-base.txt
-django-ipware==2.1.0 \
-    --hash=sha256:a7c7a8fd019dbdc9c357e6e582f65034e897572fc79a7e467674efa8aef9d00b
+django-ipware==4.0.2 \
+    --hash=sha256:602a58325a4808bd19197fef2676a0b2da2df40d0ecf21be414b2ff48c72ad05 \
+    --hash=sha256:878dbb06a87e25550798e9ef3204ed70a200dd8b15e47dcef848cf08244f04c9
     # via
     #   -r requirements/requirements-base.txt
     #   django-axes
@@ -1641,6 +1641,7 @@ setuptools==59.6.0 \
     # via
     #   -r requirements/requirements-base.txt
     #   celery
+    #   django-axes
     #   spacy
     #   thinc
     #   zope-interface
