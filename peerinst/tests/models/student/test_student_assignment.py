@@ -34,16 +34,6 @@ def test_send_email__new_assignment(student_assignment):
     )
 
 
-def test_send_email__new_assignment_with_localhost(student_assignment):
-    student_assignment.student.student.email = "fake-email@localhost"
-    student_assignment.student.student.save()
-
-    err = student_assignment.send_email(mail_type="new_assignment")
-
-    assert err is None
-    assert not mail.outbox
-
-
 def test_send_email__assignment_updated(student_assignment):
     err = student_assignment.send_email(mail_type="assignment_updated")
 
@@ -55,16 +45,6 @@ def test_send_email__assignment_updated(student_assignment):
         student_assignment.group_assignment.assignment.title,
         student_assignment.group_assignment.group.title,
     )
-
-
-def test_send_email__assignment_updated_with_localhost(student_assignment):
-    student_assignment.student.student.email = "fake-email@localhost"
-    student_assignment.student.student.save()
-
-    err = student_assignment.send_email(mail_type="assignment_updated")
-
-    assert err is None
-    assert not mail.outbox
 
 
 def test_send_email__assignment_about_to_expire(student_assignment):
@@ -101,18 +81,6 @@ def test_send_email__assignment_about_to_expire_in_0_days(student_assignment):
         student_assignment.group_assignment.group.title,
         student_assignment.group_assignment.days_to_expiry,
     )
-
-
-def test_send_email__assignment_about_to_expire_with_localhost(
-    student_assignment,
-):
-    student_assignment.student.student.email = "fake-email@localhost"
-    student_assignment.student.student.save()
-
-    err = student_assignment.send_email(mail_type="assignment_about_to_expire")
-
-    assert err is None
-    assert not mail.outbox
 
 
 def test_send_email__wrong_type(student_assignment):
