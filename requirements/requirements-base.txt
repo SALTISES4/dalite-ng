@@ -225,9 +225,9 @@ daphne==3.0.1 \
     --hash=sha256:0052c9887600c57054a5867d4b0240159fa009faa3bcf6a1627271d9cdcb005a \
     --hash=sha256:c22b692707f514de9013651ecb687f2abe4f35cf6fe292ece634e9f1737bc7e3
     # via channels
-django==3.0.14 \
-    --hash=sha256:9bc7aa619ed878fedba62ce139abe663a147dccfd20e907725ec11e02a1ca225 \
-    --hash=sha256:d58d8394036db75a81896037d757357e79406e8f68816c3e8a28721c1d9d4c11
+django==3.1.14 \
+    --hash=sha256:0fabc786489af16ad87a8c170ba9d42bfd23f7b699bd5ef05675864e8d012859 \
+    --hash=sha256:72a4a5a136a214c39cf016ccdd6b69e2aa08c7479c66d93f3a9b5e4bb9d8a347
     # via
     #   -r requirements/../blink/requirements.in
     #   -r requirements/requirements-base.in

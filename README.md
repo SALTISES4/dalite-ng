@@ -36,7 +36,7 @@ Dalite NG is a Peer Instruction Tool for online learning platforms such as Open 
 
 5.  Run the Django development server.
 
-        $ ./manage.py runsslserver
+        $ python -X dev manage.py runserver
 
 6.  Add Sample Consent Form
 

@@ -984,24 +984,24 @@ class TeacherTest(TestCase):
         )
 
         response = self.client.get(
-            reverse("collection-update", args=str(q.pk))
+            reverse("collection-update", args=[str(q.pk)])
         )
         self.assertEqual(response.status_code, 403)
 
         response = self.client.get(
-            reverse("collection-distribute", args=str(q.pk))
+            reverse("collection-distribute", args=[str(q.pk)])
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, q.title)
 
         response = self.client.get(
-            reverse("collection-detail", args=str(q.pk))
+            reverse("collection-detail", args=[str(q.pk)])
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, q.title)
 
         response = self.client.get(
-            reverse("collection-delete", args=str(q.pk))
+            reverse("collection-delete", args=[str(q.pk)])
         )
         self.assertEqual(response.status_code, 403)
 
@@ -1023,7 +1023,7 @@ class TeacherTest(TestCase):
         )
 
         response = self.client.get(
-            reverse("collection-update", args=str(q.pk))
+            reverse("collection-update", args=[str(q.pk)])
         )
         self.assertEqual(response.status_code, 200)
 
@@ -1033,7 +1033,7 @@ class TeacherTest(TestCase):
         )
 
         response = self.client.get(
-            reverse("collection-delete", args=str(q.pk))
+            reverse("collection-delete", args=[str(q.pk)])
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(

@@ -20,7 +20,7 @@ django-ipware == 2.1.0  # Temporary pin awaiting django-axes fix
 django-permissions-policy
 django-samesite-none
 django-tinymce
-django < 3.1
+django < 3.2
 django-lti-provider
 djangorestframework >= 3.11.2  # Reqd by safety
 jsonfield # required by peerinst migration 0041

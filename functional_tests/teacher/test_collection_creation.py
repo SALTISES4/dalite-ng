@@ -51,7 +51,7 @@ def create_collection(browser, assert_, teacher):
 
     browser.find_element_by_id("id_title").send_keys(title)
     browser.find_element_by_id("id_description").send_keys(description)
-    Select(browser.find_element_by_id("id_discipline")).select_by_value("1")
+    Select(browser.find_element_by_id("id_discipline")).select_by_index(1)
     browser.find_element_by_id("id_private").click()
     # go to update view
     browser.find_element_by_id("id_create").click()
@@ -115,7 +115,7 @@ def create_collection(browser, assert_, teacher):
 
     browser.find_element_by_id("id_title").send_keys(title_update)
     browser.find_element_by_id("id_description").send_keys(description_update)
-    Select(browser.find_element_by_id("id_discipline")).select_by_value("1")
+    Select(browser.find_element_by_id("id_discipline")).select_by_index(1)
     browser.find_element_by_id("id_private").click()
     # update info, leave update view
     browser.find_element_by_id("id_update").click()
