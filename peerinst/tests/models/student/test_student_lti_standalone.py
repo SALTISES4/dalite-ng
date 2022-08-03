@@ -12,7 +12,7 @@ from peerinst.models import (
 from .fixtures import *
 
 
-def test_join_group_lti(django_assert_num_queries, student, group, assignment):
+def test_join_group_lti(student, group, assignment):
     group.mode_created = group.LTI
     group.save()
 
@@ -33,15 +33,6 @@ def test_join_group_lti(django_assert_num_queries, student, group, assignment):
     assert membership.send_emails is False
     assert StudentNotification.objects.filter(student=student).count() == 0
     assert not mail.outbox
-
-
-def test_not_send_email(student, group):
-    group.mode_created = StudentGroup.LTI_STANDALONE
-    group.save()
-    mail_types = ["new_group", "confirmation", "signin"]
-    for mail_type in mail_types:
-        _ = student.send_email(mail_type=mail_type, group=group)
-        assert len(mail.outbox) == 0
 
 
 def test_not_send_email_new_assignment(student, group, group_assignment):
