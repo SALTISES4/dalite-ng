@@ -32,7 +32,7 @@ class RealisticAnswerChoiceFactory(factory.django.DjangoModelFactory):
 
 @pytest.fixture
 def realistic_questions():
-    questions = [RealisticQuestionFactory() for i in range(20)]
+    questions = [RealisticQuestionFactory() for _ in range(20)]
     # Add answer choices
     for q in questions:
         [
@@ -60,7 +60,6 @@ def institution():
 
 @pytest.fixture
 def undistributed_assignment(assignment, group):
-    undistributed_assignment = StudentGroupAssignment.objects.create(
+    return StudentGroupAssignment.objects.create(
         assignment=assignment, group=group
     )
-    return undistributed_assignment

@@ -1,16 +1,9 @@
--r requirements-base.txt
 -r requirements-test.txt
 
-bandit
 black
 django-sslserver
 flake8
 ipython
 isort
 pre-commit
-pytest
-pytest-cov
-pytest-django
-pytest-mock
-pytest-rerunfailures
 safety

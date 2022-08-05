@@ -17,15 +17,17 @@ timeout = 3
 
 
 def create_assignment(browser, teacher, complete_questions):
-    try:
-        WebDriverWait(browser, timeout).until(
-            presence_of_element_located(
-                (By.XPATH, "//h2[contains(.,'Assignments')]")
-            )
-        ).click()
-    except TimeoutException:
-        assert False
-    browser.find_element_by_xpath("//span[contains(.,'Create new')]").click()
+    WebDriverWait(browser, timeout).until(
+        presence_of_element_located(
+            (By.XPATH, "//h2[contains(.,'Assignments')]")
+        )
+    ).click()
+
+    WebDriverWait(browser, timeout).until(
+        presence_of_element_located(
+            (By.XPATH, "//span[contains(.,'Create new')]")
+        )
+    ).click()
 
     try:
         identifier = WebDriverWait(browser, timeout).until(

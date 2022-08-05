@@ -358,7 +358,7 @@ def collection_add_assignment(request, teacher):
 
     student_group = get_object_or_404(StudentGroup, pk=group_pk)
 
-    title = (student_group.title + "'s curriculum")[:40]
+    title = (student_group.title + "'s curriculum ")[:40]
     description = (
         "This collection contains all assignments that have been assigned to "
         + student_group.title

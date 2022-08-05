@@ -2,6 +2,7 @@
 -r ../REST/requirements.in
 
 alt-profanity-check
+asgiref == 3.3.4 # Temporary pin [1]
 better-profanity
 bleach
 celery[redis]
@@ -22,7 +23,7 @@ django-tinymce
 django >=3.2, < 3.3
 django-lti-provider
 djangorestframework
-jsonfield # required by peerinst migration 0041
+jsonfield # Required by peerinst migration 0041
 langdetect
 mysqlclient
 pandas
@@ -35,3 +36,5 @@ requests
 
 SALTISE_course_flow == 0.7.5
 SALTISE_user_feedback
+
+# 1. https://stackoverflow.com/a/68553668

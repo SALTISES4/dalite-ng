@@ -33,7 +33,7 @@ RUN mkdir log
 RUN mkdir static
 COPY requirements ./requirements
 RUN python3 -m pip install --upgrade pip
-RUN pip3 install -r ./requirements/requirements-prod-aws.txt
+RUN pip3 install --no-deps -r ./requirements/requirements-prod-aws.txt
 COPY --from=static /code/analytics ./analytics
 COPY --from=static /code/blink ./blink
 COPY --from=static /code/dalite ./dalite

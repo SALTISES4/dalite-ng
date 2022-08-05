@@ -3,6 +3,8 @@
 #   `docker compose up`
 # To tear down (don't forget the -v to get rid of static folder):
 #   `docker compose down -v`
+# For a full clean of all images, etc.
+#   `docker system prune -a`
 # To watch Chrome tests:
 #   Open a VNC client
 #   Go to vnc://127.0.0.1:41960 and enter password "secret"
@@ -16,6 +18,7 @@
 services:
   live_app:
     image: mydalite
+    container_name: live_app
     build:
       context: .
     command: gunicorn dalite.wsgi:application --bind 0.0.0.0:8000
@@ -33,6 +36,7 @@ services:
 
   celery:
     image: mydalite
+    container_name: celery
     depends_on:
       - live_app
     command: celery -A dalite worker -l debug
@@ -49,9 +53,11 @@ services:
 
   redis:
     image: redis:5.0
+    container_name: redis
 
   test_app:
     image: mydalite
+    container_name: test_app
     command: gunicorn dalite.wsgi:application --bind 0.0.0.0:8000
     environment:
       ALLOWED_HOST: nginx
@@ -69,6 +75,7 @@ services:
 
   nginx:
     build: ./nginx
+    container_name: nginx
     ports:
       - 1337:8080
       - 1338:8081
@@ -78,44 +85,52 @@ services:
     volumes:
       - static:/static
 
-  # https://github.com/SeleniumHQ/docker-selenium
+  # https://github.com/SeleniumHQ/docker-selenium/blob/trunk/docker-compose-v3.yml
   selenium-hub:
-    image: selenium/hub:3.141.59-20200525
+    image: selenium/hub:4.2.0-20220527
     container_name: selenium-hub
     ports:
-      - 4444:4444
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
     depends_on:
       - test_app
     environment:
       - GRID_DEBUG=true
 
   chrome:
-    image: selenium/node-chrome-debug
+    image: selenium/node-chrome:4.2.0-20220527
+    container_name: chrome
+    shm_size: 2gb
     volumes:
       - /dev/shm:/dev/shm
     depends_on:
       - selenium-hub
     environment:
-      - HUB_HOST=selenium-hub
-      - HUB_PORT=4444
-      - NODE_MAX_INSTANCES=4
-      - NODE_MAX_SESSION=2
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_INSTANCES=4
+      - SE_NODE_MAX_SESSIONS=2
       - SCREEN_WIDTH=2732
       - SCREEN_HEIGHT=1536
     ports:
-      - 41960:5900
+      - "41960:5900"
 
   firefox:
-    image: selenium/node-firefox-debug
+    image: selenium/node-firefox:4.2.0-20220527
+    container_name: firefox
+    shm_size: 2gb
     volumes:
       - /dev/shm:/dev/shm
     depends_on:
       - selenium-hub
     environment:
-      - HUB_HOST=selenium-hub
-      - HUB_PORT=4444
-      - NODE_MAX_INSTANCES=4
-      - NODE_MAX_SESSION=2
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_INSTANCES=4
+      - SE_NODE_MAX_SESSIONS=2
       - SCREEN_WIDTH=2732
       - SCREEN_HEIGHT=1536
 
@@ -124,11 +139,10 @@ services:
     build:
       context: .
       dockerfile: ./functional_tests/Dockerfile
-    command: python -Wa -m pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s -k test_question_answering
+    container_name: test
+    command: python -Wa -m pytest functional_tests/ --create-db --ignore=node_modules/ -vvvv -s -x
     depends_on:
       - selenium-hub
-      - chrome
-      - firefox
     environment:
       ALLOWED_HOST: nginx
       DALITE_DB_HOST: ${HOST:-host.docker.internal}

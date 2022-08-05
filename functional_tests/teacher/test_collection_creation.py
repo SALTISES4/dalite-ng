@@ -13,7 +13,7 @@ from functional_tests.fixtures import *  # noqa
 from .utils import accept_cookies, login
 
 fake = Faker()
-timeout = 3
+timeout = 10
 
 
 def create_collection(browser, assert_, teacher):

@@ -15,7 +15,7 @@ from functional_tests.fixtures import *  # noqa
 from .utils import accept_cookies, go_to_account, login
 
 fake = Faker()
-timeout = 3
+timeout = 10
 
 
 def create_category(browser, assert_):
@@ -271,15 +271,17 @@ def create_PI_question(
 ):
     # Teacher can create a question
     # -----------------------------
-    try:
-        WebDriverWait(browser, timeout).until(
-            presence_of_element_located(
-                (By.XPATH, "//h2[contains(.,'Questions')]")
-            )
-        ).click()
-    except TimeoutException:
-        assert False
-    browser.find_element_by_xpath("//span[contains(.,'Create new')]").click()
+    WebDriverWait(browser, timeout).until(
+        presence_of_element_located(
+            (By.XPATH, "//h2[contains(.,'Questions')]")
+        )
+    ).click()
+
+    WebDriverWait(browser, timeout).until(
+        presence_of_element_located(
+            (By.XPATH, "//span[contains(.,'Create new')]")
+        )
+    ).click()
 
     # Step 1
     # ------
@@ -301,7 +303,7 @@ def create_PI_question(
     browser.switch_to.default_content()
 
     # Discipline
-    Select(browser.find_element_by_id("id_discipline")).select_by_value("1")
+    Select(browser.find_element_by_id("id_discipline")).select_by_index(1)
 
     # Category
     input_category = browser.find_element_by_id("autofill_categories")
@@ -625,30 +627,30 @@ def create_PI_question(
     assert "My Account" in browser.find_elements_by_tag_name("h1")[0].text
 
     # New question in their list of questions
-    try:
-        WebDriverWait(browser, timeout).until(
-            presence_of_element_located(
-                (By.XPATH, "//h2[contains(.,'Questions')]")
-            )
-        ).click()
-    except TimeoutException:
-        assert False
+    WebDriverWait(browser, timeout).until(
+        presence_of_element_located(
+            (By.XPATH, "//h2[contains(.,'Questions')]")
+        )
+    ).click()
+
     browser.wait_for(assert_(lambda: title in browser.page_source))
 
     # Check for question in assignment
-    try:
-        WebDriverWait(browser, timeout).until(
-            presence_of_element_located(
-                (By.XPATH, "//h2[contains(.,'Assignments')]")
-            )
-        ).click()
-    except TimeoutException:
-        assert False
-    browser.find_element_by_xpath(
-        f"//span[contains(.,'{assignment.identifier}')]"
+    WebDriverWait(browser, timeout).until(
+        presence_of_element_located(
+            (By.XPATH, "//h2[contains(.,'Assignments')]")
+        )
     ).click()
 
-    assert browser.find_element_by_xpath(f"//h2[contains(.,'{title}')]")
+    WebDriverWait(browser, timeout).until(
+        presence_of_element_located(
+            (By.XPATH, f"//span[contains(.,'{assignment.identifier}')]")
+        )
+    ).click()
+
+    assert WebDriverWait(browser, timeout).until(
+        presence_of_element_located((By.XPATH, f"//h2[contains(.,'{title}')]"))
+    )
 
 
 def edit_PI_question():
@@ -690,7 +692,7 @@ def create_RO_question(browser, assert_, category, discipline, teacher):
     browser.switch_to.default_content()
 
     # Discipline
-    Select(browser.find_element_by_id("id_discipline")).select_by_value("1")
+    Select(browser.find_element_by_id("id_discipline")).select_by_index(1)
 
     # Category
     input_category = browser.find_element_by_id("autofill_categories")

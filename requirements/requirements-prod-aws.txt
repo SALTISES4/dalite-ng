@@ -21,9 +21,9 @@ amqp==5.0.9 \
     # via
     #   -r requirements/requirements-base.txt
     #   kombu
-asgiref==3.5.2 \
-    --hash=sha256:1d2880b792ae8757289136f1db2b7b99100ce959b2aa57fd69dab783d05afac4 \
-    --hash=sha256:4a29362a6acebe09bf1d6640db38c1dc3d9217c68e6f9f6204d72667fc19a424
+asgiref==3.3.4 \
+    --hash=sha256:92906c611ce6c967347bbfea733f13d6313901d54dcca88195eaeb52b2a8e8ee \
+    --hash=sha256:d1216dfbdfb63826470995d31caed36225dcaf34f182e0fa257a4dd9e86f1b78
     # via
     #   -r requirements/requirements-base.txt
     #   channels
@@ -275,9 +275,9 @@ daphne==3.0.1 \
     # via
     #   -r requirements/requirements-base.txt
     #   channels
-django==3.2.14 \
-    --hash=sha256:677182ba8b5b285a4e072f3ac17ceee6aff1b5ce77fd173cc5b6a2d3dc022fcf \
-    --hash=sha256:a8681e098fa60f7c33a4b628d6fcd3fe983a0939ff1301ecacac21d0b38bad56
+django==3.2.15 \
+    --hash=sha256:115baf5049d5cf4163e43492cdc7139c306ed6d451e7d3571fe9612903903713 \
+    --hash=sha256:f71934b1a822f14a86c9ac9634053689279cd04ae69cb6ade4a59471b886582b
     # via
     #   -r requirements/requirements-base.txt
     #   channels

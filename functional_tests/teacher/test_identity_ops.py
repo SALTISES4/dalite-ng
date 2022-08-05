@@ -120,9 +120,9 @@ def test_change_discipline_and_institution(
         in browser.find_element_by_tag_name("h2").text
     )
 
-    Select(browser.find_element_by_id("id_institutions")).select_by_value("1")
+    Select(browser.find_element_by_id("id_institutions")).select_by_index(0)
 
-    Select(browser.find_element_by_id("id_disciplines")).select_by_value("1")
+    Select(browser.find_element_by_id("id_disciplines")).select_by_index(0)
 
     browser.find_element_by_id("update-identity").click()
 

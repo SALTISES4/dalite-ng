@@ -92,7 +92,7 @@ def answer_questions(browser, student, assignment):
     for answers_done, question in enumerate(assignment.questions.all()):
         time.sleep(3)
         browser.find_element_by_class_name("mdc-radio__native-control").click()
-        rationale = fake.sentence(nb_words=6)
+        rationale = "This is a rationale that will pass all validators"
         tinymce_embed = browser.find_element_by_tag_name("iframe")
         browser.switch_to.frame(tinymce_embed)
         ifrinputbox = browser.find_element_by_id("tinymce")
@@ -128,10 +128,13 @@ def answer_questions(browser, student, assignment):
             )
         )
         if answers_done == 9:
-            browser.find_element_by_class_name("mdc-button").click()
+            finish_button = WebDriverWait(browser, timeout=10).until(
+                EC.element_to_be_clickable((By.ID, "finish-button"))
+            )
+            finish_button.click()
 
             try:
-                WebDriverWait(browser, 30).until(EC.alert_is_present())
+                WebDriverWait(browser, timeout=10).until(EC.alert_is_present())
             except TimeoutException:
                 assert False
             alert = browser.switch_to.alert

@@ -4,6 +4,8 @@ AXES_ENABLED = False
 
 DEBUG = False
 
+WATCH = True
+
 SSL_CONTEXT = False
 SECURE_HSTS_SECONDS = 0
 CSRF_COOKIE_NAME = "csrftoken"
