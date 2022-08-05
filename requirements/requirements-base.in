@@ -6,7 +6,8 @@ asgiref == 3.3.4 # Temporary pin [1]
 better-profanity
 bleach
 celery[redis]
-contextualSpellCheck
+# contextualSpellCheck # Remove until used
+django >=3.2, < 3.3
 django-analytical
 django-axes
 django-celery-beat
@@ -15,13 +16,12 @@ django-cookie-law
 django-csp
 django-decorator-include
 django-elasticsearch-dsl
-django-minify-html
 django-inlinecss
+django-lti-provider
+django-minify-html
 django-permissions-policy
 django-samesite-none
 django-tinymce
-django >=3.2, < 3.3
-django-lti-provider
 djangorestframework
 jsonfield # Required by peerinst migration 0041
 langdetect

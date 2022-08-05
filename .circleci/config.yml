@@ -46,7 +46,7 @@ jobs:
             . .venv/bin/activate
             python -m pip install -r requirements/requirements-dev.txt
             python -m pip freeze
-            python -m spacy download en_core_web_sm
+            # python -m spacy download en_core_web_sm
             npm install --no-optional
       - snyk/scan:
           fail-on-issues: false
