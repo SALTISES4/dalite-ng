@@ -75,7 +75,6 @@ class RichTextRationaleField(forms.CharField):
         return bleach.clean(
             super().to_python(value),
             tags=STRICT_TAGS,
-            styles=[],
             strip=True,
         )
 

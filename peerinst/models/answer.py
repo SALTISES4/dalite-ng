@@ -34,7 +34,6 @@ class AnswerChoice(models.Model):
         self.text = bleach.clean(
             self.text,
             tags=ALLOWED_TAGS,
-            styles=[],
             strip=True,
         ).strip()
         super().save(*args, **kwargs)

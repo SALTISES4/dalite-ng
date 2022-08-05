@@ -15,7 +15,7 @@ logger = logging.getLogger("nlp")
 # def spell_check(text):
 #     logger.debug(text)
 #     output = []
-#     doc = nlp(bleach.clean(text, tags=[], styles=[], strip=True))
+#     doc = nlp(bleach.clean(text, tags=[], strip=True))
 #     for sentence in doc.sents:
 #         _sentence = str(sentence).strip()
 #         for suggestion in doc._.suggestions_spellCheck.items():

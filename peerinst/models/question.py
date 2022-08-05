@@ -59,7 +59,6 @@ class Category(models.Model):
         self.title = bleach.clean(
             self.title,
             tags=[],
-            styles=[],
             strip=True,
         ).strip()
         super().save(*args, **kwargs)
@@ -93,7 +92,6 @@ class Subject(models.Model):
         self.title = bleach.clean(
             self.title,
             tags=[],
-            styles=[],
             strip=True,
         ).strip()
         super().save(*args, **kwargs)
@@ -121,7 +119,6 @@ class Discipline(models.Model):
         self.title = bleach.clean(
             self.title,
             tags=[],
-            styles=[],
             strip=True,
         ).strip()
         super().save(*args, **kwargs)
@@ -372,13 +369,11 @@ class Question(models.Model):
         self.text = bleach.clean(
             self.text,
             tags=ALLOWED_TAGS,
-            styles=[],
             strip=True,
         ).strip()
         self.title = bleach.clean(
             self.title,
             tags=ALLOWED_TAGS,
-            styles=[],
             strip=True,
         ).strip()
 
@@ -1009,7 +1004,6 @@ class Question(models.Model):
                 bleach.clean(
                     text,
                     tags=ALLOWED_TAGS,
-                    styles=[],
                     strip=True,
                 ).strip(),
             )
@@ -1056,7 +1050,6 @@ class Question(models.Model):
                 d["text"] = bleach.clean(
                     q_answerchoices[first_answer_choice][2],
                     tags=ALLOWED_TAGS,
-                    styles=[],
                     strip=True,
                 )
                 d["correct"] = q_answerchoices[first_answer_choice][1]
@@ -1067,7 +1060,7 @@ class Question(models.Model):
                     "rationale"
                 ].apply(
                     lambda x: basic_syntax(
-                        bleach.clean(x, tags=[], styles=[], strip=True)
+                        bleach.clean(x, tags=[], strip=True)
                     )
                 )
                 d["most_convincing"] = most_convincing.to_dict(

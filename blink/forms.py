@@ -39,7 +39,6 @@ class BlinkAnswerForm(forms.Form):
                                 bleach.clean(
                                     pair[1],
                                     tags=ALLOWED_TAGS,
-                                    styles=[],
                                     strip=True,
                                 ),
                             )

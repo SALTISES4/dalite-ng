@@ -143,7 +143,6 @@ class QuestionDocument(Document):
                     "text": bleach.clean(
                         ac[1],
                         tags=ALLOWED_TAGS,
-                        styles=[],
                         strip=True,
                     ).strip(),
                 }
@@ -158,7 +157,6 @@ class QuestionDocument(Document):
                 bleach.clean(
                     c.title,
                     tags=[],
-                    styles=[],
                     strip=True,
                 ).strip()
                 for c in instance.category.all()
@@ -187,7 +185,6 @@ class QuestionDocument(Document):
                 "title": bleach.clean(
                     instance.discipline.title,
                     tags=[],
-                    styles=[],
                     strip=True,
                 ).strip()
             }
@@ -224,7 +221,6 @@ class QuestionDocument(Document):
         return bleach.clean(
             instance.text,
             tags=ALLOWED_TAGS,
-            styles=[],
             strip=True,
         ).strip()
 
@@ -232,7 +228,6 @@ class QuestionDocument(Document):
         return bleach.clean(
             instance.title,
             tags=ALLOWED_TAGS,
-            styles=[],
             strip=True,
         ).strip()
 

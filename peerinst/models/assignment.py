@@ -107,7 +107,6 @@ class Assignment(models.Model):
                     bleach.clean(
                         getattr(self, field),
                         tags=ALLOWED_TAGS,
-                        styles=[],
                         strip=True,
                     ).strip(),
                 )
@@ -120,7 +119,6 @@ class Assignment(models.Model):
                     bleach.clean(
                         getattr(self, field),
                         tags=[],
-                        styles=[],
                         strip=True,
                     ).strip(),
                 )
