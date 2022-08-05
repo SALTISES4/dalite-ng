@@ -575,7 +575,7 @@ class TeacherTest(TestCase):
         response = self.client.get(
             reverse("sample-answer-form", kwargs={"question_id": 29})
         )
-        self.assertContains(response, 'id="add_question_to_assignment"')
+        self.assertContains(response, "id=add_question_to_assignment")
 
         assignment = Assignment.objects.get(pk="Assignment1")
         self.assertNotIn(
