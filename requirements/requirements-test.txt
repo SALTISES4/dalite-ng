@@ -66,6 +66,27 @@ automat==20.2.0 \
     # via
     #   -r requirements/requirements-base.txt
     #   twisted
+backports-zoneinfo==0.2.1 \
+    --hash=sha256:17746bd546106fa389c51dbea67c8b7c8f0d14b5526a579ca6ccf5ed72c526cf \
+    --hash=sha256:1b13e654a55cd45672cb54ed12148cd33628f672548f373963b0bff67b217328 \
+    --hash=sha256:1c5742112073a563c81f786e77514969acb58649bcdf6cdf0b4ed31a348d4546 \
+    --hash=sha256:4a0f800587060bf8880f954dbef70de6c11bbe59c673c3d818921f042f9954a6 \
+    --hash=sha256:5c144945a7752ca544b4b78c8c41544cdfaf9786f25fe5ffb10e838e19a27570 \
+    --hash=sha256:7b0a64cda4145548fed9efc10322770f929b944ce5cee6c0dfe0c87bf4c0c8c9 \
+    --hash=sha256:8439c030a11780786a2002261569bdf362264f605dfa4d65090b64b05c9f79a7 \
+    --hash=sha256:8961c0f32cd0336fb8e8ead11a1f8cd99ec07145ec2931122faaac1c8f7fd987 \
+    --hash=sha256:89a48c0d158a3cc3f654da4c2de1ceba85263fafb861b98b59040a5086259722 \
+    --hash=sha256:a76b38c52400b762e48131494ba26be363491ac4f9a04c1b7e92483d169f6582 \
+    --hash=sha256:da6013fd84a690242c310d77ddb8441a559e9cb3d3d59ebac9aca1a57b2e18bc \
+    --hash=sha256:e55b384612d93be96506932a786bbcde5a2db7a9e6a4bb4bffe8b733f5b9036b \
+    --hash=sha256:e81b76cace8eda1fca50e345242ba977f9be6ae3945af8d46326d776b4cf78d1 \
+    --hash=sha256:e8236383a20872c0cdf5a62b554b27538db7fa1bbec52429d8d106effbaeca08 \
+    --hash=sha256:f04e857b59d9d1ccc39ce2da1021d196e47234873820cbeaad210724b1ee28ac \
+    --hash=sha256:fadbfe37f74051d024037f223b8e001611eac868b5c5b06144ef4d8b799862f2
+    # via
+    #   -r requirements/requirements-base.txt
+    #   django-celery-beat
+    #   django-timezone-field
 beautifulsoup4==4.8.2 \
     --hash=sha256:05fd825eb01c290877657a56df4c6e4c311b3965bda790c613a3d6fb01a5462a \
     --hash=sha256:9fbb4d6e48ecd30bcacc5b63b94088192dcda178513b2ae3c394229f8911b887 \
@@ -117,9 +138,9 @@ catalogue==2.0.6 \
     #   spacy
     #   srsly
     #   thinc
-celery[redis]==5.2.3 \
-    --hash=sha256:8aacd02fc23a02760686d63dde1eb0daa9f594e735e73ea8fb15c2ff15cb608c \
-    --hash=sha256:e2cd41667ad97d4f6a2f4672d1c6a6ebada194c619253058b5f23704aaadaa82
+celery[redis]==5.2.7 \
+    --hash=sha256:138420c020cd58d6707e6257b6beda91fd39af7afde5d36c6334d175302c0e14 \
+    --hash=sha256:fafbd82934d30f8a004f81e8f7a062e31413a23d444be8ee3326553915958c6d
     # via
     #   -r requirements/requirements-base.txt
     #   django-celery-beat
@@ -330,7 +351,6 @@ django==3.2.15 \
     #   django-model-utils
     #   django-permissions-policy
     #   django-redis
-    #   django-timezone-field
     #   djangorestframework
     #   jsonfield
     #   saltise-course-flow
@@ -350,9 +370,9 @@ django-axes==5.36.0 \
     --hash=sha256:466e6ed1affd0866c78f245ee658d2619f74250aca5856852d86e61dba400eda \
     --hash=sha256:bac08a7047fde26ffb54813c971fd40eeadb4ecb8d342a6e47d53de666d1a792
     # via -r requirements/requirements-base.txt
-django-celery-beat==2.2.1 \
-    --hash=sha256:97ae5eb309541551bdb07bf60cc57cadacf42a74287560ced2d2c06298620234 \
-    --hash=sha256:ab43049634fd18dc037927d7c2c7d5f67f95283a20ebbda55f42f8606412e66c
+django-celery-beat==2.3.0 \
+    --hash=sha256:ba24f86ed956ba0ee2b43237a49303ebf5aa7e0fb0ccb7e0542b7e31a463dcba \
+    --hash=sha256:ff694e1d30f84de3d2b78822c90005c6c7c1462768e845ae162af71a6a46f1eb
     # via -r requirements/requirements-base.txt
 django-classy-tags==1.0.0 \
     --hash=sha256:ad6a25fc2b58a098f00d86bd5e5dad47922f5ca4e744bc3cccb7b4be5bc35eb1
@@ -420,9 +440,9 @@ django-samesite-none==0.0.2 \
     --hash=sha256:340fcc2ef83226896261a2f7b1d216124408bdad7959e166b3e697b33f61a709 \
     --hash=sha256:57863ff8e5ff081e93543dbf2b5382f4b26b8a7e1b6850909649f6701ef3a115
     # via -r requirements/requirements-base.txt
-django-timezone-field==4.2.1 \
-    --hash=sha256:6dc782e31036a58da35b553bd00c70f112d794700025270d8a6a4c1d2e5b26c6 \
-    --hash=sha256:97780cde658daa5094ae515bb55ca97c1352928ab554041207ad515dee3fe971
+django-timezone-field==5.0 \
+    --hash=sha256:15746ed367a5a32eda76cfa2886eeec1de8cda79f519b7c5e12f87ed7cdbd663 \
+    --hash=sha256:199f211082eeac7e83563929b8ce41399c1c0f00dfc2f36bc00bea381027eaaa
     # via
     #   -r requirements/requirements-base.txt
     #   django-celery-beat
@@ -1560,6 +1580,12 @@ typing-extensions==4.2.0 \
     #   pydantic
     #   torch
     #   twisted
+tzdata==2022.1 \
+    --hash=sha256:238e70234214138ed7b4e8a0fab0e5e13872edab3be586ab8198c407620e2ab9 \
+    --hash=sha256:8b536a8ec63dc0751342b3984193a3118f8fca2afe25752bb9b7fffd398552d3
+    # via
+    #   -r requirements/requirements-base.txt
+    #   django-celery-beat
 urllib3[secure,socks]==1.26.9 \
     --hash=sha256:44ece4d53fb1706f667c9bd1c648f5469a2ec925fcf3a776667042d645472c14 \
     --hash=sha256:aabaf16477806a5e1dd19aa41f8c2b7950dd3c746362d7e3223dbe6de6ac448e
@@ -1654,12 +1680,11 @@ zope-interface==5.1.0 \
     #   twisted
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==59.6.0 \
-    --hash=sha256:22c7348c6d2976a52632c67f7ab0cdf40147db7789f9aed18734643fe9cf3373 \
-    --hash=sha256:4ce92f1e1f8f01233ee9952c04f6b81d1e02939d6e1b488428154974a4d0783e
+setuptools==63.4.1 \
+    --hash=sha256:7c7854ee1429a240090297628dc9f75b35318d193537968e2dc14010ee2f5bca \
+    --hash=sha256:dc2662692f47d99cb8ae15a784529adeed535bcd7c277fee0beccf961522baf6
     # via
     #   -r requirements/requirements-base.txt
-    #   celery
     #   django-axes
     #   pytest-rerunfailures
     #   spacy
