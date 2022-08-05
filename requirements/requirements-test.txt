@@ -84,9 +84,9 @@ billiard==3.6.4.0 \
     # via
     #   -r requirements/requirements-base.txt
     #   celery
-bleach==4.1.0 \
-    --hash=sha256:0900d8b37eba61a802ee40ac0061f8c2b5dee29c1927dd1d233e075ebf5a71da \
-    --hash=sha256:4d2651ab93271d1129ac9cbc679f524565cc8a1b791909c4a51eac4446a15994
+bleach==5.0.1 \
+    --hash=sha256:085f7f33c15bd408dd9b17a4ad77c577db66d76203e5984b1bd59baeee948b2a \
+    --hash=sha256:0d03255c47eb9bd2f26aa9bb7f2107732e7e8fe195ca2f64709fcf3b0a4a085c
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
@@ -851,7 +851,6 @@ packaging==21.0 \
     --hash=sha256:c86254f9220d55e31cc94d69bade760f0847da8000def4dfe1c6b872fd14ff14
     # via
     #   -r requirements/requirements-base.txt
-    #   bleach
     #   huggingface-hub
     #   pytest
     #   spacy

@@ -122,9 +122,9 @@ black==22.6.0 \
     --hash=sha256:f586c26118bc6e714ec58c09df0157fe2d9ee195c764f630eb0d8e7ccce72e69 \
     --hash=sha256:f6fe02afde060bbeef044af7996f335fbe90b039ccf3f5eb8f16df8b20f77666
     # via -r requirements/requirements-dev.in
-bleach==4.1.0 \
-    --hash=sha256:0900d8b37eba61a802ee40ac0061f8c2b5dee29c1927dd1d233e075ebf5a71da \
-    --hash=sha256:4d2651ab93271d1129ac9cbc679f524565cc8a1b791909c4a51eac4446a15994
+bleach==5.0.1 \
+    --hash=sha256:085f7f33c15bd408dd9b17a4ad77c577db66d76203e5984b1bd59baeee948b2a \
+    --hash=sha256:0d03255c47eb9bd2f26aa9bb7f2107732e7e8fe195ca2f64709fcf3b0a4a085c
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
@@ -960,7 +960,6 @@ packaging==21.0 \
     --hash=sha256:c86254f9220d55e31cc94d69bade760f0847da8000def4dfe1c6b872fd14ff14
     # via
     #   -r requirements/requirements-test.txt
-    #   bleach
     #   dparse
     #   huggingface-hub
     #   pytest
