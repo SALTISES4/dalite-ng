@@ -70,9 +70,7 @@ beautifulsoup4==4.8.2 \
     --hash=sha256:05fd825eb01c290877657a56df4c6e4c311b3965bda790c613a3d6fb01a5462a \
     --hash=sha256:9fbb4d6e48ecd30bcacc5b63b94088192dcda178513b2ae3c394229f8911b887 \
     --hash=sha256:e1505eeed31b0f4ce2dbb3bc8eb256c04cc2b3b72af7d551a4ab6efd5cbe5dae
-    # via
-    #   django-htmlmin
-    #   pynliner
+    # via pynliner
 better-profanity==0.7.0 \
     --hash=sha256:8a6fdc8606d7471e7b5f6801917eca98ec211098262e82f62da4f5de3a73145b \
     --hash=sha256:bd4c529ea6aa2db1aaa50524be1ed14d0fe5c664f1fd88c8bc388c7e9f9f00e8
@@ -263,6 +261,7 @@ django==3.2.15 \
     #   django-decorator-include
     #   django-inlinecss
     #   django-lti-provider
+    #   django-minify-html
     #   django-model-utils
     #   django-permissions-policy
     #   django-redis
@@ -314,9 +313,6 @@ django-elasticsearch-dsl==7.2.2 \
     --hash=sha256:3c58a254a6318b169eb904d41d802924b99ea8e53ddc2c596ebba90506cf47fa \
     --hash=sha256:811d3909b3387fd55c19d9bbcf0e9a9b234f085df3f8422d59e7519a5f733e0e
     # via -r requirements/requirements-base.in
-django-htmlmin==0.11.0 \
-    --hash=sha256:e41b2a2157570846645cc636a9bddde8aa3e03f6834a9211e61a17f2ed42b87e
-    # via -r requirements/requirements-base.in
 django-inlinecss==0.3.0 \
     --hash=sha256:5a014278b017a07d9d0babe2bf1bc75a52e184fb0ed26e333e8ff0d8e777b9e2 \
     --hash=sha256:eddcb295a35fcddf4fce26f9c232c472a9283b954aaf084641d0718415bd694b
@@ -328,6 +324,10 @@ django-ipware==4.0.2 \
 django-lti-provider==1.0.0 \
     --hash=sha256:73f1d9d6a3e796a6e16fd1da6620aa05d9133b7b15dfc3dbb408819e6ce83a9b \
     --hash=sha256:afc56ecfd26bbd0075244c41b55a5937d0e29b3dfadfcb52ca8f77b4fe073c12
+    # via -r requirements/requirements-base.in
+django-minify-html==1.3.0 \
+    --hash=sha256:1ad32a686cd8464ed7a57385fc8b8ce0d99d01684bdedb89f11fa33be4a44c89 \
+    --hash=sha256:63121b38a3896c15dd690a40325e869dc82a2ec69dee856cb137d28866425748
     # via -r requirements/requirements-base.in
 django-model-utils==4.1.1 \
     --hash=sha256:eb5dd05ef7d7ce6bc79cae54ea7c4a221f6f81e2aad7722933aee66489e7264b \
@@ -466,10 +466,6 @@ html2text==2020.1.16 \
     --hash=sha256:c7c629882da0cf377d66f073329ccf34a12ed2adf0169b9285ae4e63ef54c82b \
     --hash=sha256:e296318e16b059ddb97f7a8a1d6a5c1d7af4544049a01e261731d2d5cc277bbb
     # via saltise-course-flow
-html5lib==1.0.1 \
-    --hash=sha256:20b159aa3badc9d5ee8f5c647e5efd02ed2a66ab8d354930bd9ff139fc1dc0a3 \
-    --hash=sha256:66cb0dcfdbbc4f9c3ba1a63fdb511ffdbd4f513b2b6d81b80cd26ce6b3fb3736
-    # via django-htmlmin
 httplib2==0.20.4 \
     --hash=sha256:58a98e45b4b1a48273073f905d2961666ecf0fbac4250ea5b47aef259eb5c585 \
     --hash=sha256:8b6a905cb1c79eefd03f8669fd993c36dc341f7c558f056cb5a33b5c2f458543
@@ -596,6 +592,23 @@ markupsafe==2.0.1 \
     --hash=sha256:f9081981fe268bd86831e5c75f7de206ef275defcb82bc70740ae6dc507aee51 \
     --hash=sha256:fa130dd50c57d53368c9d59395cb5526eda596d3ffe36666cd81a44d56e48872
     # via jinja2
+minify-html==0.9.2 \
+    --hash=sha256:031a5ec031d56b815402193b69c9db6b04990f6db08e5c78cd9d7d4379891ba4 \
+    --hash=sha256:087d84e60443e4a11455a60e31db78313d2e08c63b90b5aa9a3c2055383f9dbb \
+    --hash=sha256:2a2f0c1588ff7ae77b55c6bfcfbe21f1682afa6586deee71e638b69635d43d18 \
+    --hash=sha256:481936dd4ef083afd5e4672fb8727d00a2cb945db22d0a60a397e7791276d710 \
+    --hash=sha256:4944cf1f10805e20f68bcb67304a4a692d7bb28b9212f6825abe0dbad4d76647 \
+    --hash=sha256:69bf111a39062db5d773da0d4b1c39e829668327e2d744d273fc6b930185d395 \
+    --hash=sha256:6dff2d565f94fe7c5e9fe5254b75262271fc76277065af156dec5ca856d21fb0 \
+    --hash=sha256:95edae199f951b3ccc3d4b2e1727982a694c7464631a61c21b0a49ccd53338ac \
+    --hash=sha256:96e11bc0bf86066317396e15f872033c5a67a25c2138790fe60602387a6fd163 \
+    --hash=sha256:9ce703f6d9a18b8618457ac5791ef91635211e4fe253540a6a17e38e69922802 \
+    --hash=sha256:a66eaa7af27826f908adb85f9854db7bef23a9e4c237475196fdb3b3386c94fe \
+    --hash=sha256:b001dadd29ace73dc12c8f73e4ef203248f807866a31d6e9578a3c52c2b2a27b \
+    --hash=sha256:cf65be62e2e8f77ee7cd8b3346ef46088882ee06451ffc041f4e84bb5007617d \
+    --hash=sha256:cfe6e5e5e6c75e64bdb2a8753241432242aa8ac1b94443a649c3b393f07f8481 \
+    --hash=sha256:fb0ec0ce8c3f9494152979678003ec843ebd2d0f0499362db2fa198e49113fe0
+    # via django-minify-html
 msgpack==1.0.0 \
     --hash=sha256:002a0d813e1f7b60da599bdf969e632074f9eec1b96cbed8fb0973a63160a408 \
     --hash=sha256:25b3bc3190f3d9d965b818123b7752c5dfb953f0d774b454fd206c18fe384fb8 \
@@ -1126,7 +1139,6 @@ six==1.15.0 \
     #   django-classy-tags
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl
-    #   html5lib
     #   langdetect
     #   pylti
     #   pyopenssl
@@ -1314,9 +1326,7 @@ wcwidth==0.2.5 \
 webencodings==0.5.1 \
     --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \
     --hash=sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923
-    # via
-    #   bleach
-    #   html5lib
+    # via bleach
 xlrd==2.0.1 \
     --hash=sha256:6a33ee89877bd9abc1158129f6e94be74e2679636b8a205b43b85206c3f0bbdd \
     --hash=sha256:f72f148f54442c6b056bf931dbc34f986fd0c3b0b6b5a58d013c9aef274d0c88

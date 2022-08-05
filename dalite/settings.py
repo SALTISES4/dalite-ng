@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     "compressor",
     "analytical",
     "axes",
+    "django_minify_html",
     "django_inlinecss",
 )
 
@@ -71,9 +72,7 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "dalite.custom_middleware.resp_405_middleware",
     "dalite.custom_middleware.resp_503_middleware",
-    # Minify html
-    "htmlmin.middleware.HtmlMinifyMiddleware",
-    "htmlmin.middleware.MarkRequestMiddleware",
+    "django_minify_html.middleware.MinifyHtmlMiddleware",
     "axes.middleware.AxesMiddleware",
 )
 
@@ -174,9 +173,6 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
     "compressor.finders.CompressorFinder",
 )
-
-KEEP_COMMENTS_ON_MINIFYING = False
-HTML_MINIFY = not DEBUG
 
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True

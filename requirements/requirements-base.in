@@ -15,7 +15,7 @@ django-cookie-law
 django-csp
 django-decorator-include
 django-elasticsearch-dsl
-django-htmlmin
+django-minify-html
 django-inlinecss
 django-permissions-policy
 django-samesite-none
