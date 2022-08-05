@@ -66,7 +66,7 @@ def logout(browser, assert_):
     icon.click()
 
     with contextlib.suppress(NoSuchElementException):
-        logout_button = WebDriverWait(browser, 5).until(
+        logout_button = WebDriverWait(browser, 10).until(
             EC.element_to_be_clickable(
                 (By.XPATH, "//a[contains(text(), 'Logout')]")
             )

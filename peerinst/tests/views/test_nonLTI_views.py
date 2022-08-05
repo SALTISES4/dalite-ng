@@ -399,8 +399,8 @@ class TeacherTest(TestCase):
         )
         self.assertNotContains(
             response,
-            '<form id="question-create-form" enctype="multipart/form-data" '
-            'method="post">',
+            "<form id=question-create-form enctype=multipart/form-data "
+            "method=post>",
         )
 
         response = self.client.post(
@@ -452,7 +452,7 @@ class TeacherTest(TestCase):
             response.context["question"], Question.objects.get(pk=32)
         )
         self.assertContains(
-            response, '<form id="answer-choice-form" method="post">'
+            response, "<form id=answer-choice-form method=post>"
         )
 
         # ... test post (to do but need to send formset in POST) -> 302 to step
@@ -480,7 +480,7 @@ class TeacherTest(TestCase):
             "this question",
         )
         self.assertNotContains(
-            response, '<form id="answer-choice-form" method="post">'
+            response, "<form id=answer-choice-form method=post>"
         )
 
     def test_sample_answers(self):
@@ -1029,7 +1029,7 @@ class TeacherTest(TestCase):
 
         self.assertContains(
             response,
-            '<form enctype="multipart/form-data" id="collection-update-form" method="post">',  # noqa
+            "<form enctype=multipart/form-data id=collection-update-form method=post>",  # noqa
         )
 
         response = self.client.get(
@@ -1037,7 +1037,7 @@ class TeacherTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(
-            response, '<form id="collection-delete-form" method="post">'
+            response, "<form id=collection-delete-form method=post>"
         )
 
         # all list views should always return 200 for teacher
