@@ -372,9 +372,9 @@ django-model-utils==4.1.1 \
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
-django-permissions-policy==4.1.0 \
-    --hash=sha256:30df0dfe6579f60743d181378c7cbbb44526a5df469aa633251234387d3819f1 \
-    --hash=sha256:774ca81646c84793c8c5645e581ecd4d08a88d492cf90c8983648d8fddcbb3c8
+django-permissions-policy==4.12.0 \
+    --hash=sha256:1f10fc354110fef9270fbabbbf8d5358a6d6f5380c79f0dfba56dd41e45b1936 \
+    --hash=sha256:88ee9cb345898414a6ad3f2eb0d8284c67decdfc43c6fc5331531b7c39809d8c
     # via -r requirements/requirements-base.txt
 django-redis==5.2.0 \
     --hash=sha256:1d037dc02b11ad7aa11f655d26dac3fb1af32630f61ef4428860a2e29ff92026 \
