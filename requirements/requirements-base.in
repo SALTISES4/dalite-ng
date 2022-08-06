@@ -3,7 +3,7 @@
 
 alt-profanity-check
 asgiref == 3.3.4 # Temporary pin [1]
-better-profanity
+better-profanity == 0.6.1 # Temporary pin [2]
 bleach
 celery[redis]
 # contextualSpellCheck # Remove until used
@@ -38,3 +38,4 @@ SALTISE_course_flow == 0.7.5
 SALTISE_user_feedback
 
 # 1. https://stackoverflow.com/a/68553668
+# 2. https://github.com/snguyenthanh/better_profanity/issues/19

@@ -59,7 +59,7 @@ class RichTextRationaleField(forms.CharField):
             _("Please provide a more detailed rationale for your choice."),
         ),
         NoProfanityValidator(
-            0.10,
+            0.5,
             _(
                 "The language filter has labeled this as possibly toxic or profane; please rephrase your rationale."  # noqa
             ),

@@ -86,9 +86,9 @@ beautifulsoup4==4.8.2 \
     # via
     #   -r requirements/requirements-base.txt
     #   pynliner
-better-profanity==0.7.0 \
-    --hash=sha256:8a6fdc8606d7471e7b5f6801917eca98ec211098262e82f62da4f5de3a73145b \
-    --hash=sha256:bd4c529ea6aa2db1aaa50524be1ed14d0fe5c664f1fd88c8bc388c7e9f9f00e8
+better-profanity==0.6.1 \
+    --hash=sha256:a20902b17f846aff9f9030e61ca75e2142824c2af287c078808e76a6e3292ecc \
+    --hash=sha256:c8f1a05dfabc5e8bbe3c6f51e25cea9d1df3e2a38e433b7b88e6579d46df296b
     # via -r requirements/requirements-base.txt
 billiard==3.6.4.0 \
     --hash=sha256:299de5a8da28a783d51b197d496bef4f1595dd023a93a4f59dde1886ae905547 \

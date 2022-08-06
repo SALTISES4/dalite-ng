@@ -6,7 +6,6 @@
 
   <!DOCTYPE html>
   <html lang="{{ LANGUAGE_CODE }}">
-
     <head>
       <!-- Meta -->
       <title>{% block title %}myDALITE{% endblock %}</title>
@@ -148,7 +147,7 @@
             value={{ request.path|slice:"3:"|urlencode }}>
           <input name="language"
             type="hidden"
-            value={% if LANGUAGE_CODE == 'en' %}fr{% else %}en{% endif %}>
+            value="{% if LANGUAGE_CODE == 'en' %}fr{% else %}en{% endif %}">
         </form>
         <svg id="corner" class="corner" width=35 height=35></svg>
         {% block body %}{% endblock %}
