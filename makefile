@@ -3,7 +3,7 @@ test:
 test-cdb:
 	pytest --cov --cov-report term-missing --create-db -vvvs
 rebuild:
-	./node_modules/gulp/bin/gulp.js build
+	npx gulp build
 	./manage.py collectstatic --clear --noinput
 	./manage.py compress
 refresh: rebuild
