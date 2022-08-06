@@ -47,7 +47,7 @@ def test_change_password(browser, assert_, teacher):
     browser.find_element_by_link_text("Back to My Account").click()
     assert "My Account" in browser.find_element_by_tag_name("h1").text
 
-    logout(browser, assert_)
+    logout(browser)
 
     browser.get(f'{browser.server_url}{reverse("login")}')
 
