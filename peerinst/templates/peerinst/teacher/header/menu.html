@@ -1,5 +1,7 @@
 {% load i18n %}
 
+{% get_current_language as LANGUAGE_CODE %}
+
 <i id="menu-icon" class="material-icons md-32 header-icon">menu</i>
 <aside class="mdc-drawer mdc-drawer--temporary mdc-typography">
   <nav class="mdc-drawer__drawer">
@@ -58,6 +60,13 @@
         </i>
         CourseFlow
       </a>
+      <span id="submit-language-form" class="mdc-list-item">
+        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+          aria-hidden="true">
+          language
+        </i>
+        {% if LANGUAGE_CODE == 'en' %}Français{% else %}English{% endif %}
+      </span>
       <a class="mdc-list-item" href="{% url 'logout' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
           aria-hidden="true">

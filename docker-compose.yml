@@ -141,7 +141,7 @@ services:
       context: .
       dockerfile: ./functional_tests/Dockerfile
     container_name: test
-    command: python -Wa -m pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s -x
+    command: python -Wa -m pytest functional_tests/teacher/test_navigation.py --reuse-db --ignore=node_modules/ -vvvv -s -x
     depends_on:
       - selenium-hub
     environment:

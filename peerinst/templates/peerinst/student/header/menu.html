@@ -65,6 +65,14 @@
           {% trans 'Terms of service' %}
         </a>
 
+        <span id="submit-language-form" class="mdc-list-item">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            language
+          </i>
+          {% if LANGUAGE_CODE == 'en' %}Français{% else %}English{% endif %}
+        </span>
+
         <a class="mdc-list-item" href="{% url 'logout' %}" id="logout">
           <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
             aria-hidden="true">
