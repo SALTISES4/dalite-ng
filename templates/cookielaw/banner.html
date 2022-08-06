@@ -8,11 +8,12 @@
 </div>
 
 <script nonce="{{ request.csp_nonce }}">
-  window.addEventListener("load", () => {
+  window.addEventListener("load", function() {
     const link = document.getElementById("accept-cookies");
-    link.onclick = function() {
-      Cookielaw.setCookielawCookie();
+    link.addEventListener("click", function() {
+      console.info("Accepting cookies");
+      Cookielaw.setCookielawCookie(true, secure=false);
       Cookielaw.hideCookielawBanner();
-    }
+    });
   });
 </script>
