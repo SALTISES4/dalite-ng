@@ -11,6 +11,7 @@
 
 # TODO:
 #   - Currently, --create-db ensures tests do not start until other services are ready, but a wait function should be added.
+#   - Add memcached image?
 
 # GOTCHAS:
 #   - Use `docker image prune` to avoid serving old static content or using excessive disk space
@@ -52,7 +53,7 @@ services:
       - emails:/code/emails
 
   redis:
-    image: redis:5.0
+    image: redis:6
     container_name: redis
 
   test_app:
@@ -140,7 +141,7 @@ services:
       context: .
       dockerfile: ./functional_tests/Dockerfile
     container_name: test
-    command: python -Wa -m pytest functional_tests/ --create-db --ignore=node_modules/ -vvvv -s -x
+    command: python -Wa -m pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s -x
     depends_on:
       - selenium-hub
     environment:

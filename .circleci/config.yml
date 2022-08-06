@@ -56,7 +56,7 @@ jobs:
       - run:
           name: Gulp build
           command: |
-            ./node_modules/gulp/bin/gulp.js build
+            npx gulp build
       - run:
           name: Setup local_settings.py
           command: |
