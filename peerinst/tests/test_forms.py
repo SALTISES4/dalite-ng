@@ -98,6 +98,19 @@ def test_FirstAnswerForm_rationale_valid_language():
     assert "Please clarify what you've written." in form.errors["rationale"]
 
 
+def test_FirstAnswerForm_rationale_all_numbers():
+    form = FirstAnswerForm(
+        answer_choices=["A. Choice A", "B. Choice B"],
+        data={
+            "first_answer_choice": 1,
+            "rationale": "1111",
+        },
+    )
+
+    assert len(form.errors) == 1
+    assert "Please clarify what you've written." in form.errors["rationale"]
+
+
 def test_FirstAnswerForm_rationale_valid_language_equation():
     form = FirstAnswerForm(
         answer_choices=["A. Choice A", "B. Choice B"],
