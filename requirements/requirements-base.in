@@ -30,7 +30,7 @@ pandas
 pillow
 pip-lock
 pyjwt
-python-memcached == 1.59
+pymemcache
 pytz
 requests
 

@@ -625,6 +625,10 @@ pylti==0.7.0 \
     --hash=sha256:1284a22c2959aa6b1c2895925133ef8d6ab6f41c2e7d0a7cef9a1d27e366410e \
     --hash=sha256:80938a235b1ab390f6889a95237d087ea7adde5cc50fcae9c80c49898e8ee78e
     # via django-lti-provider
+pymemcache==3.5.2 \
+    --hash=sha256:3fca0215845d7b2ecd5f4c627fcf4ce2345a703a897b7e116380115b5a197be2 \
+    --hash=sha256:8923ab59840f0d5338f1c52dba229fa835545b91c3c2f691c118e678d0fb974e
+    # via -r requirements/requirements-base.in
 pynliner==0.8.0 \
     --hash=sha256:32da16ed8ba1fec775909e39f0ffa8e6e02a674b889286c9a2370c3c03f617a5 \
     --hash=sha256:83e7dd4d48001bebbe0a648d7089e94e21ffb74c5af2f582c47d8793ffe8628e
@@ -647,10 +651,6 @@ python-dateutil==2.8.1 \
     #   elasticsearch-dsl
     #   pandas
     #   python-crontab
-python-memcached==1.59 \
-    --hash=sha256:4dac64916871bd3550263323fc2ce18e1e439080a2d5670c594cf3118d99b594 \
-    --hash=sha256:a2e28637be13ee0bf1a8b6843e7490f9456fd3f2a4cb60471733c7b5d5557e4f
-    # via -r requirements/requirements-base.in
 pytz==2022.1 \
     --hash=sha256:1e760e2fe6a8163bc0b3d9a19c4f84342afa0a2affebfaa84b01b978a02ecaa7 \
     --hash=sha256:e68985985296d9a66a881eb3193b0906246245294a881e7c8afe623866ac6a5c
@@ -785,9 +785,9 @@ six==1.15.0 \
     #   elasticsearch-dsl
     #   langdetect
     #   pylti
+    #   pymemcache
     #   pyopenssl
     #   python-dateutil
-    #   python-memcached
 soupsieve==2.0 \
     --hash=sha256:e914534802d7ffd233242b785229d5ba0766a7f487385e3f714446a07bf540ae \
     --hash=sha256:fcd71e08c0aee99aca1b73f45478549ee7e7fc006d51b37bec9e9def7dc22b69

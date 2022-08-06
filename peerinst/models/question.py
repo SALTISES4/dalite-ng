@@ -34,15 +34,11 @@ def images(instance, filename):
     hash = hashlib.sha256(f"{datetime.now()}-{filename}".encode()).hexdigest()[
         :8
     ]
-    if instance.user:
-        path = "images/{}/{}/{}_{}".format(
-            instance.user.username, datetime.now().month, hash, filename
-        )
-    else:
-        path = "images/{}/{}/{}_{}".format(
-            "unknown", datetime.now().month, hash, filename
-        )
-    return path
+    return (
+        f"images/{instance.user.username}/{datetime.now().month}/{hash}_{filename}"
+        if instance.user
+        else f"images/unknown/{datetime.now().month}/{hash}_{filename}"
+    )
 
 
 class Category(models.Model):
@@ -380,7 +376,7 @@ class Question(models.Model):
         if self.type == "PI":
             self.second_answer_needed = True
 
-        if self.type == "RO":
+        elif self.type == "RO":
             self.second_answer_needed = False
 
         super().save(*args, **kwargs)
