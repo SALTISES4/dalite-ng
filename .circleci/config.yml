@@ -20,6 +20,7 @@ jobs:
           MYSQL_PASSWORD: test key
           MYSQL_HOST: localhost
           MYSQL_ROOT_PASSWORD: mariadb
+      - image: memcached
     working_directory: ~/repo
     steps:
       - checkout
