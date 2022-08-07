@@ -69,12 +69,24 @@ def test_FirstAnswerForm_rationale_no_profanity():
     )
 
 
-def test_FirstAnswerForm_rationale_profanity_safewords():
+def test_FirstAnswerForm_rationale_profanity_false_positives():
     form = FirstAnswerForm(
         answer_choices=["A. Choice A", "B. Choice B"],
         data={
             "first_answer_choice": 1,
             "rationale": "It is where all the PE is transformed to KE",
+        },
+    )
+
+    assert len(form.errors) == 0
+
+
+def test_FirstAnswerForm_rationale_profanity_false_positives_from_whitespace():
+    form = FirstAnswerForm(
+        answer_choices=["A. Choice A", "B. Choice B"],
+        data={
+            "first_answer_choice": 1,
+            "rationale": "It is where all they find all the fi-sh. It is a good spot.",
         },
     )
 
