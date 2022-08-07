@@ -62,8 +62,6 @@ def dashboard(req, teacher):
     HttpResponse
         Html response with basic template skeleton
     """
-    teacher.last_dashboard_access = datetime.now(pytz.utc)
-
     data = {
         "urls": {
             "dalite_messages": reverse("teacher-dashboard--dalite-messages"),
@@ -84,6 +82,9 @@ def dashboard(req, teacher):
         "rationales": rationales,
         "teacher": teacher,
     }
+
+    teacher.last_dashboard_access = datetime.now(pytz.utc)
+    teacher.save()
 
     return render(req, "peerinst/teacher/dashboard.html", context)
 

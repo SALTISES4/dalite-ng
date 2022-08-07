@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 declare let bundle: any; // bundle will be available globally at runtime
 
 // MDC
@@ -1305,15 +1306,22 @@ export function bindCheckbox() {
   });
 }
 
-/** Plot student activity
- *  @function
- *  @param {String} el
- *  @param {String} d
- */
-export function plotTimeSeries(el, d) {
+/* Plot student activity */
+export function plotTimeSeries(
+  el: string,
+  d: {
+    answers: [string];
+    distribution_date: string;
+    due_date: string;
+    last_login: string;
+    now: string;
+    total: number;
+  },
+): void {
+  console.debug(el, d);
   const svg = d3.select(el);
 
-  const width = 0.8 * $("main").innerWidth();
+  const width = 0.8 * d3.select("main").node().getBoundingClientRect().width;
   svg.attr("width", width);
   const height = +svg.attr("height");
 
@@ -1502,14 +1510,14 @@ export function plotTimeSeries(el, d) {
     g.select(".slider-label-top")
       .attr("x", xValue)
       .text(
-        `${parseInt(
+        `${
           (100 *
             d3.bisectLeft(
               d.answers.map((x) => new Date(d3.timeParse(x))),
               x.invert(xValue),
             )) /
-            d.total,
-        )}%`,
+          d.total
+        }%`,
       );
 
     let data = d.answers.map((x) => new Date(d3.timeParse(x)));
