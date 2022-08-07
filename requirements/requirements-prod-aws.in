@@ -1,8 +1,8 @@
 -r requirements-base.txt
 
-django-storages
-sentry-sdk>=0.20.3
 boto3
-gunicorn
-watchtower
 django-ses
+django-storages
+gunicorn
+sentry-sdk >= 0.20.3
+watchtower

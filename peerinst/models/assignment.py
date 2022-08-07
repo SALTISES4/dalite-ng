@@ -9,7 +9,7 @@ from django.core import validators
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 from quality.models import Quality
@@ -107,7 +107,6 @@ class Assignment(models.Model):
                     bleach.clean(
                         getattr(self, field),
                         tags=ALLOWED_TAGS,
-                        styles=[],
                         strip=True,
                     ).strip(),
                 )
@@ -120,7 +119,6 @@ class Assignment(models.Model):
                     bleach.clean(
                         getattr(self, field),
                         tags=[],
-                        styles=[],
                         strip=True,
                     ).strip(),
                 )

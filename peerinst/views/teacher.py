@@ -12,7 +12,7 @@ from django.template.defaultfilters import date, linebreaks
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as translate
+from django.utils.translation import gettext_lazy as translate
 from django.views.decorators.http import (
     require_GET,
     require_POST,

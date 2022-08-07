@@ -69,6 +69,18 @@ def test_FirstAnswerForm_rationale_no_profanity():
     )
 
 
+def test_FirstAnswerForm_rationale_profanity_safewords():
+    form = FirstAnswerForm(
+        answer_choices=["A. Choice A", "B. Choice B"],
+        data={
+            "first_answer_choice": 1,
+            "rationale": "It is where all the PE is transformed to KE",
+        },
+    )
+
+    assert len(form.errors) == 0
+
+
 def test_FirstAnswerForm_rationale_no_profanity_variants():
     form = FirstAnswerForm(
         answer_choices=["A. Choice A", "B. Choice B"],
@@ -91,6 +103,19 @@ def test_FirstAnswerForm_rationale_valid_language():
         data={
             "first_answer_choice": 1,
             "rationale": "asfds asd  asdjklasdlk  sdfas;dlk asdf;sd",
+        },
+    )
+
+    assert len(form.errors) == 1
+    assert "Please clarify what you've written." in form.errors["rationale"]
+
+
+def test_FirstAnswerForm_rationale_all_numbers():
+    form = FirstAnswerForm(
+        answer_choices=["A. Choice A", "B. Choice B"],
+        data={
+            "first_answer_choice": 1,
+            "rationale": "1111",
         },
     )
 

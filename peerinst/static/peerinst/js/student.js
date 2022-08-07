@@ -4,7 +4,7 @@ export {
   modifyTos,
   toggleJoinGroup,
   handleJoinGroupLinkInput,
-} from "./_student/index.ts";
+} from "./_student/index";
 
 export { init as initStudentHeader } from "./_student/header/notifications.js";
 

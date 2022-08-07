@@ -6,7 +6,7 @@ from operator import mul, sub
 
 from django.db import models
 from django.db.utils import IntegrityError
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from dalite.models.custom_fields import CommaSepField, ProbabilityField
 from quality.models.criterion.criterion import Criterion, CriterionRules

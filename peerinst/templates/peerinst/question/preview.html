@@ -53,7 +53,6 @@
 {% block submit_button %}{% trans 'Submit sample rationales' %}{% endblock %}
 {% block extra_content %}
   {% if question.type == "PI" %}
-    {{ form.errors }}
     <hr class="simple-hr">
     <h3>{% trans 'Existing sample answers' %}</h3>
     {% if not save_allowed %}

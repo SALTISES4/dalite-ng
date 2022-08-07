@@ -1,8 +1,16 @@
 import re
 
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.expected_conditions import (
+    presence_of_element_located,
+)
+from selenium.webdriver.support.ui import WebDriverWait
+
 from functional_tests.fixtures import *  # noqa
 from functional_tests.teacher.utils import go_to_account
 from tos.models import Role, Tos
+
+MAX_TIMEOUT = 10
 
 
 def test_new_user_signup_workflow(
@@ -105,7 +113,9 @@ def test_new_user_signup_workflow(
 
     browser.wait_for(lambda: assert_("No users to add" in browser.page_source))
 
-    browser.get(f"{browser.server_url}/logout")
+    browser.get(f"{browser.server_url}/en/logout/")
+
+    assert "login" in browser.current_url
 
     # Account verification email is sent to new user
     assert len(mail_outbox) == 2

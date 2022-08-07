@@ -1,3 +1,5 @@
+import contextlib
+import datetime
 import os
 import time
 from functools import partial
@@ -9,7 +11,6 @@ from selenium.common.exceptions import (
     UnexpectedAlertPresentException,
     WebDriverException,
 )
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.remote.webelement import WebElement
 
 MAX_WAIT = 30
@@ -51,15 +52,14 @@ def browser(live_server):
         print("Using staging server")
         selenium_hub = os.environ.get("SELENIUM_HUB")
         print(" > Settings options")
-        options = webdriver.ChromeOptions()
-        options.add_experimental_option("w3c", False)
+        options = webdriver.chrome.options.Options()
         options.add_argument("start-maximized")
         options.add_argument("window-size=1080,1440")
+        # options.add_argument("auto-open-devtools-for-tabs")
 
         print(" > Requesting browser from hub")
         driver = webdriver.Remote(
             command_executor=f"http://{selenium_hub}/wd/hub",
-            desired_capabilities=DesiredCapabilities.CHROME,
             options=options,
         )
         print(f" > Received browser {driver}")
@@ -70,7 +70,6 @@ def browser(live_server):
             browser = "firefox"
 
         options = webdriver.ChromeOptions()
-        options.add_experimental_option("w3c", False)
 
         if hasattr(settings, "HEADLESS_TESTING") and settings.HEADLESS_TESTING:
             os.environ["MOZ_HEADLESS"] = "1"
@@ -92,28 +91,26 @@ def browser(live_server):
                 "be firefox or chrome."
             )
 
-    # Add an implicit wait function to handle latency in page loads
     @wait
     def wait_for(fn):
         return fn
 
     driver.wait_for = wait_for
-    driver.implicitly_wait(MAX_WAIT)
 
     # Add assertion that web console logs are null after any get() or click()
     # Log and screenshot function
     def add_log(fct, driver, *args, **kwargs):
         if WATCH:
-            time.sleep(1)
+            time.sleep(2)
 
         result = fct(*args, **kwargs)
 
         logs = driver.get_log("browser")
 
         if isinstance(result, WebElement):
-            print("Logs checked after: " + fct.func.__name__)
+            print(f"Logs checked after: {fct.func.__name__}")
         else:
-            print("Logs checked after: " + fct.__name__)
+            print(f"Logs checked after: {fct.__name__}")
 
         take_screenshot(driver)
 
@@ -127,17 +124,19 @@ def browser(live_server):
             and "youtube" not in d["message"]
             and "mdc-auto-init" not in d["message"]
         ]
-        assert len(filtered_logs) == 0, logs
+        assert not filtered_logs, logs
 
         return result
 
     # Add screenshot
     def take_screenshot(driver):
-        file_path = os.path.join(settings.BASE_DIR, "snapshots/test.png")
-        try:
+        file_path = os.path.join(
+            settings.BASE_DIR, f"snapshots/test-{datetime.datetime.now()}.png"
+        )
+        with contextlib.suppress(
+            UnexpectedAlertPresentException, WebDriverException
+        ):
             driver.save_screenshot(file_path)
-        except UnexpectedAlertPresentException:
-            pass
 
     # Log function for finders
     def click_with_log(finder, driver, *args, **kwargs):
@@ -163,12 +162,11 @@ def browser(live_server):
                 )
 
     if staging_server:
-        driver.server_url = "http://" + staging_server
+        driver.server_url = f"http://{staging_server}"
     else:
         driver.server_url = live_server.url
 
     yield driver
-    driver.close()
     driver.quit()
     if os.path.exists("geckodriver.log"):
         os.remove("geckodriver.log")

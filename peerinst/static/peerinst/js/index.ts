@@ -737,44 +737,6 @@ export function disciplineForm(
   });
 }
 
-// Custom functions
-/** Corner language switcher
- * @function
- * @param {String} svgSelector
- * @param {String} formID
- * @param {String} lang
- * @param {String} className
- */
-export function cornerGraphic(svgSelector, formID, lang, className) {
-  const svg = d3.select(svgSelector);
-  const w = +svg.attr("width");
-  const h = +svg.attr("height");
-
-  const g = svg.append("g");
-  g.append("path")
-    .attr("class", className)
-    .attr("d", () => {
-      const path_ = d3.path();
-      path_.moveTo(0, h);
-      path_.lineTo(w, 0);
-      path_.lineTo(w, h);
-      path_.closePath();
-      return path_;
-    });
-
-  g.append("text")
-    .attr("x", w - w / 3)
-    .attr("y", h - h / 3 + h / 6)
-    .attr("text-anchor", "middle")
-    .style("fill", "white")
-    .style("font-size", `${h / 3}px`)
-    .text(lang);
-
-  g.on("click", () => {
-    document.getElementById(formID).submit();
-  });
-}
-
 /** Mike Bostock's svg line wrap function
  *   https://bl.ocks.org/mbostock/7555321
  *   (only slightly modified)

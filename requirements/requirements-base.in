@@ -2,41 +2,41 @@
 -r ../REST/requirements.in
 
 alt-profanity-check
-better-profanity
+asgiref == 3.3.4 # [1]
+better-profanity == 0.6.1 # [2]
 bleach
 celery[redis]
-contextualSpellCheck
+# contextualSpellCheck # [3]
+django >=3.2, < 3.3
+django-analytical
 django-axes
 django-celery-beat
-django-analytical
-django-compressor >= 2.3
+django-compressor
 django-cookie-law
 django-csp
 django-decorator-include
 django-elasticsearch-dsl
-django-grappelli
-django-htmlmin
 django-inlinecss
-django-ipware == 2.1.0  # Temporary pin awaiting django-axes fix
-django-permissions-policy
-django-referrer-policy
-django-samesite-none
-django-tinymce
-django < 3.0.0
 django-lti-provider
-djangorestframework >= 3.11.2  # Reqd by safety
-jsonfield # required by peerinst migration 0041
+django-minify-html
+django-permissions-policy
+django-tinymce
+djangorestframework
+jsonfield # [4]
 langdetect
-lxml >= 4.6.2  # Reqd by safety
 mysqlclient
-packaging
 pandas
-pillow > 8.2.0  # Reqd by safety
+pillow
 pip-lock
-pyjwt >= 2.4  # Reqd by safety
-python-memcached == 1.59
+pyjwt
+pymemcache
 pytz
 requests
 
-SALTISE_course_flow == 0.7.3
-SALTISE_user_feedback >= 1.1.1
+SALTISE_course_flow == 0.7.5
+SALTISE_user_feedback
+
+# 1. Temporary pin – See: https://stackoverflow.com/a/68553668
+# 2. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
+# 3. Removed until used – See: peerinst/grammar.py
+# 4. Required by peerinst migration 0041

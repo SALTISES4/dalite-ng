@@ -52,6 +52,5 @@ def bleach_html(text):
         text,
         tags=ALLOWED_TAGS,
         attributes=ALLOWED_ATTR,
-        styles=[],
         strip=True,
     )

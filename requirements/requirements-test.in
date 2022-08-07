@@ -1,6 +1,6 @@
 -r requirements-base.txt
 
-coverage>=6.0b1
+coverage
 ddt
 factory_boy
 Faker
@@ -10,6 +10,7 @@ pytest
 pytest-celery
 pytest-cov
 pytest-django
-pytz
-pyyaml>=5.4
-selenium==3.13.0
+pytest-mock
+pytest-rerunfailures
+pyyaml
+selenium < 4.3

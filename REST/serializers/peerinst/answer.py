@@ -71,14 +71,13 @@ class AnswerSerializer(DynamicFieldsModelSerializer):
         for key in keys:
             if key in ret and ret[key]:
                 ret[key] = bleach.clean(
-                    ret[key], tags=ALLOWED_TAGS, styles=[], strip=True
+                    ret[key], tags=ALLOWED_TAGS, strip=True
                 ).strip()
         if "answer_choice" in ret:
             if ret["answer_choice"]:
                 ret["answer_choice"]["text"] = bleach.clean(
                     ret["answer_choice"]["text"],
                     tags=ALLOWED_TAGS,
-                    styles=[],
                     strip=True,
                 ).strip()
             else:

@@ -5,7 +5,7 @@ import bleach
 from better_profanity import profanity
 from django.core.validators import BaseValidator, MinLengthValidator
 from django.utils.translation import ngettext_lazy
-from langdetect import DetectorFactory, detect_langs
+from langdetect import DetectorFactory, LangDetectException, detect_langs
 from profanity_check import predict_prob
 
 DetectorFactory.seed = 0
@@ -304,7 +304,11 @@ class EnglishFrenchValidator(BaseValidator):
         # Return a tuple with results English and French
         cleaned_text = html_to_text(text)
         validation_logger.info(cleaned_text)
-        detected_languages = detect_langs(cleaned_text)
+        try:
+            detected_languages = detect_langs(cleaned_text)
+        except LangDetectException:
+            detected_languages = []
+
         dl_as_dict = {
             result.lang: result.prob for result in detected_languages
         }

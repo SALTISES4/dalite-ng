@@ -47,7 +47,7 @@ def test_change_password(browser, assert_, teacher):
     browser.find_element_by_link_text("Back to My Account").click()
     assert "My Account" in browser.find_element_by_tag_name("h1").text
 
-    logout(browser, assert_)
+    logout(browser)
 
     browser.get(f'{browser.server_url}{reverse("login")}')
 
@@ -120,9 +120,9 @@ def test_change_discipline_and_institution(
         in browser.find_element_by_tag_name("h2").text
     )
 
-    Select(browser.find_element_by_id("id_institutions")).select_by_value("1")
+    Select(browser.find_element_by_id("id_institutions")).select_by_index(0)
 
-    Select(browser.find_element_by_id("id_disciplines")).select_by_value("1")
+    Select(browser.find_element_by_id("id_disciplines")).select_by_index(0)
 
     browser.find_element_by_id("update-identity").click()
 

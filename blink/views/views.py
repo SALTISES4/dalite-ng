@@ -1,3 +1,4 @@
+import contextlib
 import random
 from datetime import datetime
 
@@ -340,12 +341,9 @@ def blink_assignment_set_time(request, pk):
 
 
 def blink_status(request, pk):
-
     blinkquestion = BlinkQuestion.objects.get(pk=pk)
 
-    response = {}
-    response["status"] = blinkquestion.active
-
+    response = {"status": blinkquestion.active}
     return JsonResponse(response)
 
 
@@ -501,15 +499,14 @@ class BlinkQuestionDetailView(DetailView):
     template_name = "blink/blinkquestion_detail.html"
 
     def get(self, request, *args, **kwargs):
-        # Check for an answer... teacher might have refreshed their page and
-        # started a new round
         if not request.user.is_authenticated:
-            try:
+            with contextlib.suppress(Exception):
                 r = BlinkRound.objects.get(
                     question=self.get_object(), deactivate_time__isnull=True
                 )
+
                 if not request.session.get(
-                    "BQid_" + self.get_object().key + "_R_" + str(r.id), False
+                    f"BQid_{self.get_object().key}_R_{str(r.id)}", False
                 ):
                     return HttpResponseRedirect(
                         reverse(
@@ -517,8 +514,6 @@ class BlinkQuestionDetailView(DetailView):
                             kwargs={"pk": self.get_object().pk},
                         )
                     )
-            except Exception:
-                pass
 
         return super().get(request, *args, **kwargs)
 
@@ -587,7 +582,7 @@ class BlinkQuestionDetailView(DetailView):
             context[
                 "latest_answer_choice"
             ] = self.object.question.get_choice_label(
-                int(self.request.session.get("BQid_" + self.object.key, 0))
+                int(self.request.session.get(f"BQid_{self.object.key}", 0))
             )
 
         context["teacher"] = self.object.teacher.user.username

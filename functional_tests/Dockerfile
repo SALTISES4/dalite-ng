@@ -7,11 +7,10 @@ RUN mkdir snapshots
 RUN mkdir static
 COPY requirements ./requirements
 RUN python3 -m pip install --upgrade pip
-RUN pip3 install -r ./requirements/requirements-dev.txt
+RUN pip3 install --no-deps -r ./requirements/requirements-dev.txt
 COPY ./analytics analytics
 COPY ./blink blink
 COPY ./dalite dalite
-COPY ./functional_tests functional_tests
 COPY ./locale locale
 COPY ./peerinst peerinst
 COPY ./quality quality
@@ -21,6 +20,7 @@ COPY ./saltise ./saltise
 COPY ./templates templates
 COPY ./tos tos
 COPY ./manage.py .
+COPY ./functional_tests functional_tests
 
 # https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
 RUN groupadd -r container_user && useradd --no-log-init -r -g container_user container_user

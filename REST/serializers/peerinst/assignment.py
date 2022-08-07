@@ -27,9 +27,7 @@ class CategorySerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """Bleach"""
         ret = super().to_representation(instance)
-        ret["title"] = bleach.clean(
-            ret["title"], tags=[], styles=[], strip=True
-        ).strip()
+        ret["title"] = bleach.clean(ret["title"], tags=[], strip=True).strip()
         return ret
 
 
@@ -41,9 +39,7 @@ class DisciplineSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """Bleach"""
         ret = super().to_representation(instance)
-        ret["title"] = bleach.clean(
-            ret["title"], tags=[], styles=[], strip=True
-        ).strip()
+        ret["title"] = bleach.clean(ret["title"], tags=[], strip=True).strip()
         return ret
 
 
@@ -83,7 +79,6 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                 "text": bleach.clean(
                     ac[1],
                     tags=ALLOWED_TAGS,
-                    styles=[],
                     strip=True,
                 ).strip(),
             }
@@ -178,11 +173,11 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         ret = super().to_representation(instance)
         if "title" in ret:
             ret["title"] = bleach.clean(
-                ret["title"], tags=ALLOWED_TAGS, styles=[], strip=True
+                ret["title"], tags=ALLOWED_TAGS, strip=True
             ).strip()
         if "text" in ret:
             ret["text"] = bleach.clean(
-                ret["text"], tags=ALLOWED_TAGS, styles=[], strip=True
+                ret["text"], tags=ALLOWED_TAGS, strip=True
             ).strip()
         return ret
 
@@ -325,12 +320,12 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         for field in ["conclusion_page", "description", "intro_page"]:
             if field in ret and ret[field]:
                 ret[field] = bleach.clean(
-                    ret[field], tags=ALLOWED_TAGS, styles=[], strip=True
+                    ret[field], tags=ALLOWED_TAGS, strip=True
                 ).strip()
         for field in ["title"]:
             if field in ret and ret[field]:
                 ret[field] = bleach.clean(
-                    ret[field], tags=[], styles=[], strip=True
+                    ret[field], tags=[], strip=True
                 ).strip()
         return ret
 

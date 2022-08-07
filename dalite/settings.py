@@ -53,13 +53,12 @@ INSTALLED_APPS = (
     "compressor",
     "analytical",
     "axes",
+    "django_minify_html",
     "django_inlinecss",
 )
 
 MIDDLEWARE = (
-    "django_samesite_none.middleware.SameSiteNoneMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "django_referrer_policy.middleware.ReferrerPolicyMiddleware",
     "django_permissions_policy.PermissionsPolicyMiddleware",
     "csp.middleware.CSPMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -72,9 +71,7 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "dalite.custom_middleware.resp_405_middleware",
     "dalite.custom_middleware.resp_503_middleware",
-    # Minify html
-    "htmlmin.middleware.HtmlMinifyMiddleware",
-    "htmlmin.middleware.MarkRequestMiddleware",
+    "django_minify_html.middleware.MinifyHtmlMiddleware",
     "axes.middleware.AxesMiddleware",
 )
 
@@ -113,10 +110,12 @@ DATABASES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 # Caching
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
         "LOCATION": "127.0.0.1:11211",
     }
 }
@@ -146,8 +145,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.8/topics/i18n/
-
 LANGUAGE_CODE = "en"
 LANGUAGES = (("fr", "FR"), ("en", "EN"))
 
@@ -175,9 +172,6 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
     "compressor.finders.CompressorFinder",
 )
-
-KEEP_COMMENTS_ON_MINIFYING = False
-HTML_MINIFY = not DEBUG
 
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
@@ -228,8 +222,6 @@ AXES_ONLY_USER_FAILURES = True
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = datetime.timedelta(minutes=5)
 AXES_LOCKOUT_TEMPLATE = "registration/lockout.html"
-
-GRAPPELLI_ADMIN_TITLE = "Dalite NG administration"
 
 # LTI integration
 # these are sensitive settings, so it is better to fail early than use some

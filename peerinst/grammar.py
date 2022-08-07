@@ -3,6 +3,7 @@ import re
 
 # import bleach
 
+# If uncommented, return to requirements
 # import contextualSpellCheck
 # import editdistance
 # import spacy
@@ -15,7 +16,7 @@ logger = logging.getLogger("nlp")
 # def spell_check(text):
 #     logger.debug(text)
 #     output = []
-#     doc = nlp(bleach.clean(text, tags=[], styles=[], strip=True))
+#     doc = nlp(bleach.clean(text, tags=[], strip=True))
 #     for sentence in doc.sents:
 #         _sentence = str(sentence).strip()
 #         for suggestion in doc._.suggestions_spellCheck.items():
@@ -53,7 +54,7 @@ def basic_syntax(text):
     - Start with a capital letter.
     - End with a punctuation mark.
     """
-    # logger.debug(text)
+    logger.debug(text)
     _text = re.sub(r"[\n|\r][\n|\r]+", "\n", text.strip())
     if len(_text) > 1:
         processed_text = []
@@ -70,6 +71,6 @@ def basic_syntax(text):
             processed_text.append(" ".join(processed_paragraph))
 
         output = "\n".join(processed_text)
-        # logger.debug(output)
+        logger.debug(output)
         return output
     return _text

@@ -17,17 +17,13 @@ def accept_cookies(browser):
 
 
 def go_to_account(browser):
-    icon = browser.find_element_by_xpath("//i[contains(text(), 'menu')]")
-    icon.click()
+    browser.find_element_by_xpath("//i[contains(text(), 'menu')]").click()
 
-    with contextlib.suppress(NoSuchElementException):
-        account_button = WebDriverWait(browser, MAX_WAIT).until(
-            EC.element_to_be_clickable(
-                (By.XPATH, "//i[contains(text(), 'account_circle')]")
-            )
+    WebDriverWait(browser, MAX_WAIT).until(
+        EC.element_to_be_clickable(
+            (By.XPATH, "//i[contains(text(), 'account_circle')]")
         )
-        time.sleep(1)
-        account_button.click()
+    ).click()
 
 
 def login(browser, teacher):
@@ -61,17 +57,13 @@ def login(browser, teacher):
     assert browser.current_url.endswith("teacher/dashboard/")
 
 
-def logout(browser, assert_):
-    icon = browser.find_element_by_xpath("//i[contains(text(), 'menu')]")
-    icon.click()
+def logout(browser):
+    browser.find_element(By.XPATH, "//i[contains(text(), 'menu')]").click()
 
-    with contextlib.suppress(NoSuchElementException):
-        logout_button = WebDriverWait(browser, 5).until(
-            EC.element_to_be_clickable(
-                (By.XPATH, "//a[contains(text(), 'Logout')]")
-            )
+    WebDriverWait(browser, MAX_WAIT).until(
+        EC.element_to_be_clickable(
+            (By.XPATH, "//i[contains(text(), 'logout')]")
         )
-        time.sleep(1)
-        logout_button.click()
+    ).click()
 
     assert browser.current_url == f"{browser.server_url}/en/login/"

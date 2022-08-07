@@ -6,7 +6,7 @@ from itertools import chain, islice
 import jwt
 import pytz
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as translate
+from django.utils.translation import gettext_lazy as translate
 
 DELTA = timedelta(weeks=16)
 

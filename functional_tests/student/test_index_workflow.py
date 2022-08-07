@@ -14,7 +14,7 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from functional_tests.fixtures import *  # noqa
 
-timeout = 1
+TIMEOUT = 10
 
 
 def signin(browser, student, mail_outbox):
@@ -53,23 +53,22 @@ def join_group_with_link(browser, group):
     add_group = browser.find_element_by_xpath(
         "//span[contains(string(), 'Add group')]"
     )
+
     add_group.click()
-
-    input_ = browser.find_element_by_name("new-group")
-    input_.clear()
-    input_.send_keys(link)
-    input_.send_keys(Keys.ENTER)
-
+    link_field = browser.find_element_by_name("new-group")
+    link_field.clear()
+    link_field.send_keys(link)
+    browser.find_element(By.ID, "join-group-btn").click()
     try:
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             presence_of_element_located(
                 (
                     By.XPATH,
-                    "//div[@class='student-group--title']/"
-                    "h3[text()='{}']".format(group.title),
+                    f"//div[@class='student-group--title']/h3[text()='{group.title}']",
                 )
             )
         )
+
     except TimeoutException:
         assert False
 
@@ -102,18 +101,24 @@ def join_old_group(browser, group):
     add_group = browser.find_element_by_xpath(
         "//span[contains(string(), 'Add group')]"
     )
-    add_group.click()
 
+    add_group.click()
     select = Select(browser.find_element_by_id("student-old-groups"))
     select.select_by_visible_text(group.title)
-
     join = browser.find_element_by_id("join-group-btn")
     join.click()
+    try:
+        WebDriverWait(browser, timeout=TIMEOUT).until(
+            presence_of_element_located(
+                (
+                    By.XPATH,
+                    f"//div[@class='student-group--title']/h3[text()='{group.title}']",
+                )
+            )
+        )
 
-    browser.find_element_by_xpath(
-        "//div[@class='student-group--title']/"
-        "h3[text()='{}']".format(group.title)
-    )
+    except TimeoutException:
+        assert False
 
 
 def toggle_notification(browser):
@@ -159,19 +164,19 @@ def change_student_id(browser):
         #  WebDriverWait(browser, timeout).until(
         #  visibility_of_element_located((By.XPATH, copy_xpath))
         #  )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, span_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, input_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, edit_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, check_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, cancel_xpath))
         )
     except TimeoutException:
@@ -183,19 +188,19 @@ def change_student_id(browser):
         #  WebDriverWait(browser, timeout).until(
         #  invisibility_of_element_located((By.XPATH, copy_xpath))
         #  )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, span_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, input_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, edit_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, check_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, cancel_xpath))
         )
     except TimeoutException:
@@ -209,22 +214,22 @@ def change_student_id(browser):
         #  WebDriverWait(browser, timeout).until(
         #  visibility_of_element_located((By.XPATH, copy_xpath))
         #  )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, span_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, input_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, edit_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, check_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, cancel_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             text_to_be_present_in_element((By.XPATH, span_xpath), "test1")
         )
     except TimeoutException:
@@ -236,19 +241,19 @@ def change_student_id(browser):
         #  WebDriverWait(browser, timeout).until(
         #  invisibility_of_element_located((By.XPATH, copy_xpath))
         #  )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, span_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, input_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, edit_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, check_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, cancel_xpath))
         )
     except TimeoutException:
@@ -263,22 +268,22 @@ def change_student_id(browser):
         #  WebDriverWait(browser, timeout).until(
         #  visibility_of_element_located((By.XPATH, copy_xpath))
         #  )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, span_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, input_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, edit_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, check_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, cancel_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             text_to_be_present_in_element((By.XPATH, span_xpath), "test2")
         )
     except TimeoutException:
@@ -290,19 +295,19 @@ def change_student_id(browser):
         #  WebDriverWait(browser, timeout).until(
         #  invisibility_of_element_located((By.XPATH, copy_xpath))
         #  )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, span_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, input_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, edit_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, check_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, cancel_xpath))
         )
     except TimeoutException:
@@ -317,22 +322,22 @@ def change_student_id(browser):
         #  WebDriverWait(browser, timeout).until(
         #  visibility_of_element_located((By.XPATH, copy_xpath))
         #  )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, span_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, input_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             visibility_of_element_located((By.XPATH, edit_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, check_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             invisibility_of_element_located((By.XPATH, cancel_xpath))
         )
-        WebDriverWait(browser, timeout).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             text_to_be_present_in_element((By.XPATH, span_xpath), "test2")
         )
     except TimeoutException:

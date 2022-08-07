@@ -3,6 +3,7 @@ from functools import wraps
 
 import celery
 from celery import Celery
+from celery.exceptions import OperationalError
 from celery.schedules import crontab
 from celery.utils.log import get_logger
 
@@ -28,11 +29,6 @@ def debug_task(self):
     print(f"Request: {self.request!r}")
 
 
-@app.task
-def heartbeat():
-    logger.info("Heartbeat check")
-
-
 def try_async(func):
     """
     Decorator for celery tasks such that they default to synchronous operation
@@ -43,9 +39,9 @@ def try_async(func):
     def wrapper(*args, **kwargs):
         try:
             logger.info("Checking for celery message broker...")
-            heartbeat.delay()
+            celery.current_app.control.ping()
 
-        except heartbeat.OperationalError as e:
+        except OperationalError as e:
             info = "Celery unavailable ({}).  Executing {} synchronously.".format(  # noqa
                 e, func.__name__
             )

@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.db.models import Count, Q
 from django.forms import ModelForm
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from tinymce.widgets import TinyMCE
 
 from peerinst.templatetags.bleach_html import STRICT_TAGS
@@ -59,7 +59,7 @@ class RichTextRationaleField(forms.CharField):
             _("Please provide a more detailed rationale for your choice."),
         ),
         NoProfanityValidator(
-            0.10,
+            0.5,
             _(
                 "The language filter has labeled this as possibly toxic or profane; please rephrase your rationale."  # noqa
             ),
@@ -75,7 +75,6 @@ class RichTextRationaleField(forms.CharField):
         return bleach.clean(
             super().to_python(value),
             tags=STRICT_TAGS,
-            styles=[],
             strip=True,
         )
 
