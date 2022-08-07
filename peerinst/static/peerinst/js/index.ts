@@ -856,15 +856,13 @@ export function difficulty(matrix, id) {
   };
   let max = -0;
   let label = "";
-  for (const entry in Object.entries(matrix)) {
-    if ({}.hasOwnProperty.call(Object.entries(matrix), entry)) {
-      const item = Object.entries(matrix)[entry];
-      if (item.value > max) {
-        max = item.value;
-        label = item.key;
-      }
+  Object.entries(matrix).map((entry) => {
+    if (entry[1] > max) {
+      max = entry[1];
+      label = entry[0];
     }
-  }
+  });
+
   const stats = document.getElementById(`stats-${id}`);
   if (max > 0) {
     const rating = document.getElementById(`rating-${id}`);
@@ -903,15 +901,12 @@ export function plot(matrix, freq, id) {
   };
   let max = -0;
   let label = "";
-  for (const entry in Object.entries(matrix)) {
-    if ({}.hasOwnProperty.call(Object.entries(matrix), entry)) {
-      const item = Object.entries(matrix)[entry];
-      if (item.value > max) {
-        max = item.value;
-        label = item.key;
-      }
+  Object.entries(matrix).map((entry) => {
+    if (entry[1] > max) {
+      max = entry[1];
+      label = entry[0];
     }
-  }
+  });
   if (max > 0) {
     const rating = document.getElementById(`rating-${id}`);
     if (rating) {
@@ -1102,7 +1097,12 @@ export function plot(matrix, freq, id) {
 
   gg.append("g")
     .selectAll("rect")
-    .data(Object.entries(freq["second_choice"]))
+    .data(
+      Object.entries(freq["second_choice"]).map((entry) => ({
+        key: entry[0],
+        value: entry[1],
+      })),
+    )
     .enter()
     .append("rect")
     .attr("id", `second_choice-${id}`)
@@ -1126,7 +1126,12 @@ export function plot(matrix, freq, id) {
   ggg
     .append("g")
     .selectAll("rect")
-    .data(Object.entries(freq["first_choice"]))
+    .data(
+      Object.entries(freq["first_choice"]).map((entry) => ({
+        key: entry[0],
+        value: entry[1],
+      })),
+    )
     .enter()
     .append("rect")
     .attr("id", `first_choice-${id}`)
@@ -1151,7 +1156,12 @@ export function plot(matrix, freq, id) {
 
   gg.append("g")
     .selectAll("text")
-    .data(Object.entries(freq["second_choice"]))
+    .data(
+      Object.entries(freq["second_choice"]).map((entry) => ({
+        key: entry[0],
+        value: entry[1],
+      })),
+    )
     .enter()
     .append("text")
     .attr("x", x(0))
@@ -1169,7 +1179,12 @@ export function plot(matrix, freq, id) {
   ggg
     .append("g")
     .selectAll("text")
-    .data(Object.entries(freq["first_choice"]))
+    .data(
+      Object.entries(freq["first_choice"]).map((entry) => ({
+        key: entry[0],
+        value: entry[1],
+      })),
+    )
     .enter()
     .append("text")
     .attr("x", x(1))
@@ -1186,7 +1201,12 @@ export function plot(matrix, freq, id) {
 
   gg.append("g")
     .selectAll("text")
-    .data(Object.entries(freq["second_choice"]))
+    .data(
+      Object.entries(freq["second_choice"]).map((entry) => ({
+        key: entry[0],
+        value: entry[1],
+      })),
+    )
     .enter()
     .append("text")
     .attr("x", x(0))

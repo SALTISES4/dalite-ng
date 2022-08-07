@@ -3,7 +3,7 @@ import { useCallback, useState } from "preact/hooks";
 import { triScale } from "../_theming/colours.js";
 import { scaleThreshold } from "d3";
 import { Favourites } from "./providers.js";
-import { PlotConfusionMatrix } from "../_assignment/analytics.jsx";
+import { PlotConfusionMatrix } from "../_assignment/analytics";
 import { get, submitData } from "../_ajax/ajax";
 
 import { Button } from "@rmwc/button";

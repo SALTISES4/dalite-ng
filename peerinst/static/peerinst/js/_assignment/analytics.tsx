@@ -16,6 +16,8 @@ export class PlotConfusionMatrix extends Component {
   ref = createRef();
 
   shouldComponentUpdate(nextProps, nextState) {
+    console.debug(nextProps, nextState);
+
     if (nextProps.plot == true) {
       const freq = nextProps.freq;
       this.state.matrix["easy"] = nextProps._matrix["easy"]
@@ -242,7 +244,12 @@ export class PlotConfusionMatrix extends Component {
 
       gg.append("g")
         .selectAll("rect")
-        .data(Object.entries(freq["second_choice"]))
+        .data(
+          Object.entries(freq["second_choice"]).map((entry) => ({
+            key: entry[0],
+            value: entry[1],
+          })),
+        )
         .enter()
         .append("rect")
         .attr("finalwidth", function (d) {
@@ -267,7 +274,12 @@ export class PlotConfusionMatrix extends Component {
       ggg
         .append("g")
         .selectAll("rect")
-        .data(Object.entries(freq["first_choice"]))
+        .data(
+          Object.entries(freq["first_choice"]).map((entry) => ({
+            key: entry[0],
+            value: entry[1],
+          })),
+        )
         .enter()
         .append("rect")
         .attr("finalwidth", function (d) {
@@ -296,7 +308,12 @@ export class PlotConfusionMatrix extends Component {
 
       gg.append("g")
         .selectAll("text")
-        .data(Object.entries(freq["second_choice"]))
+        .data(
+          Object.entries(freq["second_choice"]).map((entry) => ({
+            key: entry[0],
+            value: entry[1],
+          })),
+        )
         .enter()
         .append("text")
         .attr("x", x(0))
@@ -314,7 +331,12 @@ export class PlotConfusionMatrix extends Component {
       ggg
         .append("g")
         .selectAll("text")
-        .data(Object.entries(freq["first_choice"]))
+        .data(
+          Object.entries(freq["first_choice"]).map((entry) => ({
+            key: entry[0],
+            value: entry[1],
+          })),
+        )
         .enter()
         .append("text")
         .attr("x", x(1))
@@ -331,18 +353,27 @@ export class PlotConfusionMatrix extends Component {
 
       gg.append("g")
         .selectAll("text")
-        .data(Object.entries(freq["second_choice"]))
+        .data(
+          Object.entries(freq["second_choice"]).map((entry) => ({
+            key: entry[0],
+            value: entry[1],
+          })),
+        )
         .enter()
         .append("text")
         .attr("x", x(0))
         .attr("dx", 6)
-        .attr("y", function (d) {
+        .attr("y", function (d: { key: string; value: number }):
+          | number
+          | undefined {
           return y(d.key);
         })
         .attr("dy", y.bandwidth() / 2 + 4)
         .attr("class", "annotation-dark")
-        .text(function (d) {
-          return d.key.length < 30 ? d.key : `${d.key.substring(0, 30)}...`;
+        .text((d: { key: string; value: number }): string => {
+          return (
+            (d.key.length < 30 ? d.key : `${d.key.substring(0, 30)}...`) || ""
+          );
         });
     }
     return false;
