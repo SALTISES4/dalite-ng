@@ -20,7 +20,6 @@ django-inlinecss
 django-lti-provider
 django-minify-html
 django-permissions-policy
-django-samesite-none
 django-tinymce
 djangorestframework
 jsonfield # [4]

@@ -58,7 +58,6 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = (
-    "django_samesite_none.middleware.SameSiteNoneMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django_permissions_policy.PermissionsPolicyMiddleware",
     "csp.middleware.CSPMiddleware",

@@ -448,10 +448,6 @@ django-redis==5.2.0 \
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-django-samesite-none==0.0.2 \
-    --hash=sha256:340fcc2ef83226896261a2f7b1d216124408bdad7959e166b3e697b33f61a709 \
-    --hash=sha256:57863ff8e5ff081e93543dbf2b5382f4b26b8a7e1b6850909649f6701ef3a115
-    # via -r requirements/requirements-test.txt
 django-sslserver==0.22 \
     --hash=sha256:c598a363d2ccdc2421c08ddb3d8b0973f80e8e47a3a5b74e4a2896f21c2947c5
     # via -r requirements/requirements-dev.in

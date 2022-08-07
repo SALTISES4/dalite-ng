@@ -393,10 +393,6 @@ django-redis==5.2.0 \
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
-django-samesite-none==0.0.2 \
-    --hash=sha256:340fcc2ef83226896261a2f7b1d216124408bdad7959e166b3e697b33f61a709 \
-    --hash=sha256:57863ff8e5ff081e93543dbf2b5382f4b26b8a7e1b6850909649f6701ef3a115
-    # via -r requirements/requirements-base.txt
 django-timezone-field==5.0 \
     --hash=sha256:15746ed367a5a32eda76cfa2886eeec1de8cda79f519b7c5e12f87ed7cdbd663 \
     --hash=sha256:199f211082eeac7e83563929b8ce41399c1c0f00dfc2f36bc00bea381027eaaa
