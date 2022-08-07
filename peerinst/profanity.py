@@ -4,6 +4,15 @@ from better_profanity.better_profanity import Profanity
 
 
 class WhitespaceSeparatedProfanity(Profanity):
+    """
+    The original Profanity class functions exactly as needed but it imports
+    a utility function to look for swear words formed across word separators.
+    Tests show that the strategy results in a lot of false positives for
+    the kinds of rationales students in Science write.
+
+    We want to keep the original class and overwrite just this utility function.
+    """
+
     @patch(
         "better_profanity.better_profanity.any_next_words_form_swear_word",
         lambda cur_word, next_words_indices, censor_words: (False, -1),
