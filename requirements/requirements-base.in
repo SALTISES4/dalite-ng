@@ -22,7 +22,6 @@ django-minify-html
 django-permissions-policy
 django-tinymce
 djangorestframework
-jsonfield # [4]
 langdetect
 mysqlclient
 pandas
@@ -39,4 +38,3 @@ SALTISE_user_feedback
 # 1. Temporary pin – See: https://stackoverflow.com/a/68553668
 # 2. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
 # 3. Removed until used – See: peerinst/grammar.py
-# 4. Required by peerinst migration 0041

@@ -363,7 +363,6 @@ django==3.2.15 \
     #   django-redis
     #   django-sslserver
     #   djangorestframework
-    #   jsonfield
     #   saltise-course-flow
     #   saltise-user-feedback
 django-analytical==2.5.0 \
@@ -638,10 +637,6 @@ joblib==1.1.0 \
     #   -r requirements/requirements-test.txt
     #   alt-profanity-check
     #   scikit-learn
-jsonfield==3.1.0 \
-    --hash=sha256:7e4e84597de21eeaeeaaa7cc5da08c61c48a9b64d0c446b2d71255d01812887a \
-    --hash=sha256:df857811587f252b97bafba42e02805e70a398a7a47870bc6358a0308dd689ed
-    # via -r requirements/requirements-test.txt
 kombu==5.2.3 \
     --hash=sha256:81a90c1de97e08d3db37dbf163eaaf667445e1068c98bfd89f051a40e9f6dbbd \
     --hash=sha256:eeaeb8024f3a5cfc71c9250e45cddb8493f269d74ada2f74909a93c59c4b4179
