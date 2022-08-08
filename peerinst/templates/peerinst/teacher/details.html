@@ -45,19 +45,19 @@
                 <span class="mdc-list-item__graphic mdc-theme--primary">
                   <i class="clickable mdc-theme--primary material-icons md-36">group</i>
                 </span>
-                <span class="clickable mdc-list-item__text mdc-theme--secondary bold">
-                  {% if not g.title %} {{ g.name }} {% else %} {{ g.title }} {% endif %}
-                  <span class="mdc-list-item__secondary-text">
+                <div class="clickable mdc-list-item__text mdc-theme--secondary bold">
+                  {% if not g.title %}{{ g.name }}{% else %}{{ g.title }}{% endif %}
+                  <div class="mdc-list-item__secondary-text">
                     {% if g.discipline %}
                       {{ g.discipline.title }} / {{ g.semester }} {{ g.year }}
                     {% else %}
                       {% trans 'Update group details' %}
                     {% endif %}
-                  </span>
-                  <span class="mdc-list-item__secondary-text">
+                  </div>
+                  <div class="mdc-list-item__secondary-text">
                     {% trans "Students: " %} {{ g.students.all.count  }}
-                  </span>
-                </span>
+                  </div>
+                </div>
                 <span class="mdc-list-item__meta">
                   {% if g.mode_created == "STANDALONE" %}
                     <a href="{% url 'group-share' pk=teacher.id group_hash=g.hash %}">
@@ -143,13 +143,13 @@
                 <span class="mdc-list-item__graphic mdc-theme--primary">
                   <i class="clickable mdc-theme--primary material-icons md-36 collection-icon" id="{{ a.pk }}">book</i>
                 </span>
-                <span class="mdc-list-item__text mdc-theme--secondary bold">
+                <div class="mdc-list-item__text mdc-theme--secondary bold">
                   <a class="mdc-theme--secondary" href="{% url 'collection-detail' a.pk %}">{{ a.title }}</a>
-                  <span class="mdc-list-item__secondary-text">
+                  <div class="mdc-list-item__secondary-text">
                     {{ a.assignments.count }} {% if a.assignments.count == 1 %}{% trans 'assignment' %}{% else %}{% trans 'assignments' %}{% endif %},
                     {{ a.followers.count }} {% if a.followers.count == 1 %}{% trans 'follower' %}{% else %}{% trans 'followers' %}{% endif %}
-                  </span>
-                </span>
+                  </div>
+                </div>
                 <span class="mdc-list-item__meta">
                   <i id="activate-dialog-{{a.pk|slugify}}" class="material-icons md-24 mdc-ripple-surface icon-list collection-stats" pk="{{a.pk}}">bar_chart</i>
                   <a href="{% url 'collection-delete' a.pk %}">
@@ -219,63 +219,63 @@
             <li role="separator" class="mdc-list-divider"></li>
             <li class="mdc-list-item pointer" id="edit-user-btn">
               <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-36">account_circle</i></span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
+              <div class="mdc-list-item__text mdc-theme--secondary bold">
                 {{ object.user.username }}
-                <span class="mdc-list-item__secondary-text">
+                <div class="mdc-list-item__secondary-text">
                   {% trans "Email: " %} {{ object.user.email }}
-                </span>
-                <span class="mdc-list-item__secondary-text">
+                </div>
+                <div class="mdc-list-item__secondary-text">
                   {% trans "Member since: " %} {{ user.date_joined  }}
-                </span>
-              </span>
+                </div>
+              </div>
               <span class="mdc-list-item__meta"><i class="material-icons md-24">lock</i></span>
             </li>
             <li role="separator" class="mdc-list-divider"></li>
             <li class="mdc-list-item pointer edit-identity-btn">
               <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-36">book</i></span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
+              <div class="mdc-list-item__text mdc-theme--secondary bold">
                 {% for d in object.disciplines.all %}
                   {{ d.title }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
-                <span class="mdc-list-item__secondary-text">
+                <div class="mdc-list-item__secondary-text">
                   {% trans "Discipline" %}
-                </span>
-              </span>
+                </div>
+              </div>
               <span class="mdc-list-item__meta"><i class="material-icons md-24">settings</i></span>
             </li>
             <li role="separator" class="mdc-list-divider"></li>
             <li class="mdc-list-item pointer edit-identity-btn">
               <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-36">school</i></span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
+              <div class="mdc-list-item__text mdc-theme--secondary bold">
                 {% for i in object.institutions.all %}
                   {{ i.name }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
-                <span class="mdc-list-item__secondary-text">
+                <div class="mdc-list-item__secondary-text">
                   {% trans "Institution" %}
-                </span>
-              </span>
+                </div>
+              </div>
               <span class="mdc-list-item__meta"><i class="material-icons md-24">settings</i></span>
             </li>
             <li role="separator" class="mdc-list-divider"></li>
             <li class="mdc-list-item pointer" id="tos-modify-btn">
               <span class="mdc-list-item__graphic mdc-theme--primary {% if not tos_accepted %}red{% endif %}"><i class="material-icons md-36">{% if tos_accepted %}check{% else %}clear{% endif %}</i></span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
+              <div class="mdc-list-item__text mdc-theme--secondary bold">
                 {% if tos_accepted %}{% trans 'Terms of service: Sharing' %}{% else %}{% trans 'Terms of service: Not sharing' %}{% endif %}
-                <span class="mdc-list-item__secondary-text">
+                <div class="mdc-list-item__secondary-text">
                   {% trans 'Signed: ' %}{{ tos_timestamp }}
-                </span>
-              </span>
+                </div>
+              </div>
               <span class="mdc-list-item__meta"><i class="material-icons md-24">settings</i></span>
             </li>
             <li role="separator" class="mdc-list-divider"></li>
             <li class="mdc-list-item pointer" id="email-modify-btn">
               <span class="mdc-list-item__graphic mdc-theme--primary"><i class="material-icons md-36">email</i></span>
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
+              <div class="mdc-list-item__text mdc-theme--secondary bold">
                 {% trans "Email settings" %}
-                <span class="mdc-list-item__secondary-text">
+                <div class="mdc-list-item__secondary-text">
                   {% trans 'Notifications: ' %}{{ user.emailconsent_set.latest.datetime }}
-                </span>
-              </span>
+                </div>
+              </div>
               <span class="mdc-list-item__meta"><i class="material-icons md-24">settings</i></span>
             </li>
             <li role="separator" class="mdc-list-divider"></li>

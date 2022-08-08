@@ -6,6 +6,34 @@ function getCsrfToken() {
   ).value;
 }
 
+async function handleJSONResponse(response: Response) {
+  const contentType = response.headers.get("content-type");
+  if (!contentType) {
+    throw new Error("Missing content-type header on response");
+  }
+  if (
+    contentType.includes("application/json") &&
+    [200, 201].includes(response.status)
+  ) {
+    return response.json();
+  }
+  throw new Error("Non-JSON reponse");
+}
+
+async function handleTemplateResponse(response: Response) {
+  const contentType = response.headers.get("content-type");
+  if (!contentType) {
+    throw new Error("Missing content-type header on response");
+  }
+  if (
+    contentType.includes("text/html") &&
+    [200, 201].includes(response.status)
+  ) {
+    return response.text();
+  }
+  throw new Error("Non-HTML reponse");
+}
+
 async function handleResponse(response: Response) {
   if (
     response.status == 200 || // OK
@@ -79,4 +107,28 @@ export async function get(
   Object.assign(settings, defaultSettings);
   const response = await fetch(url, settings);
   return await handleResponse(response);
+}
+
+export async function fetchJSON(
+  url: string,
+  method = "GET",
+): Promise<Record<string, unknown> | unknown[] | Error> {
+  const settings = {
+    method,
+  };
+  Object.assign(settings, defaultSettings);
+  const response = await fetch(url, settings);
+  return await handleJSONResponse(response);
+}
+
+export async function fetchTemplate(
+  url: string,
+  method = "GET",
+): Promise<Record<string, unknown> | unknown[] | Error> {
+  const settings = {
+    method,
+  };
+  Object.assign(settings, defaultSettings);
+  const response = await fetch(url, settings);
+  return await handleTemplateResponse(response);
 }

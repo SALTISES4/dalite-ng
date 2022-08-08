@@ -97,6 +97,7 @@ const scriptBuilds = [
       "ajax",
       "assignment",
       "preact",
+      "get",
     ],
   },
   {
@@ -231,7 +232,7 @@ function buildScript(app, module) {
         exclude: "node_modules/**",
         extensions: [".js", ".jsx", ".ts", ".tsx"],
       }),
-      strip({ include: ["**/*.(js|jsx|ts|tsx)"] }),
+      // strip({ include: ["**/*.(js|jsx|ts|tsx)"] }),
     ],
   };
   const outputOptions = {

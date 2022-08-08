@@ -277,6 +277,9 @@
   {% compress js file search %}
     <script src="{% static 'peerinst/js/search.min.js' %}"></script>
   {% endcompress %}
+  {% compress js file get %}
+    <script src="{% static 'peerinst/js/get.min.js' %}"></script>
+  {% endcompress %}
   <script src="https://unpkg.com/json5@2.1.1/dist/index.min.js" integrity="sha384-gRrJKgBpstjyexh9UmCoTPivgMMb7/EAtEdR5DLbVhiPYdl03QxdzMzbylHUSloD" crossorigin="anonymous"></script>
   <script nonce="{{ request.csp_nonce }}">
     bundle.toggleImages();
@@ -290,25 +293,19 @@
       bundle.search('.searchable', filterBar);
     }
 
+    const searchResults = document.getElementById("search_results");
     const input = document.getElementById('search-bar');
-    input.onchange = function() {
+    input.onchange = async function() {
       if (input.value != "") {
         search.setupSearch();
         console.info("Searching: "+input.value);
-        $('#search_results').load("{% url 'question-search-legacy' %}", "search_string="+input.value+"&type=blink&id={{ object.id|urlencode }}&limit_search="+limitSearch.checked, function(){
-          search.processResponse();
-          setupAnalytics();
-        });
+        const template = await get.fetchTemplate("{% url 'question-search-legacy' %}?search_string="+input.value+"&type=blink&id={{ object.id|urlencode }}&limit_search="+limitSearch.checked);
+        searchResults.innerHTML = "";
+        searchResults.innerHTML = template;
+        search.processResponse();
+        setupAnalytics();
       }
     }
-
-    $.ajaxSetup({
-      beforeSend: function(xhr, settings) {
-        if (!bundle.csrfSafeMethod(settings.type) && !this.crossDomain) {
-          xhr.setRequestHeader("X-CSRFToken", bundle.getCsrfToken());
-        }
-      }
-    });
 
     function setupAnalytics(){
       bundle.addDialog();
@@ -340,13 +337,14 @@
       }
     }
 
-    function pageNav(page) {
+    async function pageNav(page) {
       search.setupSearch();
       console.info("Searching: "+input.value);
-      $('#search_results').load("{% url 'question-search' %}?page="+page, "search_string="+input.value+"&type=blink&id={{ object.id|urlencode }}&limit_search="+limitSearch.checked, function(){
-        search.processResponse();
-        setupAnalytics();
-      });
+      const template = await get.fetchTemplate("{% url 'question-search-legacy' %}?page="+page+"&search_string="+input.value+"&type=blink&id={{ object.id|urlencode }}&limit_search="+limitSearch.checked);
+      searchResults.innerHTML = "";
+      searchResults.innerHTML = template;
+      search.processResponse();
+      setupAnalytics();
     }
 
     window.addEventListener("load", function() {

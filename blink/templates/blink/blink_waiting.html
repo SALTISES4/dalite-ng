@@ -1,9 +1,19 @@
 {% extends 'peerinst/base.html' %}
 
-{% load add_class i18n %}
+{% load add_class compress i18n static  %}
+
+{% block jQuery %}
+  <!-- No jQuery dependency -->
+{% endblock %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  {% compress js file get %}
+    <script src="{% static 'peerinst/js/get.min.js' %}" defer></script>
+  {% endcompress %}
+{% endblock %}
 
 {% block body %}
-
   <main>
     <section>
       <h1 class="mdc-typography--display3"> {% trans 'Blink' %}
@@ -40,32 +50,33 @@
       {% else %}
         <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Waiting for teacher' %}</h2>
       {% endif %}
-
     </section>
   </main>
-
 {% endblock %}
 
 {% block scripts %}
   {{ block.super }}
   {% if not request.user.is_authenticated %}
     <script nonce="{{ request.csp_nonce }}">
-      function processResponse(response, status, obj) {
-        const action = response["action"];
+      window.addEventListener("load", () => {
+        function processResponse(data) {
+          const action = data["action"];
 
-        if (action !== "stop") {
-          if (status === "success" & window.location.pathname != action) {
-            clearInterval(status);
-            window.location = action;
+          if (action !== "stop") {
+            if (window.location.pathname != action) {
+              clearInterval(status);
+              window.location = action;
+            }
           }
         }
-      }
 
-      function checkURL() {
-        $.get("{% url 'blink:blink-get-current-url' username=teacher.user.username %}", processResponse);
-      }
+        async function checkURL() {
+          const data = await get.fetchJSON("{% url 'blink:blink-get-current-url' username=teacher.user.username %}");
+          processResponse(data);
+        }
 
-      const status = window.setInterval(checkURL, 1000);
+        const status = window.setInterval(checkURL, 1000);
+      })
     </script>
   {% endif %}
 {% endblock %}
