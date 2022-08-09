@@ -392,6 +392,7 @@ def index_page(req):
     Main student page. Accessed through a link sent by email containing
     a token or without the token for a logged in student.
     """
+    req.session["access_type"] = StudentGroup.STANDALONE
 
     token = req.GET.get("token")
     group_student_id_needed = req.GET.get("group-student-id-needed", "")
@@ -424,8 +425,8 @@ def index_page_LTI(req):
     Main student page  when accessed via LTI
     """
 
-    if "LTI" in req.session.get("_auth_user_backend"):
-        req.session["LTI"] = True
+    req.session["access_type"] = StudentGroup.LTI_STANDALONE
+
     session_data = {k: v for k, v in req.session.items()}
     logger.info(f"Session data for question view : {session_data}")
 

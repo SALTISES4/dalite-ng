@@ -893,33 +893,38 @@ class QuestionMixin:
         )
 
         # Pass hints so that template knows context
-        if self.request.session.get("LTI"):
-            context.update(lti=True)
+
+        if self.request.session.get("access_type") == StudentGroup.STANDALONE:
+            context.update(access_standalone=True)
+        elif (
+            self.request.session.get("access_type")
+            == StudentGroup.LTI_STANDALONE
+        ):
+            context.update(access_lti_standalone=True)
         else:
-            context.update(lti=False)
-            hash = self.request.session.get("assignment")
-            if hash is not None:
-                group_assignment = StudentGroupAssignment.get(hash)
-                context.update(group_assignment=group_assignment)
-            context.update(
-                assignment_first=self.request.session.get("assignment_first")
-            )
-            context.update(
-                assignment_last=self.request.session.get("assignment_last")
-            )
-            context.update(
-                assignment_expired=self.request.session.get(
-                    "assignment_expired"
-                )
-            )
-            context.update(quality=self.request.session.get("quality"))
+            context.update(access_teacher=True)
+
+        hash = self.request.session.get("assignment")
+        if hash is not None:
+            group_assignment = StudentGroupAssignment.get(hash)
+            context.update(group_assignment=group_assignment)
+        context.update(
+            assignment_first=self.request.session.get("assignment_first")
+        )
+        context.update(
+            assignment_last=self.request.session.get("assignment_last")
+        )
+        context.update(
+            assignment_expired=self.request.session.get("assignment_expired")
+        )
+        context.update(quality=self.request.session.get("quality"))
 
         return context
 
     def send_grade(self):
 
-        if not self.request.session.get("LTI"):
-            # We are running outside of an LTI context, so we don't need to
+        if not self.request.session.get("access_type") == StudentGroup.LTI:
+            # We are running outside of a basic LTI context, so we don't need to
             # send a grade.
             return
         else:
@@ -1582,7 +1587,7 @@ def question(request, assignment_id, question_id):
     """
 
     if "LTI" in request.session.get("_auth_user_backend"):
-        request.session["LTI"] = True
+        request.session["access_type"] = StudentGroup.LTI
         manage_LTI_studentgroup(request=request)
 
     session_data = {k: v for k, v in request.session.items()}
@@ -1639,7 +1644,7 @@ def question(request, assignment_id, question_id):
         stage_class = QuestionStartView
 
     logger_auth.info(
-        f"LTI access for {user_token} to assignment {assignment} and question {question} dispatched to {stage_class}"  # noqa
+        f"Access type {request.session.get('access_type')} for {user_token} to assignment {assignment} and question {question} dispatched to {stage_class}"  # noqa
     )
     # Delegate to the view
     stage = stage_class(**view_data)
@@ -1759,8 +1764,8 @@ class TeacherDetailView(TeacherBase, DetailView):
         context["owned_collections"] = Collection.objects.filter(
             owner=self.request.user.teacher
         )
-        context["LTI_key"] = str(settings.LTI_CLIENT_KEY)
-        context["LTI_secret"] = str(settings.LTI_CLIENT_SECRET)
+        context["LTI_key"] = str(settings.LTI_BASIC_CLIENT_KEY)
+        context["LTI_secret"] = str(settings.LTI_BASIC_CLIENT_SECRET)
         context["LTI_launch_url"] = str(
             "https://" + self.request.get_host() + "/lti/"
         )

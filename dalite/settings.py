@@ -226,17 +226,16 @@ AXES_LOCKOUT_TEMPLATE = "registration/lockout.html"
 # LTI integration
 # these are sensitive settings, so it is better to fail early than use some
 # defaults visible on public repo
-LTI_CLIENT_KEY = os.environ.get("LTI_CLIENT_KEY", None)
-LTI_CLIENT_SECRET = os.environ.get("LTI_CLIENT_SECRET", None)
+LTI_BASIC_CLIENT_KEY = os.environ.get("LTI_BASIC_CLIENT_KEY", "")
+LTI_BASIC_CLIENT_SECRET = os.environ.get("LTI_BASIC_CLIENT_SECRET", "")
+LTI_STANDALONE_CLIENT_KEY = os.environ.get("LTI_STANDALONE_CLIENT_KEY", "")
+LTI_STANDALONE_CLIENT_SECRET = os.environ.get(
+    "LTI_STANDALONE_CLIENT_SECRET", ""
+)
 
 # hint: LTi passport in edX Studio should look like
 # <arbitrary_label>:LTI_CLIENT_KEY:LTI_CLIENT_SECRET
 
-# Used to automatically generate stable passwords from anonymous user ids
-# coming from LTI requests - keep secret as well
-# If compromised, attackers would be able to restore any student passwords
-# knowing his anonymous user ID from LMS
-PASSWORD_GENERATOR_NONCE = os.environ.get("PASSWORD_GENERATOR_NONCE", None)
 # LTI Integration end
 
 # Configureation file for the heartbeat view, should contain json file. See

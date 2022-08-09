@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -92,8 +93,13 @@ def signup_through_link(request, group_hash):
 @require_safe
 def live(request, token, assignment_hash):
 
-    if "LTI" not in request.session.get("_auth_user_backend"):
-
+    if (
+        request.session.get("oauth_consumer_key")
+        == settings.LTI_STANDALONE_CLIENT_KEY
+    ):
+        user = request.user
+        request.session["access_type"] = StudentGroup.LTI_STANDALONE
+    else:
         # Call logout to ensure a clean session
         logout(request)
 
@@ -106,9 +112,7 @@ def live(request, token, assignment_hash):
         )
 
         # Register access type
-        request.session["LTI"] = False
-    else:
-        user = request.user
+        request.session["access_type"] = StudentGroup.STANDALONE
 
     # Get assignment for this token and current question
     group_assignment = StudentGroupAssignment.get(assignment_hash)
