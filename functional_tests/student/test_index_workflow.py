@@ -31,7 +31,12 @@ def signin(browser, student, mail_outbox):
     input_.send_keys(email)
     input_.send_keys(Keys.ENTER)
 
-    assert len(mail_outbox) == 1
+    try:
+        WebDriverWait(browser, timeout=TIMEOUT).until(
+            lambda d: len(mail_outbox) == 1
+        )
+    except TimeoutException:
+        assert False
     assert list(mail_outbox[0].to) == [email]
 
     m = re.search(
@@ -68,7 +73,6 @@ def join_group_with_link(browser, group):
                 )
             )
         )
-
     except TimeoutException:
         assert False
 

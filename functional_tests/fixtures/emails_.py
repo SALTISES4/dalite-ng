@@ -75,11 +75,9 @@ def mail_outbox(mailoutbox):
     shared network volume and accessed across processes, but we need to
     implement the outbox interface.
     """
-    staging_server = os.environ.get("STAGING_SERVER")
-    if staging_server:
-        print("Using staging server > replacing default mailoutbox fixture")
-        outbox = FileBasedOutbox()
-        yield outbox
-        outbox.clear()
-    else:
+    if not (staging_server := os.environ.get("STAGING_SERVER")):
         return mailoutbox
+    print("Using staging server > replacing default mailoutbox fixture")
+    outbox = FileBasedOutbox()
+    yield outbox
+    outbox.clear()

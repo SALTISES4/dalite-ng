@@ -7,7 +7,7 @@
 #   `docker system prune -a`
 # To watch Chrome tests:
 #   Open a VNC client
-#   Go to vnc://127.0.0.1:41960 and enter password "secret"
+#   Go to vnc://127.0.0.1:41960 or vnc://127.0.0.1:41961 or vnc://127.0.0.1:41962 and enter password "secret"
 
 # TODO:
 #   - Currently, --create-db ensures tests do not start until other services are ready, but a wait function should be added.
@@ -24,6 +24,7 @@ services:
       context: .
     command: gunicorn dalite.wsgi:application --bind 0.0.0.0:8000
     environment:
+      ALLOWED_HOST: nginx
       DALITE_DB_HOST: ${HOST:-host.docker.internal}
       DALITE_DB_NAME: dalite_ng
       EMAIL_BACKEND: django.core.mail.backends.filebased.EmailBackend
@@ -56,6 +57,7 @@ services:
     image: redis:6
     container_name: redis
 
+  # Database is created and populated by test_chrome runner
   test_app:
     image: mydalite
     container_name: test_app
@@ -134,24 +136,84 @@ services:
       - SE_NODE_MAX_SESSIONS=2
       - SCREEN_WIDTH=2732
       - SCREEN_HEIGHT=1536
+    ports:
+      - "41961:5900"
 
-  # The test service runs all functional tests against the live test_app server.
-  test:
+  edge:
+    image: selenium/node-edge:4.2.0-20220527
+    container_name: edge
+    shm_size: 2gb
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_INSTANCES=4
+      - SE_NODE_MAX_SESSIONS=2
+      - SCREEN_WIDTH=2732
+      - SCREEN_HEIGHT=1536
+    ports:
+      - "41962:5900"
+
+  # The test services run all functional tests against the test_app live server
+  test_chrome:
     build:
       context: .
       dockerfile: ./functional_tests/Dockerfile
-    container_name: test
-    command: python -Wa -m pytest functional_tests/teacher/test_navigation.py --reuse-db --ignore=node_modules/ -vvvv -s -x
+    container_name: test_chrome
+    command: python -Wa -m pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s -x
     depends_on:
       - selenium-hub
     environment:
       ALLOWED_HOST: nginx
+      BROWSER: Chrome
       DALITE_DB_HOST: ${HOST:-host.docker.internal}
-      STAGING_SERVER: nginx:8080
-      SELENIUM_HUB: selenium-hub:4444
       DJANGO_SETTINGS_MODULE: dalite.functional_test_settings
+      SELENIUM_HUB: selenium-hub:4444
+      STAGING_SERVER: nginx:8080
     volumes:
-      - ./snapshots:/code/snapshots
+      - ./snapshots/chrome:/code/snapshots
+      - emails:/code/emails
+
+  test_firefox:
+    build:
+      context: .
+      dockerfile: ./functional_tests/Dockerfile
+    container_name: test_firefox
+    command: python -Wa -m pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s -x
+    depends_on:
+      - selenium-hub
+    environment:
+      ALLOWED_HOST: nginx
+      BROWSER: Firefox
+      DALITE_DB_HOST: ${HOST:-host.docker.internal}
+      DJANGO_SETTINGS_MODULE: dalite.functional_test_settings
+      SELENIUM_HUB: selenium-hub:4444
+      STAGING_SERVER: nginx:8080
+    volumes:
+      - ./snapshots/firefox:/code/snapshots
+      - emails:/code/emails
+
+  test_edge:
+    build:
+      context: .
+      dockerfile: ./functional_tests/Dockerfile
+    container_name: test_edge
+    command: python -Wa -m pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s -x
+    depends_on:
+      - selenium-hub
+    environment:
+      ALLOWED_HOST: nginx
+      BROWSER: Edge
+      DALITE_DB_HOST: ${HOST:-host.docker.internal}
+      DJANGO_SETTINGS_MODULE: dalite.functional_test_settings
+      SELENIUM_HUB: selenium-hub:4444
+      STAGING_SERVER: nginx:8080
+    volumes:
+      - ./snapshots/edge:/code/snapshots
       - emails:/code/emails
 
 volumes:

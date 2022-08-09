@@ -17,6 +17,7 @@ from functional_tests.student.test_index_workflow import join_group_with_link
 from peerinst.models.answer import Answer, AnswerChoice
 
 fake = Faker()
+MAX_TIMEOUT = 10
 
 
 def signin(browser, student, mail_outbox, new=False):
@@ -33,7 +34,13 @@ def signin(browser, student, mail_outbox, new=False):
     input_.send_keys(email)
     input_.send_keys(Keys.ENTER)
 
-    assert len(mail_outbox) == 1
+    try:
+        WebDriverWait(browser, timeout=MAX_TIMEOUT).until(
+            lambda d: len(mail_outbox) == 1
+        )
+    except TimeoutException:
+        [print(e) for e in mail_outbox]
+        assert False
     assert list(mail_outbox[0].to) == [email]
 
     m = re.search(
