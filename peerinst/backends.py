@@ -31,10 +31,10 @@ class CustomPermissionsBackend(ModelBackend):
 
 
 class DaliteLTIBackend(LTIBackend):
-    def authenticate(self, *args, **kwargs):
+    def authenticate(self, request, lti):
         try:
             logger.info("Authenticating using django-lti-provider")
-            super().authenticate(self, *args, **kwargs)
+            super().authenticate(self, request, lti)
         except LTIException as e:
             logger.info(e)
             return None
