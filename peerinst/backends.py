@@ -1,5 +1,11 @@
+import logging
+
 from django.contrib.auth.backends import ModelBackend
 from django.core.exceptions import PermissionDenied
+from lti_provider.auth import LTIBackend
+from pylti.common import LTIException
+
+logger = logging.getLogger("peerinst-auth")
 
 
 class CustomPermissionsBackend(ModelBackend):
@@ -22,3 +28,13 @@ class CustomPermissionsBackend(ModelBackend):
                 return super().has_perm(user_obj, perm)
             else:
                 raise PermissionDenied from e
+
+
+class DaliteLTIBackend(LTIBackend):
+    def authenticate(self, *args, **kwargs):
+        try:
+            logger.info("Authenticating using django-lti-provider")
+            super().authenticate(self, *args, **kwargs)
+        except LTIException as e:
+            logger.info(e)
+            return None
