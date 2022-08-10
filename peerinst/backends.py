@@ -34,7 +34,7 @@ class DaliteLTIBackend(LTIBackend):
     def authenticate(self, request, lti):
         try:
             logger.info("Authenticating using django-lti-provider")
-            super().authenticate(self, request, lti)
+            super().authenticate(request, lti)
         except LTIException as e:
             logger.info(e)
             return None
