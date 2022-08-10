@@ -424,7 +424,7 @@ def index_page_LTI(req):
     Main student page  when accessed via LTI
     """
 
-    if "LTI" in req.session.get("_auth_user_backend"):
+    if "LTI" in req.session.get("_auth_user_backend", ""):
         req.session["LTI"] = True
     session_data = {k: v for k, v in req.session.items()}
     logger.info(f"Session data for question view : {session_data}")
