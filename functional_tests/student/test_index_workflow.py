@@ -131,7 +131,13 @@ def toggle_notification(browser):
     )
     icon.click()
 
-    assert icon.text == "notifications_off"
+    try:
+        WebDriverWait(browser, timeout=TIMEOUT).until(
+            lambda d: icon.text == "notifications_off"
+        )
+    except TimeoutException:
+        assert False
+
     assert "student-group--notifications__disabled" in icon.get_attribute(
         "class"
     )

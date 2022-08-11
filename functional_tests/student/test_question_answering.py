@@ -157,10 +157,14 @@ def answer_questions(browser, student, assignment):
         else:
             browser.find_elements_by_class_name("md-60")[1].click()
         first = False
-    assert (
-        "You've finished this assignment. You"
-        in browser.find_element_by_tag_name("p").text
-    )
+
+    try:
+        WebDriverWait(browser, timeout=MAX_TIMEOUT).until(
+            lambda d: "You've finished this assignment. You"
+            in browser.find_element_by_tag_name("p").text
+        )
+    except TimeoutException:
+        assert False
 
 
 def test_question_answering(

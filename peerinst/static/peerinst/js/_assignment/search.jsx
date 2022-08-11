@@ -61,6 +61,7 @@ export class SearchBar extends Component {
             }}
             theme="secondary"
             outlined
+            id="search-field"
           />
           <TextFieldHelperText persistent>
             {this.props.gettext(

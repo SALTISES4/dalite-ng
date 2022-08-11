@@ -315,7 +315,12 @@ def create_PI_question(
 
     # Step 2
     # ------
-    assert "Step 2" in browser.find_element_by_tag_name("h2").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 2" in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
 
     tinymce_embed = browser.find_element_by_id(
         "id_answerchoice_set-0-text_ifr"
@@ -350,7 +355,12 @@ def create_PI_question(
 
     # Step 3
     # ------
-    assert "Step 3" in browser.find_element_by_tag_name("h2").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 3" in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
 
     browser.find_element_by_id("id_first_answer_choice_0").click()
 
@@ -440,7 +450,12 @@ def create_PI_question(
 
     browser.find_element_by_id("answer-choice-form").submit()
 
-    assert "Step 3" in browser.find_element_by_tag_name("h2").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 3" in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
 
     browser.wait_for(
         lambda: assert_(
@@ -456,10 +471,13 @@ def create_PI_question(
     # Access expert rationale update page and return > no change
     browser.find_elements_by_class_name("click-to-edit")[0].click()
 
-    assert (
-        "Approve Expert Rationale"
-        in browser.find_elements_by_tag_name("h2")[0].text
-    )
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Approve Expert Rationale"
+            in browser.find_elements_by_tag_name("h2")[0].text
+        )
+    except TimeoutException:
+        assert False
 
     browser.find_element_by_id("update-button").click()
 
@@ -716,17 +734,47 @@ def create_RO_question(browser, assert_, category, discipline, teacher):
 
     # Step 2
     # ------
-    assert "Step 2: Preview" in browser.find_element_by_tag_name("h2").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 2: Preview"
+            in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
 
     browser.find_element_by_id("back").submit()
-    assert "Step 1" in browser.find_element_by_tag_name("h2").text
+
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 1" in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
 
     browser.find_element_by_id("question-create-form").submit()
-    assert "Step 2: Preview" in browser.find_element_by_tag_name("h2").text
+
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 2: Preview"
+            in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
 
     browser.find_element_by_id("back").submit()
+
+    time.sleep(1)
+
     browser.find_element_by_id("next").submit()
-    assert "Step 2: Preview" in browser.find_element_by_tag_name("h2").text
+
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 2: Preview"
+            in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
+
     assert (
         "You currently do not have any assignments. "
         "You can create one from your account page."
@@ -735,7 +783,13 @@ def create_RO_question(browser, assert_, category, discipline, teacher):
 
     browser.find_element_by_id("done").click()
 
-    assert "My Account" in browser.find_element_by_tag_name("h1").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "My Account"
+            in browser.find_element_by_tag_name("h1").text
+        )
+    except TimeoutException:
+        assert False
 
     # New question in their list of questions
     try:

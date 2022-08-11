@@ -1,8 +1,9 @@
+import time
+
 from faker import Faker
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
-
-# from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.expected_conditions import (
     presence_of_element_located,
 )
@@ -13,7 +14,7 @@ from functional_tests.fixtures import *  # noqa
 from .utils import go_to_account, login
 
 fake = Faker()
-timeout = 3
+timeout = 10
 
 
 def create_assignment(browser, teacher, complete_questions):
@@ -59,31 +60,33 @@ def create_assignment(browser, teacher, complete_questions):
     create = browser.find_element_by_xpath("//input[@value='Create']")
     create.click()
 
-    search = browser.find_element_by_id("search-db-app").find_element_by_xpath(
-        "//input[@type='text']"
-    )
-    search.send_keys(teacher.user.username)
+    time.sleep(1)
 
-    """
-    # rmwc throws console error
-
-    search.send_keys(Keys.ENTER)
     try:
-        question = WebDriverWait(browser, timeout).until(
+        search = WebDriverWait(browser, timeout).until(
             presence_of_element_located(
                 (
                     By.XPATH,
-                    "//div[@class='mdc-card']//button[@title='Add this question to this assignment']",  # noqa E501
+                    "//div[@id='search-db-app']//input[@type='text']",
                 )
             )
         )
     except TimeoutException:
         assert False
+    search.send_keys(teacher.user.username)
+    search.send_keys(Keys.ENTER)
 
-    question.click()
-    """
+    time.sleep(1)
 
-    link = browser.find_element_by_link_text("Back to My Account").click()
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Add this question to this assignment"
+            in browser.page_source
+        )
+    except TimeoutException:
+        assert False
+
+    # question.click()
 
 
 def create_group(browser):

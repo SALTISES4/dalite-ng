@@ -149,6 +149,7 @@ def browser(live_server):
         setattr(driver, "get", partial(add_log, _get, driver))
 
         # Update find_element() to add logging to click() of passed WebElement
+        # TODO: Make this work with selenium 4.3 syntax using By
         for method in dir(driver):
             if "find_element_" in method:
                 _method = getattr(driver, method)
