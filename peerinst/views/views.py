@@ -1587,8 +1587,11 @@ def question(request, assignment_id, question_id):
     """
 
     if "LTI" in request.session.get("_auth_user_backend"):
-        request.session["access_type"] = StudentGroup.LTI
         manage_LTI_studentgroup(request=request)
+        if request.session.get("access_type") != StudentGroup.LTI_STANDALONE:
+            # this means we arrived via a teacher using all three LTI custom parameters,
+            # directly to this view
+            request.session["access_type"] = StudentGroup.LTI
 
     session_data = {k: v for k, v in request.session.items()}
     logger_auth.info(f"Session data for question view : {session_data}")

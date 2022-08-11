@@ -50,7 +50,7 @@
       {% endcompress %}
 
       <!-- Cookie law -->
-      {% if not request.session.LTI %}
+      {% if access_lti_standalone or access_standalone %}
         {% compress js file cookie_law %}
           <script src="{% static 'cookielaw/js/cookielaw.js' %}" defer="true"></script>
         {% endcompress %}
@@ -109,7 +109,7 @@
         <div id="header-left">
           {% block header-left %}{% endblock %}
           <div class="header branding">
-            {% if not request.session.LTI %}
+            {% if access_lti_standalone or access_standalone %}
               <a href="{% url 'landing_page' %}">
                 <img src="{% static 'peerinst/img/SALTISE-favicon.gif' %}"
                   alt="site-logo"
@@ -120,7 +120,7 @@
                 alt="site-logo"
                 id="logo">
             {% endif %}
-            {% if not user.student and not request.session.LTI  %}
+            {% if not user.student  %}
               <a href="{% url 'browse-database' %}">
                 <div id="custom-instance-header">
                   <span class="dalite-my">my</span><span class="dalite-dalite">Dalite</span>
@@ -181,7 +181,7 @@
         {% piwik %}
       {% endscript %}
 
-      {% if not request.session.LTI %}
+      {% if access_lti_standalone or access_standalone %}
         {% cookielaw_banner %}
       {% endif %}
 
