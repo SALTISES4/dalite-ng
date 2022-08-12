@@ -901,6 +901,8 @@ class QuestionMixin:
             == StudentGroup.LTI_STANDALONE
         ):
             context.update(access_lti_standalone=True)
+        elif self.request.session.get("access_type") == StudentGroup.LTI:
+            context.update(access_lti_basic_client_key=True)
         else:
             context.update(access_teacher=True)
 
@@ -1588,7 +1590,10 @@ def question(request, assignment_id, question_id):
 
     if "LTI" in request.session.get("_auth_user_backend"):
         manage_LTI_studentgroup(request=request)
-        if request.session.get("access_type") != StudentGroup.LTI_STANDALONE:
+        if (
+            request.session.get("oauth_consumer_key")
+            == settings.LTI_BASIC_CLIENT_KEY
+        ):
             # this means we arrived via a teacher using all three LTI custom parameters,
             # directly to this view
             request.session["access_type"] = StudentGroup.LTI

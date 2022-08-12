@@ -108,7 +108,7 @@
         {% block extra_content %}{% endblock %}
       </div>
 
-      {% if access_lti_standalone or access_standalone or access_teacher %}
+      {% if not access_lti_basic_client_key %}
         <div class='nav-question'>
 
           {% if not assignment_first %}
