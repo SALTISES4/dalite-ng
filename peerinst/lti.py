@@ -73,10 +73,9 @@ def manage_LTI_studentgroup(request):
         group.mode_created = StudentGroup.LTI_STANDALONE
         group.save()
 
-        lms_url_raw = request.session.get(
+        if lms_url_raw := request.session.get(
             "launch_presentation_return_url", None
-        )
-        if lms_url_raw:
+        ):
             lms_url = urlparse(lms_url_raw).hostname
             (
                 institutional_lms,
@@ -91,7 +90,7 @@ def manage_LTI_studentgroup(request):
             group.institution = institutional_lms.institution
             group.save()
         else:
-            session_data = {k: v for k, v in request.session.items()}
+            session_data = dict(request.session.items())
             logger.info("No LMS URL found in session data: {session_data}")
 
     # add group to student

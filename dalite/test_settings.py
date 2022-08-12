@@ -35,7 +35,7 @@ LTI_TOOL_CONFIGURATION = {
     "embed_url": "",
     "embed_icon_url": "",
     "embed_tool_id": "",
-    "landing_url": "lti/student_lti/",
+    "landing_url": "student_lti/",
     "course_aware": False,
     "course_navigation": False,
     "new_tab": False,

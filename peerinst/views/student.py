@@ -422,12 +422,11 @@ def index_page(req):
 
 def index_page_LTI(req):
     """
-    Main student page  when accessed via LTI
+    Main student page when accessed via LTI
     """
-
     req.session["access_type"] = StudentGroup.LTI_STANDALONE
 
-    session_data = {k: v for k, v in req.session.items()}
+    session_data = dict(req.session.items())
     logger.info(f"Session data for question view : {session_data}")
 
     assignment_id = req.session.get("custom_assignment_id", None)
@@ -446,12 +445,7 @@ def index_page_LTI(req):
 
     user = req.user
 
-    try:
-        student = Student.objects.get(student=user)
-        new_student = False
-    except Student.DoesNotExist:
-        student = Student.objects.create(student=user)
-        new_student = True
+    student, new_student = Student.objects.get_or_create(student=user)
 
     if not user.is_active or new_student:
         user.is_active = True
@@ -476,7 +470,7 @@ def index_page_LTI(req):
         "group_student_id_needed": "",
         "access_lti_standalone": True,
     }
-    session_data = {k: v for k, v in req.session.items()}
+    session_data = dict(req.session.items())
     logger.info(f"Session data for LTI-Standalone access : {session_data}")
     return render(req, "peerinst/student/index.html", context)
 

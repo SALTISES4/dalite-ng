@@ -8,6 +8,8 @@ from lti_provider.tests.factories import generate_lti_request
 from lti_provider.views import LTIRoutingView
 
 from dalite.views import admin_index_wrapper
+from peerinst.models import Student
+from tos.models import Consent, Role, Tos
 
 
 class TestViews(TestCase):
@@ -39,10 +41,39 @@ class TestAccess(TestCase):
         request = generate_lti_request()
         response = LTIRoutingView.as_view()(request)
 
-        print(response)
-
         assert request.user.is_authenticated is True
         assert request.user is not AnonymousUser
         assert response.status_code == 302
         assert response.url == "lti/student_lti/"
         assert "LTI" in request.session.get("_auth_user_backend")
+
+    def test_lti_make_student(self):
+        # Create a TOS
+        role = Role.objects.get(role="student")
+        tos = Tos(version=1, text="Test", current=True, role=role)
+        tos.save()
+
+        request = generate_lti_request()
+        response = self.client.post("/lti/", request.POST, follow=True)
+
+        self.assertTemplateUsed(response, "tos/tos_modify.html")
+        assert Student.objects.count() == 1
+
+        # Add consent
+        consent = Consent(
+            user=Student.objects.first().student,
+            accepted=True,
+            tos=Tos.objects.first(),
+        )
+        consent.save()
+
+        request = generate_lti_request()
+        params = dict(request.POST)
+        params.update(
+            {
+                "launch_presentation_return_url": "scivero.com",
+            }
+        )
+        response = self.client.post("/lti/", params, follow=True)
+
+        assert Student.objects.count() == 1
