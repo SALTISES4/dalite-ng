@@ -242,8 +242,6 @@ LTI_STANDALONE_CLIENT_SECRET = os.environ.get(
 # this url for file contents.
 HEARTBEAT_REQUIRED_FREE_SPACE_PERCENTAGE = 20
 
-PINAX_FORUMS_EDIT_TIMEOUT = {"days": 120}
-
 # CourseFlow settings
 COURSE_FLOW_RETURN_URL = {"name": "welcome", "title": "myDalite"}
 
