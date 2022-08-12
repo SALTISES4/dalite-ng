@@ -474,6 +474,7 @@ def index_page_LTI(req):
     context = {
         "data": json.dumps(data),
         "group_student_id_needed": "",
+        "access_lti_standalone": True,
     }
     session_data = {k: v for k, v in req.session.items()}
     logger.info(f"Session data for LTI-Standalone access : {session_data}")
