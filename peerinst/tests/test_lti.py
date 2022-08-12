@@ -44,7 +44,7 @@ class TestAccess(TestCase):
         assert request.user.is_authenticated is True
         assert request.user is not AnonymousUser
         assert response.status_code == 302
-        assert response.url == "lti/student_lti/"
+        assert response.url.endswith("student_lti/")
         assert "LTI" in request.session.get("_auth_user_backend")
 
     def test_lti_make_student(self):
