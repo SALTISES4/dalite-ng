@@ -39,6 +39,8 @@ class TestAccess(TestCase):
         request = generate_lti_request()
         response = LTIRoutingView.as_view()(request)
 
+        print(response)
+
         assert request.user.is_authenticated is True
         assert request.user is not AnonymousUser
         assert response.status_code == 302
