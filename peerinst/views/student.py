@@ -422,6 +422,7 @@ def index_page(req):
 
 
 @login_required
+@require_safe
 def index_page_LTI(req):
     """
     Main student page when accessed via LTI
