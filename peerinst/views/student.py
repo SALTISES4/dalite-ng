@@ -3,6 +3,7 @@ import logging
 import re
 
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -420,6 +421,7 @@ def index_page(req):
     return render(req, "peerinst/student/index.html", context)
 
 
+@login_required
 def index_page_LTI(req):
     """
     Main student page when accessed via LTI
