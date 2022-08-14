@@ -4,11 +4,13 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.views.i18n import JavaScriptCatalog
 
+from dalite.views import CookieGroupAcceptViewPatch
 from peerinst import views as peerinst_views
 from peerinst.middleware import lti_access_allowed
 
@@ -35,7 +37,29 @@ urlpatterns = [
 ]
 
 # Cookie consent
-urlpatterns += [path("cookies/", include("cookie_consent.urls"))]
+urlpatterns += [
+    path(
+        "cookies/",
+        include(
+            [
+                re_path(
+                    r"^accept/$",
+                    csrf_exempt(CookieGroupAcceptViewPatch.as_view()),
+                    name="cookie_consent_accept_all",
+                ),
+                re_path(
+                    r"^accept/(?P<varname>.*)/$",
+                    csrf_exempt(CookieGroupAcceptViewPatch.as_view()),
+                    name="cookie_consent_accept",
+                ),
+            ]
+        ),
+    ),
+    path(
+        "cookies/",
+        include("cookie_consent.urls"),
+    ),
+]
 
 # Apps
 urlpatterns += i18n_patterns(
