@@ -15,14 +15,6 @@ from dalite.views import admin_index_wrapper
 from peerinst.models import Student
 from tos.models import Consent, Role, Tos
 
-LTI_STANDALONE_CLIENT_KEY = "standalone_key"
-LTI_STANDALONE_CLIENT_SECRET = "standalone_secret"
-PYLTI_CONFIG = {
-    "consumers": {
-        LTI_STANDALONE_CLIENT_KEY: {"secret": LTI_STANDALONE_CLIENT_SECRET}
-    }
-}
-
 
 def generate_lti_request_dalite():
     """
@@ -32,8 +24,8 @@ def generate_lti_request_dalite():
     which we use to LTI determine access type
     """
     client = oauthlib.oauth1.Client(
-        LTI_STANDALONE_CLIENT_KEY,
-        client_secret=LTI_STANDALONE_CLIENT_SECRET,
+        settings.LTI_STANDALONE_CLIENT_KEY,
+        client_secret=settings.LTI_STANDALONE_CLIENT_SECRET,
         signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
         signature_type=oauthlib.oauth1.SIGNATURE_TYPE_QUERY,
     )
@@ -92,7 +84,7 @@ class TestViews(TestCase):
 
 class TestAccess(TestCase):
     def test_lti_auth(self):
-        request = generate_lti_request()
+        request = generate_lti_request_dalite()
         response = LTIRoutingView.as_view()(request)
 
         assert request.user.is_authenticated is True
@@ -107,7 +99,7 @@ class TestAccess(TestCase):
         tos = Tos(version=1, text="Test", current=True, role=role)
         tos.save()
 
-        request = generate_lti_request()
+        request = generate_lti_request_dalite()
         response = self.client.post("/lti/", request.POST, follow=True)
 
         self.assertTemplateUsed(response, "tos/tos_modify.html")
@@ -121,7 +113,7 @@ class TestAccess(TestCase):
         )
         consent.save()
 
-        request = generate_lti_request()
+        request = generate_lti_request_dalite()
         params = dict(request.POST)
 
         params.update(

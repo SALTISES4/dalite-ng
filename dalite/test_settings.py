@@ -45,6 +45,10 @@ LTI_TOOL_CONFIGURATION = {
     "allow_ta_access": False,
     "assignments": {},
 }
+LTI_STANDALONE_CLIENT_KEY = "standalone_key"
+LTI_STANDALONE_CLIENT_SECRET = "standalone_secret"
 PYLTI_CONFIG = {
-    "consumers": {"__consumer_key__": {"secret": "__lti_secret__"}}
+    "consumers": {
+        LTI_STANDALONE_CLIENT_KEY: {"secret": LTI_STANDALONE_CLIENT_SECRET}
+    }
 }
