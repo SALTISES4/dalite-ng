@@ -40,7 +40,6 @@ INSTALLED_APPS = (
     "REST",
     "django_elasticsearch_dsl",
     "lti_provider",
-    "cookielaw",
     "tinymce",
     "csp",
     "django.contrib.admin",

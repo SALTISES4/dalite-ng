@@ -49,16 +49,6 @@
         <link href="{% static 'peerinst/css/main.min.css' %}" rel="stylesheet">
       {% endcompress %}
 
-      <!-- Cookie law -->
-      {% if not request.session.LTI %}
-        {% compress js file cookie_law %}
-          <script src="{% static 'cookielaw/js/cookielaw.js' %}" defer="true"></script>
-        {% endcompress %}
-        {% compress css file cookie_law %}
-          <link href="{% static 'peerinst/css/cookie_law.min.css' %}" rel="stylesheet">
-        {% endcompress %}
-      {% endif %}
-
       <!-- Javascript translations -->
       <script src="{% url 'javascript-catalog' %}"></script>
 
