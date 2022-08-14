@@ -34,6 +34,9 @@ urlpatterns = [
     ),
 ]
 
+# Cookie consent
+urlpatterns += [path("cookies/", include("cookie_consent.urls"))]
+
 # Apps
 urlpatterns += i18n_patterns(
     path(
