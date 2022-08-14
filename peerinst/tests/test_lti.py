@@ -1,15 +1,69 @@
 from unittest import mock
+from urllib.parse import parse_qs, urlencode, urlparse
 
+import oauthlib.oauth1
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.db import IntegrityError
 from django.test import TestCase
-from lti_provider.tests.factories import generate_lti_request
+from django.test.client import RequestFactory
+from lti_provider.tests.factories import BASE_LTI_PARAMS, generate_lti_request
 from lti_provider.views import LTIRoutingView
 
 from dalite.views import admin_index_wrapper
 from peerinst.models import Student
 from tos.models import Consent, Role, Tos
+
+LTI_STANDALONE_CLIENT_KEY = "standalone_key"
+LTI_STANDALONE_CLIENT_SECRET = "standalone_secret"
+PYLTI_CONFIG = {
+    "consumers": {
+        LTI_STANDALONE_CLIENT_KEY: {"secret": LTI_STANDALONE_CLIENT_SECRET}
+    }
+}
+
+
+def generate_lti_request_dalite():
+    """
+    This code generated valid LTI 1.0 basic-lti-launch-request request
+    It is a modified version of lti_provider.tests.factories.generate_lti_request
+    but uses PYLTI_CONFIG with consumer LTI_STANDALONE_CLIENT_KEY,
+    which we use to LTI determine access type
+    """
+    client = oauthlib.oauth1.Client(
+        LTI_STANDALONE_CLIENT_KEY,
+        client_secret=LTI_STANDALONE_CLIENT_SECRET,
+        signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
+        signature_type=oauthlib.oauth1.SIGNATURE_TYPE_QUERY,
+    )
+    params = BASE_LTI_PARAMS.copy()
+
+    signature = client.sign(
+        "http://mydalite.org/lti/",
+        http_method="POST",
+        body=urlencode(params),
+        headers={
+            "Content-Type": oauthlib.oauth1.rfc5849.CONTENT_TYPE_FORM_URLENCODED
+        },
+    )
+
+    url_parts = urlparse(signature[0])
+    query_string = parse_qs(url_parts.query, keep_blank_values=True)
+    verify_params = dict()
+    for key, value in query_string.items():
+        verify_params[key] = value[0]
+
+    params.update(verify_params)
+
+    request = RequestFactory().post("/lti/", params)
+
+    middleware = SessionMiddleware()
+    middleware.process_request(request)
+    request.session.save()
+
+    request.user = AnonymousUser()
+    return request
 
 
 class TestViews(TestCase):
@@ -69,6 +123,7 @@ class TestAccess(TestCase):
 
         request = generate_lti_request()
         params = dict(request.POST)
+
         params.update(
             {
                 "launch_presentation_return_url": "scivero.com",
@@ -77,3 +132,4 @@ class TestAccess(TestCase):
         response = self.client.post("/lti/", params, follow=True)
 
         assert Student.objects.count() == 1
+        self.assertTemplateUsed(response, "peerinst/student/index.html")
