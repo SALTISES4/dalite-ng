@@ -28,6 +28,7 @@ def generate_lti_request_dalite(
     assignment_id=None,
     question_id=None,
     user_credentials=None,
+    **extra_params,
 ):
     """
     This code generated valid LTI 1.0 basic-lti-launch-request request
@@ -67,6 +68,9 @@ def generate_lti_request_dalite(
         params.update(
             lis_person_contact_email_primary=user_credentials["email"]
         )
+
+    # any extra parameters
+    params.update(**extra_params)
 
     signature = client.sign(
         "http://testserver/lti/",
@@ -121,19 +125,134 @@ class TestAccess(TestCase):
         tos = Tos(version=1, text="Test", current=True, role=role)
         tos.save()
 
-    def test_lti_auth(self):
+        # Create a teacher
+        cls.teacher = Teacher.objects.create(
+            user=User.objects.create(
+                username="teacher", email="teacher@mydalite.org"
+            )
+        )
+
+        # Create a staff user
+        cls.staff = User.objects.create(
+            username="staff",
+            email="staff@mydalite.org",
+            password="test",
+            is_staff=True,
+        )
+
+        # Create a superuser
+        cls.superuser = User.objects.create(
+            username="superuser",
+            email="superuser@mydalite.org",
+            password="test",
+            is_superuser=True,
+        )
+
+    def test_lti_auth_new_user_with_email(self):
+        """
+        Check that proper lti request results in successful authentication
+        """
         request = generate_lti_request_dalite(
-            client_key=settings.LTI_STANDALONE_CLIENT_KEY
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            lis_person_contact_email_primary="new_user@mydalite.org",
         )
         response = LTIRoutingView.as_view()(request)
 
         assert request.user.is_authenticated is True
         assert request.user is not AnonymousUser
+        assert request.user.email == "new_user@mydalite.org"
+        assert not request.user.has_usable_password()
         assert response.status_code == 302
         assert response.url.endswith("student_lti/")
         assert "LTI" in request.session.get("_auth_user_backend")
 
-    def test_lti_make_student_show_tos_access_index(self):
+    def test_lti_auth_new_user_without_email(self):
+        """
+        Check user creation without email field
+        """
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            lis_person_contact_email_primary="",
+        )
+        response = LTIRoutingView.as_view()(request)
+
+        assert request.user.is_authenticated is True
+        assert request.user is not AnonymousUser
+        assert request.user.email == ""
+        assert not request.user.has_usable_password()
+        assert response.status_code == 302
+        assert response.url.endswith("student_lti/")
+        assert "LTI" in request.session.get("_auth_user_backend")
+
+    def test_lti_auth_teacher_accounts_not_accessible(self):
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            lis_person_contact_email_primary=self.teacher.user.email,
+        )
+        response = LTIRoutingView.as_view()(request)
+
+        assert request.user.is_authenticated is True
+        assert request.user != self.teacher.user
+        assert not request.user.has_usable_password()
+        assert request.user.email == self.teacher.user.email
+
+    def test_lti_auth_staff_accounts_not_accessible(self):
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            lis_person_contact_email_primary=self.staff.email,
+        )
+        response = LTIRoutingView.as_view()(request)
+
+        assert request.user.is_authenticated is True
+        assert request.user.is_staff is False
+        assert request.user != self.staff
+        assert not request.user.has_usable_password()
+        assert request.user.email == self.staff.email
+
+    def test_lti_auth_superuser_accounts_not_accessible(self):
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            lis_person_contact_email_primary=self.superuser.email,
+        )
+        response = LTIRoutingView.as_view()(request)
+
+        assert request.user.is_authenticated is True
+        assert request.user.is_superuser is False
+        assert request.user != self.superuser
+        assert not request.user.has_usable_password()
+        assert request.user.email == self.superuser.email
+
+    def test_lti_new_student_show_tos_access_index(self):
+        """
+        Check that first access by new user results in
+        - creation of a new Student
+        - redirection to TOS
+        - redirection to index if Consent object exists
+        """
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY
+        )
+        response = self.client.post("/lti/", request.POST, follow=True)
+
+        self.assertTemplateUsed(response, "tos/tos_modify.html")
+        assert Student.objects.count() == 1
+
+        consent = Consent(
+            user=Student.objects.first().student,
+            accepted=True,
+            tos=Tos.objects.first(),
+        )
+        consent.save()
+
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+        )
+        response = self.client.post("/lti/", request.POST, follow=True)
+
+        self.assertTemplateUsed(response, "peerinst/student/index.html")
+        assert Student.objects.count() == 1
+
+    def test_lti_studentgroup(self):
         request = generate_lti_request_dalite(
             client_key=settings.LTI_STANDALONE_CLIENT_KEY
         )

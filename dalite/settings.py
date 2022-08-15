@@ -124,7 +124,7 @@ CACHES = {
 AUTHENTICATION_BACKENDS = (
     "axes.backends.AxesBackend",
     "peerinst.backends.CustomPermissionsBackend",
-    "lti_provider.auth.LTIBackend",
+    "peerinst.lti.LTIBackendStudentsOnly",
 )
 
 # Password validators through django-password-validation (backport from 1.9)

@@ -1,14 +1,17 @@
 import logging
 from urllib.parse import urlparse
 
-from django.contrib.auth import get_permission_codename, logout
+from django.contrib.auth import get_permission_codename, get_user_model, logout
 from django.contrib.auth.models import Permission
+from lti_provider.auth import LTIBackend
 from pylti.common import LTIException
 
 from .models import Institution, InstitutionalLMS, StudentGroup, Teacher
 from .models.group import current_semester, current_year
 
 logger = logging.getLogger(__name__)
+
+username_field = get_user_model().USERNAME_FIELD
 
 
 class LTIRoles:
@@ -26,6 +29,46 @@ MODELS_STAFF_USER_CAN_EDIT = (
     ("peerinst", "assignment"),
     ("peerinst", "category"),
 )
+
+
+class LTIBackendStudentsOnly(LTIBackend):
+    def find_user(self, request, lti):
+        # Search for users but exclude staff, superuser, and teacher accounts
+
+        # find the user via lms identifier first
+        kwargs = {username_field: lti.user_identifier(request)}
+        user_model = get_user_model()
+        user = (
+            user_model.objects.filter(
+                is_staff=False, is_superuser=False, **kwargs
+            )
+            .exclude(teacher__isnull=False)
+            .first()
+        )
+
+        # find the user via email address, if it exists
+        email = lti.user_email(request)
+        if user is None and email:
+            user = (
+                user_model.objects.filter(
+                    email=email, is_staff=False, is_superuser=False
+                )
+                .exclude(teacher__isnull=False)
+                .first()
+            )
+
+        if user is None:
+            # find the user via hashed username
+            username = self.get_hashed_username(request, lti)
+            user = (
+                user_model.objects.filter(
+                    username=username, is_staff=False, is_superuser=False
+                )
+                .exclude(teacher__isnull=False)
+                .first()
+            )
+
+        return user
 
 
 def get_permissions_for_staff_user():
