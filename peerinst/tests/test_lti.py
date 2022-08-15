@@ -29,7 +29,10 @@ def generate_lti_request_dalite():
         signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
         signature_type=oauthlib.oauth1.SIGNATURE_TYPE_QUERY,
     )
+
     params = BASE_LTI_PARAMS.copy()
+    # Full url instead of relative
+    params.update(launch_presentation_return_url="http://scivero.com")
 
     signature = client.sign(
         "http://testserver/lti/",
@@ -42,18 +45,12 @@ def generate_lti_request_dalite():
 
     url_parts = urlparse(signature[0])
     query_string = parse_qs(url_parts.query, keep_blank_values=True)
-    verify_params = dict()
-    for key, value in query_string.items():
-        verify_params[key] = value[0]
-
+    verify_params = {key: value[0] for key, value in query_string.items()}
     params.update(verify_params)
-
     request = RequestFactory().post("/lti/", params)
-
     middleware = SessionMiddleware()
     middleware.process_request(request)
     request.session.save()
-
     request.user = AnonymousUser()
     return request
 
@@ -83,6 +80,13 @@ class TestViews(TestCase):
 
 
 class TestAccess(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Create a TOS
+        role = Role.objects.get(role="student")
+        tos = Tos(version=1, text="Test", current=True, role=role)
+        tos.save()
+
     def test_lti_auth(self):
         request = generate_lti_request_dalite()
         response = LTIRoutingView.as_view()(request)
@@ -93,19 +97,13 @@ class TestAccess(TestCase):
         assert response.url.endswith("student_lti/")
         assert "LTI" in request.session.get("_auth_user_backend")
 
-    def test_lti_make_student(self):
-        # Create a TOS
-        role = Role.objects.get(role="student")
-        tos = Tos(version=1, text="Test", current=True, role=role)
-        tos.save()
-
+    def test_lti_make_student_show_tos_access_index(self):
         request = generate_lti_request_dalite()
         response = self.client.post("/lti/", request.POST, follow=True)
 
         self.assertTemplateUsed(response, "tos/tos_modify.html")
         assert Student.objects.count() == 1
 
-        # Add consent
         consent = Consent(
             user=Student.objects.first().student,
             accepted=True,
@@ -114,14 +112,7 @@ class TestAccess(TestCase):
         consent.save()
 
         request = generate_lti_request_dalite()
-        params = dict(request.POST)
+        response = self.client.post("/lti/", request.POST, follow=True)
 
-        params.update(
-            {
-                "launch_presentation_return_url": "scivero.com",
-            }
-        )
-        response = self.client.post("/lti/", params, follow=True)
-
-        assert Student.objects.count() == 1
         self.assertTemplateUsed(response, "peerinst/student/index.html")
+        assert Student.objects.count() == 1
