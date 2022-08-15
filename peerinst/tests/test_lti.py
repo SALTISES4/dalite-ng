@@ -8,6 +8,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.db import IntegrityError
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 from lti_provider.tests.factories import BASE_LTI_PARAMS, generate_lti_request
 from lti_provider.views import LTIRoutingView
 
@@ -121,7 +122,18 @@ class TestAccess(TestCase):
         tos = Tos(version=1, text="Test", current=True, role=role)
         tos.save()
 
+    def test_lti_login_required(self):
+        # straight GET on url
+        response = self.client.get(reverse("student-page-LTI"), follow=True)
+        self.assertTemplateUsed("peerinst/login.html")
+
+        # post LTI params on url
+        post_data = BASE_LTI_PARAMS
+        response = self.client.post("/lti/", post_data)
+        self.assertTemplateUsed("peerinst/login.html")
+
     def test_lti_auth(self):
+
         request = generate_lti_request_dalite(
             client_key=settings.LTI_STANDALONE_CLIENT_KEY
         )
@@ -163,6 +175,10 @@ class TestAccess(TestCase):
         response = self.client.post("/lti/", request.POST, follow=True)
 
         self.assertTemplateUsed(response, "peerinst/student/index.html")
+        self.assertContains(
+            response, BASE_LTI_PARAMS["lis_person_contact_email_primary"]
+        )
+
         assert Student.objects.count() == 1
         assert (
             StudentGroup.objects.filter(name="myMoodleCourseID").count() == 1
@@ -195,14 +211,32 @@ class TestAccess(TestCase):
         self.assertTemplateUsed(response, "peerinst/question/start.html")
 
         # test different student
+        student2_credentials = {
+            "user_id": "student2",
+            "email": "another@email.com",
+        }
         request = generate_lti_request_dalite(
             client_key=settings.LTI_STANDALONE_CLIENT_KEY,
             teacher_id=teacher.hash,
-            user_credentials={
-                "user_id": "student2",
-                "email": "another@email.com",
-            },
+            user_credentials=student2_credentials,
         )
         response = self.client.post("/lti/", request.POST, follow=True)
         self.assertTemplateUsed(response, "tos/tos_modify.html")
         assert Student.objects.count() == 2
+
+        consent = Consent(
+            user=Student.objects.get(
+                student__email=student2_credentials["email"]
+            ).student,
+            accepted=True,
+            tos=Tos.objects.first(),
+        )
+        consent.save()
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            teacher_id=teacher.hash,
+            user_credentials=student2_credentials,
+        )
+        response = self.client.post("/lti/", request.POST, follow=True)
+        self.assertTemplateUsed(response, "peerinst/student/index.html")
+        self.assertContains(response, student2_credentials["email"])
