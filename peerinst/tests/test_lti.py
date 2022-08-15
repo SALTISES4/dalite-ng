@@ -262,6 +262,7 @@ class TestAccess(TestCase):
 
         self.assertTemplateUsed(response, "peerinst/student/index.html")
         assert Student.objects.count() == 1
+        assert not hasattr(Student.objects.first(), "teacher")
 
     def test_lti_studentgroup(self):
         request = generate_lti_request_dalite(
@@ -280,15 +281,10 @@ class TestAccess(TestCase):
         consent.save()
 
         # test manage_LTI_studentgroup
-        teacher = Teacher.objects.create(
-            user=User.objects.create(
-                username="moodleTeacher", password="good_password"
-            )
-        )
 
         request = generate_lti_request_dalite(
             client_key=settings.LTI_STANDALONE_CLIENT_KEY,
-            teacher_id=teacher.hash,
+            teacher_id=self.teacher.hash,
         )
         response = self.client.post("/lti/", request.POST, follow=True)
 
@@ -310,7 +306,7 @@ class TestAccess(TestCase):
         )
         assert (
             StudentGroup.objects.get(name="myMoodleCourseID")
-            in teacher.current_groups.all()
+            in self.teacher.current_groups.all()
         )
 
         # test basic LTI mode
@@ -321,7 +317,7 @@ class TestAccess(TestCase):
         assignment.questions.add(question)
         request = generate_lti_request_dalite(
             client_key=settings.LTI_BASIC_CLIENT_KEY,
-            teacher_id=teacher.hash,
+            teacher_id=self.teacher.hash,
             assignment_id=assignment.identifier,
             question_id=question.pk,
         )
@@ -335,7 +331,7 @@ class TestAccess(TestCase):
         }
         request = generate_lti_request_dalite(
             client_key=settings.LTI_STANDALONE_CLIENT_KEY,
-            teacher_id=teacher.hash,
+            teacher_id=self.teacher.hash,
             user_credentials=student2_credentials,
         )
         response = self.client.post("/lti/", request.POST, follow=True)
@@ -352,9 +348,40 @@ class TestAccess(TestCase):
         consent.save()
         request = generate_lti_request_dalite(
             client_key=settings.LTI_STANDALONE_CLIENT_KEY,
-            teacher_id=teacher.hash,
+            teacher_id=self.teacher.hash,
             user_credentials=student2_credentials,
         )
         response = self.client.post("/lti/", request.POST, follow=True)
         self.assertTemplateUsed(response, "peerinst/student/index.html")
         self.assertContains(response, student2_credentials["email"])
+
+        # test for myDalite Teacher logging in via LMS LTI
+        teacher_credentials = {
+            "user_id": self.teacher.user.username,
+            "email": self.teacher.user.email,
+        }
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            teacher_id=self.teacher.hash,
+            user_credentials=teacher_credentials,
+        )
+        response = self.client.post("/lti/", request.POST, follow=True)
+        self.assertTemplateUsed(response, "tos/tos_modify.html")
+        assert Student.objects.count() == 3
+
+        consent = Consent(
+            user=Student.objects.get(
+                student__email=self.teacher.user.email
+            ).student,
+            accepted=True,
+            tos=Tos.objects.first(),
+        )
+        consent.save()
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            teacher_id=self.teacher.hash,
+            user_credentials=teacher_credentials,
+        )
+        response = self.client.post("/lti/", request.POST, follow=True)
+        self.assertTemplateUsed(response, "peerinst/student/index.html")
+        self.assertContains(response, teacher_credentials["email"])
