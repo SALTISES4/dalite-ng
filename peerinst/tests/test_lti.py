@@ -33,7 +33,7 @@ def generate_lti_request_dalite():
     params = BASE_LTI_PARAMS.copy()
     # Full url instead of relative
     params.update(launch_presentation_return_url="http://scivero.com")
-
+    params.update(context_id="myMoodleCourseID")
     signature = client.sign(
         "http://testserver/lti/",
         http_method="POST",
