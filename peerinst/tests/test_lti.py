@@ -32,7 +32,7 @@ def generate_lti_request_dalite():
     params = BASE_LTI_PARAMS.copy()
 
     signature = client.sign(
-        "http://mydalite.org/lti/",
+        "http://testserver/lti/",
         http_method="POST",
         body=urlencode(params),
         headers={
