@@ -1,8 +1,9 @@
 import logging
 from urllib.parse import urlparse
 
-from django.contrib.auth import get_permission_codename
+from django.contrib.auth import get_permission_codename, logout
 from django.contrib.auth.models import Permission
+from pylti.common import LTIException
 
 from .models import Institution, InstitutionalLMS, StudentGroup, Teacher
 from .models.group import current_semester, current_year
@@ -60,6 +61,10 @@ def manage_LTI_studentgroup(request):
     teacher_hash = request.session.get("custom_teacher_id", None)
     course_id = request.session.get("context_id", "")
     course_title = request.session.get("context_title", None)
+
+    if not course_id:
+        logout(request)
+        raise LTIException()
 
     try:
         group = StudentGroup.objects.get(name=course_id)
