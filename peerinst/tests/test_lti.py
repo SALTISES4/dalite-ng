@@ -23,13 +23,22 @@ from tos.models import Consent, Role, Tos
 
 
 def generate_lti_request_dalite(
-    client_key, teacher_id=None, assignment_id=None, question_id=None
+    client_key,
+    teacher_id=None,
+    assignment_id=None,
+    question_id=None,
+    user_credentials=None,
 ):
     """
     This code generated valid LTI 1.0 basic-lti-launch-request request
     It is a modified version of lti_provider.tests.factories.generate_lti_request
     but uses PYLTI_CONFIG with consumer LTI_STANDALONE_CLIENT_KEY,
     which we use to LTI determine access type
+
+    `user_credentials` is optional dict with keys "user_id" and "email",
+    which we use to test effects of different students being created
+    and logged in correctly
+
     """
     client = oauthlib.oauth1.Client(
         client_key,
@@ -53,6 +62,11 @@ def generate_lti_request_dalite(
         params.update(custom_assignment_id=assignment_id)
     if question_id:
         params.update(custom_question_id=question_id)
+    if user_credentials:
+        params.update(user_id=user_credentials["user_id"])
+        params.update(
+            lis_person_contact_email_primary=user_credentials["email"]
+        )
 
     signature = client.sign(
         "http://testserver/lti/",
@@ -153,9 +167,12 @@ class TestAccess(TestCase):
         assert (
             StudentGroup.objects.filter(name="myMoodleCourseID").count() == 1
         )
+        student = Student.objects.get(
+            student__email=BASE_LTI_PARAMS["lis_person_contact_email_primary"]
+        )
         assert (
             StudentGroup.objects.get(name="myMoodleCourseID")
-            in Student.objects.first().groups.all()
+            in student.groups.all()
         )
         assert (
             StudentGroup.objects.get(name="myMoodleCourseID")
@@ -176,3 +193,16 @@ class TestAccess(TestCase):
         )
         response = self.client.post("/lti/", request.POST, follow=True)
         self.assertTemplateUsed(response, "peerinst/question/start.html")
+
+        # test different student
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            teacher_id=teacher.hash,
+            user_credentials={
+                "user_id": "student2",
+                "email": "another@email.com",
+            },
+        )
+        response = self.client.post("/lti/", request.POST, follow=True)
+        self.assertTemplateUsed(response, "tos/tos_modify.html")
+        assert Student.objects.count() == 2

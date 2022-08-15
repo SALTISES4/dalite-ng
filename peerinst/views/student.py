@@ -430,7 +430,7 @@ def index_page_LTI(req):
     req.session["access_type"] = StudentGroup.LTI_STANDALONE
 
     session_data = dict(req.session.items())
-    logger.info(f"Session data for question view : {session_data}")
+    logger.info(f"Session data for student index view : {session_data}")
 
     assignment_id = req.session.get("custom_assignment_id", None)
     question_id = req.session.get("custom_question_id", None)
