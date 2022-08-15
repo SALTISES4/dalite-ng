@@ -12,11 +12,19 @@ from lti_provider.tests.factories import BASE_LTI_PARAMS, generate_lti_request
 from lti_provider.views import LTIRoutingView
 
 from dalite.views import admin_index_wrapper
-from peerinst.models import Student
+from peerinst.models import (
+    Assignment,
+    Question,
+    Student,
+    StudentGroup,
+    Teacher,
+)
 from tos.models import Consent, Role, Tos
 
 
-def generate_lti_request_dalite():
+def generate_lti_request_dalite(
+    client_key, teacher_id=None, assignment_id=None, question_id=None
+):
     """
     This code generated valid LTI 1.0 basic-lti-launch-request request
     It is a modified version of lti_provider.tests.factories.generate_lti_request
@@ -24,16 +32,28 @@ def generate_lti_request_dalite():
     which we use to LTI determine access type
     """
     client = oauthlib.oauth1.Client(
-        settings.LTI_STANDALONE_CLIENT_KEY,
-        client_secret=settings.LTI_STANDALONE_CLIENT_SECRET,
+        client_key,
+        client_secret=settings.PYLTI_CONFIG["consumers"][client_key]["secret"],
         signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
         signature_type=oauthlib.oauth1.SIGNATURE_TYPE_QUERY,
     )
 
     params = BASE_LTI_PARAMS.copy()
+
     # Full url instead of relative
     params.update(launch_presentation_return_url="http://scivero.com")
+
+    # required for group creation
     params.update(context_id="myMoodleCourseID")
+
+    # custom parameters
+    if teacher_id:
+        params.update(custom_teacher_id=teacher_id)
+    if assignment_id:
+        params.update(custom_assignment_id=assignment_id)
+    if question_id:
+        params.update(custom_question_id=question_id)
+
     signature = client.sign(
         "http://testserver/lti/",
         http_method="POST",
@@ -88,7 +108,9 @@ class TestAccess(TestCase):
         tos.save()
 
     def test_lti_auth(self):
-        request = generate_lti_request_dalite()
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY
+        )
         response = LTIRoutingView.as_view()(request)
 
         assert request.user.is_authenticated is True
@@ -98,7 +120,9 @@ class TestAccess(TestCase):
         assert "LTI" in request.session.get("_auth_user_backend")
 
     def test_lti_make_student_show_tos_access_index(self):
-        request = generate_lti_request_dalite()
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY
+        )
         response = self.client.post("/lti/", request.POST, follow=True)
 
         self.assertTemplateUsed(response, "tos/tos_modify.html")
@@ -111,8 +135,44 @@ class TestAccess(TestCase):
         )
         consent.save()
 
-        request = generate_lti_request_dalite()
+        # test manage_LTI_studentgroup
+        teacher = Teacher.objects.create(
+            user=User.objects.create(
+                username="moodleTeacher", password="good_password"
+            )
+        )
+
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            teacher_id=teacher.hash,
+        )
         response = self.client.post("/lti/", request.POST, follow=True)
 
         self.assertTemplateUsed(response, "peerinst/student/index.html")
         assert Student.objects.count() == 1
+        assert (
+            StudentGroup.objects.filter(name="myMoodleCourseID").count() == 1
+        )
+        assert (
+            StudentGroup.objects.get(name="myMoodleCourseID")
+            in Student.objects.first().groups.all()
+        )
+        assert (
+            StudentGroup.objects.get(name="myMoodleCourseID")
+            in teacher.current_groups.all()
+        )
+
+        # test basic LTI mode
+        assignment = Assignment.objects.create(identifier="new_assignment")
+        question = Question.objects.create(
+            title="physics", text="why is sky blue?"
+        )
+        assignment.questions.add(question)
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_BASIC_CLIENT_KEY,
+            teacher_id=teacher.hash,
+            assignment_id=assignment.identifier,
+            question_id=question.pk,
+        )
+        response = self.client.post("/lti/", request.POST, follow=True)
+        self.assertTemplateUsed(response, "peerinst/question/start.html")
