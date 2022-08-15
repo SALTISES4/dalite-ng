@@ -10,7 +10,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.views.i18n import JavaScriptCatalog
 
-from dalite.views import CookieGroupAcceptViewPatch
+from dalite.cookie_consent import CookieGroupAcceptViewPatch
 from peerinst import views as peerinst_views
 from peerinst.middleware import lti_access_allowed
 

@@ -71,7 +71,7 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "dalite.custom_middleware.resp_405_middleware",
     "dalite.custom_middleware.resp_503_middleware",
-    "dalite.custom_middleware.CleanCookiesFixMiddleware",
+    "dalite.cookie_consent.CleanCookiesFixMiddleware",
     "django_minify_html.middleware.MinifyHtmlMiddleware",
     "axes.middleware.AxesMiddleware",
 )

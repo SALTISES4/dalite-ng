@@ -1,4 +1,4 @@
-{% load csp static i18n compress cookielaw_tags admin_urls tz piwik %}
+{% load compress cookie_consent_tags csp i18n piwik static tz %}
 
 {% get_current_language as LANGUAGE_CODE %}
 
@@ -92,6 +92,20 @@
       />
 
       {% block stylesheets %}{% endblock %}
+      <style nonce="{{ request.csp_nonce }}" type="text/css" media="screen">
+        body.with-cookie-bar {
+          padding-top: 35px;
+        }
+        .cookie-bar {
+          position: fixed;
+          width: 100%;
+          top:0;
+          text-align:center;
+          height:25px;
+          line-height: 25px;
+          background: #eee;
+        }
+      </style>
     </head>
 
     <body {% block logged_in_layout_class %}{% endblock %} >
@@ -173,11 +187,53 @@
         {% piwik %}
       {% endscript %}
 
-      {% if not request.session.LTI %}
-        {% cookielaw_banner %}
-      {% endif %}
-
       {% include 'icons.svg' %}
+
+      <p>
+        <a href="{% url "cookie_consent_cookie_group_list" %}">Cookies policy</a>
+      </p>
+
+      <script nonce="{{ request.csp_nonce }}" type="text/javascript" src={% static "cookie_consent/cookiebar.js" %}></script>
+
+      {% if request|cookie_consent_enabled %}
+        {% not_accepted_or_declined_cookie_groups request as cookie_groups %}
+
+        {% if cookie_groups %}
+          {% url "cookie_consent_cookie_group_list" as url_cookies %}
+          {% cookie_consent_accept_url cookie_groups as url_accept %}
+          {% cookie_consent_decline_url cookie_groups as url_decline %}
+          <script nonce="{{ request.csp_nonce }}" type="text/javascript">
+            var cookie_groups = [];
+            {% for cookie_group in cookie_groups %}
+              cookie_groups.push("{{ cookie_group.varname }}");
+            {% endfor %}
+
+            function ready(fn) {
+              if (document.readyState != 'loading') {
+                fn();
+              } else if (document.addEventListener) {
+                document.addEventListener('DOMContentLoaded', fn);
+              } else {
+                document.attachEvent('onreadystatechange', function() {
+                  if (document.readyState != 'loading')
+                  fn();
+                });
+              }
+            }
+
+            ready(function() {
+              showCookieBar({
+                content: "{% filter escapejs %}{% with cookie_groups=cookie_groups|join:", " %}<div class="cookie-bar">This site uses {{ cookie_groups }} cookies for better performance and user experience. Do you agree to use cookies? <a href="{{ url_accept }}" class="cc-cookie-accept">Accept</a> <a href="{{ url_decline }}" class="cc-cookie-decline">Decline</a> <a href="{{ url_cookies }}">Cookies info</a></div>{% endwith %}{% endfilter %}",
+                cookie_groups: cookie_groups,
+                cookie_decline: "{% get_decline_cookie_groups_cookie_string request cookie_groups %}",
+                beforeDeclined: function() {
+                  document.cookie = "{% get_decline_cookie_groups_cookie_string request cookie_groups %}";
+                }
+              });
+            });
+          </script>
+        {% endif %}
+      {% endif %}
     </body>
 
   </html>
