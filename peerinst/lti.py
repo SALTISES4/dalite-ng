@@ -2,6 +2,8 @@ import logging
 from urllib.parse import urlparse
 
 from django.contrib.auth import get_user_model, logout
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
+from django.db.models import Q
 from lti_provider.auth import LTIBackend
 from pylti.common import LTIException
 
@@ -16,14 +18,18 @@ username_field = get_user_model().USERNAME_FIELD
 class LTIBackendStudentsOnly(LTIBackend):
     def find_user(self, request, lti):
         # Search for users but exclude staff, superuser, and teacher accounts
+        # as well as standalone student accounts
 
         # find the user via lms identifier first
         kwargs = {username_field: lti.user_identifier(request)}
         user_model = get_user_model()
         user = (
             user_model.objects.filter(
-                is_staff=False, is_superuser=False, **kwargs
+                is_staff=False,
+                is_superuser=False,
+                **kwargs,
             )
+            .filter(Q(password__startswith=UNUSABLE_PASSWORD_PREFIX))
             .exclude(teacher__isnull=False)
             .first()
         )
@@ -33,8 +39,11 @@ class LTIBackendStudentsOnly(LTIBackend):
         if user is None and email:
             user = (
                 user_model.objects.filter(
-                    email=email, is_staff=False, is_superuser=False
+                    email=email,
+                    is_staff=False,
+                    is_superuser=False,
                 )
+                .filter(Q(password__startswith=UNUSABLE_PASSWORD_PREFIX))
                 .exclude(teacher__isnull=False)
                 .first()
             )
@@ -44,8 +53,11 @@ class LTIBackendStudentsOnly(LTIBackend):
             username = self.get_hashed_username(request, lti)
             user = (
                 user_model.objects.filter(
-                    username=username, is_staff=False, is_superuser=False
+                    username=username,
+                    is_staff=False,
+                    is_superuser=False,
                 )
+                .filter(Q(password__startswith=UNUSABLE_PASSWORD_PREFIX))
                 .exclude(teacher__isnull=False)
                 .first()
             )

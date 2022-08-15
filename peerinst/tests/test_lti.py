@@ -128,13 +128,13 @@ class TestAccess(TestCase):
 
         # Create a teacher
         cls.teacher = Teacher.objects.create(
-            user=User.objects.create(
+            user=User.objects.create_user(
                 username="teacher", email="teacher@mydalite.org"
             )
         )
 
         # Create a staff user
-        cls.staff = User.objects.create(
+        cls.staff = User.objects.create_user(
             username="staff",
             email="staff@mydalite.org",
             password="test",
@@ -142,7 +142,7 @@ class TestAccess(TestCase):
         )
 
         # Create a superuser
-        cls.superuser = User.objects.create(
+        cls.superuser = User.objects.create_user(
             username="superuser",
             email="superuser@mydalite.org",
             password="test",
@@ -232,6 +232,26 @@ class TestAccess(TestCase):
         assert request.user != self.superuser
         assert not request.user.has_usable_password()
         assert request.user.email == self.superuser.email
+
+    def test_lti_auth_standalone_student_accounts_not_accessible(self):
+        student = Student.objects.create(
+            student=User.objects.create_user(
+                username="student",
+                email="student@mydalite.org",
+                password="password",
+            )
+        )
+
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            lis_person_contact_email_primary=student.student.email,
+        )
+        response = LTIRoutingView.as_view()(request)
+
+        assert request.user.is_authenticated is True
+        assert request.user != student.student
+        assert not request.user.has_usable_password()
+        assert request.user.email == student.student.email
 
     def test_lti_new_student_show_tos_access_index(self):
         """
