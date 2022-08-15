@@ -1,8 +1,7 @@
 import logging
 from urllib.parse import urlparse
 
-from django.contrib.auth import get_permission_codename, get_user_model, logout
-from django.contrib.auth.models import Permission
+from django.contrib.auth import get_user_model, logout
 from lti_provider.auth import LTIBackend
 from pylti.common import LTIException
 
@@ -12,23 +11,6 @@ from .models.group import current_semester, current_year
 logger = logging.getLogger(__name__)
 
 username_field = get_user_model().USERNAME_FIELD
-
-
-class LTIRoles:
-    """
-    Non-comprehensive list of roles commonly used in LTI applications
-    """
-
-    LEARNER = "Learner"
-    INSTRUCTOR = "Instructor"
-    STAFF = "Staff"
-
-
-MODELS_STAFF_USER_CAN_EDIT = (
-    ("peerinst", "question"),
-    ("peerinst", "assignment"),
-    ("peerinst", "category"),
-)
 
 
 class LTIBackendStudentsOnly(LTIBackend):
@@ -69,26 +51,6 @@ class LTIBackendStudentsOnly(LTIBackend):
             )
 
         return user
-
-
-def get_permissions_for_staff_user():
-    """
-    Returns all permissions that staff user possess. Staff user can create and
-    edit all models from `MODELS_STAFF_USER_CAN_EDIT` list. By design he has no
-    delete privileges --- as deleting questions could lead to bad user
-    experience for students.
-
-    :return: Iterable[django.contrib.auth.models.Permission]
-    """
-    from django.apps.registry import apps
-
-    for app_label, model_name in MODELS_STAFF_USER_CAN_EDIT:
-        model = apps.get_model(app_label, model_name)
-        for action in ("add", "change"):
-            codename = get_permission_codename(action, model._meta)
-            yield Permission.objects.get_by_natural_key(
-                codename, app_label, model_name
-            )
 
 
 def manage_LTI_studentgroup(request):

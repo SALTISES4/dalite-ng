@@ -233,12 +233,7 @@ LTI_STANDALONE_CLIENT_SECRET = os.environ.get(
     "LTI_STANDALONE_CLIENT_SECRET", ""
 )
 
-# hint: LTi passport in edX Studio should look like
-# <arbitrary_label>:LTI_CLIENT_KEY:LTI_CLIENT_SECRET
-
-# LTI Integration end
-
-# Configureation file for the heartbeat view, should contain json file. See
+# Configuration file for the heartbeat view, should contain json file. See
 # this url for file contents.
 HEARTBEAT_REQUIRED_FREE_SPACE_PERCENTAGE = 20
 
