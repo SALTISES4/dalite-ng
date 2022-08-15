@@ -159,6 +159,9 @@ class TestAccess(TestCase):
         response = self.client.post("/lti/", post_data)
         self.assertTemplateUsed("peerinst/login.html")
 
+    def test_lti_index_logged_as_wrong_user_type(self):
+        pass
+
     def test_lti_auth_new_user_with_email(self):
         """
         Check that proper lti request results in successful authentication

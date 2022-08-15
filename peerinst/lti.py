@@ -18,7 +18,7 @@ username_field = get_user_model().USERNAME_FIELD
 class LTIBackendStudentsOnly(LTIBackend):
     def find_user(self, request, lti):
         # Search for users but exclude staff, superuser, and teacher accounts
-        # as well as standalone student accounts
+        # as well as standalone student accounts (which have a password)
 
         # find the user via lms identifier first
         kwargs = {username_field: lti.user_identifier(request)}
