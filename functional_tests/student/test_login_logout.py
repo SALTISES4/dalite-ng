@@ -2,7 +2,9 @@ import re
 import time
 
 from django.urls import reverse
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
 
 from functional_tests.fixtures import *  # noqa
 from peerinst.students import (
@@ -25,7 +27,12 @@ def signin(browser, student, mail_outbox, new=False):
     input_.send_keys(email)
     input_.send_keys(Keys.ENTER)
 
-    assert len(mail_outbox) == 1
+    try:
+        WebDriverWait(browser, timeout=10).until(
+            lambda d: len(mail_outbox) == 1
+        )
+    except TimeoutException:
+        assert False
     assert list(mail_outbox[0].to) == [email]
 
     m = re.search(

@@ -1,5 +1,6 @@
 import re
 
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.expected_conditions import (
     presence_of_element_located,
@@ -86,7 +87,14 @@ def test_new_user_signup_workflow(
     )
 
     # Managers receive a notification
-    assert len(mail_outbox) == 1
+    try:
+        WebDriverWait(browser, timeout=MAX_TIMEOUT).until(
+            lambda d: len(mail_outbox) == 1
+        )
+    except TimeoutException:
+        [print(e) for e in mail_outbox]
+        assert False
+
     for manager in settings.MANAGERS:
         assert manager[1] in mail_outbox[0].to
 
@@ -118,7 +126,12 @@ def test_new_user_signup_workflow(
     assert "login" in browser.current_url
 
     # Account verification email is sent to new user
-    assert len(mail_outbox) == 2
+    try:
+        WebDriverWait(browser, timeout=MAX_TIMEOUT).until(
+            lambda d: len(mail_outbox) == 2
+        )
+    except TimeoutException:
+        assert False
     assert list(mail_outbox[0].to) == ["test@mydalite.org"]
 
     # Password reset email is sent to teacher
@@ -236,6 +249,12 @@ def test_new_teacher(browser, assert_, new_teacher, tos_teacher):
     inputbox.send_keys("default_password")
 
     browser.find_element_by_id("submit-btn").click()
+
+    browser.wait_for(
+        lambda: assert_(
+            browser.find_element_by_xpath("//a[contains(.,'My dashboard')]")
+        )
+    )
 
     browser.find_element_by_xpath("//a[contains(.,'My dashboard')]").click()
 

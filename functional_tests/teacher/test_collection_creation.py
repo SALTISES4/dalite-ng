@@ -2,6 +2,7 @@ import time
 
 from django.urls import reverse
 from faker import Faker
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.expected_conditions import (
     presence_of_element_located,
@@ -126,10 +127,15 @@ def create_collection(browser, assert_, teacher):
 
     assert "Collection Statistics" in browser.page_source
     assert "Collections" in browser.find_element_by_tag_name("h1").text
-    assert any(
-        title_update == h2.text
-        for h2 in browser.find_elements_by_tag_name("h2")
-    )
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: any(
+                title_update == h2.text
+                for h2 in browser.find_elements_by_tag_name("h2")
+            )
+        )
+    except TimeoutException:
+        assert False
 
     assert description_update in browser.find_element_by_id("obj.desc").text
     assert ("Created by") in browser.find_element_by_class_name(
@@ -355,25 +361,45 @@ def collection_buttons(
     # go back to distribute detail view
     browser.execute_script("window.history.go(-1)")
     # assure button shows "assign "
-    assert "ASSIGN" in browser.find_element_by_class_name("mdc-button").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "ASSIGN"
+            in browser.find_element_by_class_name("mdc-button").text
+        )
+    except TimeoutException:
+        assert False
     # click on assign
     browser.find_element_by_class_name("collection-toggle-assign").click()
-    time.sleep(5)
     # assure button changes to unassign
-    assert "UNASSIGN" in browser.find_element_by_class_name("mdc-button").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "UNASSIGN"
+            in browser.find_element_by_class_name("mdc-button").text
+        )
+    except TimeoutException:
+        assert False
     # go to group page
     browser.find_element_by_id(group.hash).click()
     # assure on group detail view
-    assert (
-        group.title
-        in browser.find_element_by_class_name(
-            "mdc-list-item__secondary-text"
-        ).text
-    )
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: group.title
+            in browser.find_element_by_class_name(
+                "mdc-list-item__secondary-text"
+            ).text
+        )
+    except TimeoutException:
+        assert False
     # open assignments foldable
     browser.find_element_by_xpath("//h2[@id='assignments-title']").click()
     # assure assignments have been added to group
-    assert student_group_assignment.assignment.title in browser.page_source
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: student_group_assignment.assignment.title
+            in browser.page_source
+        )
+    except TimeoutException:
+        assert False
 
 
 def test_create_collection(

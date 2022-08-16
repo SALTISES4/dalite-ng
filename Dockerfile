@@ -23,7 +23,7 @@ COPY templates ./templates
 COPY tos ./tos
 COPY manage.py .
 COPY gulpfile.js .
-RUN node_modules/gulp/bin/gulp.js build
+RUN npx gulp build
 
 FROM python:3.8
 ENV PYTHONDONTWRITEBYTECODE 1

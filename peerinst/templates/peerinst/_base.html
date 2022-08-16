@@ -169,9 +169,11 @@
           }
 
           const formSubmit = document.getElementById("submit-language-form");
-          formSubmit.addEventListener("click", function() {
-            document.getElementById("switchLanguage").submit();
-          });
+          if (formSubmit) {
+            formSubmit.addEventListener("click", function() {
+              document.getElementById("switchLanguage").submit();
+            });
+          }
         })
       </script>
 

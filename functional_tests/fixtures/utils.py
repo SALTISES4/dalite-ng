@@ -6,6 +6,7 @@ from functools import partial
 
 import pytest
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from selenium import webdriver
 from selenium.common.exceptions import (
     UnexpectedAlertPresentException,
@@ -49,47 +50,38 @@ def browser(live_server):
     staging_server = os.environ.get("STAGING_SERVER")
 
     if staging_server:
-        print("Using staging server")
+        print(f"Staging server: {staging_server}")
         selenium_hub = os.environ.get("SELENIUM_HUB")
+        print(" > Get browser from env")
+        browser_name = os.environ.get("BROWSER", "Chrome")
         print(" > Settings options")
-        options = webdriver.chrome.options.Options()
-        options.add_argument("start-maximized")
-        options.add_argument("window-size=1080,1440")
-        # options.add_argument("auto-open-devtools-for-tabs")
+        if browser_name.lower() == "chrome":
+            options = webdriver.chrome.options.Options()
+            options.add_argument("start-maximized")
+            options.add_argument("window-size=1080,1440")
+            # options.add_argument("auto-open-devtools-for-tabs")
 
-        print(" > Requesting browser from hub")
+        if browser_name.lower() == "firefox":
+            options = webdriver.firefox.options.Options()
+            options.add_argument("--width=1080")
+            options.add_argument("--height=1440")
+
+        if browser_name.lower() == "edge":
+            options = webdriver.edge.options.Options()
+            options.add_argument("--width=1080")
+            options.add_argument("--height=1440")
+
+        print(" > Requesting remote browser instance from hub")
         driver = webdriver.Remote(
             command_executor=f"http://{selenium_hub}/wd/hub",
             options=options,
         )
         print(f" > Received browser {driver}")
+
     else:
-        if hasattr(settings, "TESTING_BROWSER"):
-            browser = settings.TESTING_BROWSER.lower()
-        else:
-            browser = "firefox"
-
-        options = webdriver.ChromeOptions()
-
-        if hasattr(settings, "HEADLESS_TESTING") and settings.HEADLESS_TESTING:
-            os.environ["MOZ_HEADLESS"] = "1"
-            options.add_argument("headless")
-
-        if browser == "firefox":
-            try:
-                driver = webdriver.Firefox()
-            except WebDriverException:
-                driver = webdriver.Chrome(options=options)
-        elif browser == "chrome":
-            try:
-                driver = webdriver.Chrome(options=options)
-            except WebDriverException:
-                driver = webdriver.Firefox()
-        else:
-            raise ValueError(
-                "The TESTING_BROWSER setting in local_settings.py must either "
-                "be firefox or chrome."
-            )
+        raise ImproperlyConfigured(
+            "Missing STAGING_SERVER setting in environment"
+        )
 
     @wait
     def wait_for(fn):
@@ -97,69 +89,76 @@ def browser(live_server):
 
     driver.wait_for = wait_for
 
-    # Add assertion that web console logs are null after any get() or click()
-    # Log and screenshot function
-    def add_log(fct, driver, *args, **kwargs):
-        if WATCH:
-            time.sleep(2)
+    if browser_name.lower() == "chrome":
+        # Add assertion that web console logs are null after any get() or click()
+        # Log and screenshot function
+        def add_log(fct, driver, *args, **kwargs):
+            if WATCH:
+                # This "implicit" wait on redirect makes a lot of tests in Chrome pass, but fail in FF and Edge
+                # TODO: Refactor tests to explicitly wait for first detected element
+                time.sleep(2)
 
-        result = fct(*args, **kwargs)
+            result = fct(*args, **kwargs)
 
-        logs = driver.get_log("browser")
+            logs = driver.get_log("browser")
 
-        if isinstance(result, WebElement):
-            print(f"Logs checked after: {fct.func.__name__}")
-        else:
-            print(f"Logs checked after: {fct.__name__}")
+            try:
+                print(f"Logs checked after: {fct.func.__name__}")
+            except AttributeError:
+                print(f"Logs checked after: {fct.__name__}")
 
-        take_screenshot(driver)
+            take_screenshot(driver)
 
-        # Ignore network errors during testing
-        filtered_logs = [
-            d
-            for d in logs
-            if d["source"] != "network"
-            and d["level"] == "ERROR"
-            and "tinymce" not in d["message"]
-            and "youtube" not in d["message"]
-            and "mdc-auto-init" not in d["message"]
-        ]
-        assert not filtered_logs, logs
+            # Ignore network errors during testing
+            filtered_logs = [
+                d
+                for d in logs
+                if d["source"] != "network"
+                and d["level"] == "ERROR"
+                and "tinymce" not in d["message"]
+                and "youtube" not in d["message"]
+                and "mdc-auto-init" not in d["message"]
+            ]
+            assert not filtered_logs, logs
 
-        return result
+            return result
 
-    # Add screenshot
-    def take_screenshot(driver):
-        file_path = os.path.join(
-            settings.BASE_DIR, f"snapshots/test-{datetime.datetime.now()}.png"
-        )
-        with contextlib.suppress(
-            UnexpectedAlertPresentException, WebDriverException
-        ):
-            driver.save_screenshot(file_path)
+        # Add screenshot
+        def take_screenshot(driver):
+            file_path = os.path.join(
+                settings.BASE_DIR,
+                f"snapshots/test-{datetime.datetime.now()}.png",
+            )
+            with contextlib.suppress(
+                UnexpectedAlertPresentException, WebDriverException
+            ):
+                driver.save_screenshot(file_path)
 
-    # Log function for finders
-    def click_with_log(finder, driver, *args, **kwargs):
-        web_element = finder(*args, **kwargs)
+        # Log function for finders
+        def click_with_log(finder, driver, *args, **kwargs):
+            web_element = finder(*args, **kwargs)
 
-        _click = getattr(web_element, "click")
+            _click = getattr(web_element, "click")
 
-        setattr(web_element, "click", partial(add_log, _click, driver))
+            setattr(web_element, "click", partial(add_log, _click, driver))
 
-        return web_element
+            return web_element
 
-    # Update get()
-    _get = getattr(driver, "get")
-    setattr(driver, "get", partial(add_log, _get, driver))
+        # Update get()
+        _get = getattr(driver, "get")
+        setattr(driver, "get", partial(add_log, _get, driver))
 
-    # Update find_*() to add logging to click() of passed WebElement
-    for method in dir(driver):
-        if "find_element_" in method:
-            _method = getattr(driver, method)
-            if callable(_method):
-                setattr(
-                    driver, method, partial(click_with_log, _method, driver)
-                )
+        # Update find_element() to add logging to click() of passed WebElement
+        # TODO: Make this work with selenium 4.3 syntax using By
+        for method in dir(driver):
+            if "find_element_" in method:
+                _method = getattr(driver, method)
+                if callable(_method):
+                    setattr(
+                        driver,
+                        method,
+                        partial(click_with_log, _method, driver),
+                    )
 
     if staging_server:
         driver.server_url = f"http://{staging_server}"
