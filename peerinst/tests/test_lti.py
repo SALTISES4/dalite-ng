@@ -296,6 +296,8 @@ class TestAccess(TestCase):
         self.assertTemplateUsed(response, "peerinst/student/index.html")
         assert Student.objects.count() == 1
         assert not hasattr(Student.objects.first().student, "teacher")
+        assert response.context["access_lti_standalone"] == True
+        assert not response.context.get("access_lti_basic_client_key")
 
     def test_lti_studentgroup(self):
         request = generate_lti_request_dalite(
@@ -370,6 +372,8 @@ class TestAccess(TestCase):
         )
         response = self.client.post("/lti/", request.POST, follow=True)
         self.assertTemplateUsed(response, "peerinst/question/start.html")
+        assert response.context["access_lti_basic_client_key"] == True
+        assert not response.context.get("access_lti_standalone")
 
     def test_lti_student_wrong_email(self):
         # student 1
