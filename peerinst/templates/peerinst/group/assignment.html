@@ -173,7 +173,7 @@
                     </span>
                   {% endif %}
                 </span>
-                {% if student.student.email %}
+                {% if student.student.email and group.mode_created == group.STANDALONE %}
                   <span class="mdc-list-item__meta">
                     <i class="email-btn material-icons md-24 icon-list mdc-ripple-surface" title="{% trans 'Resend link' %}">
                       email
