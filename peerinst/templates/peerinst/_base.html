@@ -50,7 +50,7 @@
       {% endcompress %}
 
       <!-- Cookie law -->
-      {% if access_lti_standalone or access_standalone %}
+      {% if not access_lti_standalone %}
         {% compress js file cookie_law %}
           <script src="{% static 'cookielaw/js/cookielaw.js' %}" defer="true"></script>
         {% endcompress %}
@@ -183,7 +183,7 @@
         {% piwik %}
       {% endscript %}
 
-      {% if access_standalone %}
+      {% if not access_lti_standalone %}
         {% cookielaw_banner %}
       {% endif %}
 
