@@ -295,7 +295,7 @@ class TestAccess(TestCase):
 
         self.assertTemplateUsed(response, "peerinst/student/index.html")
         assert Student.objects.count() == 1
-        assert not hasattr(Student.objects.first(), "teacher")
+        assert not hasattr(Student.objects.first().student, "teacher")
 
     def test_lti_studentgroup(self):
         request = generate_lti_request_dalite(
