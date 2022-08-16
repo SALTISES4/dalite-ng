@@ -5,6 +5,7 @@ import bleach
 import pytz
 from django import forms
 from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User
 from django.db.models import Count, Q
 from django.forms import ModelForm
@@ -30,14 +31,13 @@ from .validators import (
 )
 
 
-class NonStudentPasswordResetForm(PasswordResetForm):
+class TeacherPasswordResetForm(PasswordResetForm):
     def get_users(self, email):
-        active_users = User.objects.filter(email__iexact=email, is_active=True)
-
-        return (
-            u
-            for u in active_users
-            if u.has_usable_password() and not hasattr(u, "student")
+        return User.objects.filter(
+            email__iexact=email, is_active=True, teacher__isnull=False
+        ).filter(
+            Q(password__isnull=True)
+            | ~Q(password__startswith=UNUSABLE_PASSWORD_PREFIX)
         )
 
 

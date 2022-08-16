@@ -7,7 +7,7 @@ from django.views.generic.base import TemplateView
 from peerinst.middleware import lti_access_allowed
 
 from . import admin_views, views
-from .forms import NonStudentPasswordResetForm
+from .forms import TeacherPasswordResetForm
 from .mixins import student_check
 
 
@@ -267,7 +267,7 @@ def old_patterns():
             "password_reset/",
             auth_views.PasswordResetView.as_view(
                 html_email_template_name="registration/password_reset_email_html.html",  # noqa
-                form_class=NonStudentPasswordResetForm,
+                form_class=TeacherPasswordResetForm,
             ),
             name="password_reset",
         ),
