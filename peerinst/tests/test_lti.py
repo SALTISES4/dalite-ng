@@ -182,6 +182,7 @@ class TestAccess(TestCase):
         assert request.user.is_authenticated is False
 
     def test_lti_auth_new_user_with_email(self):
+        # sourcery skip: class-extract-method
         """
         Check that proper lti request results in successful authentication
         """
@@ -321,6 +322,11 @@ class TestAccess(TestCase):
         assert not hasattr(Student.objects.first().student, "teacher")
         assert response.context["access_lti_standalone"] == True
         assert not response.context.get("access_lti_basic_client_key")
+        assert StudentGroup.objects.count() == 1
+        assert (
+            StudentGroup.objects.first()
+            in Student.objects.first().groups.all()
+        )
 
     def test_lti_studentgroup(self):
         request = generate_lti_request_dalite(
