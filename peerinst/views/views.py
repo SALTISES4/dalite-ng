@@ -55,7 +55,6 @@ from tos.models import Consent, Tos
 
 from .. import admin, forms, models, rationale_choice
 from ..admin_views import get_question_rationale_aggregates
-from ..lti import manage_LTI_studentgroup
 from ..mixins import (
     LoginRequiredMixin,
     NoStudentsMixin,
@@ -931,7 +930,7 @@ class QuestionMixin:
             return
         else:
             redirect_url = reverse(
-                "question-LTI",
+                "question",
                 kwargs={
                     "assignment_id": self.assignment,
                     "question_id": self.question,
@@ -1587,37 +1586,6 @@ def question(request, assignment_id, question_id):
     dispatcher loads the session state and relevant database objects. Based on
     the available data, it delegates to the correct view class.
     """
-
-    if "LTI" in request.session.get("_auth_user_backend"):
-        user = request.user
-
-        student, new_student = Student.objects.get_or_create(student=user)
-
-        if not user.is_active or new_student:
-            user.is_active = True
-            user.save()
-            new_student = True
-
-        if not Consent.objects.filter(
-            user=student.student, tos__role__role="student"
-        ).exists():
-            return HttpResponseRedirect(
-                reverse("tos:tos_consent", kwargs={"role": "student"})
-                + "?next="
-                + request.path
-            )
-        manage_LTI_studentgroup(request=request)
-        if (
-            request.session.get("oauth_consumer_key")
-            == settings.LTI_BASIC_CLIENT_KEY
-        ):
-            # this means we arrived via a teacher using all three LTI custom parameters,
-            # directly to this view
-            request.session["access_type"] = StudentGroup.LTI
-
-    session_data = {k: v for k, v in request.session.items()}
-    logger_auth.info(f"Session data for question view : {session_data}")
-
     if not request.user.is_authenticated:
         return redirect_to_login_or_show_cookie_help(request)
 

@@ -37,11 +37,6 @@ urlpatterns = [
         lti_access_allowed(peerinst_views.student.index_page_LTI),
         name="student-page-LTI",
     ),
-    path(
-        "lti/student_lti/<assignment_id>/<question_id>/",
-        lti_access_allowed(peerinst_views.question),
-        name="question-LTI",
-    ),
 ]
 
 # Apps
