@@ -171,6 +171,16 @@ class TestAccess(TestCase):
 
         assert Student.objects.count() == student_count
 
+    def test_lti_auth_missing_course_id(self):
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            context_id="",
+        )
+        response = self.client.post("/lti/", request.POST, follow=True)
+
+        self.assertTemplateUsed(response, "lti_provider/fail_auth.html")
+        assert request.user.is_authenticated is False
+
     def test_lti_auth_new_user_with_email(self):
         """
         Check that proper lti request results in successful authentication

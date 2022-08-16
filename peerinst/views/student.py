@@ -423,22 +423,24 @@ def index_page(req):
 
 @login_required
 @require_safe
-def index_page_LTI(req):
+def index_page_LTI(request):
     """
     Main student page when accessed via LTI for new accounts
     """
-    if req.user.has_usable_password():
+    course_id = request.session.get("context_id", None)
+
+    if request.user.has_usable_password() or not course_id:
         # Only allow access via new LTI student accounts
-        logout(req)
+        logout(request)
         return HttpResponseRedirect(reverse("lti-fail-auth"))
 
-    req.session["access_type"] = StudentGroup.LTI_STANDALONE
+    request.session["access_type"] = StudentGroup.LTI_STANDALONE
 
-    session_data = dict(req.session.items())
+    session_data = dict(request.session.items())
     logger.info(f"Session data for student index view : {session_data}")
 
-    assignment_id = req.session.get("custom_assignment_id", None)
-    question_id = req.session.get("custom_question_id", None)
+    assignment_id = request.session.get("custom_assignment_id", None)
+    question_id = request.session.get("custom_question_id", None)
 
     if assignment_id and question_id:
         return HttpResponseRedirect(
@@ -451,7 +453,7 @@ def index_page_LTI(req):
             ),
         )
 
-    user = req.user
+    user = request.user
 
     student, new_student = Student.objects.get_or_create(student=user)
 
@@ -466,21 +468,21 @@ def index_page_LTI(req):
         return HttpResponseRedirect(
             reverse("tos:tos_consent", kwargs={"role": "student"})
             + "?next="
-            + req.path
+            + request.path
         )
 
-    manage_LTI_studentgroup(request=req)
+    manage_LTI_studentgroup(request)
 
-    data = get_context_data_index_page(req, student, new_student)
+    data = get_context_data_index_page(request, student, new_student)
 
     context = {
         "data": json.dumps(data),
         "group_student_id_needed": "",
         "access_lti_standalone": True,
     }
-    session_data = dict(req.session.items())
+    session_data = dict(request.session.items())
     logger.info(f"Session data for LTI-Standalone access : {session_data}")
-    return render(req, "peerinst/student/index.html", context)
+    return render(request, "peerinst/student/index.html", context)
 
 
 @student_required

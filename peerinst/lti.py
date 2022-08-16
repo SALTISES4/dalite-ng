@@ -65,13 +65,10 @@ def manage_LTI_studentgroup(request):
             - assign year, semester and Discipline of teacher
               to StudentGroup
     """
-    teacher_hash = request.session.get("custom_teacher_id", None)
-    course_id = request.session.get("context_id", "")
-    course_title = request.session.get("context_title", None)
+    course_id = request.session.get("context_id")
 
-    if not course_id:
-        logout(request)
-        raise LTIException()
+    teacher_hash = request.session.get("custom_teacher_id", None)
+    course_title = request.session.get("context_title", None)
 
     try:
         group = StudentGroup.objects.get(name=course_id)
