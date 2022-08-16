@@ -5,6 +5,7 @@ import re
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -427,6 +428,11 @@ def index_page_LTI(req):
     """
     Main student page when accessed via LTI
     """
+    if req.user.has_usable_password():
+        # Only allow access to new LTI student accounts
+        logout(req)
+        raise PermissionDenied
+
     req.session["access_type"] = StudentGroup.LTI_STANDALONE
 
     session_data = dict(req.session.items())

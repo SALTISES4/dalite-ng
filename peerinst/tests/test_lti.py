@@ -129,7 +129,9 @@ class TestAccess(TestCase):
         # Create a teacher
         cls.teacher = Teacher.objects.create(
             user=User.objects.create_user(
-                username="teacher", email="teacher@mydalite.org"
+                username="teacher",
+                email="teacher@mydalite.org",
+                password="test",
             )
         )
 
@@ -160,7 +162,15 @@ class TestAccess(TestCase):
         self.assertTemplateUsed("peerinst/login.html")
 
     def test_lti_index_logged_as_wrong_user_type(self):
-        pass
+        student_count = Student.objects.count()
+
+        self.client.force_login(self.teacher.user)
+        response = self.client.get("/lti/student_lti/")
+
+        assert response.status_code == 403
+        self.assertTemplateUsed(response, "403.html")
+
+        assert Student.objects.count() == student_count
 
     def test_lti_auth_new_user_with_email(self):
         """
