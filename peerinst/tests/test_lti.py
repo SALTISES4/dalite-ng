@@ -208,6 +208,20 @@ class TestAccess(TestCase):
         assert response.url.endswith("student_lti/")
         assert "LTI" in request.session.get("_auth_user_backend")
 
+    def test_lti_auth_new_user_without_user_id(self):
+        """
+        Check user creation without user id
+        """
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            user_id="",
+        )
+        response = LTIRoutingView.as_view()(request)
+
+        assert request.user.is_authenticated is False
+        assert Student.objects.count() == 0
+        self.assertTemplateUsed("lti_provider/fail_auth.html")
+
     def test_lti_auth_teacher_accounts_not_accessible(self):
         request = generate_lti_request_dalite(
             client_key=settings.LTI_STANDALONE_CLIENT_KEY,

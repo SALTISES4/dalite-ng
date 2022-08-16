@@ -22,6 +22,10 @@ class LTIBackendStudentsOnly(LTIBackend):
 
         # find the user via lms identifier first
         kwargs = {username_field: lti.user_identifier(request)}
+        if not lti.user_id(request):
+            logout(request)
+            raise LTIException
+
         user_model = get_user_model()
         user = (
             user_model.objects.filter(
