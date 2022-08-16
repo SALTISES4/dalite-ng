@@ -34,20 +34,6 @@ class LTIBackendStudentsOnly(LTIBackend):
             .first()
         )
 
-        # find the user via email address, if it exists
-        email = lti.user_email(request)
-        if user is None and email:
-            user = (
-                user_model.objects.filter(
-                    email=email,
-                    is_staff=False,
-                    is_superuser=False,
-                )
-                .filter(Q(password__startswith=UNUSABLE_PASSWORD_PREFIX))
-                .exclude(teacher__isnull=False)
-                .first()
-            )
-
         if user is None:
             # find the user via hashed username
             username = self.get_hashed_username(request, lti)

@@ -313,8 +313,6 @@ class TestAccess(TestCase):
         )
         consent.save()
 
-        # test manage_LTI_studentgroup
-
         request = generate_lti_request_dalite(
             client_key=settings.LTI_STANDALONE_CLIENT_KEY,
             teacher_id=self.teacher.hash,
@@ -342,6 +340,7 @@ class TestAccess(TestCase):
             in self.teacher.current_groups.all()
         )
 
+    def test_lti_basic_client_key(self):
         # test basic LTI mode
         assignment = Assignment.objects.create(identifier="new_assignment")
         question = Question.objects.create(
@@ -355,39 +354,79 @@ class TestAccess(TestCase):
             question_id=question.pk,
         )
         response = self.client.post("/lti/", request.POST, follow=True)
-        self.assertTemplateUsed(response, "peerinst/question/start.html")
-
-        # test different student
-        student2_credentials = {
-            "user_id": "student2",
-            "email": "another@email.com",
-        }
-        request = generate_lti_request_dalite(
-            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
-            teacher_id=self.teacher.hash,
-            user_credentials=student2_credentials,
-        )
-        response = self.client.post("/lti/", request.POST, follow=True)
-        self.assertTemplateUsed(response, "tos/tos_modify.html")
-        assert Student.objects.count() == 2
-
         consent = Consent(
-            user=Student.objects.get(
-                student__email=student2_credentials["email"]
-            ).student,
+            user=Student.objects.first().student,
             accepted=True,
             tos=Tos.objects.first(),
         )
         consent.save()
+
+        # log back in after TOS
         request = generate_lti_request_dalite(
-            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            client_key=settings.LTI_BASIC_CLIENT_KEY,
             teacher_id=self.teacher.hash,
-            user_credentials=student2_credentials,
+            assignment_id=assignment.identifier,
+            question_id=question.pk,
         )
         response = self.client.post("/lti/", request.POST, follow=True)
-        self.assertTemplateUsed(response, "peerinst/student/index.html")
-        self.assertContains(response, student2_credentials["email"])
+        self.assertTemplateUsed(response, "peerinst/question/start.html")
 
+    def test_lti_student_wrong_email(self):
+        # student 1
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY
+        )
+        response = self.client.post("/lti/", request.POST, follow=True)
+        self.assertTemplateUsed("tos/tos_modify.html")
+
+        # TOS for student 1
+        consent = Consent(
+            user=Student.objects.first().student,
+            accepted=True,
+            tos=Tos.objects.first(),
+        )
+        consent.save()
+
+        # log back in student 1
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY
+        )
+        response = self.client.post("/lti/", request.POST, follow=True)
+
+        # student 2 who changes their email in LMS to that of student 1
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            user_credentials={
+                "user_id": "wrong_student",
+                "email": BASE_LTI_PARAMS["lis_person_contact_email_primary"],
+            },
+        )
+        response = self.client.post("/lti/", request.POST, follow=True)
+
+        # ensure new student gets created, even if emails match
+        assert Student.objects.count() == 2
+
+        # TOS for student 2
+        consent = Consent(
+            user=User.objects.last(),
+            accepted=True,
+            tos=Tos.objects.first(),
+        )
+        consent.save()
+
+        # log back in student 2
+        request = generate_lti_request_dalite(
+            client_key=settings.LTI_STANDALONE_CLIENT_KEY,
+            user_credentials={
+                "user_id": "wrong_student",
+                "email": BASE_LTI_PARAMS["lis_person_contact_email_primary"],
+            },
+        )
+        response = self.client.post("/lti/", request.POST, follow=True)
+        assert Student.objects.count() == 2
+        self.assertTemplateUsed("peerinst/student/index.html")
+
+    def test_lti_teacher_lti_login(self):
         # test for myDalite Teacher logging in via LMS LTI
         teacher_credentials = {
             "user_id": self.teacher.user.username,
@@ -400,7 +439,6 @@ class TestAccess(TestCase):
         )
         response = self.client.post("/lti/", request.POST, follow=True)
         self.assertTemplateUsed(response, "tos/tos_modify.html")
-        assert Student.objects.count() == 3
 
         consent = Consent(
             user=Student.objects.get(

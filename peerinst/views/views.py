@@ -1589,6 +1589,23 @@ def question(request, assignment_id, question_id):
     """
 
     if "LTI" in request.session.get("_auth_user_backend"):
+        user = request.user
+
+        student, new_student = Student.objects.get_or_create(student=user)
+
+        if not user.is_active or new_student:
+            user.is_active = True
+            user.save()
+            new_student = True
+
+        if not Consent.objects.filter(
+            user=student.student, tos__role__role="student"
+        ).exists():
+            return HttpResponseRedirect(
+                reverse("tos:tos_consent", kwargs={"role": "student"})
+                + "?next="
+                + request.path
+            )
         manage_LTI_studentgroup(request=request)
         if (
             request.session.get("oauth_consumer_key")
