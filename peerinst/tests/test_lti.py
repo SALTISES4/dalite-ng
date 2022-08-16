@@ -11,6 +11,7 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from lti_provider.tests.factories import BASE_LTI_PARAMS, generate_lti_request
 from lti_provider.views import LTIRoutingView
+from pylti.common import LTIException
 
 from dalite.views import admin_index_wrapper
 from peerinst.models import (
@@ -165,10 +166,8 @@ class TestAccess(TestCase):
         student_count = Student.objects.count()
 
         self.client.force_login(self.teacher.user)
-        response = self.client.get("/lti/student_lti/")
-
-        assert response.status_code == 403
-        self.assertTemplateUsed(response, "403.html")
+        response = self.client.get("/lti/student_lti/", follow=True)
+        self.assertTemplateUsed(response, "lti_provider/fail_auth.html")
 
         assert Student.objects.count() == student_count
 
