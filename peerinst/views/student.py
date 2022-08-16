@@ -426,7 +426,7 @@ def index_page(req):
 @require_safe
 def index_page_LTI(req):
     """
-    Main student page when accessed via LTI
+    Main student page when accessed via LTI for new accounts
     """
     if req.user.has_usable_password():
         # Only allow access to new LTI student accounts

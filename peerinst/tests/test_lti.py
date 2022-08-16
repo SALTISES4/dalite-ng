@@ -151,7 +151,7 @@ class TestAccess(TestCase):
             is_superuser=True,
         )
 
-    def test_lti_login_required(self):
+    def test_lti_index_login_required(self):
         # straight GET on url
         response = self.client.get(reverse("student-page-LTI"), follow=True)
         self.assertTemplateUsed("peerinst/login.html")
@@ -161,7 +161,7 @@ class TestAccess(TestCase):
         response = self.client.post("/lti/", post_data)
         self.assertTemplateUsed("peerinst/login.html")
 
-    def test_lti_index_logged_as_wrong_user_type(self):
+    def test_lti_index_logged_in_as_wrong_user_type(self):
         student_count = Student.objects.count()
 
         self.client.force_login(self.teacher.user)
