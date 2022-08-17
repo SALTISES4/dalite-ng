@@ -34,6 +34,8 @@ RUN mkdir static
 COPY requirements ./requirements
 RUN python3 -m pip install --upgrade pip
 RUN pip3 install --no-deps -r ./requirements/requirements-prod-aws.txt
+# Temporary fix for upcoming lti_provider functional tests
+RUN pip3 install factory-boy
 COPY --from=static /code/analytics ./analytics
 COPY --from=static /code/blink ./blink
 COPY --from=static /code/dalite ./dalite

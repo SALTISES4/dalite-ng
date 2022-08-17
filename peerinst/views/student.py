@@ -416,6 +416,7 @@ def index_page(req):
     context = {
         "data": json.dumps(data),
         "group_student_id_needed": group_student_id_needed,
+        "access_standalone": True,
     }
 
     return render(req, "peerinst/student/index.html", context)
