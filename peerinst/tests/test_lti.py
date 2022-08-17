@@ -30,6 +30,7 @@ def generate_lti_request_dalite(
     assignment_id=None,
     question_id=None,
     user_credentials=None,
+    server="http://testserver/lti/",
     **extra_params,
 ):
     """
@@ -75,7 +76,7 @@ def generate_lti_request_dalite(
     params.update(**extra_params)
 
     signature = client.sign(
-        "http://testserver/lti/",
+        server,
         http_method="POST",
         body=urlencode(params),
         headers={

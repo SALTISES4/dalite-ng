@@ -32,3 +32,5 @@ PYLTI_CONFIG = {
         LTI_BASIC_CLIENT_KEY: {"secret": LTI_BASIC_CLIENT_SECRET},
     }
 }
+
+ROOT_URLCONF = "dalite.test_urls"

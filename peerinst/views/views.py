@@ -932,8 +932,8 @@ class QuestionMixin:
             redirect_url = reverse(
                 "question",
                 kwargs={
-                    "assignment_id": self.assignment,
-                    "question_id": self.question,
+                    "assignment_id": self.assignment.pk,
+                    "question_id": self.question.id,
                 },
             )
             launch_url = None
@@ -942,7 +942,7 @@ class QuestionMixin:
             login(
                 self.request,
                 user,
-                backend="lti_provider.auth.LTIBackend",
+                backend="peerinst.lti.LTIBackendStudentsOnly",
             )
 
             xml = lti.generate_request_xml(
@@ -953,15 +953,20 @@ class QuestionMixin:
                 launch_url=launch_url,
             )
 
-            post_message(
-                consumers=lti.consumers(),
-                lti_key=lti.oauth_consumer_key(self.request),
-                url=lti.lis_outcome_service_url(self.request),
-                body=xml,
-            )
-            logger_auth.info(
-                f"Grade of {self.answer.grade} posted for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_outcome_service_url(self.request)}"  # noqa
-            )
+            try:
+                post_message(
+                    consumers=lti.consumers(),
+                    lti_key=lti.oauth_consumer_key(self.request),
+                    url=lti.lis_outcome_service_url(self.request),
+                    body=xml,
+                )
+                logger_auth.info(
+                    f"Grade of {self.answer.grade} posted for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_outcome_service_url(self.request)}"  # noqa
+                )
+            except Exception as e:
+                logger_auth.error(
+                    f"Failure '{e}' while posting grade of {self.answer.grade} for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_outcome_service_url(self.request)}"  # noqa
+                )
 
 
 class QuestionReload(Exception):

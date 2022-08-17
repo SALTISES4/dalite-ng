@@ -414,17 +414,29 @@ def student_patterns():
         ),
         path(
             "student/remove-notification/",
-            views.student.remove_notification,
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(views.student.remove_notification)
+                )
+            ),
             name="student-remove-notification",
         ),
         path(
             "student/remove-notifications/",
-            views.student.remove_notifications,
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(views.student.remove_notifications)
+                )
+            ),
             name="student-remove-notifications",
         ),
         path(
             "student/get-notifications/",
-            views.student.get_notifications,
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(views.student.get_notifications)
+                )
+            ),
             name="student-get-notifications",
         ),
         path(

@@ -258,10 +258,12 @@ export function joinGroup() {
 /* view */
 /** ******/
 
-function view(groupStudentId, callback) {
+function view(groupStudentId, lti, callback) {
   identityView();
-  groupsView(groupStudentId);
-  joinGroupView();
+  groupsView(groupStudentId, lti);
+  if (!lti) {
+    joinGroupView();
+  }
   callback();
 }
 
@@ -365,13 +367,13 @@ function verifyJoinGroupDisabledStatus() {
   }
 }
 
-function groupsView(groupStudentId = "") {
+function groupsView(groupStudentId = "", lti) {
   const groups = document.getElementById("student-groups");
   clear(groups);
   model.groups
     .filter((group) => group.memberOf)
-    .map((group) => groups.appendChild(groupView(group)));
-  if (groupStudentId) {
+    .map((group) => groups.appendChild(groupView(group, lti)));
+  if (groupStudentId && !lti) {
     for (let i = 0; i < model.groups.length; i++) {
       if (model.groups[i].name == groupStudentId) {
         toggleStudentIdNeededView(model.groups[i]);
@@ -381,22 +383,23 @@ function groupsView(groupStudentId = "") {
   }
 }
 
-function groupView(group) {
+function groupView(group, lti) {
   const div = document.createElement("div");
   div.classList.add("student-group");
   div.setAttribute("data-group", group.name);
 
-  div.appendChild(groupTitleView(group));
+  div.appendChild(groupTitleView(group, lti));
+
   div.appendChild(groupAssignmentsView(group));
 
   return div;
 }
 
-function groupTitleView(group) {
+function groupTitleView(group, lti) {
   const div = document.createElement("div");
   div.classList.add("student-group--title");
 
-  if (group.studentIdNeeded) {
+  if (group.studentIdNeeded && !lti) {
     div.appendChild(groupTitleIdView(group));
   }
 
@@ -404,44 +407,48 @@ function groupTitleView(group) {
   title.textContent = group.title;
   div.appendChild(title);
 
-  const icons = document.createElement("div");
-  icons.classList.add("student-group--icons");
-  div.appendChild(icons);
+  if (!lti) {
+    const icons = document.createElement("div");
+    icons.classList.add("student-group--icons");
+    div.appendChild(icons);
 
-  if (group.connectedCourseUrl) {
-    const courseButtonContainer = document.createElement("div");
-    courseButtonContainer.classList.add("student-group--course");
-    icons.appendChild(courseButtonContainer);
+    if (group.connectedCourseUrl) {
+      const courseButtonContainer = document.createElement("div");
+      courseButtonContainer.classList.add("student-group--course");
+      icons.appendChild(courseButtonContainer);
 
-    const courseButton = document.createElement("i");
-    courseButton.classList.add("material-icons", "md-28");
-    courseButton.title = model.translations.courseFlowButton;
-    courseButton.addEventListener(
-      "click",
-      () => (window.location.href = group.connectedCourseUrl),
+      const courseButton = document.createElement("i");
+      courseButton.classList.add("material-icons", "md-28");
+      courseButton.title = model.translations.courseFlowButton;
+      courseButton.addEventListener(
+        "click",
+        () => (window.location.href = group.connectedCourseUrl),
+      );
+      courseButton.classList.add("course-flow-button");
+      courseButton.textContent = "calendar_today";
+      courseButtonContainer.appendChild(courseButton);
+    }
+
+    const notifications = document.createElement("div");
+    notifications.classList.add("student-group--notifications");
+    icons.appendChild(notifications);
+
+    const bell = document.createElement("i");
+    bell.classList.add("material-icons", "md-28");
+    bell.title = model.translations.notificationsBell;
+    bell.addEventListener("click", () =>
+      toggleGroupNotifications(group, bell),
     );
-    courseButton.classList.add("course-flow-button");
-    courseButton.textContent = "calendar_today";
-    courseButtonContainer.appendChild(courseButton);
+    if (group.notifications) {
+      bell.textContent = "notifications";
+    } else {
+      bell.textContent = "notifications_off";
+      bell.classList.add("student-group--notifications__disabled");
+    }
+    notifications.appendChild(bell);
+
+    icons.appendChild(leaveGroupView(group, div));
   }
-
-  const notifications = document.createElement("div");
-  notifications.classList.add("student-group--notifications");
-  icons.appendChild(notifications);
-
-  const bell = document.createElement("i");
-  bell.classList.add("material-icons", "md-28");
-  bell.title = model.translations.notificationsBell;
-  bell.addEventListener("click", () => toggleGroupNotifications(group, bell));
-  if (group.notifications) {
-    bell.textContent = "notifications";
-  } else {
-    bell.textContent = "notifications_off";
-    bell.classList.add("student-group--notifications__disabled");
-  }
-  notifications.appendChild(bell);
-
-  icons.appendChild(leaveGroupView(group, div));
 
   return div;
 }
@@ -784,32 +791,32 @@ function addLinkListeners() {
 function addJoinGroupListeners() {
   document
     .querySelector("#student-add-group .admin-link")
-    .addEventListener("click", function () {
+    ?.addEventListener("click", function () {
       toggleJoinGroup();
     });
   document
     .getElementById("student-add-group--box")
-    .addEventListener("click", function () {
+    ?.addEventListener("click", function (event) {
       event.stopPropagation;
     });
   document
     .querySelector("#student-add-group--box > div")
-    .addEventListener("click", function () {
+    ?.addEventListener("click", function (event) {
       event.stopPropagation;
     });
   document
     .querySelector("#student-add-group--box input[name='new-group']")
-    .addEventListener("keyup", function (event) {
+    ?.addEventListener("keyup", function (event) {
       handleJoinGroupLinkInput(event);
     });
   document
     .getElementById("join-group-btn")
-    .addEventListener("click", function () {
+    ?.addEventListener("click", function () {
       joinGroup();
     });
   document
     .getElementById("cancel-join-group-btn")
-    .addEventListener("click", function () {
+    ?.addEventListener("click", function () {
       toggleJoinGroup();
     });
 }
@@ -848,8 +855,13 @@ function timeuntil(date1, date2) {
 /* init */
 /** ******/
 
-export function initStudentPage(data, groupStudentId = "", callback) {
+export function initStudentPage(
+  data,
+  groupStudentId = "",
+  lti = false,
+  callback,
+) {
   initModel(data);
-  view(groupStudentId, callback);
+  view(groupStudentId, lti, callback);
   initListeners();
 }
