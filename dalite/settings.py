@@ -232,6 +232,35 @@ LTI_STANDALONE_CLIENT_KEY = os.environ.get("LTI_STANDALONE_CLIENT_KEY", "")
 LTI_STANDALONE_CLIENT_SECRET = os.environ.get(
     "LTI_STANDALONE_CLIENT_SECRET", ""
 )
+LTI_PROPERTY_LIST_EX = [
+    "context_title",
+    "custom_teacher_id",
+    "custom_assignment_id",
+    "custom_question_id",
+]
+LTI_TOOL_CONFIGURATION = {
+    "title": "myDALITE",
+    "description": "Asynchronous peer instruction",
+    "launch_url": "lti/",
+    "embed_url": "",
+    "embed_icon_url": "",
+    "embed_tool_id": "",
+    "landing_url": "/student/lti/",
+    "course_aware": False,
+    "course_navigation": False,
+    "new_tab": False,
+    "frame_width": 600,
+    "frame_height": 400,
+    "custom_fields": {},
+    "allow_ta_access": False,
+    "assignments": {},
+}
+PYLTI_CONFIG = {
+    "consumers": {
+        LTI_STANDALONE_CLIENT_KEY: {"secret": LTI_STANDALONE_CLIENT_SECRET},
+        LTI_BASIC_CLIENT_KEY: {"secret": LTI_BASIC_CLIENT_SECRET},
+    }
+}
 
 # CourseFlow settings
 COURSE_FLOW_RETURN_URL = {"name": "welcome", "title": "myDalite"}
@@ -244,6 +273,7 @@ TEACHER_GROUP = "Teacher"
 
 DEFAULT_TIMEZONE = "America/Montreal"
 
+# Celery
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     "max_retries": 3,
     "interval_start": 0,

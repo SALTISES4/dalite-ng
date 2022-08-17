@@ -22,29 +22,6 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
 }
 
 # LTI
-LTI_PROPERTY_LIST_EX = [
-    "context_title",
-    "custom_teacher_id",
-    "custom_assignment_id",
-    "custom_question_id",
-]
-LTI_TOOL_CONFIGURATION = {
-    "title": "myDALITE",
-    "description": "Asynchronous peer instruction",
-    "launch_url": "lti/",
-    "embed_url": "",
-    "embed_icon_url": "",
-    "embed_tool_id": "",
-    "landing_url": "/student/lti/",
-    "course_aware": False,
-    "course_navigation": False,
-    "new_tab": False,
-    "frame_width": 600,
-    "frame_height": 400,
-    "custom_fields": {},
-    "allow_ta_access": False,
-    "assignments": {},
-}
 LTI_STANDALONE_CLIENT_KEY = "standalone_key"
 LTI_STANDALONE_CLIENT_SECRET = "standalone_secret"
 LTI_BASIC_CLIENT_KEY = "basic_key"
