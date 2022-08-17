@@ -1648,6 +1648,7 @@ def question(request, assignment_id, question_id):
         stage_data.clear()
         return redirect(request.path)
     stage_data.store()
+
     return result
 
 

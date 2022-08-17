@@ -46,7 +46,7 @@ urlpatterns += i18n_patterns(
     path("quality/", include("quality.urls", namespace="quality")),
     path("tos/", include("tos.urls")),
     path("rest-api/", include("REST.urls", namespace="REST")),
-    path(r"", include("peerinst.urls")),
+    path("", include("peerinst.urls")),
     path(
         "assignment/<assignment_id>/",
         include(
@@ -57,7 +57,7 @@ urlpatterns += i18n_patterns(
                     name="question-list",
                 ),
                 path(
-                    r"<int:question_id>/",
+                    "<int:question_id>/",
                     include(
                         [
                             # myDalite question - Must allow to be framed
@@ -95,7 +95,7 @@ urlpatterns += i18n_patterns(
         ),
     ),
     path(
-        r"admin_index_wrapper/",
+        "admin_index_wrapper/",
         views.admin_index_wrapper,
         name="admin_index_wrapper",
     ),

@@ -15,10 +15,9 @@ class LTIAccessMiddleware:
         return self.get_response(request)
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        # LTI authentication hook sets LTI session key to True
-        if request.session.get("LTI", False) and not getattr(
-            view_func, "lti_access_allowed", False
-        ):
+        if "LTI" in request.session.get(
+            "_auth_user_backend", ""
+        ) and not getattr(view_func, "lti_access_allowed", False):
             # If access is denied, force a logout to prevent being stuck
             return HttpResponseRedirect(reverse("access_denied_and_logout"))
 

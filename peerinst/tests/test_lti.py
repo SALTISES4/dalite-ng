@@ -321,6 +321,7 @@ class TestAccess(TestCase):
         assert Student.objects.count() == 1
         assert not hasattr(Student.objects.first().student, "teacher")
         assert response.context["access_lti_standalone"] == True
+        assert "LTI" in self.client.session.get("_auth_user_backend")
         assert not response.context.get("access_lti_basic_client_key")
         assert StudentGroup.objects.count() == 1
         assert (
