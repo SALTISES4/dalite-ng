@@ -166,7 +166,7 @@ class TestAccess(TestCase):
         student_count = Student.objects.count()
 
         self.client.force_login(self.teacher.user)
-        response = self.client.get("/lti/student_lti/", follow=True)
+        response = self.client.get("/student/lti/", follow=True)
         self.assertTemplateUsed(response, "lti_provider/fail_auth.html")
 
         assert Student.objects.count() == student_count
@@ -197,7 +197,7 @@ class TestAccess(TestCase):
         assert request.user.email == "new_user@mydalite.org"
         assert not request.user.has_usable_password()
         assert response.status_code == 302
-        assert response.url.endswith("student_lti/")
+        assert response.url.endswith("/student/lti/")
         assert "LTI" in request.session.get("_auth_user_backend")
 
     def test_lti_auth_new_user_without_email(self):
@@ -215,7 +215,7 @@ class TestAccess(TestCase):
         assert request.user.email == ""
         assert not request.user.has_usable_password()
         assert response.status_code == 302
-        assert response.url.endswith("student_lti/")
+        assert response.url.endswith("/student/lti/")
         assert "LTI" in request.session.get("_auth_user_backend")
 
     def test_lti_auth_new_user_without_user_id(self):

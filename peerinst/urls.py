@@ -1,14 +1,15 @@
+from csp.decorators import csp_replace
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import user_passes_test
 from django.urls import include, path
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic.base import TemplateView
 
 from peerinst.middleware import lti_access_allowed
 
 from . import admin_views, views
 from .forms import TeacherPasswordResetForm
-from .mixins import student_check
 
 
 def not_authenticated(user):
@@ -250,10 +251,10 @@ def old_patterns():
         ),
         path("logout/", lti_access_allowed(views.logout_view), name="logout"),
         path("welcome/", views.welcome, name="welcome"),
-        # Only non-students can change their password
+        # Only teachers can change their password
         path(
             "password_change/",
-            user_passes_test(student_check)(
+            user_passes_test(lambda user: user.teacher)(
                 auth_views.PasswordChangeView.as_view()
             ),
             name="password_change",
@@ -377,6 +378,15 @@ def student_patterns():
             name="finish-assignment",
         ),
         path("student/", views.student.index_page, name="student-page"),
+        path(
+            "student/lti/",
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(views.student.index_page_LTI)
+                )
+            ),
+            name="student-page-LTI",
+        ),
         path(
             "student/join-group/",
             views.student.join_group,
