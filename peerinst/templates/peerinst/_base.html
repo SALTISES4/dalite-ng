@@ -217,7 +217,7 @@
       <!-- Matomo analytics -->
       {% if request|cookie_group_declined:"optional" %}
         <script nonce="{{ request.csp_nonce }}">
-          const _paq = [];
+          var _paq = [];
           _paq.push(['disableCookies']);
         </script>
       {% endif %}
