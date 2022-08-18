@@ -44,12 +44,28 @@ urlpatterns += [
             [
                 re_path(
                     r"^accept/$",
-                    csrf_exempt(CookieGroupAcceptViewPatch.as_view()),
+                    csp_replace(FRAME_ANCESTORS=["*"])(
+                        xframe_options_exempt(
+                            lti_access_allowed(
+                                csrf_exempt(
+                                    CookieGroupAcceptViewPatch.as_view()
+                                )
+                            )
+                        )
+                    ),
                     name="cookie_consent_accept_all",
                 ),
                 re_path(
                     r"^accept/(?P<varname>.*)/$",
-                    csrf_exempt(CookieGroupAcceptViewPatch.as_view()),
+                    csp_replace(FRAME_ANCESTORS=["*"])(
+                        xframe_options_exempt(
+                            lti_access_allowed(
+                                csrf_exempt(
+                                    CookieGroupAcceptViewPatch.as_view()
+                                )
+                            )
+                        )
+                    ),
                     name="cookie_consent_accept",
                 ),
             ]
@@ -57,7 +73,14 @@ urlpatterns += [
     ),
     path(
         "cookies/",
-        include("cookie_consent.urls"),
+        decorator_include(
+            (
+                csp_replace(FRAME_ANCESTORS=["*"]),
+                xframe_options_exempt,
+                lti_access_allowed,
+            ),
+            "cookie_consent.urls",
+        ),
     ),
 ]
 

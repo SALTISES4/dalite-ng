@@ -161,8 +161,6 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.8/howto/static-files/
-
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
@@ -174,6 +172,8 @@ STATICFILES_FINDERS = (
     "compressor.finders.CompressorFinder",
 )
 
+
+# Compressor
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
 COMPRESS_URL = STATIC_URL
@@ -188,12 +188,12 @@ EMAIL_BACKEND = os.environ.get(
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "emails")
 
 
-# LOGIN_URL = 'login'
+# Login
 LOGIN_URL = "login"
-
 LOGIN_REDIRECT_URL = "welcome"
 
 
+# DRF
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -246,8 +246,14 @@ HEARTBEAT_REQUIRED_FREE_SPACE_PERCENTAGE = 20
 
 PINAX_FORUMS_EDIT_TIMEOUT = {"days": 120}
 
+
 # CourseFlow settings
 COURSE_FLOW_RETURN_URL = {"name": "welcome", "title": "myDalite"}
+
+
+# Cookie consent
+COOKIE_CONSENT_NAME = "cookie_consent"
+COOKIE_CONSENT_LOG_ENABLED = True
 
 # NB: Object level permissions are checked for certain models, including
 # Question

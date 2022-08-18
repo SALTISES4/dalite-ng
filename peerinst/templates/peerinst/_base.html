@@ -183,17 +183,9 @@
 
       {% block scripts %}{% endblock %}
 
-      {% script type="text/javascript" %}
-        {% piwik %}
-      {% endscript %}
-
       {% include 'icons.svg' %}
 
-      <p>
-        <a href="{% url "cookie_consent_cookie_group_list" %}">Cookies policy</a>
-      </p>
-
-      <script nonce="{{ request.csp_nonce }}" type="text/javascript" src={% static "cookie_consent/cookiebar.js" %}></script>
+      <script nonce="{{ request.csp_nonce }}" type="text/javascript" src="{% static 'cookie_consent/cookiebar.js' %}"></script>
 
       {% if request|cookie_consent_enabled %}
         {% not_accepted_or_declined_cookie_groups request as cookie_groups %}
@@ -208,22 +200,9 @@
               cookie_groups.push("{{ cookie_group.varname }}");
             {% endfor %}
 
-            function ready(fn) {
-              if (document.readyState != 'loading') {
-                fn();
-              } else if (document.addEventListener) {
-                document.addEventListener('DOMContentLoaded', fn);
-              } else {
-                document.attachEvent('onreadystatechange', function() {
-                  if (document.readyState != 'loading')
-                  fn();
-                });
-              }
-            }
-
-            ready(function() {
+            window.addEventListener("load", () => {
               showCookieBar({
-                content: "{% filter escapejs %}{% with cookie_groups=cookie_groups|join:", " %}<div class="cookie-bar">This site uses {{ cookie_groups }} cookies for better performance and user experience. Do you agree to use cookies? <a href="{{ url_accept }}" class="cc-cookie-accept">Accept</a> <a href="{{ url_decline }}" class="cc-cookie-decline">Decline</a> <a href="{{ url_cookies }}">Cookies info</a></div>{% endwith %}{% endfilter %}",
+                content: "{% filter escapejs %}{% with cookie_groups=cookie_groups|join:', ' %}<div class='cookie-bar'>This site uses {{ cookie_groups }} cookies for better performance and user experience. Do you agree to use cookies? <a href='{{ url_accept }}' class='cc-cookie-accept'>Accept</a> <a href='{{ url_decline }}' class='cc-cookie-decline'>Decline</a> <a href='{{ url_cookies }}'>Cookies info</a></div>{% endwith %}{% endfilter %}",
                 cookie_groups: cookie_groups,
                 cookie_decline: "{% get_decline_cookie_groups_cookie_string request cookie_groups %}",
                 beforeDeclined: function() {
@@ -234,6 +213,17 @@
           </script>
         {% endif %}
       {% endif %}
+
+      <!-- Matomo analytics -->
+      {% if request|cookie_group_declined:"optional" %}
+        <script nonce="{{ request.csp_nonce }}">
+          const _paq = [];
+          _paq.push(['disableCookies']);
+        </script>
+      {% endif %}
+      {% script type="text/javascript" %}
+        {% piwik %}
+      {% endscript %}
     </body>
 
   </html>

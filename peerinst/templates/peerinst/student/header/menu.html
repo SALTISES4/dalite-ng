@@ -15,6 +15,13 @@
           {% trans 'Terms of service' %}
         </a>
 
+        <a class="mdc-list-item" href="{% url 'cookie_consent_cookie_group_list' %}">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            cookie
+          </i>
+          {% trans 'Cookies policy' %}
+        </a>
 
         <a class="mdc-list-item logout" href="{% url 'logout' %}" id='logout-no-iframe'>
           <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
@@ -63,6 +70,14 @@
             settings
           </i>
           {% trans 'Terms of service' %}
+        </a>
+
+        <a class="mdc-list-item" href="{% url 'cookie_consent_cookie_group_list' %}">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            cookie
+          </i>
+          {% trans 'Cookies policy' %}
         </a>
 
         <span id="submit-language-form" class="mdc-list-item">
