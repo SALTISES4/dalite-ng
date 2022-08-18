@@ -1,13 +1,17 @@
+from cookie_consent.cache import all_cookie_groups
+from cookie_consent.conf import settings
 from cookie_consent.middleware import CleanCookiesMiddleware
 from cookie_consent.models import ACTION_ACCEPTED, LogItem
 from cookie_consent.util import (
     dict_to_cookie_str,
     get_cookie_dict_from_request,
     get_cookie_groups,
+    is_cookie_consent_enabled,
 )
 from cookie_consent.views import CookieGroupAcceptView
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.encoding import smart_str
 
 """
 This file contains patches for the django-cookie-consent package
@@ -18,7 +22,32 @@ This file contains patches for the django-cookie-consent package
 
 class CleanCookiesFixMiddleware(CleanCookiesMiddleware, MiddlewareMixin):
     # https://github.com/jazzband/django-cookie-consent/issues/13#issuecomment-1136968085
-    pass
+
+    def process_response(self, request, response):
+        # https://github.com/jazzband/django-cookie-consent/blob/master/cookie_consent/middleware.py
+        if not is_cookie_consent_enabled(request):
+            return response
+        cookie_dic = get_cookie_dict_from_request(request)
+        for cookie_group in all_cookie_groups().values():
+            if not cookie_group.is_deletable:
+                continue
+            group_version = cookie_dic.get(cookie_group.varname, None)
+            for cookie in cookie_group.cookie_set.all():
+                if cookie.name not in request.COOKIES:
+                    continue
+                if group_version == settings.COOKIE_CONSENT_DECLINE:
+                    response.delete_cookie(
+                        smart_str(cookie.name), cookie.path, cookie.domain
+                    )
+                if (
+                    cookie_dic  # <-- Fixes error when missing
+                    and group_version < cookie.get_version()
+                    and not settings.COOKIE_CONSENT_OPT_OUT
+                ):
+                    response.delete_cookie(
+                        smart_str(cookie.name), cookie.path, cookie.domain
+                    )
+        return response
 
 
 def set_cookie_dict_to_response(response, dic):
