@@ -100,7 +100,7 @@ def authenticate_student(req, token):
 
 
 def get_student_username_and_password(email, max_username_length=30):
-    key = settings.SECRET_KEY
+    key = settings.PWD_KEY
 
     username = hashlib.md5(email.encode()).hexdigest()[:max_username_length]
     password = hashlib.md5((f"{username}:{key}").encode()).hexdigest()
