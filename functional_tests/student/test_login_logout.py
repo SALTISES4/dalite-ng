@@ -3,6 +3,7 @@ import time
 
 from django.urls import reverse
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -109,6 +110,20 @@ def test_students_cannot_access_password_change(browser, mail_outbox, student):
 
     # user_passes_test redirects to login which should redirect to account
     assert browser.current_url.endswith("student/")
+
+
+def test_students_cannot_reset_password(browser, mail_outbox, student):
+    browser.get(f'{browser.server_url}{reverse("password_reset")}')
+
+    browser.find_element(By.ID, "id_email").send_keys(student.student.email)
+    browser.find_element(By.ID, "submit-btn").click()
+
+    time.sleep(5)
+    assert len(mail_outbox) == 0
+    assert (
+        "If you have a non-student account that is active, you will receive an email with instructions for setting a new password."  # noqa
+        in browser.page_source
+    )
 
 
 def test_student_cannot_login_via_username_and_password(browser, student):

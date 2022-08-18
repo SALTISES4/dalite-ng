@@ -164,7 +164,7 @@ services:
       context: .
       dockerfile: ./functional_tests/Dockerfile
     container_name: test_chrome
-    command: python -Wa -m pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s -k test_students_cannot_access_password_change
+    command: python -Wa -m pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s -k test_reset_password
     depends_on:
       - selenium-hub
     environment:
