@@ -1,4 +1,11 @@
-from peerinst.forms import FirstAnswerForm, TeacherPasswordResetForm
+import pytest
+from django.core.exceptions import ValidationError
+
+from peerinst.forms import (
+    FirstAnswerForm,
+    NonStudentAuthenticationForm,
+    TeacherPasswordResetForm,
+)
 
 
 def test_FirstAnswerForm_first_choice_answer_required():
@@ -228,3 +235,20 @@ def test_TeacherPasswordResetForm(students, teachers, staff, superuser):
     assert not list(form.get_users(staff.email))
 
     assert not list(form.get_users(superuser.email))
+
+
+def test_NonStudentAuthenticationForm(student, teacher, staff, superuser):
+    form = NonStudentAuthenticationForm()
+
+    with pytest.raises(ValidationError):
+        form.confirm_login_allowed(student.student)
+
+    form.confirm_login_allowed(teacher.user)
+    form.confirm_login_allowed(staff)
+    form.confirm_login_allowed(superuser)
+
+    teacher.user.is_active = False
+    teacher.user.save()
+
+    with pytest.raises(ValidationError):
+        form.confirm_login_allowed(teacher.user)

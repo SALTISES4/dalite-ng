@@ -101,6 +101,40 @@ def test_fake_link(browser):
     browser.find_element_by_xpath(f"//*[contains(text(), '{err}')]")
 
 
+def test_student_cannot_login_via_username_and_password(browser, student):
+    browser.get(f'{browser.server_url}{reverse("login")}')
+    browser.find_element_by_xpath(
+        "//button[contains(.,'Login via SALTISE')]"
+    ).click()
+
+    username = student.student.username
+    password = "test"
+    student.student.set_password(password)
+    student.student.save()
+
+    username_input = browser.find_element_by_xpath(
+        "//input[@id='id_username']"
+    )
+    username_input.clear()
+    username_input.send_keys(username)
+
+    password_input = browser.find_element_by_xpath(
+        "//input[@id='id_password']"
+    )
+    password_input.clear()
+    password_input.send_keys(password)
+
+    submit_button = browser.find_element_by_xpath(
+        "//button[@id='submit-btn']"
+    ).click()
+
+    assert browser.current_url.endswith("login/")
+    assert (
+        "Your username and password didn't match or your account has not yet been activated or you are trying to log in with a student account."  # noqa
+        in browser.page_source
+    )
+
+
 def test_student_login_logout(browser, assert_, mail_outbox, student):
     signin(browser, student, mail_outbox, new=False)
     access_logged_in_account_from_landing_page(browser, student)
