@@ -254,7 +254,7 @@ def old_patterns():
         # Only teachers can change their password
         path(
             "password_change/",
-            user_passes_test(lambda user: user.teacher)(
+            user_passes_test(lambda user: hasattr(user, "teacher"))(
                 auth_views.PasswordChangeView.as_view()
             ),
             name="password_change",

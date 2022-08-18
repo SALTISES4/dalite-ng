@@ -12,6 +12,8 @@ from peerinst.students import (
     get_student_username_and_password,
 )
 
+TIMEOUT = 30
+
 
 def signin(browser, student, mail_outbox, new=False):
     email = student.student.email
@@ -28,7 +30,7 @@ def signin(browser, student, mail_outbox, new=False):
     input_.send_keys(Keys.ENTER)
 
     try:
-        WebDriverWait(browser, timeout=10).until(
+        WebDriverWait(browser, timeout=TIMEOUT).until(
             lambda d: len(mail_outbox) == 1
         )
     except TimeoutException:
@@ -99,6 +101,14 @@ def test_fake_link(browser):
         "You may try asking for another one."
     )
     browser.find_element_by_xpath(f"//*[contains(text(), '{err}')]")
+
+
+def test_students_cannot_access_password_change(browser, mail_outbox, student):
+    signin(browser, student, mail_outbox, new=False)
+    browser.get(f'{browser.server_url}{reverse("password_change")}')
+
+    # user_passes_test redirects to login which should redirect to account
+    assert browser.current_url.endswith("student/")
 
 
 def test_student_cannot_login_via_username_and_password(browser, student):
