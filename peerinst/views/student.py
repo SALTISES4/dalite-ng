@@ -737,25 +737,17 @@ def send_signin_link(req):
         )
 
     student = Student.objects.filter(student__email=email)
-
     if not student:
         student, created = Student.get_or_create(email)
         logger.info(f"Student created with email {email}.")
-
     elif len(student) == 1:
         student = student[0]
-
     else:
         username, __ = get_student_username_and_password(email)
         student = student.filter(student__username=username).first()
-
     if student:
         err = student.send_email(mail_type="signin", request=req)
-        if err is None:
-            context = {"error": False}
-        else:
-            context = {"error": True}
-
+        context = {"error": False} if err is None else {"error": True}
     return render(req, "peerinst/student/login_confirmation.html", context)
 
 
