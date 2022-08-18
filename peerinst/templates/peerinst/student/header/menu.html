@@ -1,12 +1,22 @@
 {% load static i18n %}
 
-{% if request.session.LTI %}
+{% if access_lti_standalone or access_lti_basic_client_key %}
 
   <i id="menu-icon" class="material-icons md-32 header-icon">menu</i>
   <aside class="mdc-drawer mdc-drawer--temporary mdc-typography">
     <nav class="mdc-drawer__drawer">
 
       <nav id="icon-with-text-demo" class="mdc-drawer__content mdc-list">
+        {% if access_lti_standalone %}
+          <a class="mdc-list-item" href="{% url 'student-page-LTI' %}">
+            <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+              aria-hidden="true">
+              account_circle
+            </i>
+            {% trans 'My account' %}
+          </a>
+        {% endif %}
+
         <a class="mdc-list-item" href="{% url 'tos:tos_modify' 'student' %}?next={{ request.path }}">
           <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
             aria-hidden="true">

@@ -1,14 +1,15 @@
+from csp.decorators import csp_replace
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import user_passes_test
 from django.urls import include, path
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic.base import TemplateView
 
 from peerinst.middleware import lti_access_allowed
 
 from . import admin_views, views
-from .forms import NonStudentPasswordResetForm
-from .mixins import student_check
+from .forms import TeacherPasswordResetForm
 
 
 def not_authenticated(user):
@@ -250,10 +251,10 @@ def old_patterns():
         ),
         path("logout/", lti_access_allowed(views.logout_view), name="logout"),
         path("welcome/", views.welcome, name="welcome"),
-        # Only non-students can change their password
+        # Only teachers can change their password
         path(
             "password_change/",
-            user_passes_test(student_check)(
+            user_passes_test(lambda user: hasattr(user, "teacher"))(
                 auth_views.PasswordChangeView.as_view()
             ),
             name="password_change",
@@ -267,7 +268,7 @@ def old_patterns():
             "password_reset/",
             auth_views.PasswordResetView.as_view(
                 html_email_template_name="registration/password_reset_email_html.html",  # noqa
-                form_class=NonStudentPasswordResetForm,
+                form_class=TeacherPasswordResetForm,
             ),
             name="password_reset",
         ),
@@ -378,14 +379,13 @@ def student_patterns():
         ),
         path("student/", views.student.index_page, name="student-page"),
         path(
-            "lti/student_lti/",
-            lti_access_allowed(views.student.index_page_LTI),
+            "student/lti/",
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(views.student.index_page_LTI)
+                )
+            ),
             name="student-page-LTI",
-        ),
-        path(
-            "lti/student_lti/<assignment_id>/<question_id>/",
-            lti_access_allowed(views.question),
-            name="question-LTI",
         ),
         path(
             "student/join-group/",
@@ -414,17 +414,29 @@ def student_patterns():
         ),
         path(
             "student/remove-notification/",
-            views.student.remove_notification,
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(views.student.remove_notification)
+                )
+            ),
             name="student-remove-notification",
         ),
         path(
             "student/remove-notifications/",
-            views.student.remove_notifications,
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(views.student.remove_notifications)
+                )
+            ),
             name="student-remove-notifications",
         ),
         path(
             "student/get-notifications/",
-            views.student.get_notifications,
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(views.student.get_notifications)
+                )
+            ),
             name="student-get-notifications",
         ),
         path(

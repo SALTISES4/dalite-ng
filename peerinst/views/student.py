@@ -3,9 +3,11 @@ import logging
 import re
 
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
+from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -129,28 +131,6 @@ def validate_group_data(req):
 
 
 def login_student(req, token=None):
-    """
-    Logs in the user depending on the given token and req.user. For lti users,
-    the student corresponding to the email is used, creating it if necessary.
-
-    Parameters
-    ----------
-    req : HttpRequest
-        Request with a logged in user or not
-    token : Optional[str] (default : None)
-        Student token
-
-    Parameters
-    ----------
-    Either
-        Student
-            Logged in student
-        HttpResponse
-            Error response
-    bool
-        If this is a new student
-    """
-
     if token is None:
         if not isinstance(req.user, User):
             return (
@@ -168,52 +148,32 @@ def login_student(req, token=None):
                 ),
                 None,
             )
-
         user = req.user
-        username, password = get_student_username_and_password(user.email)
-
-        is_lti = user.username != username
-
     else:
-        user, is_lti = authenticate_student(req, token)
-        if isinstance(user, HttpResponse):
+        user = authenticate_student(req, token)
+        if isinstance(user, TemplateResponse):
             return user, None
-
-        if is_lti:
-            username, password = get_student_username_and_password(user.email)
-
-    if is_lti:
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            user = User.objects.create_user(
-                username=username, password=password, email=user.email
-            )
 
     try:
         student = Student.objects.get(student=user)
-        new_student = False
     except Student.DoesNotExist:
-        if is_lti:
-            return (
-                response_403(
-                    req,
-                    msg=_(
-                        "You must be a logged in student to access this "
-                        "resource."
-                    ),
-                    logger_msg=(
-                        "Student index page accessed without a token or being "
-                        "logged in."
-                    ),
-                    log=logger.warning,
+        return (
+            response_403(
+                req,
+                msg=_(
+                    "You must be a logged in student to access this "
+                    "resource."
                 ),
-                None,
-            )
-        student = Student.objects.create(student=user)
-        new_student = True
+                logger_msg=(
+                    "Student index page accessed by non-student account"
+                ),
+                log=logger.warning,
+            ),
+            None,
+        )
 
-    if not user.is_active or new_student:
+    new_student = False
+    if not user.is_active:
         user.is_active = True
         user.save()
         new_student = True
@@ -392,6 +352,7 @@ def index_page(req):
     Main student page. Accessed through a link sent by email containing
     a token or without the token for a logged in student.
     """
+    req.session["access_type"] = StudentGroup.STANDALONE
 
     token = req.GET.get("token")
     group_student_id_needed = req.GET.get("group-student-id-needed", "")
@@ -414,43 +375,28 @@ def index_page(req):
     context = {
         "data": json.dumps(data),
         "group_student_id_needed": group_student_id_needed,
+        "access_standalone": True,
     }
 
     return render(req, "peerinst/student/index.html", context)
 
 
-def index_page_LTI(req):
+@login_required
+@require_safe
+def index_page_LTI(request):
     """
-    Main student page  when accessed via LTI
+    Main student page when accessed via LTI for new accounts
     """
+    course_id = request.session.get("context_id", None)
 
-    if "LTI" in req.session.get("_auth_user_backend"):
-        req.session["LTI"] = True
-    session_data = {k: v for k, v in req.session.items()}
-    logger.info(f"Session data for question view : {session_data}")
+    if request.user.has_usable_password() or not course_id:
+        # Only allow access via new LTI student accounts
+        logout(request)
+        return HttpResponseRedirect(reverse("lti-fail-auth"))
 
-    assignment_id = req.session.get("custom_assignment_id", None)
-    question_id = req.session.get("custom_question_id", None)
+    user = request.user
 
-    if assignment_id and question_id:
-        return HttpResponseRedirect(
-            reverse(
-                "question-LTI",
-                kwargs={
-                    "assignment_id": assignment_id,
-                    "question_id": question_id,
-                },
-            ),
-        )
-
-    user = req.user
-
-    try:
-        student = Student.objects.get(student=user)
-        new_student = False
-    except Student.DoesNotExist:
-        student = Student.objects.create(student=user)
-        new_student = True
+    student, new_student = Student.objects.get_or_create(student=user)
 
     if not user.is_active or new_student:
         user.is_active = True
@@ -463,20 +409,44 @@ def index_page_LTI(req):
         return HttpResponseRedirect(
             reverse("tos:tos_consent", kwargs={"role": "student"})
             + "?next="
-            + req.path
+            + request.path
         )
 
-    manage_LTI_studentgroup(request=req)
+    manage_LTI_studentgroup(request)
 
-    data = get_context_data_index_page(req, student, new_student)
+    assignment_id = request.session.get("custom_assignment_id", None)
+    question_id = request.session.get("custom_question_id", None)
+
+    if assignment_id and question_id:
+        request.session["access_type"] = StudentGroup.LTI
+        logger.info(
+            f"Session data for question view : {dict(request.session.items())}"
+        )
+
+        return HttpResponseRedirect(
+            reverse(
+                "question",
+                kwargs={
+                    "assignment_id": assignment_id,
+                    "question_id": question_id,
+                },
+            ),
+        )
+
+    request.session["access_type"] = StudentGroup.LTI_STANDALONE
+    logger.info(
+        f"Session data for LTI standalone index : {dict(request.session.items())}"
+    )
+
+    data = get_context_data_index_page(request, student, new_student)
 
     context = {
         "data": json.dumps(data),
         "group_student_id_needed": "",
+        "access_lti_standalone": True,
     }
-    session_data = {k: v for k, v in req.session.items()}
-    logger.info(f"Session data for LTI-Standalone access : {session_data}")
-    return render(req, "peerinst/student/index.html", context)
+
+    return render(request, "peerinst/student/index.html", context)
 
 
 @student_required
@@ -767,25 +737,17 @@ def send_signin_link(req):
         )
 
     student = Student.objects.filter(student__email=email)
-
     if not student:
         student, created = Student.get_or_create(email)
         logger.info(f"Student created with email {email}.")
-
     elif len(student) == 1:
         student = student[0]
-
     else:
         username, __ = get_student_username_and_password(email)
         student = student.filter(student__username=username).first()
-
     if student:
         err = student.send_email(mail_type="signin", request=req)
-        if err is None:
-            context = {"error": False}
-        else:
-            context = {"error": True}
-
+        context = {"error": False} if err is None else {"error": True}
     return render(req, "peerinst/student/login_confirmation.html", context)
 
 

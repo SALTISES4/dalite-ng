@@ -43,7 +43,7 @@ class StudentGroup(models.Model):
 
     LTI = "LTI"
     STANDALONE = "STANDALONE"
-    LTI_STANDALONE = "LTI_STANDAONE"
+    LTI_STANDALONE = "LTI_STANDALONE"
 
     MODE_CREATED_CHOICES = (
         (LTI, "LTI"),

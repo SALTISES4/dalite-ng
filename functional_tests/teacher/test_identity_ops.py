@@ -1,8 +1,10 @@
+import re
 import time
 
 from django.urls import reverse
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from functional_tests.fixtures import *  # noqa
 
@@ -107,7 +109,30 @@ def test_email_notification_change(browser, teacher):
 
     # TODO: Send an email... outbox should be empty
 
-    # TODO: Reset password... outbox should have 1 message
+
+def test_reset_password(browser, mail_outbox, teacher):
+    browser.get(f'{browser.server_url}{reverse("password_reset")}')
+
+    browser.find_element(By.ID, "id_email").send_keys(teacher.user.email)
+    browser.find_element(By.ID, "submit-btn").click()
+
+    WebDriverWait(browser, timeout=5).until(lambda d: len(mail_outbox) == 1)
+
+    m = re.search(
+        r"http[s]*://.*/reset/.*/.*/", mail_outbox[0].body
+    )  # noqa W605
+    signin_link = m[0]
+
+    browser.get(signin_link)
+
+    assert "Create a password" in browser.find_element_by_tag_name("h2").text
+
+    browser.find_element_by_id("id_new_password1").send_keys("retest&987")
+    browser.find_element_by_id("id_new_password2").send_keys("retest&987")
+
+    browser.find_element_by_css_selector("input[type='submit']").click()
+
+    assert "Success" in browser.page_source
 
 
 def test_change_discipline_and_institution(

@@ -125,7 +125,7 @@ CACHES = {
 AUTHENTICATION_BACKENDS = (
     "axes.backends.AxesBackend",
     "peerinst.backends.CustomPermissionsBackend",
-    "lti_provider.auth.LTIBackend",
+    "peerinst.lti.LTIBackendStudentsOnly",
 )
 
 # Password validators through django-password-validation (backport from 1.9)
@@ -227,24 +227,41 @@ AXES_LOCKOUT_TEMPLATE = "registration/lockout.html"
 # LTI integration
 # these are sensitive settings, so it is better to fail early than use some
 # defaults visible on public repo
-LTI_CLIENT_KEY = os.environ.get("LTI_CLIENT_KEY", None)
-LTI_CLIENT_SECRET = os.environ.get("LTI_CLIENT_SECRET", None)
-
-# hint: LTi passport in edX Studio should look like
-# <arbitrary_label>:LTI_CLIENT_KEY:LTI_CLIENT_SECRET
-
-# Used to automatically generate stable passwords from anonymous user ids
-# coming from LTI requests - keep secret as well
-# If compromised, attackers would be able to restore any student passwords
-# knowing his anonymous user ID from LMS
-PASSWORD_GENERATOR_NONCE = os.environ.get("PASSWORD_GENERATOR_NONCE", None)
-# LTI Integration end
-
-# Configureation file for the heartbeat view, should contain json file. See
-# this url for file contents.
-HEARTBEAT_REQUIRED_FREE_SPACE_PERCENTAGE = 20
-
-PINAX_FORUMS_EDIT_TIMEOUT = {"days": 120}
+LTI_BASIC_CLIENT_KEY = os.environ.get("LTI_BASIC_CLIENT_KEY", "")
+LTI_BASIC_CLIENT_SECRET = os.environ.get("LTI_BASIC_CLIENT_SECRET", "")
+LTI_STANDALONE_CLIENT_KEY = os.environ.get("LTI_STANDALONE_CLIENT_KEY", "")
+LTI_STANDALONE_CLIENT_SECRET = os.environ.get(
+    "LTI_STANDALONE_CLIENT_SECRET", ""
+)
+LTI_PROPERTY_LIST_EX = [
+    "context_title",
+    "custom_teacher_id",
+    "custom_assignment_id",
+    "custom_question_id",
+]
+LTI_TOOL_CONFIGURATION = {
+    "title": "myDALITE",
+    "description": "Asynchronous peer instruction",
+    "launch_url": "lti/",
+    "embed_url": "",
+    "embed_icon_url": "",
+    "embed_tool_id": "",
+    "landing_url": "/student/lti/",
+    "course_aware": False,
+    "course_navigation": False,
+    "new_tab": False,
+    "frame_width": 600,
+    "frame_height": 400,
+    "custom_fields": {},
+    "allow_ta_access": False,
+    "assignments": {},
+}
+PYLTI_CONFIG = {
+    "consumers": {
+        LTI_STANDALONE_CLIENT_KEY: {"secret": LTI_STANDALONE_CLIENT_SECRET},
+        LTI_BASIC_CLIENT_KEY: {"secret": LTI_BASIC_CLIENT_SECRET},
+    }
+}
 
 
 # CourseFlow settings
@@ -263,6 +280,7 @@ TEACHER_GROUP = "Teacher"
 
 DEFAULT_TIMEZONE = "America/Montreal"
 
+# Celery
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     "max_retries": 3,
     "interval_start": 0,

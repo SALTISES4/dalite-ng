@@ -10,7 +10,7 @@ def new_teachers(n):
             i += 1
             yield {
                 "username": f"teacher{i}",
-                "email": f"test{i}@test.com",
+                "email": f"teacher{i}@test.com",
                 "password": "test",
             }
 

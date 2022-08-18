@@ -92,13 +92,24 @@ urlpatterns += i18n_patterns(
     path("saltise/", include("saltise.urls", namespace="saltise")),
     path("blink/", include("blink.urls", namespace="blink")),
     path("course-flow/", include("course_flow.urls", namespace="course_flow")),
-    path("reputation/", include("reputation.urls", namespace="reputation")),
+    path(
+        "reputation/",
+        decorator_include(
+            (
+                csp_replace(FRAME_ANCESTORS=["*"]),
+                xframe_options_exempt,
+                lti_access_allowed,
+            ),
+            "reputation.urls",
+            namespace="reputation",
+        ),
+    ),
     path("quality/", include("quality.urls", namespace="quality")),
     path("tos/", include("tos.urls")),
     path("rest-api/", include("REST.urls", namespace="REST")),
-    path(r"", include("peerinst.urls")),
+    path("", include("peerinst.urls")),
     path(
-        "assignment/<assignment_id>/",
+        "assignment/<str:assignment_id>/",
         include(
             [
                 path(
@@ -107,7 +118,7 @@ urlpatterns += i18n_patterns(
                     name="question-list",
                 ),
                 path(
-                    r"<int:question_id>/",
+                    "<int:question_id>/",
                     include(
                         [
                             # myDalite question - Must allow to be framed
@@ -124,13 +135,7 @@ urlpatterns += i18n_patterns(
                             ),
                             path(
                                 "reset/",
-                                csp_replace(FRAME_ANCESTORS=["*"])(
-                                    xframe_options_exempt(
-                                        lti_access_allowed(
-                                            peerinst_views.reset_question
-                                        )
-                                    )
-                                ),
+                                peerinst_views.reset_question,
                                 name="reset-question",
                             ),
                         ]
@@ -145,7 +150,7 @@ urlpatterns += i18n_patterns(
         ),
     ),
     path(
-        r"admin_index_wrapper/",
+        "admin_index_wrapper/",
         views.admin_index_wrapper,
         name="admin_index_wrapper",
     ),

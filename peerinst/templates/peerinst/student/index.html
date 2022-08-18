@@ -79,37 +79,39 @@
           {% trans 'Groups' %}
         </h2>
         <div class="foldable--body">
-          <div id="student-add-group">
-            <span class="admin-link">
-              {% trans 'Add group' %}
-            </span>
-            <div id="student-add-group--box"
-              class="hidden">
-              <div>
-                <h3>{% trans 'Join group' %}</h3>
-                <p>
-                  {% blocktrans %}
-                    You may join any of your old groups or a new one by pasting
-                    the link in the box below.
-                  {% endblocktrans %}
-                </p>
-                <p id="student-add-group__error" hidden></p>
-                <input type="text"
-                  name="new-group"
-                  value=""
-                  placeholder="Url link">
-                <select id="student-old-groups"></select>
-                <button class="mdc-button mdc-button--unelevated"
-                  id="join-group-btn">
-                  {% trans 'Join' %}
-                </button>
-                <button class="mdc-button"
-                  id="cancel-join-group-btn">
-                  {% trans 'Cancel' %}
-                </button>
+          {% if access_standalone %}
+            <div id="student-add-group">
+              <span class="admin-link">
+                {% trans 'Add group' %}
+              </span>
+              <div id="student-add-group--box"
+                class="hidden">
+                <div>
+                  <h3>{% trans 'Join group' %}</h3>
+                  <p>
+                    {% blocktrans %}
+                      You may join any of your old groups or a new one by pasting
+                      the link in the box below.
+                    {% endblocktrans %}
+                  </p>
+                  <p id="student-add-group__error" hidden></p>
+                  <input type="text"
+                    name="new-group"
+                    value=""
+                    placeholder="Url link">
+                  <select id="student-old-groups"></select>
+                  <button class="mdc-button mdc-button--unelevated"
+                    id="join-group-btn">
+                    {% trans 'Join' %}
+                  </button>
+                  <button class="mdc-button"
+                    id="cancel-join-group-btn">
+                    {% trans 'Cancel' %}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          {% endif %}
           <div id="student-groups" class="foldable--body">
           </div>
         </div>
@@ -122,7 +124,7 @@
   <script nonce="{{ request.csp_nonce }}">
     window.addEventListener("load", function() {
       student.initStudentPage(
-        {{ data|safe }}, "{{ group_student_id_needed }}", callback
+        {{ data|safe }}, "{{ group_student_id_needed }}", {% if access_standalone %}false{% else %}true{% endif %}, callback
       );
 
       // Callback executed after async load of group assignment elements
