@@ -12,7 +12,7 @@ DELTA = timedelta(weeks=16)
 
 
 def create_token(payload, exp=DELTA):
-    key = settings.SECRET_KEY
+    key = settings.TOKEN_KEY
 
     payload_ = payload.copy()
     payload_.update(
@@ -29,7 +29,7 @@ def create_token(payload, exp=DELTA):
 
 
 def verify_token(token):
-    key = settings.SECRET_KEY
+    key = settings.TOKEN_KEY
 
     payload, err = None, None
 
