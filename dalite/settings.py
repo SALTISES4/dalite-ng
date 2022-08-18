@@ -114,10 +114,11 @@ DATABASES = {
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # Caching
+MEMCACHE_ADDRESS = os.environ.get("MEMCACHE_ADDRESS", "127.0.0.1")
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
-        "LOCATION": "127.0.0.1:11211",
+        "LOCATION": f"{MEMCACHE_ADDRESS}:11211",
     }
 }
 

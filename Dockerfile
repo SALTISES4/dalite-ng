@@ -49,7 +49,7 @@ COPY --from=static /code/templates ./templates
 COPY --from=static /code/tos ./tos
 COPY --from=static /code/manage.py .
 RUN python3 manage.py collectstatic --clear --noinput --skip-checks
-RUN python3 manage.py compress --skip-checks
+RUN python3 manage.py compress
 RUN mkdir emails
 
 # https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user

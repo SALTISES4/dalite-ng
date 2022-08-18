@@ -46,31 +46,3 @@ class PeerinstConfig(AppConfig):
             raise ImproperlyConfigured(
                 f"{_url.netloc} is not in ALLOWED_HOSTS"
             )
-
-        # Ensure required cookies are created
-        from cookie_consent.models import Cookie, CookieGroup  # noqa
-
-        required_cookie_group, _created = CookieGroup.objects.get_or_create(
-            name="Required cookies",
-            varname="required",
-            is_required=True,
-            is_deletable=False,
-        )
-        optional_cookie_group, _created = CookieGroup.objects.get_or_create(
-            name="Optional cookies",
-            varname="optional",
-            is_required=False,
-            is_deletable=True,
-        )
-        for cookie in REQUIRED_COOKIES:
-            Cookie.objects.get_or_create(
-                cookiegroup=required_cookie_group,
-                name=cookie,
-                domain=settings.ALLOWED_HOSTS[0],
-            )
-        for cookie in OPTIONAL_COOKIES:
-            Cookie.objects.get_or_create(
-                cookiegroup=optional_cookie_group,
-                name=cookie,
-                domain=settings.ALLOWED_HOSTS[0],
-            )
