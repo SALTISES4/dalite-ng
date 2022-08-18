@@ -75,7 +75,7 @@
         {% if LANGUAGE_CODE == 'en' %}Français{% else %}English{% endif %}
       </span>
 
-      <a class="mdc-list-item" href="{% url 'cookie_consent_cookie_group_list' %}">
+      <a class="mdc-list-item" href="{% url 'cookie_consent_cookie_group_list' %}?next={{ request.path }}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
           aria-hidden="true">
           cookie
