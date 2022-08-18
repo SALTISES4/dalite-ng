@@ -15,3 +15,7 @@ if __name__ == "__main__":
     chars = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)"
     key = "".join(urandom.choice(chars) for i in range(key_length))
     print(f"SECRET_KEY = {repr(key)}")
+    key = "".join(urandom.choice(chars) for i in range(key_length))
+    print(f"PWD_KEY = {repr(key)}")
+    key = "".join(urandom.choice(chars) for i in range(key_length))
+    print(f"TOKEN_KEY = {repr(key)}")
