@@ -130,28 +130,6 @@ def validate_group_data(req):
 
 
 def login_student(req, token=None):
-    """
-    Logs in the user depending on the given token and req.user. For lti users,
-    the student corresponding to the email is used, creating it if necessary.
-
-    Parameters
-    ----------
-    req : HttpRequest
-        Request with a logged in user or not
-    token : Optional[str] (default : None)
-        Student token
-
-    Parameters
-    ----------
-    Either
-        Student
-            Logged in student
-        HttpResponse
-            Error response
-    bool
-        If this is a new student
-    """
-
     if token is None:
         if not isinstance(req.user, User):
             return (
@@ -169,52 +147,32 @@ def login_student(req, token=None):
                 ),
                 None,
             )
-
         user = req.user
-        username, password = get_student_username_and_password(user.email)
-
-        is_lti = user.username != username
-
     else:
-        user, is_lti = authenticate_student(req, token)
+        user = authenticate_student(req, token)
         if isinstance(user, HttpResponse):
             return user, None
 
-        if is_lti:
-            username, password = get_student_username_and_password(user.email)
-
-    if is_lti:
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            user = User.objects.create_user(
-                username=username, password=password, email=user.email
-            )
-
     try:
         student = Student.objects.get(student=user)
-        new_student = False
     except Student.DoesNotExist:
-        if is_lti:
-            return (
-                response_403(
-                    req,
-                    msg=_(
-                        "You must be a logged in student to access this "
-                        "resource."
-                    ),
-                    logger_msg=(
-                        "Student index page accessed without a token or being "
-                        "logged in."
-                    ),
-                    log=logger.warning,
+        return (
+            response_403(
+                req,
+                msg=_(
+                    "You must be a logged in student to access this "
+                    "resource."
                 ),
-                None,
-            )
-        student = Student.objects.create(student=user)
-        new_student = True
+                logger_msg=(
+                    "Student index page accessed by non-student account"
+                ),
+                log=logger.warning,
+            ),
+            None,
+        )
 
-    if not user.is_active or new_student:
+    new_student = False
+    if not user.is_active:
         user.is_active = True
         user.save()
         new_student = True

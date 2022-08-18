@@ -96,7 +96,7 @@ def authenticate_student(req, token):
             False,
         )
 
-    return user, False
+    return user
 
 
 def get_student_username_and_password(email, max_username_length=30):

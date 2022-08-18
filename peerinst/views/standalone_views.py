@@ -104,7 +104,7 @@ def live(request, token, assignment_hash):
         logout(request)
 
         # Login through token
-        user, __ = authenticate_student(request, token)
+        user = authenticate_student(request, token)
         if isinstance(user, HttpResponse):
             return user
         login(
