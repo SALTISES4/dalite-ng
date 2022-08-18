@@ -1,50 +1,58 @@
 import logging
 from urllib.parse import urlparse
 
-from django.contrib.auth import get_permission_codename
-from django.contrib.auth.models import Permission
+from django.contrib.auth import get_user_model, logout
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
+from django.db.models import Q
+from lti_provider.auth import LTIBackend
+from pylti.common import LTIException
 
 from .models import Institution, InstitutionalLMS, StudentGroup, Teacher
 from .models.group import current_semester, current_year
 
 logger = logging.getLogger(__name__)
 
-
-class LTIRoles:
-    """
-    Non-comprehensive list of roles commonly used in LTI applications
-    """
-
-    LEARNER = "Learner"
-    INSTRUCTOR = "Instructor"
-    STAFF = "Staff"
+username_field = get_user_model().USERNAME_FIELD
 
 
-MODELS_STAFF_USER_CAN_EDIT = (
-    ("peerinst", "question"),
-    ("peerinst", "assignment"),
-    ("peerinst", "category"),
-)
+class LTIBackendStudentsOnly(LTIBackend):
+    def find_user(self, request, lti):
+        # Search for users but exclude staff, superuser, and teacher accounts
+        # as well as standalone student accounts (which have a password)
 
+        # find the user via lms identifier first
+        kwargs = {username_field: lti.user_identifier(request)}
+        if not lti.user_id(request):
+            logout(request)
+            raise LTIException
 
-def get_permissions_for_staff_user():
-    """
-    Returns all permissions that staff user possess. Staff user can create and
-    edit all models from `MODELS_STAFF_USER_CAN_EDIT` list. By design he has no
-    delete privileges --- as deleting questions could lead to bad user
-    experience for students.
-
-    :return: Iterable[django.contrib.auth.models.Permission]
-    """
-    from django.apps.registry import apps
-
-    for app_label, model_name in MODELS_STAFF_USER_CAN_EDIT:
-        model = apps.get_model(app_label, model_name)
-        for action in ("add", "change"):
-            codename = get_permission_codename(action, model._meta)
-            yield Permission.objects.get_by_natural_key(
-                codename, app_label, model_name
+        user_model = get_user_model()
+        user = (
+            user_model.objects.filter(
+                is_staff=False,
+                is_superuser=False,
+                **kwargs,
             )
+            .filter(Q(password__startswith=UNUSABLE_PASSWORD_PREFIX))
+            .exclude(teacher__isnull=False)
+            .first()
+        )
+
+        if user is None:
+            # find the user via hashed username
+            username = self.get_hashed_username(request, lti)
+            user = (
+                user_model.objects.filter(
+                    username=username,
+                    is_staff=False,
+                    is_superuser=False,
+                )
+                .filter(Q(password__startswith=UNUSABLE_PASSWORD_PREFIX))
+                .exclude(teacher__isnull=False)
+                .first()
+            )
+
+        return user
 
 
 def manage_LTI_studentgroup(request):
@@ -57,8 +65,9 @@ def manage_LTI_studentgroup(request):
             - assign year, semester and Discipline of teacher
               to StudentGroup
     """
+    course_id = request.session.get("context_id")
+
     teacher_hash = request.session.get("custom_teacher_id", None)
-    course_id = request.session.get("context_id", "")
     course_title = request.session.get("context_title", None)
 
     try:
@@ -73,10 +82,9 @@ def manage_LTI_studentgroup(request):
         group.mode_created = StudentGroup.LTI_STANDALONE
         group.save()
 
-        lms_url_raw = request.session.get(
+        if lms_url_raw := request.session.get(
             "launch_presentation_return_url", None
-        )
-        if lms_url_raw:
+        ):
             lms_url = urlparse(lms_url_raw).hostname
             (
                 institutional_lms,
@@ -91,7 +99,7 @@ def manage_LTI_studentgroup(request):
             group.institution = institutional_lms.institution
             group.save()
         else:
-            session_data = {k: v for k, v in request.session.items()}
+            session_data = dict(request.session.items())
             logger.info("No LMS URL found in session data: {session_data}")
 
     # add group to student

@@ -1,4 +1,5 @@
 import base64
+import binascii
 import math
 from datetime import datetime, timedelta
 from itertools import chain, islice
@@ -12,7 +13,7 @@ DELTA = timedelta(weeks=16)
 
 
 def create_token(payload, exp=DELTA):
-    key = settings.SECRET_KEY
+    key = settings.TOKEN_KEY
 
     payload_ = payload.copy()
     payload_.update(
@@ -29,7 +30,7 @@ def create_token(payload, exp=DELTA):
 
 
 def verify_token(token):
-    key = settings.SECRET_KEY
+    key = settings.TOKEN_KEY
 
     payload, err = None, None
 
@@ -40,6 +41,8 @@ def verify_token(token):
             audience="dalite",
             algorithms="HS256",
         )
+    except binascii.Error as e:
+        err = e
     except TypeError:
         err = "Invalid token"
     except KeyError:

@@ -32,6 +32,7 @@ def inactive_user():
 @pytest.fixture
 def superuser():
     user = add_users(new_users(1))[0]
+    user.username = "superuser"
     user.is_superuser = True
     user.save()
     return user
@@ -45,6 +46,7 @@ def new_teacher():
 @pytest.fixture
 def staff():
     user = add_users(new_users(1))[0]
+    user.username = "staff"
     user.is_staff = True
     user.save()
     return user

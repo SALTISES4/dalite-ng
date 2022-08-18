@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import path
 from django.views.generic.base import TemplateView
 
+from peerinst.forms import NonStudentAuthenticationForm
+
 app_name = "saltise"
 
 
@@ -21,7 +23,12 @@ urlpatterns = [
             not_authenticated,
             login_url="/saltise/lobby/",
             redirect_field_name=None,
-        )(auth_views.LoginView.as_view(template_name="saltise/login.html")),
+        )(
+            auth_views.LoginView.as_view(
+                template_name="saltise/login.html",
+                authentication_form=NonStudentAuthenticationForm,
+            )
+        ),
         name="login",
     ),
     path(

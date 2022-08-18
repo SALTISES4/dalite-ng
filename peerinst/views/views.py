@@ -55,7 +55,6 @@ from tos.models import Consent, Tos
 
 from .. import admin, forms, models, rationale_choice
 from ..admin_views import get_question_rationale_aggregates
-from ..lti import manage_LTI_studentgroup
 from ..mixins import (
     LoginRequiredMixin,
     NoStudentsMixin,
@@ -893,41 +892,48 @@ class QuestionMixin:
         )
 
         # Pass hints so that template knows context
-        if self.request.session.get("LTI"):
-            context.update(lti=True)
+
+        if self.request.session.get("access_type") == StudentGroup.STANDALONE:
+            context.update(access_standalone=True)
+        elif (
+            self.request.session.get("access_type")
+            == StudentGroup.LTI_STANDALONE
+        ):
+            context.update(access_lti_standalone=True)
+        elif self.request.session.get("access_type") == StudentGroup.LTI:
+            context.update(access_lti_basic_client_key=True)
         else:
-            context.update(lti=False)
-            hash = self.request.session.get("assignment")
-            if hash is not None:
-                group_assignment = StudentGroupAssignment.get(hash)
-                context.update(group_assignment=group_assignment)
-            context.update(
-                assignment_first=self.request.session.get("assignment_first")
-            )
-            context.update(
-                assignment_last=self.request.session.get("assignment_last")
-            )
-            context.update(
-                assignment_expired=self.request.session.get(
-                    "assignment_expired"
-                )
-            )
-            context.update(quality=self.request.session.get("quality"))
+            context.update(access_teacher=True)
+
+        hash = self.request.session.get("assignment")
+        if hash is not None:
+            group_assignment = StudentGroupAssignment.get(hash)
+            context.update(group_assignment=group_assignment)
+        context.update(
+            assignment_first=self.request.session.get("assignment_first")
+        )
+        context.update(
+            assignment_last=self.request.session.get("assignment_last")
+        )
+        context.update(
+            assignment_expired=self.request.session.get("assignment_expired")
+        )
+        context.update(quality=self.request.session.get("quality"))
 
         return context
 
     def send_grade(self):
 
-        if not self.request.session.get("LTI"):
-            # We are running outside of an LTI context, so we don't need to
+        if not self.request.session.get("access_type") == StudentGroup.LTI:
+            # We are running outside of a basic LTI context, so we don't need to
             # send a grade.
             return
         else:
             redirect_url = reverse(
-                "question-LTI",
+                "question",
                 kwargs={
-                    "assignment_id": self.assignment,
-                    "question_id": self.question,
+                    "assignment_id": self.assignment.pk,
+                    "question_id": self.question.id,
                 },
             )
             launch_url = None
@@ -936,7 +942,7 @@ class QuestionMixin:
             login(
                 self.request,
                 user,
-                backend="lti_provider.auth.LTIBackend",
+                backend="peerinst.lti.LTIBackendStudentsOnly",
             )
 
             xml = lti.generate_request_xml(
@@ -947,15 +953,20 @@ class QuestionMixin:
                 launch_url=launch_url,
             )
 
-            post_message(
-                consumers=lti.consumers(),
-                lti_key=lti.oauth_consumer_key(self.request),
-                url=lti.lis_outcome_service_url(self.request),
-                body=xml,
-            )
-            logger_auth.info(
-                f"Grade of {self.answer.grade} posted for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_outcome_service_url(self.request)}"  # noqa
-            )
+            try:
+                post_message(
+                    consumers=lti.consumers(),
+                    lti_key=lti.oauth_consumer_key(self.request),
+                    url=lti.lis_outcome_service_url(self.request),
+                    body=xml,
+                )
+                logger_auth.info(
+                    f"Grade of {self.answer.grade} posted for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_outcome_service_url(self.request)}"  # noqa
+                )
+            except Exception as e:
+                logger_auth.error(
+                    f"Failure '{e}' while posting grade of {self.answer.grade} for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_outcome_service_url(self.request)}"  # noqa
+                )
 
 
 class QuestionReload(Exception):
@@ -1580,14 +1591,6 @@ def question(request, assignment_id, question_id):
     dispatcher loads the session state and relevant database objects. Based on
     the available data, it delegates to the correct view class.
     """
-
-    if "LTI" in request.session.get("_auth_user_backend"):
-        request.session["LTI"] = True
-        manage_LTI_studentgroup(request=request)
-
-    session_data = {k: v for k, v in request.session.items()}
-    logger_auth.info(f"Session data for question view : {session_data}")
-
     if not request.user.is_authenticated:
         return redirect_to_login_or_show_cookie_help(request)
 
@@ -1639,7 +1642,7 @@ def question(request, assignment_id, question_id):
         stage_class = QuestionStartView
 
     logger_auth.info(
-        f"LTI access for {user_token} to assignment {assignment} and question {question} dispatched to {stage_class}"  # noqa
+        f"Access type {request.session.get('access_type')} for {user_token} to assignment {assignment} and question {question} dispatched to {stage_class}"  # noqa
     )
     # Delegate to the view
     stage = stage_class(**view_data)
@@ -1650,6 +1653,7 @@ def question(request, assignment_id, question_id):
         stage_data.clear()
         return redirect(request.path)
     stage_data.store()
+
     return result
 
 
@@ -1759,8 +1763,8 @@ class TeacherDetailView(TeacherBase, DetailView):
         context["owned_collections"] = Collection.objects.filter(
             owner=self.request.user.teacher
         )
-        context["LTI_key"] = str(settings.LTI_CLIENT_KEY)
-        context["LTI_secret"] = str(settings.LTI_CLIENT_SECRET)
+        context["LTI_key"] = str(settings.LTI_BASIC_CLIENT_KEY)
+        context["LTI_secret"] = str(settings.LTI_BASIC_CLIENT_SECRET)
         context["LTI_launch_url"] = str(
             "https://" + self.request.get_host() + "/lti/"
         )

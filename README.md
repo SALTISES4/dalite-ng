@@ -27,7 +27,7 @@ Dalite NG is a Peer Instruction Tool for online learning platforms such as Open 
          $ export DALITE_DB_PASSWORD='your password here'
 
 3.  Generate a secret key, e.g. using `tools/gen_secret_key.py`, an put it in
-    `dalite/local_settings.py`.
+    `dalite/local_settings.py` along with a `PWD_KEY` and `TOKEN_KEY`.
 
 4.  Create the database tables and the superuser.
 

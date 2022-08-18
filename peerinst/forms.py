@@ -4,8 +4,10 @@ from datetime import date, datetime
 import bleach
 import pytz
 from django import forms
-from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db.models import Count, Q
 from django.forms import ModelForm
 from django.utils.safestring import mark_safe
@@ -30,14 +32,23 @@ from .validators import (
 )
 
 
-class NonStudentPasswordResetForm(PasswordResetForm):
-    def get_users(self, email):
-        active_users = User.objects.filter(email__iexact=email, is_active=True)
+class NonStudentAuthenticationForm(AuthenticationForm):
+    def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)
+        if hasattr(user, "student"):
+            raise ValidationError(
+                _("Students cannot login via username and password"),
+                code="no_students",
+            )
 
-        return (
-            u
-            for u in active_users
-            if u.has_usable_password() and not hasattr(u, "student")
+
+class TeacherPasswordResetForm(PasswordResetForm):
+    def get_users(self, email):
+        return User.objects.filter(
+            email__iexact=email, is_active=True, teacher__isnull=False
+        ).filter(
+            Q(password__isnull=True)
+            | ~Q(password__startswith=UNUSABLE_PASSWORD_PREFIX)
         )
 
 

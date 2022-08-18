@@ -5,6 +5,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.expected_conditions import (
+    element_to_be_clickable,
     invisibility_of_element_located,
     presence_of_element_located,
     text_to_be_present_in_element,
@@ -60,7 +61,9 @@ def join_group_with_link(browser, group):
     )
 
     add_group.click()
-    link_field = browser.find_element_by_name("new-group")
+    link_field = WebDriverWait(browser, timeout=60).until(
+        element_to_be_clickable((By.NAME, "new-group"))
+    )
     link_field.clear()
     link_field.send_keys(link)
     browser.find_element(By.ID, "join-group-btn").click()
