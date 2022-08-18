@@ -5,6 +5,7 @@ import time
 from functools import partial
 
 import pytest
+from cookie_consent.models import Cookie, CookieGroup
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from selenium import webdriver
@@ -45,8 +46,59 @@ def assert_():
     return fct
 
 
+@pytest.fixture
+def cookies():
+    domain = "nginx"
+    hash_ = "2036"
+    required_group = CookieGroup.objects.create(
+        name="required", is_deletable=False, is_required=True
+    )
+    optional_group = CookieGroup.objects.create(
+        name="optional", is_deletable=True, is_required=False
+    )
+
+    sessionid_cookie = Cookie.objects.create(
+        name="sessionid",
+        cookiegroup=required_group,
+        path="/",
+        domain=domain,
+    )
+    csrftoken_cookie = Cookie.objects.create(
+        name="csrftoken",
+        cookiegroup=required_group,
+        path="/",
+        domain=domain,
+    )
+    cookie_consent_cookie = Cookie.objects.create(
+        name="cookie_consent",
+        cookiegroup=required_group,
+        path="/",
+        domain=domain,
+    )
+    django_language_cookie = Cookie.objects.create(
+        name="django_language",
+        cookiegroup=required_group,
+        path="/",
+        domain=domain,
+    )
+    matomo_id_cookie = Cookie.objects.create(
+        name=f"_pk_id.1.{hash_}",
+        cookiegroup=optional_group,
+        path="/",
+        domain=domain,
+    )
+    matomo_ses_cookie = Cookie.objects.create(
+        name=f"_pk_ses.1.{hash_}",
+        cookiegroup=optional_group,
+        path="/",
+        domain=domain,
+    )
+
+    return Cookie.objects.all()
+
+
 @pytest.yield_fixture
-def browser(live_server):
+def browser(live_server, cookies):
     staging_server = os.environ.get("STAGING_SERVER")
 
     if staging_server:

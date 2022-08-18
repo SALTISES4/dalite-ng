@@ -6,4 +6,4 @@ echo "Done testing Chrome"
 # echo "Done testing Firefox"
 # docker compose up celery nginx redis selenium-hub edge test_edge --abort-on-container-exit
 # echo "Done testing Edge"
-docker compose down -v
+# docker compose down -v
