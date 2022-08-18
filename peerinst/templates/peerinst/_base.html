@@ -91,21 +91,12 @@
         type="text/css"
       />
 
+      <!-- Cookie consent -->
+      {% compress css file cookie_law %}
+        <link href="{% static 'peerinst/css/cookie_law.min.css' %}" rel="stylesheet">
+      {% endcompress %}
+
       {% block stylesheets %}{% endblock %}
-      <style nonce="{{ request.csp_nonce }}" type="text/css" media="screen">
-        body.with-cookie-bar {
-          padding-top: 35px;
-        }
-        .cookie-bar {
-          position: fixed;
-          width: 100%;
-          top:0;
-          text-align:center;
-          height:25px;
-          line-height: 25px;
-          background: #eee;
-        }
-      </style>
     </head>
 
     <body {% block logged_in_layout_class %}{% endblock %} >
@@ -202,7 +193,7 @@
 
             window.addEventListener("load", () => {
               showCookieBar({
-                content: "{% filter escapejs %}{% with cookie_groups=cookie_groups|join:', ' %}<div class='cookie-bar'>This site uses {{ cookie_groups }} cookies for better performance and user experience. Do you agree to use cookies? <a href='{{ url_accept }}' class='cc-cookie-accept'>Accept</a> <a href='{{ url_decline }}' class='cc-cookie-decline'>Decline</a> <a href='{{ url_cookies }}'>Cookies info</a></div>{% endwith %}{% endfilter %}",
+                content: "{% filter escapejs %}{% with cookie_groups=cookie_groups|join:', ' %}<div id='CookielawBanner' class='cookie-bar'><p>This site uses {{ cookie_groups|lower }} for better performance and user experience. Do you agree to use cookies?</p><div class='button-container'><a id='accept-cookies' class='mdc-button mdc-button--raised cc-cookie-accept' href='{{ url_accept }}'>{% trans 'Accept' %}</a> <a href='{{ url_decline }}' class='mdc-button mdc-button--raised cc-cookie-decline'>{% trans 'Decline' %}</a> <a class='mdc-button mdc-button--raised' href='{{ url_cookies }}?next={{ request.path }}'>Policy</a></div></div>{% endwith %}{% endfilter %}",
                 cookie_groups: cookie_groups,
                 cookie_decline: "{% get_decline_cookie_groups_cookie_string request cookie_groups %}",
                 beforeDeclined: function() {
