@@ -84,8 +84,23 @@ def consent_to_tos(browser):
     assert sharing.text == "Sharing"
 
 
+def test_incorrect_padding(browser, student):
+    token = create_student_token(
+        student.student.username, student.student.email
+    )
+
+    signin_link = (
+        f'{browser.server_url}{reverse("student-page")}?token={token[:-2]}'
+    )
+
+    browser.get(signin_link)
+
+    err = "Incorrect padding"
+    browser.find_element_by_xpath(f"//*[contains(text(), '{err}')]")
+
+
 def test_fake_link(browser):
-    email = "test@test.com"
+    email = "___test___@test.com"
     username, _ = get_student_username_and_password(email)
     token = create_student_token(username, email)
 

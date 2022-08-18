@@ -1,4 +1,5 @@
 import base64
+import binascii
 import math
 from datetime import datetime, timedelta
 from itertools import chain, islice
@@ -40,6 +41,8 @@ def verify_token(token):
             audience="dalite",
             algorithms="HS256",
         )
+    except binascii.Error as e:
+        err = e
     except TypeError:
         err = "Invalid token"
     except KeyError:

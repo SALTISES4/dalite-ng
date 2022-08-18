@@ -39,19 +39,11 @@ def authenticate_student(req, token):
     username, email, err = verify_student_token(token)
 
     if err is not None:
-        return (
-            TemplateResponse(
-                req,
-                "400.html",
-                context={
-                    "message": _(
-                        "This page isn't valid. You can try asking for a new "
-                        "login link."
-                    )
-                },
-                status=400,
-            ),
-            False,
+        return TemplateResponse(
+            req,
+            "400.html",
+            context={"message": err},
+            status=400,
         )
 
     try:
@@ -60,19 +52,16 @@ def authenticate_student(req, token):
             user.is_active = True
             user.save()
     except User.DoesNotExist:
-        return (
-            TemplateResponse(
-                req,
-                "400.html",
-                context={
-                    "message": _(
-                        "There is no user corresponding to the given link. "
-                        "You may try asking for another one."
-                    )
-                },
-                status=400,
-            ),
-            False,
+        return TemplateResponse(
+            req,
+            "400.html",
+            context={
+                "message": _(
+                    "There is no user corresponding to the given link. "
+                    "You may try asking for another one."
+                )
+            },
+            status=400,
         )
 
     username_, password = get_student_username_and_password(email)
@@ -81,19 +70,16 @@ def authenticate_student(req, token):
         user = authenticate(req, username=username, password=password)
 
     if user is None:
-        return (
-            TemplateResponse(
-                req,
-                "400.html",
-                context={
-                    "message": _(
-                        "There is no user corresponding to the given link. "
-                        "You may try asking for another one."
-                    )
-                },
-                status=400,
-            ),
-            False,
+        return TemplateResponse(
+            req,
+            "400.html",
+            context={
+                "message": _(
+                    "There is no user corresponding to the given link. "
+                    "You may try asking for another one."
+                )
+            },
+            status=400,
         )
 
     return user
