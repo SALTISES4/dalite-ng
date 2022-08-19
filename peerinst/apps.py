@@ -7,6 +7,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.utils import OperationalError
 from django.utils.translation import gettext_lazy as _
 
+OPTIONAL_COOKIES = []
+REQUIRED_COOKIES = ["csrftoken", "sessionid", "django_language"]
+
 
 class PeerinstConfig(AppConfig):
     name = "peerinst"

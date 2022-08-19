@@ -16,12 +16,14 @@
     padding: 20px;
   }
 
-  & a {
-    background-color: white;
-    color: $mdc-theme-secondary !important  ;
+  div.button-container {
     display: flex;
-    margin: auto;
-    margin-bottom: 20px;
-    width: max-content;
+    & a {
+      background-color: white;
+      color: $mdc-theme-secondary !important  ;
+      margin: auto;
+      margin-bottom: 20px;
+      width: max-content;
+    }
   }
 }

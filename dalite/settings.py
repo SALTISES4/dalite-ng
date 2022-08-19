@@ -40,9 +40,9 @@ INSTALLED_APPS = (
     "REST",
     "django_elasticsearch_dsl",
     "lti_provider",
-    "cookielaw",
     "tinymce",
     "csp",
+    "cookie_consent",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -71,6 +71,7 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "dalite.custom_middleware.resp_405_middleware",
     "dalite.custom_middleware.resp_503_middleware",
+    "dalite.cookie_consent.CleanCookiesFixMiddleware",
     "django_minify_html.middleware.MinifyHtmlMiddleware",
     "axes.middleware.AxesMiddleware",
 )
@@ -113,10 +114,11 @@ DATABASES = {
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # Caching
+MEMCACHE_ADDRESS = os.environ.get("MEMCACHE_ADDRESS", "127.0.0.1")
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
-        "LOCATION": "127.0.0.1:11211",
+        "LOCATION": f"{MEMCACHE_ADDRESS}:11211",
     }
 }
 
@@ -160,8 +162,6 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.8/howto/static-files/
-
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
@@ -173,6 +173,8 @@ STATICFILES_FINDERS = (
     "compressor.finders.CompressorFinder",
 )
 
+
+# Compressor
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
 COMPRESS_URL = STATIC_URL
@@ -187,12 +189,12 @@ EMAIL_BACKEND = os.environ.get(
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "emails")
 
 
-# LOGIN_URL = 'login'
+# Login
 LOGIN_URL = "login"
-
 LOGIN_REDIRECT_URL = "welcome"
 
 
+# DRF
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -262,8 +264,14 @@ PYLTI_CONFIG = {
     }
 }
 
+
 # CourseFlow settings
 COURSE_FLOW_RETURN_URL = {"name": "welcome", "title": "myDalite"}
+
+
+# Cookie consent
+COOKIE_CONSENT_NAME = "cookie_consent"
+COOKIE_CONSENT_LOG_ENABLED = True
 
 # NB: Object level permissions are checked for certain models, including
 # Question

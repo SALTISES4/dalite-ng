@@ -7,14 +7,6 @@
     <nav class="mdc-drawer__drawer">
 
       <nav id="icon-with-text-demo" class="mdc-drawer__content mdc-list">
-        <a class="mdc-list-item" href="{% url 'tos:tos_modify' 'student' %}?next={{ request.path }}">
-          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-            aria-hidden="true">
-            settings
-          </i>
-          {% trans 'Terms of service' %}
-        </a>
-
         {% if access_lti_standalone %}
           <a class="mdc-list-item" href="{% url 'student-page-LTI' %}">
             <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
@@ -24,6 +16,22 @@
             {% trans 'My account' %}
           </a>
         {% endif %}
+
+        <a class="mdc-list-item" href="{% url 'tos:tos_modify' 'student' %}?next={{ request.path }}">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            settings
+          </i>
+          {% trans 'Terms of service' %}
+        </a>
+
+        <a class="mdc-list-item" href="{% url 'cookie_consent_cookie_group_list' %}?next={{ request.path }}">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            cookie
+          </i>
+          {% trans 'Cookies policy' %}
+        </a>
 
         <a class="mdc-list-item logout" href="{% url 'logout' %}" id='logout-no-iframe'>
           <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
@@ -72,6 +80,14 @@
             settings
           </i>
           {% trans 'Terms of service' %}
+        </a>
+
+        <a class="mdc-list-item" href="{% url 'cookie_consent_cookie_group_list' %}?next={{ request.path }}">
+          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+            aria-hidden="true">
+            cookie
+          </i>
+          {% trans 'Cookies policy' %}
         </a>
 
         <span id="submit-language-form" class="mdc-list-item">

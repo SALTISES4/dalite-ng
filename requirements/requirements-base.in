@@ -12,7 +12,7 @@ django-analytical
 django-axes
 django-celery-beat
 django-compressor
-django-cookie-law
+django-cookie-consent
 django-csp
 django-decorator-include
 django-elasticsearch-dsl

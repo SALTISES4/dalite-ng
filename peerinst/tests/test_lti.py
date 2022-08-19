@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.db import IntegrityError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from lti_provider.tests.factories import BASE_LTI_PARAMS, generate_lti_request
@@ -110,6 +110,7 @@ class TestViews(TestCase):
         request.user.teacher.pk = 1
         request.get_host.return_value = "localhost"
         request.META = {}
+        request.COOKIES = {}
         response = admin_index_wrapper(request)
         self.assertEqual(response.status_code, 200)
         self.assertContains(

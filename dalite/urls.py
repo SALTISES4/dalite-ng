@@ -4,11 +4,13 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.views.i18n import JavaScriptCatalog
 
+from dalite.cookie_consent import CookieGroupAcceptViewPatch
 from peerinst import views as peerinst_views
 from peerinst.middleware import lti_access_allowed
 
@@ -30,6 +32,54 @@ urlpatterns = [
                 lti_access_allowed,
             ),
             "lti_provider.urls",
+        ),
+    ),
+]
+
+# Cookie consent
+urlpatterns += [
+    path(
+        "cookies/",
+        include(
+            [
+                re_path(
+                    r"^accept/$",
+                    csp_replace(FRAME_ANCESTORS=["*"])(
+                        xframe_options_exempt(
+                            lti_access_allowed(
+                                csrf_exempt(
+                                    CookieGroupAcceptViewPatch.as_view()
+                                )
+                            )
+                        )
+                    ),
+                    name="cookie_consent_accept_all",
+                ),
+                re_path(
+                    r"^accept/(?P<varname>.*)/$",
+                    csp_replace(FRAME_ANCESTORS=["*"])(
+                        xframe_options_exempt(
+                            lti_access_allowed(
+                                csrf_exempt(
+                                    CookieGroupAcceptViewPatch.as_view()
+                                )
+                            )
+                        )
+                    ),
+                    name="cookie_consent_accept",
+                ),
+            ]
+        ),
+    ),
+    path(
+        "cookies/",
+        decorator_include(
+            (
+                csp_replace(FRAME_ANCESTORS=["*"]),
+                xframe_options_exempt,
+                lti_access_allowed,
+            ),
+            "cookie_consent.urls",
         ),
     ),
 ]

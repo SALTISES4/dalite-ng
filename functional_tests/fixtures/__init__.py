@@ -4,6 +4,7 @@ __all__ = [
     "assignment",
     "assignments",
     "browser",
+    "cookies",
     "category",
     "discipline",
     "group",
@@ -54,4 +55,4 @@ from .peerinst_ import (
 )
 from .quality_ import min_words_criterion, min_words_rules, quality_min_words
 from .reputation_ import student_reputation_with_criteria
-from .utils import assert_, browser, second_browser
+from .utils import assert_, browser, cookies, second_browser

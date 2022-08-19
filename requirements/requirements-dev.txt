@@ -351,8 +351,7 @@ django==3.2.15 \
     #   django-appconf
     #   django-axes
     #   django-celery-beat
-    #   django-classy-tags
-    #   django-cookie-law
+    #   django-cookie-consent
     #   django-csp
     #   django-decorator-include
     #   django-inlinecss
@@ -376,6 +375,7 @@ django-appconf==1.0.3 \
     # via
     #   -r requirements/requirements-test.txt
     #   django-compressor
+    #   django-cookie-consent
 django-axes==5.36.0 \
     --hash=sha256:466e6ed1affd0866c78f245ee658d2619f74250aca5856852d86e61dba400eda \
     --hash=sha256:bac08a7047fde26ffb54813c971fd40eeadb4ecb8d342a6e47d53de666d1a792
@@ -384,20 +384,14 @@ django-celery-beat==2.3.0 \
     --hash=sha256:ba24f86ed956ba0ee2b43237a49303ebf5aa7e0fb0ccb7e0542b7e31a463dcba \
     --hash=sha256:ff694e1d30f84de3d2b78822c90005c6c7c1462768e845ae162af71a6a46f1eb
     # via -r requirements/requirements-test.txt
-django-classy-tags==1.0.0 \
-    --hash=sha256:ad6a25fc2b58a098f00d86bd5e5dad47922f5ca4e744bc3cccb7b4be5bc35eb1
-    # via
-    #   -r requirements/requirements-test.txt
-    #   django-cookie-law
 django-compressor==4.1 \
     --hash=sha256:61f313852b4c8d4ef2534cda3d2366f45ca3e399b3cbe10590e516cc6b45542d \
     --hash=sha256:8ece621d2a98f6c6635480cb8b3701db890a99f793f95ca20cb00abc194d331d
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-django-cookie-law==2.2.0 \
-    --hash=sha256:121b503e8134287b6cb71bb0b617840e0cb350174d8f2947be2f5af0e7c8cf56 \
-    --hash=sha256:c3c6c10a01b257886077dd170ead11a49448b5bdfd06e81acc5c7c4e2292d4c8
+django-cookie-consent==0.3.1 \
+    --hash=sha256:71701c23e82f8ad64cc899ae3595d9595d0e6faaac47c27a614e1178cd95e3e0
     # via -r requirements/requirements-test.txt
 django-csp==3.7 \
     --hash=sha256:01443a07723f9a479d498bd7bb63571aaa771e690f64bde515db6cdb76e8041a \
@@ -1257,7 +1251,6 @@ six==1.15.0 \
     #   bleach
     #   click-repl
     #   django-appconf
-    #   django-classy-tags
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl
     #   faker

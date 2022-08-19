@@ -11,7 +11,6 @@
 
 # TODO:
 #   - Currently, --create-db ensures tests do not start until other services are ready, but a wait function should be added.
-#   - Add memcached image?
 
 # GOTCHAS:
 #   - Use `docker image prune` to avoid serving old static content or using excessive disk space
@@ -32,6 +31,7 @@ services:
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       CHANNELS_REDIS_ADDRESS: redis
       CHANNELS_REDIS_PORT: 6379
+      MEMCACHE_ADDRESS: memcached
     volumes:
       - static:/code/static
       - emails:/code/emails
@@ -50,6 +50,7 @@ services:
       EMAIL_BACKEND: django.core.mail.backends.filebased.EmailBackend
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
+      MEMCACHE_ADDRESS: memcached
     volumes:
       - emails:/code/emails
 
@@ -72,9 +73,16 @@ services:
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       CHANNELS_REDIS_ADDRESS: redis
       CHANNELS_REDIS_PORT: 6379
+      MEMCACHE_ADDRESS: memcached
     volumes:
       - static:/code/static
       - emails:/code/emails
+
+  memcached:
+    image: memcached:latest
+    container_name: memcached
+    expose:
+      - "11211"
 
   nginx:
     build: ./nginx
@@ -172,6 +180,7 @@ services:
       BROWSER: Chrome
       DALITE_DB_HOST: ${HOST:-host.docker.internal}
       DJANGO_SETTINGS_MODULE: dalite.functional_test_settings
+      MEMCACHE_ADDRESS: memcached
       SELENIUM_HUB: selenium-hub:4444
       STAGING_SERVER: nginx:8080
     volumes:
@@ -191,6 +200,7 @@ services:
       BROWSER: Firefox
       DALITE_DB_HOST: ${HOST:-host.docker.internal}
       DJANGO_SETTINGS_MODULE: dalite.functional_test_settings
+      MEMCACHE_ADDRESS: memcached
       SELENIUM_HUB: selenium-hub:4444
       STAGING_SERVER: nginx:8080
     volumes:
@@ -210,6 +220,7 @@ services:
       BROWSER: Edge
       DALITE_DB_HOST: ${HOST:-host.docker.internal}
       DJANGO_SETTINGS_MODULE: dalite.functional_test_settings
+      MEMCACHE_ADDRESS: memcached
       SELENIUM_HUB: selenium-hub:4444
       STAGING_SERVER: nginx:8080
     volumes:
