@@ -39,27 +39,26 @@ INSTALLED_APPS = (
     "channels",
     "REST",
     "django_elasticsearch_dsl",
-    "cookielaw",
+    "lti_provider",
+    "tinymce",
     "csp",
+    "cookie_consent",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_lti_tool_provider",
     "django_celery_beat",
     "compressor",
     "analytical",
-    "pinax.forums",
     "axes",
+    "django_minify_html",
     "django_inlinecss",
 )
 
 MIDDLEWARE = (
-    "django_samesite_none.middleware.SameSiteNoneMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "django_referrer_policy.middleware.ReferrerPolicyMiddleware",
     "django_permissions_policy.PermissionsPolicyMiddleware",
     "csp.middleware.CSPMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -70,12 +69,10 @@ MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "peerinst.middleware.NotificationMiddleware",
     "dalite.custom_middleware.resp_405_middleware",
     "dalite.custom_middleware.resp_503_middleware",
-    # Minify html
-    "htmlmin.middleware.HtmlMinifyMiddleware",
-    "htmlmin.middleware.MarkRequestMiddleware",
+    "dalite.cookie_consent.CleanCookiesFixMiddleware",
+    "django_minify_html.middleware.MinifyHtmlMiddleware",
     "axes.middleware.AxesMiddleware",
 )
 
@@ -114,11 +111,14 @@ DATABASES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 # Caching
+MEMCACHE_ADDRESS = os.environ.get("MEMCACHE_ADDRESS", "127.0.0.1")
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
-        "LOCATION": "127.0.0.1:11211",
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "LOCATION": f"{MEMCACHE_ADDRESS}:11211",
     }
 }
 
@@ -126,6 +126,7 @@ CACHES = {
 AUTHENTICATION_BACKENDS = (
     "axes.backends.AxesBackend",
     "peerinst.backends.CustomPermissionsBackend",
+    "peerinst.lti.LTIBackendStudentsOnly",
 )
 
 # Password validators through django-password-validation (backport from 1.9)
@@ -146,8 +147,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.8/topics/i18n/
-
 LANGUAGE_CODE = "en"
 LANGUAGES = (("fr", "FR"), ("en", "EN"))
 
@@ -163,8 +162,6 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.8/howto/static-files/
-
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
@@ -176,9 +173,8 @@ STATICFILES_FINDERS = (
     "compressor.finders.CompressorFinder",
 )
 
-KEEP_COMMENTS_ON_MINIFYING = False
-HTML_MINIFY = not DEBUG
 
+# Compressor
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
 COMPRESS_URL = STATIC_URL
@@ -193,12 +189,12 @@ EMAIL_BACKEND = os.environ.get(
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "emails")
 
 
-# LOGIN_URL = 'login'
+# Login
 LOGIN_URL = "login"
-
 LOGIN_REDIRECT_URL = "welcome"
 
 
+# DRF
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -229,32 +225,53 @@ AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = datetime.timedelta(minutes=5)
 AXES_LOCKOUT_TEMPLATE = "registration/lockout.html"
 
-GRAPPELLI_ADMIN_TITLE = "Dalite NG administration"
-
 # LTI integration
 # these are sensitive settings, so it is better to fail early than use some
 # defaults visible on public repo
-LTI_CLIENT_KEY = os.environ.get("LTI_CLIENT_KEY", None)
-LTI_CLIENT_SECRET = os.environ.get("LTI_CLIENT_SECRET", None)
+LTI_BASIC_CLIENT_KEY = os.environ.get("LTI_BASIC_CLIENT_KEY", "")
+LTI_BASIC_CLIENT_SECRET = os.environ.get("LTI_BASIC_CLIENT_SECRET", "")
+LTI_STANDALONE_CLIENT_KEY = os.environ.get("LTI_STANDALONE_CLIENT_KEY", "")
+LTI_STANDALONE_CLIENT_SECRET = os.environ.get(
+    "LTI_STANDALONE_CLIENT_SECRET", ""
+)
+LTI_PROPERTY_LIST_EX = [
+    "context_title",
+    "custom_teacher_id",
+    "custom_assignment_id",
+    "custom_question_id",
+]
+LTI_TOOL_CONFIGURATION = {
+    "title": "myDALITE",
+    "description": "Asynchronous peer instruction",
+    "launch_url": "lti/",
+    "embed_url": "",
+    "embed_icon_url": "",
+    "embed_tool_id": "",
+    "landing_url": "/student/lti/",
+    "course_aware": False,
+    "course_navigation": False,
+    "new_tab": False,
+    "frame_width": 600,
+    "frame_height": 400,
+    "custom_fields": {},
+    "allow_ta_access": False,
+    "assignments": {},
+}
+PYLTI_CONFIG = {
+    "consumers": {
+        LTI_STANDALONE_CLIENT_KEY: {"secret": LTI_STANDALONE_CLIENT_SECRET},
+        LTI_BASIC_CLIENT_KEY: {"secret": LTI_BASIC_CLIENT_SECRET},
+    }
+}
 
-# hint: LTi passport in edX Studio should look like
-# <arbitrary_label>:LTI_CLIENT_KEY:LTI_CLIENT_SECRET
-
-# Used to automatically generate stable passwords from anonymous user ids
-# coming from LTI requests - keep secret as well
-# If compromised, attackers would be able to restore any student passwords
-# knowing his anonymous user ID from LMS
-PASSWORD_GENERATOR_NONCE = os.environ.get("PASSWORD_GENERATOR_NONCE", None)
-# LTI Integration end
-
-# Configureation file for the heartbeat view, should contain json file. See
-# this url for file contents.
-HEARTBEAT_REQUIRED_FREE_SPACE_PERCENTAGE = 20
-
-PINAX_FORUMS_EDIT_TIMEOUT = {"days": 120}
 
 # CourseFlow settings
 COURSE_FLOW_RETURN_URL = {"name": "welcome", "title": "myDalite"}
+
+
+# Cookie consent
+COOKIE_CONSENT_NAME = "cookie_consent"
+COOKIE_CONSENT_LOG_ENABLED = True
 
 # NB: Object level permissions are checked for certain models, including
 # Question
@@ -264,6 +281,7 @@ TEACHER_GROUP = "Teacher"
 
 DEFAULT_TIMEZONE = "America/Montreal"
 
+# Celery
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     "max_retries": 3,
     "interval_start": 0,
@@ -280,6 +298,17 @@ CELERY_BROKER_URL = os.environ.get(
 CELERY_RESULT_BACKEND = os.environ.get(
     "CELERY_RESULT_BACKEND", "redis://localhost:6379/0"
 )
+
+# Tinymce config
+try:
+    from .tinymce_settings import *  # noqa F403
+except ImportError:
+    warnings.warn(
+        """
+        File tinymce_settings.py not found.
+        You probably want to add it.
+        """
+    )
 
 # CSP
 CSP_DEFAULT_SRC = [
@@ -333,6 +362,11 @@ CSP_OBJECT_SRC = [
     "docs.google.com",
     "openstax.org",
     "www.geogebra.org",
+]
+
+CSP_FRAME_ANCESTORS = [
+    "'self'",
+    "moodle.dawsoncollege.qc.ca",
 ]
 
 ELASTICSEARCH_DSL = {
@@ -468,6 +502,12 @@ LOGGING = {
             "formatter": "complete",
             "stream": "ext://sys.stdout",
         },
+        "validation_console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
     },
     "loggers": {
         "django.request": {
@@ -488,11 +528,6 @@ LOGGING = {
         "tos-models": {
             "handlers": ["tos_file_log", "tos_console_log"],
             "level": "INFO",
-            "propagate": True,
-        },
-        "django_lti_tool_provider.views": {
-            "handlers": ["file_debug_log"],
-            "level": "DEBUG",
             "propagate": True,
         },
         "teacher_activity": {
@@ -542,6 +577,11 @@ LOGGING = {
         },
         "performance": {
             "handlers": ["performance_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "validation": {
+            "handlers": ["validation_console_log"],
             "level": "DEBUG" if DEBUG else "INFO",
             "propagate": True,
         },

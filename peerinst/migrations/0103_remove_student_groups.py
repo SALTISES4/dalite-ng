@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('peerinst', '0102_create_missing_studentgroupmemberships'),
+        ('peerinst', '0101_institutionallms'),
     ]
 
     operations = [

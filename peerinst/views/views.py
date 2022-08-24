@@ -1,7 +1,6 @@
 import json
 import logging
 import random
-import re
 import time
 import urllib.error
 import urllib.parse
@@ -11,7 +10,7 @@ from datetime import datetime
 import pytz
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.views import redirect_to_login
@@ -37,16 +36,15 @@ from django.utils import timezone
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_safe
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
-from django_lti_tool_provider.models import LtiUserData
-from django_lti_tool_provider.signals import Signals
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from lti_provider.lti import LTI
+from pylti.common import post_message
+from tinymce.widgets import TinyMCE
 
 from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
@@ -73,8 +71,6 @@ from ..models import (
     Category,
     Collection,
     Discipline,
-    Institution,
-    InstitutionalLMS,
     NewUserRequest,
     Question,
     RationaleOnlyQuestion,
@@ -87,7 +83,6 @@ from ..models import (
     UserType,
     UserUrl,
 )
-from ..models.group import current_semester, current_year
 from ..stopwords import en, fr
 from ..tasks import mail_managers_async
 from ..util import (
@@ -107,6 +102,7 @@ LOGGER = logging.getLogger(__name__)
 LOGGER_teacher_activity = logging.getLogger("teacher_activity")
 performance_logger = logging.getLogger("performance")
 search_logger = logging.getLogger("search")
+logger_auth = logging.getLogger("peerinst-auth")
 
 
 # Views related to Auth
@@ -460,6 +456,13 @@ class AssignmentEditView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
         context["teacher"] = teacher
         return context
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["description"].widget = TinyMCE()
+        form.fields["intro_page"].widget = TinyMCE()
+        form.fields["conclusion_page"].widget = TinyMCE()
+        return form
+
     def get_success_url(self):
         return reverse(
             "assignment-update", kwargs={"assignment_id": self.object.pk}
@@ -520,6 +523,11 @@ class QuestionCreateView(
         form.instance.user = self.request.user
         return super().form_valid(form)
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["text"].widget = TinyMCE()
+        return form
+
     def get_success_url(self):
         if self.object.type == "RO":
             return reverse(
@@ -539,7 +547,7 @@ class QuestionCloneView(QuestionCreateView):
     def get_initial(self, *args, **kwargs):
         super().get_initial(*args, **kwargs)
         question = get_object_or_404(models.Question, pk=self.kwargs["pk"])
-        initial = {
+        return {
             "text": question.text,
             "type": question.type,
             "image": question.image,
@@ -550,10 +558,9 @@ class QuestionCloneView(QuestionCreateView):
             "discipline": question.discipline,
             "fake_attributions": question.fake_attributions,
             "sequential_review": question.sequential_review,
-            "rationale_selection_algorithm": question.rationale_selection_algorithm,  # noqa
+            "rationale_selection_algorithm": question.rationale_selection_algorithm,
             "grading_scheme": question.grading_scheme,
         }
-        return initial
 
     def get_object(self, queryset=None):
         # Remove link on object to pk to dump object permissions
@@ -601,7 +608,7 @@ class AssignmentFixView(
             assignment=True,
             broken_by_flags=broken_by_flags,
             broken_by_answerchoices=broken_by_answerchoices,
-            load_url=f"{reverse('REST:question-list')}?q={'&q='.join(str(q.pk) for q in self.object.questions.all())}",  # noqa E501
+            load_url=f"{reverse('REST:question-list')}?q={'&q='.join(str(q.pk) for q in self.object.questions.all())}",  # noqa
             teacher=self.request.user.teacher,
         )
         return context
@@ -656,8 +663,9 @@ class QuestionUpdateView(
         # Check if student answers exist
         if not self.object.is_editable:
             return None
-        else:
-            return super().get_form(form_class)
+        form = super().get_form(form_class)
+        form.fields["text"].widget = TinyMCE()
+        return form
 
     def post(self, request, *args, **kwargs):
         # Check if student answers exist
@@ -668,7 +676,7 @@ class QuestionUpdateView(
 
     def form_valid(self, form):
         # Only owner can update collaborators
-        if not self.object.user == self.request.user:
+        if self.object.user != self.request.user:
             form.cleaned_data[
                 "collaborators"
             ] = self.object.collaborators.all()
@@ -884,45 +892,81 @@ class QuestionMixin:
         )
 
         # Pass hints so that template knows context
-        if self.request.session.get("LTI"):
-            context.update(lti=True)
+
+        if self.request.session.get("access_type") == StudentGroup.STANDALONE:
+            context.update(access_standalone=True)
+        elif (
+            self.request.session.get("access_type")
+            == StudentGroup.LTI_STANDALONE
+        ):
+            context.update(access_lti_standalone=True)
+        elif self.request.session.get("access_type") == StudentGroup.LTI:
+            context.update(access_lti_basic_client_key=True)
         else:
-            context.update(lti=False)
-            hash = self.request.session.get("assignment")
-            if hash is not None:
-                group_assignment = StudentGroupAssignment.get(hash)
-                context.update(group_assignment=group_assignment)
-            context.update(
-                assignment_first=self.request.session.get("assignment_first")
-            )
-            context.update(
-                assignment_last=self.request.session.get("assignment_last")
-            )
-            context.update(
-                assignment_expired=self.request.session.get(
-                    "assignment_expired"
-                )
-            )
-            context.update(quality=self.request.session.get("quality"))
+            context.update(access_teacher=True)
+
+        hash = self.request.session.get("assignment")
+        if hash is not None:
+            group_assignment = StudentGroupAssignment.get(hash)
+            context.update(group_assignment=group_assignment)
+        context.update(
+            assignment_first=self.request.session.get("assignment_first")
+        )
+        context.update(
+            assignment_last=self.request.session.get("assignment_last")
+        )
+        context.update(
+            assignment_expired=self.request.session.get("assignment_expired")
+        )
+        context.update(quality=self.request.session.get("quality"))
 
         return context
 
     def send_grade(self):
-        if not self.lti_data:
-            # We are running outside of an LTI context, so we don't need to
+
+        if not self.request.session.get("access_type") == StudentGroup.LTI:
+            # We are running outside of a basic LTI context, so we don't need to
             # send a grade.
             return
-        if not self.lti_data.edx_lti_parameters.get("lis_outcome_service_url"):
-            # edX didn't provide a callback URL for grading, so this is an
-            # unscored problem.
-            return
+        else:
+            redirect_url = reverse(
+                "question",
+                kwargs={
+                    "assignment_id": self.assignment.pk,
+                    "question_id": self.question.id,
+                },
+            )
+            launch_url = None
+            lti = LTI(request_type="any", role_type="any")
+            user = authenticate(request=self.request, lti=lti)
+            login(
+                self.request,
+                user,
+                backend="peerinst.lti.LTIBackendStudentsOnly",
+            )
 
-        Signals.Grade.updated.send(
-            __name__,
-            user=self.request.user,
-            custom_key=self.custom_key,
-            grade=self.answer.grade,
-        )
+            xml = lti.generate_request_xml(
+                message_identifier_id=f"{time.time():.0f}",
+                operation="replaceResult",
+                lis_result_sourcedid=lti.lis_result_sourcedid(self.request),
+                score=self.answer.grade,
+                launch_url=launch_url,
+            )
+
+            try:
+                post_message(
+                    consumers=lti.consumers(),
+                    lti_key=lti.oauth_consumer_key(self.request),
+                    url=lti.lis_outcome_service_url(self.request),
+                    body=xml,
+                )
+                logger_auth.info(
+                    f"Grade of {self.answer.grade} posted for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_outcome_service_url(self.request)}"  # noqa
+                )
+            except Exception as e:
+                logger_auth.error(
+                    f"Failure '{e}' while posting grade of {self.answer.grade} for {lti.user_id(self.request)} in course {lti.course_context(self.request)} to {lti.lis_outcome_service_url(self.request)}"  # noqa
+                )
 
 
 class QuestionReload(Exception):
@@ -966,50 +1010,13 @@ class QuestionFormView(QuestionMixin, FormView):
 
     def emit_event(self, name, **data):
         """
-        Log an event in a JSON format similar to the edx-platform tracking
-        logs.
+        Log an event in a JSON format for each step in problem
         """
-        if self.lti_data:
-            # Extract information from LTI parameters.
-            course_id = self.lti_data.edx_lti_parameters.get("context_id")
-
-            try:
-                edx_org = CourseKey.from_string(course_id).org
-            except InvalidKeyError:
-                # The course_id is not from edX. Don't place the org in the
-                # logs.
-                edx_org = None
-
-            grade_handler_re = re.compile(
-                f"https?://[^/]+/courses/{re.escape(course_id)}"
-                + "/xblock/(?P<usage_key>[^/]+)/"
-            )
-            usage_key = None
-            outcome_service_url = self.lti_data.edx_lti_parameters.get(
-                "lis_outcome_service_url"
-            )
-            if outcome_service_url:
-                usage_key = grade_handler_re.match(outcome_service_url)
-                if usage_key:
-                    usage_key = usage_key.group("usage_key")
-                # Grading is enabled, so include information about max grade in
-                # event data
-                data["max_grade"] = 1.0
-            else:
-                # Grading is not enabled, so remove information about grade
-                # from event data
-                if "grade" in data:
-                    del data["grade"]
-        else:
-            edx_org = None
-            course_id = "standalone"
-            usage_key = None
 
         # Add common fields to event data
         data.update(
             assignment_id=self.assignment.pk,
             assignment_title=self.assignment.title,
-            problem=usage_key,
             question_id=self.question.pk,
             question_text=self.question.text,
         )
@@ -1019,14 +1026,8 @@ class QuestionFormView(QuestionMixin, FormView):
         event = {
             "accept_language": META.get("HTTP_ACCEPT_LANGUAGE"),
             "agent": META.get("HTTP_USER_AGENT"),
-            "context": {
-                "course_id": course_id,
-                "module": {"usage_key": usage_key},
-                "username": self.user_token,
-            },
-            "course_id": course_id,
+            "course_id": self.request.session.get("context_id", ""),
             "event": data,
-            "event_source": "server",
             "event_type": name,
             "host": META.get("SERVER_NAME"),
             "ip": META.get("HTTP_X_REAL_IP", META.get("REMOTE_ADDR")),
@@ -1035,84 +1036,8 @@ class QuestionFormView(QuestionMixin, FormView):
             "username": self.user_token,
         }
 
-        if edx_org is not None:
-            event["context"]["org_id"] = edx_org
-
         # Write JSON to log file
         LOGGER.info(json.dumps(event))
-        # lti_event = LtiEvent(
-        #     event_type=name,
-        #     event_log=json.dumps(event),
-        #     username=self.user_token,
-        #     assignment_id=self.assignment.identifier,
-        #     question_id=self.question.pk,
-        # )
-        # lti_event.save()
-
-        if self.lti_data:
-            course_title = self.lti_data.edx_lti_parameters.get(
-                "context_title"
-            )
-
-            try:
-                group = StudentGroup.objects.get(name=course_id)
-            except StudentGroup.DoesNotExist:
-                if course_title:
-                    group = StudentGroup(name=course_id, title=course_title)
-                else:
-                    group = StudentGroup(name=course_id)
-                group.semester = current_semester()
-                group.year = current_year()
-                group.mode_created = StudentGroup.LTI
-
-                lms_url = self.lti_data.edx_lti_parameters.get(
-                    "tool_consumer_instance_guid"
-                )
-                if lms_url:
-                    (
-                        institutional_lms,
-                        created,
-                    ) = InstitutionalLMS.objects.get_or_create(url=lms_url)
-                    if created:
-                        institution = Institution.objects.create(
-                            name=institutional_lms.url
-                        )
-                        institutional_lms.institution = institution
-
-                    group.institution = institutional_lms.institution
-
-                # since teachers do not necessarily set discipline for
-                # themselves, take discipline of first question seen
-                # by this group and set for group
-                if self.question.discipline:
-                    group.discipline = self.question.discipline
-                group.save()
-
-            # If this user is a student, add group to student
-            if hasattr(self.request.user, "student"):
-                if group not in self.request.user.student.groups.all():
-                    self.request.user.student.join_group(group=group)
-
-            # Create StudentGroupAssignment instance, if none exist
-            if not StudentGroupAssignment.objects.filter(
-                group=group,
-                assignment=self.assignment,
-            ).exists():
-                StudentGroupAssignment.objects.create(
-                    group=group,
-                    assignment=self.assignment,
-                )
-
-            # If teacher_id specified, add teacher to group
-            teacher_hash = self.lti_data.edx_lti_parameters.get(
-                "custom_teacher_id"
-            )
-            if teacher_hash is not None:
-                teacher = Teacher.get(teacher_hash)
-                if teacher not in group.teacher.all():
-                    group.teacher.add(teacher)
-                    teacher.current_groups.add(group)
-                    teacher.save()
 
     def submission_error(self):
         messages.error(
@@ -1201,10 +1126,7 @@ class QuestionReviewBaseView(QuestionFormView):
         self.stage_data.update(rationale_choices=self.rationale_choices)
 
     def mark_rationales_safe(self, escape_html):
-        if escape_html:
-            processor = escape
-        else:
-            processor = mark_safe
+        processor = escape if escape_html else mark_safe
         for _choice, _label, rationales in self.rationale_choices:
             rationales[:] = [(id, processor(text)) for id, text in rationales]
 
@@ -1653,7 +1575,7 @@ def redirect_to_login_or_show_cookie_help(request):
     the HTTP Referer header is set. This isn't entirely accurate, but should
     be good enough.
     """
-    if request.META.get("HTTP_REFERER"):
+    if request.headers.get("Referer"):
         # We probably got here from within the LMS, and the user has
         # third-party cookies disabled, so we show help on enabling cookies for
         # this site.
@@ -1691,9 +1613,6 @@ def question(request, assignment_id, question_id):
         "answer_choices": question.get_choices(),
         "custom_key": custom_key,
         "stage_data": stage_data,
-        "lti_data": get_object_or_none(
-            LtiUserData, user=request.user, custom_key=custom_key
-        ),
         "answer": models.Answer.objects.filter(
             assignment=assignment,
             question=question,
@@ -1722,7 +1641,9 @@ def question(request, assignment_id, question_id):
             )
         stage_class = QuestionStartView
 
-    print(stage_class)
+    logger_auth.info(
+        f"Access type {request.session.get('access_type')} for {user_token} to assignment {assignment} and question {question} dispatched to {stage_class}"  # noqa
+    )
     # Delegate to the view
     stage = stage_class(**view_data)
     try:
@@ -1732,6 +1653,7 @@ def question(request, assignment_id, question_id):
         stage_data.clear()
         return redirect(request.path)
     stage_data.store()
+
     return result
 
 
@@ -1841,8 +1763,8 @@ class TeacherDetailView(TeacherBase, DetailView):
         context["owned_collections"] = Collection.objects.filter(
             owner=self.request.user.teacher
         )
-        context["LTI_key"] = str(settings.LTI_CLIENT_KEY)
-        context["LTI_secret"] = str(settings.LTI_CLIENT_SECRET)
+        context["LTI_key"] = str(settings.LTI_BASIC_CLIENT_KEY)
+        context["LTI_secret"] = str(settings.LTI_BASIC_CLIENT_SECRET)
         context["LTI_launch_url"] = str(
             "https://" + self.request.get_host() + "/lti/"
         )

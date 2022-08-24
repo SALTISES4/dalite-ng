@@ -4,8 +4,8 @@ from operator import itemgetter
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.utils.translation import ugettext
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 from dalite.views.errors import response_400
@@ -85,7 +85,7 @@ def validate_rationale(req):
             )
 
     failed = {
-        "error_msg": ugettext(
+        "error_msg": gettext(
             "That does not seem like a clear explanation of your reasoning:"
         ),
         "failed": failed,

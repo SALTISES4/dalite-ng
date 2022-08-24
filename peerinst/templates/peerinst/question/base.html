@@ -14,4 +14,11 @@
   {% compress js file question %}
     <script src="{% static 'peerinst/js/question.min.js' %}"></script>
   {% endcompress %}
+
+  {% if form %}
+    {{ form.media }}
+  {% endif %}
+  {% if formset %}
+    {{ formset.media }}
+  {% endif %}
 {% endblock %}

@@ -7,4 +7,4 @@ class CategoryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Category
 
-    title = factory.Faker("word")
+    title = factory.Sequence(lambda n: f"Category {n}")

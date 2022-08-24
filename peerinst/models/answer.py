@@ -3,7 +3,7 @@ from django.apps import apps
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 from quality.models import Quality
@@ -34,7 +34,6 @@ class AnswerChoice(models.Model):
         self.text = bleach.clean(
             self.text,
             tags=ALLOWED_TAGS,
-            styles=[],
             strip=True,
         ).strip()
         super().save(*args, **kwargs)
@@ -124,11 +123,13 @@ class Answer(models.Model):
             _("{} for question {}").format(self.id, self.question.title)
         )
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
     def show_chosen_rationale(self):
-        if self.chosen_rationale:
-            return self.chosen_rationale.rationale
-        else:
-            return None
+        return (
+            self.chosen_rationale.rationale if self.chosen_rationale else None
+        )
 
     show_chosen_rationale.short_description = "Display chosen rationale"
 
@@ -287,7 +288,7 @@ class RationaleOnlyQuestion(Question):
         self.question.save()
         super().save(*args, **kwargs)
 
-    def start_form_valid(request, view, form):
+    def start_form_valid(self, view, form):
         rationale = form.cleaned_data["rationale"]
         datetime_start = form.cleaned_data["datetime_start"]
 

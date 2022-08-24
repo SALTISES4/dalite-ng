@@ -19,7 +19,7 @@
     <div class="votable-rationale">
       {% with label=current_rationale.2.strip|bleach_html|safe|capfirst %}
         <blockquote>
-          <p>{% trans "Answer " %}<strong>{{ current_rationale.1 }}:</strong></p>
+          <p>{% trans "Answer " %} <strong>{{ current_rationale.1 }}:</strong></p>
           <p>{{ label }}{% if label|last not in "?!." %}.{% endif %}</p>
         </blockquote>
       {% endwith %}

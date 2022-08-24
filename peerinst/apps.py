@@ -5,7 +5,10 @@ from django.apps import AppConfig
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.utils import OperationalError
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+
+OPTIONAL_COOKIES = []
+REQUIRED_COOKIES = ["csrftoken", "sessionid", "django_language"]
 
 
 class PeerinstConfig(AppConfig):
@@ -16,14 +19,10 @@ class PeerinstConfig(AppConfig):
     ]
 
     def ready(self):
-        from django_lti_tool_provider.views import LTIView  # noqa
 
         import peerinst.signals  # noqa
 
-        from .lti import ApplicationHookManager  # noqa
         from .scheduled import start_scheduled_events
-
-        LTIView.register_authentication_manager(ApplicationHookManager())
 
         try:
             start_scheduled_events()

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 declare let bundle: any; // bundle will be available globally at runtime
 
 // MDC
@@ -737,44 +738,6 @@ export function disciplineForm(
   });
 }
 
-// Custom functions
-/** Corner language switcher
- * @function
- * @param {String} svgSelector
- * @param {String} formID
- * @param {String} lang
- * @param {String} className
- */
-export function cornerGraphic(svgSelector, formID, lang, className) {
-  const svg = d3.select(svgSelector);
-  const w = +svg.attr("width");
-  const h = +svg.attr("height");
-
-  const g = svg.append("g");
-  g.append("path")
-    .attr("class", className)
-    .attr("d", () => {
-      const path_ = d3.path();
-      path_.moveTo(0, h);
-      path_.lineTo(w, 0);
-      path_.lineTo(w, h);
-      path_.closePath();
-      return path_;
-    });
-
-  g.append("text")
-    .attr("x", w - w / 3)
-    .attr("y", h - h / 3 + h / 6)
-    .attr("text-anchor", "middle")
-    .style("fill", "white")
-    .style("font-size", `${h / 3}px`)
-    .text(lang);
-
-  g.on("click", () => {
-    document.getElementById(formID).submit();
-  });
-}
-
 /** Mike Bostock's svg line wrap function
  *   https://bl.ocks.org/mbostock/7555321
  *   (only slightly modified)
@@ -893,15 +856,13 @@ export function difficulty(matrix, id) {
   };
   let max = -0;
   let label = "";
-  for (const entry in Object.entries(matrix)) {
-    if ({}.hasOwnProperty.call(Object.entries(matrix), entry)) {
-      const item = Object.entries(matrix)[entry];
-      if (item.value > max) {
-        max = item.value;
-        label = item.key;
-      }
+  Object.entries(matrix).map((entry) => {
+    if (entry[1] > max) {
+      max = entry[1];
+      label = entry[0];
     }
-  }
+  });
+
   const stats = document.getElementById(`stats-${id}`);
   if (max > 0) {
     const rating = document.getElementById(`rating-${id}`);
@@ -940,15 +901,12 @@ export function plot(matrix, freq, id) {
   };
   let max = -0;
   let label = "";
-  for (const entry in Object.entries(matrix)) {
-    if ({}.hasOwnProperty.call(Object.entries(matrix), entry)) {
-      const item = Object.entries(matrix)[entry];
-      if (item.value > max) {
-        max = item.value;
-        label = item.key;
-      }
+  Object.entries(matrix).map((entry) => {
+    if (entry[1] > max) {
+      max = entry[1];
+      label = entry[0];
     }
-  }
+  });
   if (max > 0) {
     const rating = document.getElementById(`rating-${id}`);
     if (rating) {
@@ -1139,7 +1097,12 @@ export function plot(matrix, freq, id) {
 
   gg.append("g")
     .selectAll("rect")
-    .data(Object.entries(freq["second_choice"]))
+    .data(
+      Object.entries(freq["second_choice"]).map((entry) => ({
+        key: entry[0],
+        value: entry[1],
+      })),
+    )
     .enter()
     .append("rect")
     .attr("id", `second_choice-${id}`)
@@ -1163,7 +1126,12 @@ export function plot(matrix, freq, id) {
   ggg
     .append("g")
     .selectAll("rect")
-    .data(Object.entries(freq["first_choice"]))
+    .data(
+      Object.entries(freq["first_choice"]).map((entry) => ({
+        key: entry[0],
+        value: entry[1],
+      })),
+    )
     .enter()
     .append("rect")
     .attr("id", `first_choice-${id}`)
@@ -1188,7 +1156,12 @@ export function plot(matrix, freq, id) {
 
   gg.append("g")
     .selectAll("text")
-    .data(Object.entries(freq["second_choice"]))
+    .data(
+      Object.entries(freq["second_choice"]).map((entry) => ({
+        key: entry[0],
+        value: entry[1],
+      })),
+    )
     .enter()
     .append("text")
     .attr("x", x(0))
@@ -1206,7 +1179,12 @@ export function plot(matrix, freq, id) {
   ggg
     .append("g")
     .selectAll("text")
-    .data(Object.entries(freq["first_choice"]))
+    .data(
+      Object.entries(freq["first_choice"]).map((entry) => ({
+        key: entry[0],
+        value: entry[1],
+      })),
+    )
     .enter()
     .append("text")
     .attr("x", x(1))
@@ -1223,7 +1201,12 @@ export function plot(matrix, freq, id) {
 
   gg.append("g")
     .selectAll("text")
-    .data(Object.entries(freq["second_choice"]))
+    .data(
+      Object.entries(freq["second_choice"]).map((entry) => ({
+        key: entry[0],
+        value: entry[1],
+      })),
+    )
     .enter()
     .append("text")
     .attr("x", x(0))
@@ -1343,15 +1326,22 @@ export function bindCheckbox() {
   });
 }
 
-/** Plot student activity
- *  @function
- *  @param {String} el
- *  @param {String} d
- */
-export function plotTimeSeries(el, d) {
+/* Plot student activity */
+export function plotTimeSeries(
+  el: string,
+  d: {
+    answers: [string];
+    distribution_date: string;
+    due_date: string;
+    last_login: string;
+    now: string;
+    total: number;
+  },
+): void {
+  console.debug(el, d);
   const svg = d3.select(el);
 
-  const width = 0.8 * $("main").innerWidth();
+  const width = 0.8 * d3.select("main").node().getBoundingClientRect().width;
   svg.attr("width", width);
   const height = +svg.attr("height");
 
@@ -1540,14 +1530,14 @@ export function plotTimeSeries(el, d) {
     g.select(".slider-label-top")
       .attr("x", xValue)
       .text(
-        `${parseInt(
+        `${
           (100 *
             d3.bisectLeft(
               d.answers.map((x) => new Date(d3.timeParse(x))),
               x.invert(xValue),
             )) /
-            d.total,
-        )}%`,
+          d.total
+        }%`,
       );
 
     let data = d.answers.map((x) => new Date(d3.timeParse(x)));

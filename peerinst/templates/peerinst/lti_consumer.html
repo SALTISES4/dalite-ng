@@ -1,0 +1,24 @@
+<!-- For testing only -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      iframe {
+        left: 50%;
+        position: fixed;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>LTI consumer</h1>
+    <form action="/lti/" target="embedded-iframe" method="post">
+      {% for name, value in data.items %}
+        <input name="{{ name }}" value="{{ value }}" hidden/>
+      {% endfor %}
+      <input type="submit" value="Launch"/>
+    </form>
+    <iframe name="embedded-iframe" width="800" height="600"></iframe>
+  </body>
+</html>

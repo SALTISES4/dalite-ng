@@ -1,14 +1,20 @@
 import re
 from datetime import date, datetime
 
+import bleach
 import pytz
 from django import forms
-from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db.models import Count, Q
 from django.forms import ModelForm
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+from tinymce.widgets import TinyMCE
+
+from peerinst.templatetags.bleach_html import STRICT_TAGS
 
 from .models import (
     Assignment,
@@ -19,16 +25,68 @@ from .models import (
     StudentGroupAssignment,
     Teacher,
 )
+from .validators import (
+    EnglishFrenchValidator,
+    MinWordsValidator,
+    NoProfanityValidator,
+)
 
 
-class NonStudentPasswordResetForm(PasswordResetForm):
+class NonStudentAuthenticationForm(AuthenticationForm):
+    def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)
+        if hasattr(user, "student"):
+            raise ValidationError(
+                _("Students cannot login via username and password"),
+                code="no_students",
+            )
+
+
+class TeacherPasswordResetForm(PasswordResetForm):
     def get_users(self, email):
-        active_users = User.objects.filter(email__iexact=email, is_active=True)
+        return User.objects.filter(
+            email__iexact=email, is_active=True, teacher__isnull=False
+        ).filter(
+            Q(password__isnull=True)
+            | ~Q(password__startswith=UNUSABLE_PASSWORD_PREFIX)
+        )
 
-        return (
-            u
-            for u in active_users
-            if u.has_usable_password() and not hasattr(u, "student")
+
+class RichTextRationaleField(forms.CharField):
+    widget = TinyMCE(
+        attrs={"cols": 100, "rows": 7},
+        mce_attrs={
+            "plugins": "advlist,lists,charmap,preview,wordcount",
+            "toolbar": "undo redo | charmap | bold italic underline subscript "
+            "superscript | bullist numlist | removeformat",
+        },
+    )
+    default_error_messages = {
+        "required": _("Please provide a rationale for your choice.")
+    }
+    default_validators = [
+        MinWordsValidator(
+            4,
+            _("Please provide a more detailed rationale for your choice."),
+        ),
+        NoProfanityValidator(
+            0.5,
+            _(
+                "The language filter has labeled this as possibly toxic or profane; please rephrase your rationale."  # noqa
+            ),
+        ),
+        EnglishFrenchValidator(
+            0.9,
+            _("Please clarify what you've written."),
+        ),
+    ]
+
+    def to_python(self, value):
+        """Remove all unsafe input"""
+        return bleach.clean(
+            super().to_python(value),
+            tags=STRICT_TAGS,
+            strip=True,
         )
 
 
@@ -44,9 +102,7 @@ class FirstAnswerForm(forms.Form):
             "required": _("Please make sure to select an answer choice.")
         },
     )
-    rationale = forms.CharField(
-        widget=forms.Textarea(attrs={"cols": 100, "rows": 7})
-    )
+    rationale = RichTextRationaleField()
 
     def __init__(self, answer_choices, *args, **kwargs):
         choice_texts = [
@@ -62,8 +118,6 @@ class FirstAnswerForm(forms.Form):
             )
             for pair in answer_choices
         ]
-        #  choice_texts = [mark_safe(". ".join(pair)) for pair in
-        #  answer_choices]
         self.base_fields["first_answer_choice"].choices = enumerate(
             choice_texts, 1
         )
@@ -71,9 +125,10 @@ class FirstAnswerForm(forms.Form):
 
 
 class RationaleOnlyForm(forms.Form):
-    rationale = forms.CharField(
-        widget=forms.Textarea(attrs={"cols": 100, "rows": 7})
-    )
+
+    error_css_class = "validation-error"
+
+    rationale = RichTextRationaleField()
     datetime_start = forms.CharField(
         widget=forms.HiddenInput(), initial=datetime.now(pytz.utc)
     )
@@ -119,7 +174,7 @@ class ReviewAnswerForm(forms.Form):
                 widget=forms.RadioSelect,
                 choices=rationales,
             )
-            show_more_field_name = "show-more-counter-" + str(i + 1)
+            show_more_field_name = f"show-more-counter-{str(i + 1)}"
             self.fields[show_more_field_name] = forms.IntegerField(
                 required=False, initial=2
             )
@@ -150,17 +205,20 @@ class ReviewAnswerForm(forms.Form):
                 label,
                 rationale_ids,
             ) in self.rationale_groups:
-                for i in (
-                    range(cleaned_data[label])
-                    if cleaned_data[label]
-                    else range(min(2, len(rationale_ids)))
-                ):
+                shown_rationales.extend(
+                    rationale_ids[i]
+                    for i in (
+                        range(cleaned_data[label])
+                        if cleaned_data[label]
+                        else range(min(2, len(rationale_ids)))
+                    )
                     if (
                         rationale_ids[i] is not None
                         and rationale_ids[i] != "None"
-                    ):
-                        shown_rationales.append(rationale_ids[i])
-        self.shown_rationales = shown_rationales if shown_rationales else None
+                    )
+                )
+
+        self.shown_rationales = shown_rationales or None
         rationale_choices = [
             value
             for key, value in cleaned_data.items()
@@ -206,18 +264,21 @@ class AssignmentCreateForm(forms.ModelForm):
             "intro_page",
             "conclusion_page",
         ]
+        widgets = {
+            "description": TinyMCE(),
+            "intro_page": TinyMCE(),
+            "conclusion_page": TinyMCE(),
+        }
 
 
 class AssignmentMultiselectForm(forms.Form):
     def __init__(self, user=None, question=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if user:
-            # Remove assignments with question and assignments with student
-            # answers
-            queryset = user.assignment_set.all()
-        else:
-            queryset = Assignment.objects.all()
-
+        # Remove assignments with question and assignments with student
+        # answers
+        queryset = (
+            user.assignment_set.all() if user else Assignment.objects.all()
+        )
         num_student_rationales = Count(
             "answer", filter=~Q(answer__user_token="")
         )
@@ -360,7 +421,7 @@ class ReportSelectForm(forms.Form):
 
 
 class AnswerChoiceForm(forms.ModelForm):
-    template_name = "peerinst/question/answer_choice_form.html"
+    text = forms.CharField(widget=TinyMCE())
 
     def clean_text(self):
         if self.cleaned_data["text"].startswith("<p>"):
@@ -420,11 +481,12 @@ class StudentGroupUpdateForm(forms.ModelForm):
 class StudentGroupAssignmentForm(ModelForm):
     group = forms.ModelChoiceField(
         queryset=StudentGroup.objects.filter(
-            mode_created=StudentGroup.STANDALONE
+            Q(mode_created=StudentGroup.STANDALONE)
+            | Q(mode_created=StudentGroup.LTI_STANDALONE)
         ),
         empty_label=None,
         help_text=_(
-            "Note: You can only distribute assignments to groups created from within myDALITE.  To distribute assignments to groups created via an LMS (like Moodle), use the 'Distribute via LMS' option."  # noqa E501
+            "Note: You can only distribute assignments to groups created from within myDALITE, or using the LTI-Standalone launch url in your LMS.  To distribute one question at a time to your students  via an LMS (like Moodle), use the 'Distribute via LMS' option."  # noqa E501
         ),
     )
 

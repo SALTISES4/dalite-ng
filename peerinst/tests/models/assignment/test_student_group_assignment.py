@@ -110,13 +110,14 @@ def test_get_question__by_idx(student_group_assignment):
 def test_get_question__regular(student_group_assignment):
     questions = student_group_assignment.questions
     for i, question in enumerate(questions):
-        if i != 0 and i != len(questions) - 1:
+        if i not in [0, len(questions) - 1]:
             assert (
                 student_group_assignment.get_question(
                     current_question=question, after=True
                 )
                 == questions[i + 1]
             )
+
             assert (
                 student_group_assignment.get_question(
                     current_question=question, after=False
@@ -151,7 +152,7 @@ def test_get_question__assert_raised(student_group_assignment):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_update_students(student_group_assignment, students, celery_worker):
+def test_update_students(student_group_assignment, students):
     add_to_group(students, student_group_assignment.group)
 
     for student in students:

@@ -1,5 +1,5 @@
 from django.http import HttpResponse, JsonResponse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from dalite.views.errors import response_400, response_403
 from dalite.views.utils import get_json_params

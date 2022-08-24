@@ -1,191 +1,116 @@
-import base64
-import hashlib
 import logging
+from urllib.parse import urlparse
 
-from django.contrib.auth import get_permission_codename, login
-from django.contrib.auth.models import Permission, User
-from django.urls import reverse
-from django_lti_tool_provider import AbstractApplicationHookManager
+from django.contrib.auth import get_user_model, logout
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
+from django.db.models import Q
+from lti_provider.auth import LTIBackend
+from pylti.common import LTIException
 
-from peerinst.auth import authenticate_student
+from .models import Institution, InstitutionalLMS, StudentGroup, Teacher
+from .models.group import current_semester, current_year
 
 logger = logging.getLogger(__name__)
 
-
-class LTIRoles:
-    """
-    Non-comprehensive list of roles commonly used in LTI applications
-    """
-
-    LEARNER = "Learner"
-    INSTRUCTOR = "Instructor"
-    STAFF = "Staff"
+username_field = get_user_model().USERNAME_FIELD
 
 
-MODELS_STAFF_USER_CAN_EDIT = (
-    ("peerinst", "question"),
-    ("peerinst", "assignment"),
-    ("peerinst", "category"),
-)
+class LTIBackendStudentsOnly(LTIBackend):
+    def find_user(self, request, lti):
+        # Search for users but exclude staff, superuser, and teacher accounts
+        # as well as standalone student accounts (which have a password)
 
+        # find the user via lms identifier first
+        kwargs = {username_field: lti.user_identifier(request)}
+        if not lti.user_id(request):
+            logout(request)
+            raise LTIException
 
-def get_permissions_for_staff_user():
-    """
-    Returns all permissions that staff user possess. Staff user can create and
-    edit all models from `MODELS_STAFF_USER_CAN_EDIT` list. By design he has no
-    delete privileges --- as deleting questions could lead to bad user
-    experience for students.
-
-    :return: Iterable[django.contrib.auth.models.Permission]
-    """
-    from django.apps.registry import apps
-
-    for app_label, model_name in MODELS_STAFF_USER_CAN_EDIT:
-        model = apps.get_model(app_label, model_name)
-        for action in ("add", "change"):
-            codename = get_permission_codename(action, model._meta)
-            yield Permission.objects.get_by_natural_key(
-                codename, app_label, model_name
+        user_model = get_user_model()
+        user = (
+            user_model.objects.filter(
+                is_staff=False,
+                is_superuser=False,
+                **kwargs,
             )
-
-
-class ApplicationHookManager(AbstractApplicationHookManager):
-    LTI_KEYS = ["custom_assignment_id", "custom_question_id"]
-    ADMIN_ACCESS_ROLES = {LTIRoles.INSTRUCTOR, LTIRoles.STAFF}
-
-    @classmethod
-    def _compress_user_name(cls, username):
-        try:
-            binary = username.encode()
-        except TypeError:
-            # We didn't get a normal edX hex user id, so we don't use our
-            # custom encoding. This makes previewing questions in Studio work.
-            return username
-        else:
-            return base64.urlsafe_b64encode(binary).decode().replace("=", "+")
-
-    @classmethod
-    def _generate_password(cls, base, nonce):
-        # it is totally fine to use md5 here, as it only generates PLAIN STRING
-        # password which is than fed into secure password hash
-        generator = hashlib.md5()
-        generator.update(base.encode())
-        generator.update(nonce.encode())
-        return generator.digest()
-
-    def authenticated_redirect_to(self, request, lti_data):
-        action = lti_data.get("custom_action")
-        assignment_id = lti_data.get("custom_assignment_id")
-        question_id = lti_data.get("custom_question_id")
-        show_results_view = lti_data.get("custom_show_results_view", "false")
-
-        if action == "launch-admin":
-            return reverse("admin:index")
-        elif action == "edit-question":
-            return reverse(
-                "admin:peerinst_question_change", args=(question_id,)
-            )
-
-        redirect_url = reverse(
-            "question",
-            kwargs={
-                "assignment_id": assignment_id,
-                "question_id": question_id,
-            },
+            .filter(Q(password__startswith=UNUSABLE_PASSWORD_PREFIX))
+            .exclude(teacher__isnull=False)
+            .first()
         )
-        if show_results_view == "true":
-            redirect_url += "?show_results_view=true"
-        return redirect_url
 
-    def authentication_hook(
-        self,
-        request,
-        user_id=None,
-        username=None,
-        email=None,
-        extra_params=None,
-    ):
-        if extra_params is None:
-            extra_params = {}
-
-        # username and email might be empty, depending on how edX LTI module
-        # is configured:
-        # there are individual settings for that + if it's embedded into an
-        # iframe it never sends email and username in any case so, since we
-        # want to track user for both iframe and non-iframe LTI blocks,
-        # username is completely ignored
-
-        email = email if email else user_id + "@localhost"
-
-        user, __ = authenticate_student(request, email, user_id)
-
-        if isinstance(user, User):
-            login(
-                request,
-                user,
-                backend="peerinst.backends.CustomPermissionsBackend",
+        if user is None:
+            # find the user via hashed username
+            username = self.get_hashed_username(request, lti)
+            user = (
+                user_model.objects.filter(
+                    username=username,
+                    is_staff=False,
+                    is_superuser=False,
+                )
+                .filter(Q(password__startswith=UNUSABLE_PASSWORD_PREFIX))
+                .exclude(teacher__isnull=False)
+                .first()
             )
 
-        # LTI sessions are created implicitly, and are not terminated when
-        # user logs out of Studio/LMS, which may lead to granting access to
-        # unauthorized users in shared computer setting. Students have no way
-        # to terminate dalite session (other than cleaning cookies). This
-        # setting instructs browser to clear session when browser is
-        # closed --- this allows staff user to terminate the session easily,
-        # which decreases the chance of session hijacking in shared computer
-        # environment.
+        return user
 
-        # TL; DR; Sets session expiry on browser close.
-        request.session.set_expiry(0)
 
-        # Attaches login type to session to allow view access control via
-        # middleware
-        request.session["LTI"] = True
+def manage_LTI_studentgroup(request):
+    """
+    based on parameters stored in session by django-lti-provider,
+        - create StudentGroup
+            - attach Teacher & Student
+            - create InstitutionalLMS and InstitutionObject,
+              attach to StudentGroup
+            - assign year, semester and Discipline of teacher
+              to StudentGroup
+    """
+    course_id = request.session.get("context_id")
 
-    def is_user_staff(self, extra_params):
-        """
-        Returns true if given circumstances user is considered as having a
-        staff account.
-        :param dict extra_params: Additional parameters passed by LTI.
-        :return: bool
-        """
-        # SALTISE/S4 version has no staff users
-        return False
+    teacher_hash = request.session.get("custom_teacher_id", None)
+    course_title = request.session.get("context_title", None)
 
-    def update_staff_user(self, user):
-        """
-        Updates user to acknowledge he is a staff member
-        :param django.contrib.auth.models.User user:
-        :return: None
-        """
-        user.is_staff = True
-        user.user_permissions.add(*get_permissions_for_staff_user())
-        user.save()
+    try:
+        group = StudentGroup.objects.get(name=course_id)
+    except StudentGroup.DoesNotExist:
+        if course_title:
+            group = StudentGroup(name=course_id, title=course_title)
+        else:
+            group = StudentGroup(name=course_id)
+        group.semester = current_semester()
+        group.year = current_year()
+        group.mode_created = StudentGroup.LTI_STANDALONE
+        group.save()
 
-    def vary_by_key(self, lti_data):
-        try:
-            return ":".join(str(lti_data[k]) for k in self.LTI_KEYS)
-        except KeyError:
-            # D2L myCourses LTI POST request appends trailing "_" at end of
-            # custom parameters
-            _lti_data = {k.rstrip("_"): v for k, v in lti_data.items()}
-            return ":".join(str(_lti_data[k]) for k in self.LTI_KEYS)
+        if lms_url_raw := request.session.get(
+            "launch_presentation_return_url", None
+        ):
+            lms_url = urlparse(lms_url_raw).hostname
+            (
+                institutional_lms,
+                created,
+            ) = InstitutionalLMS.objects.get_or_create(url=lms_url)
+            if created:
+                institution = Institution.objects.create(
+                    name=institutional_lms.url
+                )
+                institutional_lms.institution = institution
 
-    def optional_lti_parameters(self):
-        """
-        Return a dictionary of LTI parameters supported/required by this
-        AuthenticationHookManager in addition to user_id, username and email.
-        These parameters are passed to authentication_hook method via kwargs.
+            group.institution = institutional_lms.institution
+            group.save()
+        else:
+            session_data = dict(request.session.items())
+            logger.info("No LMS URL found in session data: {session_data}")
 
-        This dictionary should have LTI parameter names (as specified by LTI
-        specification) as keys; values are used as parameter names passed to
-        authentication_hook method, i.e. it allows renaming (not always
-        intuitive) LTI spec parameter names.
+    # add group to student
+    student = request.user.student
+    if group not in student.groups.all():
+        student.join_group(group=group)
 
-        Example:
-            # renames lis_person_name_given -> user_first_name,
-            # lis_person_name_family -> user_lat_name
-            {'lis_person_name_given': 'user_first_name',
-            'lis_person_name_family': 'user_lat_name'}
-        """
-        return {"roles": "roles"}
+    # If teacher_id specified, add teacher to group
+    if teacher_hash is not None:
+        teacher = Teacher.get(teacher_hash)
+        if teacher not in group.teacher.all():
+            group.teacher.add(teacher)
+            teacher.current_groups.add(group)
+            teacher.save()

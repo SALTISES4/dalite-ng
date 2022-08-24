@@ -2,6 +2,8 @@
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_NAME = "__Host-csrftoken"
 CSRF_COOKIE_SECURE = True
+LANGUAGE_COOKIE_HTTPONLY = True
+LANGUAGE_COOKIE_SAMESITE = "Lax"
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -10,6 +12,7 @@ SECURE_HSTS_SECONDS = 183 * 24 * 60 * 60  # 6-month default
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 # Sample Django-CSP settings
 CSP_BASE_URI = ["'none'"]
@@ -46,6 +49,3 @@ PERMISSIONS_POLICY = {
     "payment": [],
     "usb": [],
 }
-
-# django-referrer-policy
-REFERRER_POLICY = "strict-origin-when-cross-origin"

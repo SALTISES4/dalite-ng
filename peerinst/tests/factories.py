@@ -16,7 +16,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     # edx-platform/common/djangoapps/student/tests/factories.py.
     class Meta:
         model = User
-        django_get_or_create = ["username", "email"]
 
     username = factory.Sequence("robot{}".format)
     email = factory.Sequence("robot+test+{}@edx.org".format)

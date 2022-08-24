@@ -20,6 +20,7 @@ jobs:
           MYSQL_PASSWORD: test key
           MYSQL_HOST: localhost
           MYSQL_ROOT_PASSWORD: mariadb
+      - image: memcached
     working_directory: ~/repo
     steps:
       - checkout
@@ -46,7 +47,7 @@ jobs:
             . .venv/bin/activate
             python -m pip install -r requirements/requirements-dev.txt
             python -m pip freeze
-            python -m spacy download en_core_web_sm
+            # python -m spacy download en_core_web_sm
             npm install --no-optional
       - snyk/scan:
           fail-on-issues: false
@@ -55,14 +56,13 @@ jobs:
       - run:
           name: Gulp build
           command: |
-            ./node_modules/gulp/bin/gulp.js build
+            npx gulp build
       - run:
           name: Setup local_settings.py
           command: |
             tools/gen_secret_key.py > dalite/local_settings.py
             echo 'PIWIK_DOMAIN_PATH = "matomo.mydalite.org"' >> dalite/local_settings.py
             echo 'PIWIK_SITE_ID = "1"' >> dalite/local_settings.py
-            echo 'PASSWORD_GENERATOR_NONCE = "secret key"' >> dalite/local_settings.py
             echo 'import os' >> dalite/local_settings.py
             echo 'BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))' >> dalite/local_settings.py
             echo 'EMAIL_SUBJECT_PREFIX = "SALTISE/S4 @ Dawson College: "' >> dalite/local_settings.py

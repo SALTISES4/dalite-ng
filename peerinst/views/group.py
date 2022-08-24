@@ -8,8 +8,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils.translation import ugettext
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST, require_safe
 from django.views.generic.edit import UpdateView
 
@@ -92,7 +92,7 @@ def group_details_page(req, group_hash, teacher, group):
                 "name": c["name"],
                 "icon": c["badge_icon"],
                 "colour": c["badge_colour"],
-                "description": ugettext(
+                "description": gettext(
                     re.sub(
                         r"\bYou\b",
                         "They",
@@ -224,9 +224,9 @@ def group_assignment_page(req, assignment_hash, teacher, group, assignment):
                     ),
                 },
                 "translations": {
-                    "distribute": ugettext("Distribute"),
-                    "distributed": ugettext("Distributed"),
-                    "distribution_warning": ugettext(
+                    "distribute": gettext("Distribute"),
+                    "distributed": gettext("Distributed"),
+                    "distribution_warning": gettext(
                         "Distributing the assignment will send an email to "
                         "all students in the group with a link to the "
                         "assignment."

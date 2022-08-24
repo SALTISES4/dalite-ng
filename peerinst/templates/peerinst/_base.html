@@ -1,4 +1,4 @@
-{% load csp static i18n compress cookielaw_tags admin_urls tz piwik %}
+{% load compress cookie_consent_tags csp i18n piwik static tz %}
 
 {% get_current_language as LANGUAGE_CODE %}
 
@@ -6,7 +6,6 @@
 
   <!DOCTYPE html>
   <html lang="{{ LANGUAGE_CODE }}">
-
     <head>
       <!-- Meta -->
       <title>{% block title %}myDALITE{% endblock %}</title>
@@ -50,16 +49,6 @@
         <link href="{% static 'peerinst/css/main.min.css' %}" rel="stylesheet">
       {% endcompress %}
 
-      <!-- Cookie law -->
-      {% if not request.session.LTI %}
-        {% compress js file cookie_law %}
-          <script src="{% static 'cookielaw/js/cookielaw.js' %}" defer="true"></script>
-        {% endcompress %}
-        {% compress css file cookie_law %}
-          <link href="{% static 'peerinst/css/cookie_law.min.css' %}" rel="stylesheet">
-        {% endcompress %}
-      {% endif %}
-
       <!-- Javascript translations -->
       <script src="{% url 'javascript-catalog' %}"></script>
 
@@ -102,6 +91,11 @@
         type="text/css"
       />
 
+      <!-- Cookie consent -->
+      {% compress css file cookie_law %}
+        <link href="{% static 'peerinst/css/cookie_law.min.css' %}" rel="stylesheet">
+      {% endcompress %}
+
       {% block stylesheets %}{% endblock %}
     </head>
 
@@ -110,7 +104,7 @@
         <div id="header-left">
           {% block header-left %}{% endblock %}
           <div class="header branding">
-            {% if not request.session.LTI %}
+            {% if access_lti_standalone or access_standalone %}
               <a href="{% url 'landing_page' %}">
                 <img src="{% static 'peerinst/img/SALTISE-favicon.gif' %}"
                   alt="site-logo"
@@ -121,7 +115,7 @@
                 alt="site-logo"
                 id="logo">
             {% endif %}
-            {% if not user.student and not request.session.LTI  %}
+            {% if not user.student  %}
               <a href="{% url 'browse-database' %}">
                 <div id="custom-instance-header">
                   <span class="dalite-my">my</span><span class="dalite-dalite">Dalite</span>
@@ -143,14 +137,13 @@
       <div class="site-content">
         <form id="switchLanguage" action="{% url 'set_language' %}" method="post">
           {% csrf_token %}
-          <input name="next"
+          <input name="next" type="hidden" value="{{ request.path|slice:'3:'|urlencode }}">
+          <input
+            name="language"
             type="hidden"
-            value={{ request.path|slice:"3:"|urlencode }}>
-          <input name="language"
-            type="hidden"
-            value={% if LANGUAGE_CODE == 'en' %}fr{% else %}en{% endif %}>
+            value="{% if LANGUAGE_CODE == 'en' %}fr{% else %}en{% endif %}"
+          >
         </form>
-        <svg id="corner" class="corner" width=35 height=35></svg>
         {% block body %}{% endblock %}
 
         {% block footer %}{% endblock %}
@@ -161,29 +154,67 @@
         <script src="{% static 'peerinst/js/index.min.js' %}"></script>
       {% endcompress %}
 
-      {% script type="text/javascript" %}
-        <script>
+      <script nonce="{{ request.csp_nonce }}">
+        window.addEventListener("load", function() {
           if (document.querySelector('.mdc-drawer--temporary')){
             var drawer = new bundle.drawer.MDCTemporaryDrawer(document.querySelector('.mdc-drawer--temporary'));
             document.querySelector('#menu-icon').addEventListener('click', function() {
               drawer.open = true;
             });
           }
-          bundle.cornerGraphic('#corner', 'switchLanguage', {% if LANGUAGE_CODE == 'en' %}'FR'{% else %}'EN'{% endif %}, 'fill-primary');
-        </script>
-      {% endscript %}
+
+          const formSubmit = document.getElementById("submit-language-form");
+          if (formSubmit) {
+            formSubmit.addEventListener("click", function() {
+              document.getElementById("switchLanguage").submit();
+            });
+          }
+        })
+      </script>
 
       {% block scripts %}{% endblock %}
 
+      {% include 'icons.svg' %}
+
+      <script nonce="{{ request.csp_nonce }}" type="text/javascript" src="{% static 'cookie_consent/cookiebar.js' %}"></script>
+
+      {% if request|cookie_consent_enabled %}
+        {% not_accepted_or_declined_cookie_groups request as cookie_groups %}
+
+        {% if cookie_groups %}
+          {% url "cookie_consent_cookie_group_list" as url_cookies %}
+          {% cookie_consent_accept_url cookie_groups as url_accept %}
+          {% cookie_consent_decline_url cookie_groups as url_decline %}
+          <script nonce="{{ request.csp_nonce }}" type="text/javascript">
+            var cookie_groups = [];
+            {% for cookie_group in cookie_groups %}
+              cookie_groups.push("{{ cookie_group.varname }}");
+            {% endfor %}
+
+            window.addEventListener("load", () => {
+              showCookieBar({
+                content: "{% filter escapejs %}{% with cookie_groups=cookie_groups|join:', ' %}<div id='CookielawBanner' class='cookie-bar'><p>This site uses {{ cookie_groups|lower }} cookies for better performance and user experience. Do you agree to use cookies?</p><div class='button-container'><a id='accept-cookies' class='mdc-button mdc-button--raised cc-cookie-accept' href='{{ url_accept }}'>{% trans 'Accept' %}</a> <a href='{{ url_decline }}' class='mdc-button mdc-button--raised cc-cookie-decline'>{% trans 'Decline' %}</a> <a class='mdc-button mdc-button--raised' href='{{ url_cookies }}?next={{ request.path }}'>Policy</a></div></div>{% endwith %}{% endfilter %}",
+                cookie_groups: cookie_groups,
+                cookie_decline: "{% get_decline_cookie_groups_cookie_string request cookie_groups %}",
+                beforeDeclined: function() {
+                  document.cookie = "{% get_decline_cookie_groups_cookie_string request cookie_groups %}";
+                }
+              });
+            });
+          </script>
+        {% endif %}
+      {% endif %}
+
+      <!-- Matomo analytics -->
+      {% if request|cookie_group_declined:"optional" %}
+        <script nonce="{{ request.csp_nonce }}">
+          var _paq = [];
+          _paq.push(['disableCookies']);
+        </script>
+      {% endif %}
       {% script type="text/javascript" %}
         {% piwik %}
       {% endscript %}
-
-      {% if not request.session.LTI %}
-        {% cookielaw_banner %}
-      {% endif %}
-
-      {% include 'icons.svg' %}
     </body>
 
   </html>

@@ -4,7 +4,7 @@ import bleach
 from django import forms
 from django.forms import ModelForm
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from blink.models import BlinkAssignmentQuestion, BlinkQuestion
 from peerinst.models import Question
@@ -39,7 +39,6 @@ class BlinkAnswerForm(forms.Form):
                                 bleach.clean(
                                     pair[1],
                                     tags=ALLOWED_TAGS,
-                                    styles=[],
                                     strip=True,
                                 ),
                             )

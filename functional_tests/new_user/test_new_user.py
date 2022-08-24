@@ -1,8 +1,17 @@
 import re
 
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.expected_conditions import (
+    presence_of_element_located,
+)
+from selenium.webdriver.support.ui import WebDriverWait
+
 from functional_tests.fixtures import *  # noqa
 from functional_tests.teacher.utils import go_to_account
 from tos.models import Role, Tos
+
+MAX_TIMEOUT = 10
 
 
 def test_new_user_signup_workflow(
@@ -13,7 +22,7 @@ def test_new_user_signup_workflow(
     admin.save()
 
     # Hit landing page
-    browser.get(browser.server_url + "/#Features")
+    browser.get(f"{browser.server_url}/#Features")
 
     browser.wait_for(
         lambda: assert_(
@@ -62,7 +71,7 @@ def test_new_user_signup_workflow(
     )
 
     # New user cannot sign in
-    browser.get(browser.server_url + "/login")
+    browser.get(f"{browser.server_url}/saltise/login/")
     inputbox = browser.find_element_by_id("id_username")
     inputbox.send_keys("test")
 
@@ -78,7 +87,14 @@ def test_new_user_signup_workflow(
     )
 
     # Managers receive a notification
-    assert len(mail_outbox) == 1
+    try:
+        WebDriverWait(browser, timeout=MAX_TIMEOUT).until(
+            lambda d: len(mail_outbox) == 1
+        )
+    except TimeoutException:
+        [print(e) for e in mail_outbox]
+        assert False
+
     for manager in settings.MANAGERS:
         assert manager[1] in mail_outbox[0].to
 
@@ -86,7 +102,7 @@ def test_new_user_signup_workflow(
     m = re.search(
         "http[s]*://.*/.*/admin/saltise/new-user-approval", mail_outbox[0].body
     )
-    dashboard_link = m.group(0)
+    dashboard_link = m[0]
     browser.get(dashboard_link)
 
     inputbox = browser.find_element_by_id("id_username")
@@ -105,15 +121,22 @@ def test_new_user_signup_workflow(
 
     browser.wait_for(lambda: assert_("No users to add" in browser.page_source))
 
-    browser.get(browser.server_url + "/logout")
+    browser.get(f"{browser.server_url}/en/logout/")
+
+    assert "login" in browser.current_url
 
     # Account verification email is sent to new user
-    assert len(mail_outbox) == 2
+    try:
+        WebDriverWait(browser, timeout=MAX_TIMEOUT).until(
+            lambda d: len(mail_outbox) == 2
+        )
+    except TimeoutException:
+        assert False
     assert list(mail_outbox[0].to) == ["test@mydalite.org"]
 
     # Password reset email is sent to teacher
     m = re.search("http[s]*://.*/reset/.*", mail_outbox[0].body)
-    verification_link = m.group(0)
+    verification_link = m[0]
     browser.get(verification_link)
 
     # Enter new password
@@ -128,12 +151,8 @@ def test_new_user_signup_workflow(
     # Succesful save
     browser.wait_for(lambda: assert_("Success!" in browser.page_source))
 
-    browser.find_element_by_link_text("Login").click()
-
-    browser.wait_for(lambda: assert_("login" in browser.current_url))
-
     # Sign in
-    browser.get(browser.server_url + "/login")
+    browser.get(f"{browser.server_url}/saltise/login/")
     inputbox = browser.find_element_by_id("id_username")
     inputbox.send_keys("test")
 
@@ -142,16 +161,14 @@ def test_new_user_signup_workflow(
 
     browser.find_element_by_id("submit-btn").click()
 
-    # Redirected to dashboard
-    assert browser.current_url.endswith("dashboard/")
+    # Redirected to lobby
+    assert browser.current_url.endswith("lobby/")
 
 
 def test_inactive_user_login(browser, assert_, inactive_user):
 
     # Any inactive user cannot login
-    browser.get(browser.server_url + "/login")
-
-    browser.find_element_by_id("accept-cookies").click()
+    browser.get(f"{browser.server_url}/saltise/login/")
 
     inputbox = browser.find_element_by_id("id_username")
     inputbox.send_keys(inactive_user.username)
@@ -171,7 +188,7 @@ def test_inactive_user_login(browser, assert_, inactive_user):
 def test_new_teacher(browser, assert_, new_teacher, tos_teacher):
 
     # Teacher can login and access account
-    browser.get(browser.server_url + "/login")
+    browser.get(f"{browser.server_url}/saltise/login/")
 
     inputbox = browser.find_element_by_id("id_username")
     inputbox.send_keys(new_teacher.user.username)
@@ -180,6 +197,12 @@ def test_new_teacher(browser, assert_, new_teacher, tos_teacher):
     inputbox.send_keys("default_password")
 
     browser.find_element_by_id("submit-btn").click()
+
+    assert browser.current_url.endswith("saltise/lobby/")
+
+    dashboard = browser.find_element_by_xpath(
+        "//a[contains(.,'My dashboard')]"
+    ).click()
 
     # Redirected to dashboard
     assert browser.current_url.endswith("dashboard/")
@@ -211,13 +234,13 @@ def test_new_teacher(browser, assert_, new_teacher, tos_teacher):
     welcome = browser.find_element_by_id("link-to-login-or-welcome")
     browser.wait_for(
         lambda: assert_(
-            "Welcome back " + new_teacher.user.username in welcome.text
+            f"Welcome back {new_teacher.user.username}" in welcome.text
         )
     )
 
     # Logout and log back in -> skip tos step
-    browser.get(browser.server_url + "/logout")
-    browser.get(browser.server_url + "/login")
+    browser.get(f"{browser.server_url}/logout")
+    browser.get(f"{browser.server_url}/saltise/login/")
 
     inputbox = browser.find_element_by_id("id_username")
     inputbox.send_keys(new_teacher.user.username)
@@ -226,6 +249,14 @@ def test_new_teacher(browser, assert_, new_teacher, tos_teacher):
     inputbox.send_keys("default_password")
 
     browser.find_element_by_id("submit-btn").click()
+
+    browser.wait_for(
+        lambda: assert_(
+            browser.find_element_by_xpath("//a[contains(.,'My dashboard')]")
+        )
+    )
+
+    browser.find_element_by_xpath("//a[contains(.,'My dashboard')]").click()
 
     go_to_account(browser)
 
@@ -240,7 +271,9 @@ def test_new_teacher(browser, assert_, new_teacher, tos_teacher):
     new_TOS = Tos(version=2, text="Test 2", current=True, role=role)
     new_TOS.save()
 
-    browser.get(browser.server_url + "/login")
+    browser.get(f"{browser.server_url}/login")
+
+    browser.find_element_by_xpath("//a[contains(.,'My dashboard')]").click()
 
     go_to_account(browser)
 
@@ -253,7 +286,7 @@ def test_new_teacher(browser, assert_, new_teacher, tos_teacher):
     browser.find_element_by_id("tos-accept").click()
 
     # Teacher generally redirected to welcome page if logged in
-    browser.get(browser.server_url + "/login")
+    browser.get(f"{browser.server_url}/login")
 
     # Redirected to dashboard
-    assert browser.current_url.endswith("dashboard/")
+    assert browser.current_url.endswith("lobby/")

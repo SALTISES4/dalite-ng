@@ -4,10 +4,9 @@ __all__ = [
     "assignment",
     "assignments",
     "browser",
+    "cookies",
     "category",
     "discipline",
-    "forum",
-    "forums",
     "group",
     "inactive_user",
     "institution",
@@ -32,7 +31,6 @@ __all__ = [
 ]
 
 from .emails_ import mail_outbox
-from .forums_ import forum, forums
 from .peerinst_ import (
     admin,
     assignment,
@@ -57,4 +55,4 @@ from .peerinst_ import (
 )
 from .quality_ import min_words_criterion, min_words_rules, quality_min_words
 from .reputation_ import student_reputation_with_criteria
-from .utils import assert_, browser, second_browser
+from .utils import assert_, browser, cookies, second_browser

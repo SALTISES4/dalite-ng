@@ -65,6 +65,6 @@ def test_oauth_signature(client, settings):
 
     response = client.post("/lti/", oauth_parameters, follow=True)
 
-    assert (
-        response.status_code == 404
-    )  # Assignment does not exist, but oauth protocol succeeds
+    assert response.status_code == 200
+    # oauth protocol succeeds, even without custom parameters
+    # (LTI-Standalone mode)

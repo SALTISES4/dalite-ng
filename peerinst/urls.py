@@ -1,15 +1,15 @@
-from django.conf.urls import include
+from csp.decorators import csp_replace
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import user_passes_test
-from django.urls import path
+from django.urls import include, path
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic.base import TemplateView
 
 from peerinst.middleware import lti_access_allowed
 
 from . import admin_views, views
-from .forms import NonStudentPasswordResetForm
-from .mixins import student_check
+from .forms import TeacherPasswordResetForm
 
 
 def not_authenticated(user):
@@ -162,7 +162,7 @@ def old_patterns():
         ),
         path(
             "live/navigate/<assignment_id>/<question_id>/<direction>/<index>",  # noqa
-            views.navigate_assignment,
+            lti_access_allowed(views.navigate_assignment),
             name="navigate-assignment",
         ),
         path(
@@ -251,10 +251,10 @@ def old_patterns():
         ),
         path("logout/", lti_access_allowed(views.logout_view), name="logout"),
         path("welcome/", views.welcome, name="welcome"),
-        # Only non-students can change their password
+        # Only teachers can change their password
         path(
             "password_change/",
-            user_passes_test(student_check)(
+            user_passes_test(lambda user: hasattr(user, "teacher"))(
                 auth_views.PasswordChangeView.as_view()
             ),
             name="password_change",
@@ -268,7 +268,7 @@ def old_patterns():
             "password_reset/",
             auth_views.PasswordResetView.as_view(
                 html_email_template_name="registration/password_reset_email_html.html",  # noqa
-                form_class=NonStudentPasswordResetForm,
+                form_class=TeacherPasswordResetForm,
             ),
             name="password_reset",
         ),
@@ -374,10 +374,19 @@ def student_patterns():
     return [
         path(
             "assignment-complete/",
-            views.finish_assignment,
+            lti_access_allowed(views.finish_assignment),
             name="finish-assignment",
         ),
         path("student/", views.student.index_page, name="student-page"),
+        path(
+            "student/lti/",
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(views.student.index_page_LTI)
+                )
+            ),
+            name="student-page-LTI",
+        ),
         path(
             "student/join-group/",
             views.student.join_group,
@@ -405,17 +414,29 @@ def student_patterns():
         ),
         path(
             "student/remove-notification/",
-            views.student.remove_notification,
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(views.student.remove_notification)
+                )
+            ),
             name="student-remove-notification",
         ),
         path(
             "student/remove-notifications/",
-            views.student.remove_notifications,
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(views.student.remove_notifications)
+                )
+            ),
             name="student-remove-notifications",
         ),
         path(
             "student/get-notifications/",
-            views.student.get_notifications,
+            csp_replace(FRAME_ANCESTORS=["*"])(
+                xframe_options_exempt(
+                    lti_access_allowed(views.student.get_notifications)
+                )
+            ),
             name="student-get-notifications",
         ),
         path(
@@ -631,11 +652,6 @@ def teacher_patterns():
             name="teacher-dashboard--collections",
         ),
         path(
-            "teacher/dashboard/messages/",
-            views.teacher.messages,
-            name="teacher-dashboard--messages",
-        ),
-        path(
             "teacher/dashboard/dalite-messages/",
             views.teacher.dalite_messages,
             name="teacher-dashboard--dalite-messages",
@@ -644,16 +660,6 @@ def teacher_patterns():
             "teacher/dashboard/dalite-messages/remove",
             views.teacher.remove_dalite_message,
             name="teacher-dashboard--dalite-messages--remove",
-        ),
-        path(
-            "teacher/dashboard/messages/read",
-            views.teacher.mark_message_read,
-            name="teacher-dashboard--messages--read",
-        ),
-        path(
-            "teacher/dashboard/unsubscribe-thread/",
-            views.teacher.unsubscribe_from_thread,
-            name="teacher-dashboard--unsubscribe-thread",
         ),
         path(
             "teacher/gradebook/request/",

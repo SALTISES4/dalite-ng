@@ -3,17 +3,20 @@ import logging
 import re
 
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
+from django.template.response import TemplateResponse
 from django.urls import reverse
-from django.utils.translation import ugettext
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST, require_safe
 
 from dalite.views.errors import response_400, response_403
 from tos.models import Consent
 
+from ..lti import manage_LTI_studentgroup
 from ..models import (
     Student,
     StudentAssignment,
@@ -29,7 +32,7 @@ from ..students import (
 )
 from .decorators import student_required
 
-logger = logging.getLogger("peerinst-views")
+logger = logging.getLogger("peerinst-auth")
 
 
 def validate_group_data(req):
@@ -128,28 +131,6 @@ def validate_group_data(req):
 
 
 def login_student(req, token=None):
-    """
-    Logs in the user depending on the given token and req.user. For lti users,
-    the student corresponding to the email is used, creating it if necessary.
-
-    Parameters
-    ----------
-    req : HttpRequest
-        Request with a logged in user or not
-    token : Optional[str] (default : None)
-        Student token
-
-    Parameters
-    ----------
-    Either
-        Student
-            Logged in student
-        HttpResponse
-            Error response
-    bool
-        If this is a new student
-    """
-
     if token is None:
         if not isinstance(req.user, User):
             return (
@@ -167,52 +148,32 @@ def login_student(req, token=None):
                 ),
                 None,
             )
-
         user = req.user
-        username, password = get_student_username_and_password(user.email)
-
-        is_lti = user.username != username
-
     else:
-        user, is_lti = authenticate_student(req, token)
-        if isinstance(user, HttpResponse):
+        user = authenticate_student(req, token)
+        if isinstance(user, TemplateResponse):
             return user, None
-
-        if is_lti:
-            username, password = get_student_username_and_password(user.email)
-
-    if is_lti:
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            user = User.objects.create_user(
-                username=username, password=password, email=user.email
-            )
 
     try:
         student = Student.objects.get(student=user)
-        new_student = False
     except Student.DoesNotExist:
-        if is_lti:
-            return (
-                response_403(
-                    req,
-                    msg=_(
-                        "You must be a logged in student to access this "
-                        "resource."
-                    ),
-                    logger_msg=(
-                        "Student index page accessed without a token or being "
-                        "logged in."
-                    ),
-                    log=logger.warning,
+        return (
+            response_403(
+                req,
+                msg=_(
+                    "You must be a logged in student to access this "
+                    "resource."
                 ),
-                None,
-            )
-        student = Student.objects.create(student=user)
-        new_student = True
+                logger_msg=(
+                    "Student index page accessed by non-student account"
+                ),
+                log=logger.warning,
+            ),
+            None,
+        )
 
-    if not user.is_active or new_student:
+    new_student = False
+    if not user.is_active:
         user.is_active = True
         user.save()
         new_student = True
@@ -223,19 +184,7 @@ def login_student(req, token=None):
     return student, new_student
 
 
-@require_safe
-def index_page(req):
-    """
-    Main student page. Accessed through a link sent by email containing
-    a token or without the token for a logged in student.
-    """
-
-    token = req.GET.get("token")
-    group_student_id_needed = req.GET.get("group-student-id-needed", "")
-
-    student, new_student = login_student(req, token)
-    if isinstance(student, HttpResponse):
-        return student
+def get_context_data_index_page(req, student, new_student):
 
     token = create_student_token(
         student.student.username, student.student.email
@@ -287,15 +236,6 @@ def index_page(req):
         for group, assignments in list(assignments.items())
     }
 
-    if not Consent.objects.filter(
-        user=student.student, tos__role__role="student"
-    ).exists():
-        return HttpResponseRedirect(
-            reverse("tos:tos_consent", kwargs={"role": "student"})
-            + "?next="
-            + req.path
-        )
-
     latest_student_consent = (
         Consent.objects.filter(
             user__username=student.student.username, tos__role="student"
@@ -344,7 +284,7 @@ def index_page(req):
             {
                 "link": notification.link,
                 "icon": notification.notification.icon,
-                "text": ugettext(notification.text),
+                "text": gettext(notification.text),
                 "pk": notification.pk,
             }
             for notification in student.notifications.order_by("-created_on")
@@ -363,52 +303,150 @@ def index_page(req):
             ),
         },
         "translations": {
-            "assignment_about_to_expire": ugettext(
+            "assignment_about_to_expire": gettext(
                 "This assignment is about to expire"
             ),
-            "assignment_expired": ugettext("Past due date"),
-            "cancel": ugettext("Cancel"),
-            "course_flow_button": ugettext("Visit this group's CourseFlow"),
-            "completed": ugettext("Completed"),
-            "day": ugettext("day"),
-            "days": ugettext("days"),
-            "due_on": ugettext("Due on"),
-            "edit_student_id": ugettext("Edit student id"),
-            "expired": ugettext("Expired"),
-            "go_to_assignment": ugettext("Go to assignment"),
-            "grade": ugettext("Grade"),
-            "hour": ugettext("hour"),
-            "hours": ugettext("hours"),
-            "leave": ugettext("Leave"),
-            "leave_group_question": ugettext("Are you sure?"),
-            "leave_group_text": ugettext(
+            "assignment_expired": gettext("Past due date"),
+            "cancel": gettext("Cancel"),
+            "course_flow_button": gettext("Visit this group's CourseFlow"),
+            "completed": gettext("Completed"),
+            "day": gettext("day"),
+            "days": gettext("days"),
+            "due_on": gettext("Due on"),
+            "edit_student_id": gettext("Edit student id"),
+            "expired": gettext("Expired"),
+            "go_to_assignment": gettext("Go to assignment"),
+            "grade": gettext("Grade"),
+            "hour": gettext("hour"),
+            "hours": gettext("hours"),
+            "leave": gettext("Leave"),
+            "leave_group_question": gettext("Are you sure?"),
+            "leave_group_text": gettext(
                 "This will remove you from the group. All your answers will "
                 "be saved, but you won't appear as a member of the group to "
                 "your teacher.  "
             ),
-            "leave_group_title": ugettext("Leave group"),
-            "minute": ugettext("minute"),
-            "minutes": ugettext("minutes"),
-            "no_assignments": ugettext("No assignments yet"),
-            "notifications_bell": ugettext(
+            "leave_group_title": gettext("Leave group"),
+            "minute": gettext("minute"),
+            "minutes": gettext("minutes"),
+            "no_assignments": gettext("No assignments yet"),
+            "notifications_bell": gettext(
                 "Toggle email reminders for this group"
             ),
-            "not_sharing": ugettext("Not sharing"),
-            "sharing": ugettext("Sharing"),
-            "student_id": ugettext("Student id"),
-            "student_id_needed": ugettext(
+            "not_sharing": gettext("Not sharing"),
+            "sharing": gettext("Sharing"),
+            "student_id": gettext("Student id"),
+            "student_id_needed": gettext(
                 "You need to add your school's student id to do assignments "
                 "for this group."
             ),
         },
     }
 
+    return data
+
+
+@require_safe
+def index_page(req):
+    """
+    Main student page. Accessed through a link sent by email containing
+    a token or without the token for a logged in student.
+    """
+    req.session["access_type"] = StudentGroup.STANDALONE
+
+    token = req.GET.get("token")
+    group_student_id_needed = req.GET.get("group-student-id-needed", "")
+
+    student, new_student = login_student(req, token)
+    if isinstance(student, HttpResponse):
+        return student
+
+    if not Consent.objects.filter(
+        user=student.student, tos__role__role="student"
+    ).exists():
+        return HttpResponseRedirect(
+            reverse("tos:tos_consent", kwargs={"role": "student"})
+            + "?next="
+            + req.path
+        )
+
+    data = get_context_data_index_page(req, student, new_student)
+
     context = {
         "data": json.dumps(data),
         "group_student_id_needed": group_student_id_needed,
+        "access_standalone": True,
     }
 
     return render(req, "peerinst/student/index.html", context)
+
+
+@login_required
+@require_safe
+def index_page_LTI(request):
+    """
+    Main student page when accessed via LTI for new accounts
+    """
+    course_id = request.session.get("context_id", None)
+
+    if request.user.has_usable_password() or not course_id:
+        # Only allow access via new LTI student accounts
+        logout(request)
+        return HttpResponseRedirect(reverse("lti-fail-auth"))
+
+    user = request.user
+
+    student, new_student = Student.objects.get_or_create(student=user)
+
+    if not user.is_active or new_student:
+        user.is_active = True
+        user.save()
+        new_student = True
+
+    if not Consent.objects.filter(
+        user=student.student, tos__role__role="student"
+    ).exists():
+        return HttpResponseRedirect(
+            reverse("tos:tos_consent", kwargs={"role": "student"})
+            + "?next="
+            + request.path
+        )
+
+    manage_LTI_studentgroup(request)
+
+    assignment_id = request.session.get("custom_assignment_id", None)
+    question_id = request.session.get("custom_question_id", None)
+
+    if assignment_id and question_id:
+        request.session["access_type"] = StudentGroup.LTI
+        logger.info(
+            f"Session data for question view : {dict(request.session.items())}"
+        )
+
+        return HttpResponseRedirect(
+            reverse(
+                "question",
+                kwargs={
+                    "assignment_id": assignment_id,
+                    "question_id": question_id,
+                },
+            ),
+        )
+
+    request.session["access_type"] = StudentGroup.LTI_STANDALONE
+    logger.info(
+        f"Session data for LTI standalone index : {dict(request.session.items())}"
+    )
+
+    data = get_context_data_index_page(request, student, new_student)
+
+    context = {
+        "data": json.dumps(data),
+        "group_student_id_needed": "",
+        "access_lti_standalone": True,
+    }
+
+    return render(request, "peerinst/student/index.html", context)
 
 
 @student_required
@@ -699,25 +737,17 @@ def send_signin_link(req):
         )
 
     student = Student.objects.filter(student__email=email)
-
     if not student:
         student, created = Student.get_or_create(email)
         logger.info(f"Student created with email {email}.")
-
     elif len(student) == 1:
         student = student[0]
-
     else:
         username, __ = get_student_username_and_password(email)
         student = student.filter(student__username=username).first()
-
     if student:
         err = student.send_email(mail_type="signin", request=req)
-        if err is None:
-            context = {"error": False}
-        else:
-            context = {"error": True}
-
+        context = {"error": False} if err is None else {"error": True}
     return render(req, "peerinst/student/login_confirmation.html", context)
 
 
@@ -744,7 +774,7 @@ def get_notifications(req, student):
             {
                 "link": notification.link,
                 "icon": notification.notification.icon,
-                "text": ugettext(notification.text),
+                "text": gettext(notification.text),
                 "pk": notification.pk,
             }
             for notification in student.notifications.order_by("-created_on")

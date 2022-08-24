@@ -1,36 +1,5 @@
-from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-
-from .models import TeacherNotification
-
-
-class NotificationMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        if request.user.is_authenticated:
-            try:
-                notification_type = ContentType.objects.get(
-                    app_label="pinax_forums", model="ThreadSubscription"
-                )
-                request.session["forum_notifications"] = [
-                    int(i)
-                    for i in list(
-                        TeacherNotification.objects.filter(
-                            teacher=request.user.teacher
-                        )
-                        .filter(notification_type=notification_type)
-                        .values_list("object_id", flat=True)
-                    )
-                ]
-            except Exception:
-                pass
-
-        response = self.get_response(request)
-
-        return response
 
 
 class LTIAccessMiddleware:
@@ -46,10 +15,9 @@ class LTIAccessMiddleware:
         return self.get_response(request)
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        # LTI authentication hook sets LTI session key to True
-        if request.session.get("LTI", False) and not getattr(
-            view_func, "lti_access_allowed", False
-        ):
+        if "LTI" in request.session.get(
+            "_auth_user_backend", ""
+        ) and not getattr(view_func, "lti_access_allowed", False):
             # If access is denied, force a logout to prevent being stuck
             return HttpResponseRedirect(reverse("access_denied_and_logout"))
 

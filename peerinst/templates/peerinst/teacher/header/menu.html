@@ -1,5 +1,7 @@
 {% load i18n %}
 
+{% get_current_language as LANGUAGE_CODE %}
+
 <i id="menu-icon" class="material-icons md-32 header-icon">menu</i>
 <aside class="mdc-drawer mdc-drawer--temporary mdc-typography">
   <nav class="mdc-drawer__drawer">
@@ -11,6 +13,7 @@
         </i>
         {% trans 'Home page' %}
       </a>
+
       <a class="mdc-list-item" href="{% url 'browse-database' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
           aria-hidden="true">
@@ -18,6 +21,7 @@
         </i>
         {% trans 'Search database' %}
       </a>
+
       <a class="mdc-list-item" href="{% url 'student-activity' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
           aria-hidden="true">
@@ -29,6 +33,7 @@
         </i>
         {% trans 'Student activity ' %}
       </a>
+
       <a class="mdc-list-item" href="{% url 'question-create' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
           aria-hidden="true">
@@ -36,6 +41,7 @@
         </i>
         {% trans 'Create question' %}
       </a>
+
       <a class="mdc-list-item"
         href="{% url 'assignment-create' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
@@ -44,6 +50,7 @@
         </i>
         {% trans 'Create assignment' %}
       </a>
+
       <a class="mdc-list-item" href="{% url 'teacher' user.teacher.pk %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
           aria-hidden="true">
@@ -51,23 +58,7 @@
         </i>
         {% trans 'My account' %}
       </a>
-      {% if request.session.forum_notifications %}
-        <a class="mdc-list-item" href="{% url 'pinax_forums:thread_updates' %}">
-          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-            aria-hidden="true">
-            help
-          </i>
-          {% trans 'Forums' %}<span class="mdc-theme--primary new-feature">{% trans 'New!' %}</span>
-        </a>
-      {% else %}
-        <a class="mdc-list-item" href="{% url 'pinax_forums:forums' %}">
-          <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-            aria-hidden="true">
-            help
-          </i>
-          {% trans 'Forums' %}
-        </a>
-      {% endif %}
+
       <a class="mdc-list-item" href="{% url 'course_flow:home' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
           aria-hidden="true">
@@ -75,6 +66,23 @@
         </i>
         CourseFlow
       </a>
+
+      <span id="submit-language-form" class="mdc-list-item">
+        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+          aria-hidden="true">
+          language
+        </i>
+        {% if LANGUAGE_CODE == 'en' %}Français{% else %}English{% endif %}
+      </span>
+
+      <a class="mdc-list-item" href="{% url 'cookie_consent_cookie_group_list' %}?next={{ request.path }}">
+        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+          aria-hidden="true">
+          cookie
+        </i>
+        {% trans 'Cookies policy' %}
+      </a>
+
       <a class="mdc-list-item" href="{% url 'logout' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
           aria-hidden="true">

@@ -1,13 +1,15 @@
 import logging
 
+from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.response import TemplateResponse
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods, require_safe
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView
@@ -91,17 +93,26 @@ def signup_through_link(request, group_hash):
 @require_safe
 def live(request, token, assignment_hash):
 
-    # Call logout to ensure a clean session
-    logout(request)
+    if (
+        request.session.get("oauth_consumer_key")
+        == settings.LTI_STANDALONE_CLIENT_KEY
+    ):
+        user = request.user
+        request.session["access_type"] = StudentGroup.LTI_STANDALONE
+    else:
+        # Call logout to ensure a clean session
+        logout(request)
 
-    # Login through token
-    user, __ = authenticate_student(request, token)
-    if isinstance(user, HttpResponse):
-        return user
-    login(request, user, backend="peerinst.backends.CustomPermissionsBackend")
+        # Login through token
+        user = authenticate_student(request, token)
+        if isinstance(user, HttpResponse):
+            return user
+        login(
+            request, user, backend="peerinst.backends.CustomPermissionsBackend"
+        )
 
-    # Register access type
-    request.session["LTI"] = False
+        # Register access type
+        request.session["access_type"] = StudentGroup.STANDALONE
 
     # Get assignment for this token and current question
     group_assignment = StudentGroupAssignment.get(assignment_hash)
@@ -303,7 +314,8 @@ class StudentGroupAssignmentCreateView(
         form = super().get_form()
         teacher = get_object_or_404(Teacher, user=self.request.user)
         form.fields["group"].queryset = teacher.current_groups.filter(
-            mode_created=StudentGroup.STANDALONE
+            Q(mode_created=StudentGroup.STANDALONE)
+            | Q(mode_created=StudentGroup.LTI_STANDALONE)
         )
 
         return form

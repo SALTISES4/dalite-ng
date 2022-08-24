@@ -16,7 +16,7 @@
 
           {% if not user.student and assignment %}
             <div class="admin-link">
-              {% if not lti %}
+              {% if access_teacher %}
                 <a href="{% url 'question-list' assignment_id=assignment.pk %}">{% trans 'Back to assignment' %}</a>
                 {% if question.user == user or user in question.collaborators.all %}
                   <span class="admin-link--padded">|</span><a href="{% url 'question-update' question.id %}">{% trans 'Edit question' %}</a>
@@ -71,9 +71,6 @@
                 {% csrf_token %}
                 {{ form.datetime_start }}
                 {% block inner_form %}
-                  <!--
-        <span class="mdc-typography--body1">{{ form.first_answer_choice.label }}</span>
-        -->
                   <ul>
                     {% for choice in form.first_answer_choice %}
                       <li>
@@ -93,12 +90,9 @@
                   {% if form.errors.rationale %}
                     {{ form.errors.rationale }}
                   {% endif %}
-                  <div class="mdc-text-field mdc-text-field--textarea mdc-theme--background" data-mdc-auto-init="MDCTextField">
-                    {{ form.rationale|add_class:"mdc-text-field__input" }}
-                    <label for="id_rationale" class="mdc-floating-label">{{ form.rationale.label }}</label>
-                  </div>
+                  {{ form.rationale }}
                 {% endblock %}
-                {% if lti or not assignment_expired %}
+                {% if not assignment_expired %}
                   <div>
                     <input id="answer-form"
                       class="mdc-button mdc-button--raised padded-top"
@@ -114,7 +108,7 @@
         {% block extra_content %}{% endblock %}
       </div>
 
-      {% if not lti and assignment %}
+      {% if not access_lti_basic_client_key and assignment %}
         <div class='nav-question'>
 
           {% if not assignment_first %}
@@ -164,12 +158,6 @@
   {{ block.super }}
   <script nonce="{{ request.csp_nonce }}">
     window.addEventListener("load", function() {
-      question.initStart(
-        '{% url 'quality:validate' %}',
-        {{ quality|default_if_none:'null' }},
-        '{{ question.type }}',
-      );
-
       const finishButton = document.getElementById("finish-button");
       if (finishButton) {
         finishButton.addEventListener("click", function(evt) {

@@ -1,7 +1,7 @@
 import logging
 
 from django.http import HttpResponse, JsonResponse
-from django.utils.translation import ugettext_lazy as translate
+from django.utils.translation import gettext_lazy as translate
 from django.views.decorators.http import require_GET, require_POST
 
 from dalite.views.errors import response_400

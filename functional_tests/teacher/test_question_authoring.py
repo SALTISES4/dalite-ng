@@ -1,14 +1,21 @@
 import time
 
+import pytest
 from faker import Faker
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.expected_conditions import (
+    presence_of_element_located,
+)
+from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from functional_tests.fixtures import *  # noqa
 
 from .utils import accept_cookies, go_to_account, login
 
 fake = Faker()
+timeout = 10
 
 
 def create_category(browser, assert_):
@@ -264,8 +271,17 @@ def create_PI_question(
 ):
     # Teacher can create a question
     # -----------------------------
-    browser.find_element_by_id("question-section").click()
-    browser.find_element_by_link_text("Create new").click()
+    WebDriverWait(browser, timeout).until(
+        presence_of_element_located(
+            (By.XPATH, "//h2[contains(.,'Questions')]")
+        )
+    ).click()
+
+    WebDriverWait(browser, timeout).until(
+        presence_of_element_located(
+            (By.XPATH, "//span[contains(.,'Create new')]")
+        )
+    ).click()
 
     # Step 1
     # ------
@@ -287,7 +303,7 @@ def create_PI_question(
     browser.switch_to.default_content()
 
     # Discipline
-    Select(browser.find_element_by_id("id_discipline")).select_by_value("1")
+    Select(browser.find_element_by_id("id_discipline")).select_by_index(1)
 
     # Category
     input_category = browser.find_element_by_id("autofill_categories")
@@ -299,7 +315,12 @@ def create_PI_question(
 
     # Step 2
     # ------
-    assert "Step 2" in browser.find_element_by_tag_name("h2").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 2" in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
 
     tinymce_embed = browser.find_element_by_id(
         "id_answerchoice_set-0-text_ifr"
@@ -334,28 +355,37 @@ def create_PI_question(
 
     # Step 3
     # ------
-    assert "Step 3" in browser.find_element_by_tag_name("h2").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 3" in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
 
     browser.find_element_by_id("id_first_answer_choice_0").click()
 
     # Low quality throws error
-    rationale = browser.find_element_by_id("id_rationale")
+    browser.switch_to.frame("id_rationale_ifr")
+    rationale = browser.find_element_by_id("tinymce")
     rationale.send_keys("Two words.")
+    browser.switch_to.default_content()
 
     browser.find_element_by_id("answer-form").click()
 
     error = browser.find_elements_by_class_name("errorlist")[0]
     assert (
-        "That does not seem like a clear explanation of your reasoning"
+        "Please provide a more detailed rationale for your choice."
         in error.text
     )
     assert "Expert rationale saved" not in browser.page_source
 
     browser.find_element_by_id("id_first_answer_choice_0").click()
 
-    rationale = browser.find_element_by_id("id_rationale")
+    browser.switch_to.frame("id_rationale_ifr")
+    rationale = browser.find_element_by_id("tinymce")
     rationale.clear()
     rationale.send_keys("This is an expert rationale for answer choice A.")
+    browser.switch_to.default_content()
 
     browser.find_element_by_id("answer-form").click()
 
@@ -377,11 +407,13 @@ def create_PI_question(
     time.sleep(1)
     browser.find_element_by_id("id_first_answer_choice_0").click()
 
-    rationale = browser.find_element_by_id("id_rationale")
+    browser.switch_to.frame("id_rationale_ifr")
+    rationale = browser.find_element_by_id("tinymce")
     rationale.clear()
     rationale.send_keys(
         "This is another expert rationale for answer choice A."
     )
+    browser.switch_to.default_content()
 
     browser.find_element_by_id("answer-form").click()
 
@@ -397,8 +429,11 @@ def create_PI_question(
     time.sleep(1)
     browser.find_element_by_id("id_first_answer_choice_1").click()
 
-    rationale = browser.find_element_by_id("id_rationale")
+    browser.switch_to.frame("id_rationale_ifr")
+    rationale = browser.find_element_by_id("tinymce")
+    rationale.clear()
     rationale.send_keys("This is an expert rationale for answer choice B.")
+    browser.switch_to.default_content()
 
     browser.find_element_by_id("answer-form").click()
 
@@ -415,7 +450,12 @@ def create_PI_question(
 
     browser.find_element_by_id("answer-choice-form").submit()
 
-    assert "Step 3" in browser.find_element_by_tag_name("h2").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 3" in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
 
     browser.wait_for(
         lambda: assert_(
@@ -431,10 +471,13 @@ def create_PI_question(
     # Access expert rationale update page and return > no change
     browser.find_elements_by_class_name("click-to-edit")[0].click()
 
-    assert (
-        "Approve Expert Rationale"
-        in browser.find_elements_by_tag_name("h2")[0].text
-    )
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Approve Expert Rationale"
+            in browser.find_elements_by_tag_name("h2")[0].text
+        )
+    except TimeoutException:
+        assert False
 
     browser.find_element_by_id("update-button").click()
 
@@ -481,10 +524,13 @@ def create_PI_question(
     time.sleep(1)
     browser.find_element_by_id("id_first_answer_choice_1").click()
 
-    rationale = browser.find_element_by_id("id_rationale")
+    browser.switch_to.frame("id_rationale_ifr")
+    rationale = browser.find_element_by_id("tinymce")
+    rationale.clear()
     rationale.send_keys(
         "This is another expert rationale for answer choice B."
     )
+    browser.switch_to.default_content()
 
     browser.find_element_by_id("answer-form").click()
 
@@ -508,8 +554,11 @@ def create_PI_question(
 
     browser.find_element_by_id("id_first_answer_choice_0").click()
 
-    rationale = browser.find_element_by_id("id_rationale")
+    browser.switch_to.frame("id_rationale_ifr")
+    rationale = browser.find_element_by_id("tinymce")
+    rationale.clear()
     rationale.send_keys("Short rationale.")
+    browser.switch_to.default_content()
 
     browser.find_element_by_id("answer-form").click()
 
@@ -517,16 +566,18 @@ def create_PI_question(
     time.sleep(1)
     error = browser.find_elements_by_class_name("errorlist")[0]
     assert (
-        "That does not seem like a clear explanation of your reasoning"
+        "Please provide a more detailed rationale for your choice."
         in error.text
     )
     assert "Sample answer saved" not in browser.page_source
 
     browser.find_element_by_id("id_first_answer_choice_0").click()
 
-    rationale = browser.find_element_by_id("id_rationale")
+    browser.switch_to.frame("id_rationale_ifr")
+    rationale = browser.find_element_by_id("tinymce")
     rationale.clear()
     rationale.send_keys("This is an acceptable sample answer.")
+    browser.switch_to.default_content()
 
     browser.find_element_by_id("answer-form").click()
     browser.wait_for(
@@ -537,7 +588,7 @@ def create_PI_question(
     time.sleep(1)
     error = browser.find_elements_by_class_name("errorlist")[0]
     assert (
-        "You must submit some at least one example rationale for each of the answer choices above"  # noqa
+        "At least one sample rationale is required for each answer choice."  # noqa
         in error.text
     )
 
@@ -545,9 +596,11 @@ def create_PI_question(
     time.sleep(1)
     browser.find_element_by_id("id_first_answer_choice_1").click()
 
-    rationale = browser.find_element_by_id("id_rationale")
+    browser.switch_to.frame("id_rationale_ifr")
+    rationale = browser.find_element_by_id("tinymce")
     rationale.clear()
     rationale.send_keys("This is an acceptable sample answer.")
+    browser.switch_to.default_content()
 
     browser.find_element_by_id("answer-form").click()
     browser.wait_for(
@@ -558,7 +611,7 @@ def create_PI_question(
     time.sleep(1)
     error = browser.find_elements_by_class_name("errorlist")[0]
     assert (
-        "You must submit some at least one example rationale for each of the answer choices above"  # noqa
+        "At least one sample rationale is required for each answer choice."  # noqa
         in error.text
     )
 
@@ -566,9 +619,11 @@ def create_PI_question(
     time.sleep(1)
     browser.find_element_by_id("id_first_answer_choice_2").click()
 
-    rationale = browser.find_element_by_id("id_rationale")
+    browser.switch_to.frame("id_rationale_ifr")
+    rationale = browser.find_element_by_id("tinymce")
     rationale.clear()
     rationale.send_keys("This is an acceptable sample answer.")
+    browser.switch_to.default_content()
 
     browser.find_element_by_id("answer-form").click()
     browser.wait_for(
@@ -590,14 +645,30 @@ def create_PI_question(
     assert "My Account" in browser.find_elements_by_tag_name("h1")[0].text
 
     # New question in their list of questions
-    browser.find_element_by_id("question-section").click()
+    WebDriverWait(browser, timeout).until(
+        presence_of_element_located(
+            (By.XPATH, "//h2[contains(.,'Questions')]")
+        )
+    ).click()
+
     browser.wait_for(assert_(lambda: title in browser.page_source))
 
     # Check for question in assignment
-    browser.find_element_by_id("assignment-section").click()
-    browser.find_element_by_link_text(assignment.identifier).click()
+    WebDriverWait(browser, timeout).until(
+        presence_of_element_located(
+            (By.XPATH, "//h2[contains(.,'Assignments')]")
+        )
+    ).click()
 
-    assert assignment.title in browser.find_elements_by_tag_name("h1")[0].text
+    WebDriverWait(browser, timeout).until(
+        presence_of_element_located(
+            (By.XPATH, f"//span[contains(.,'{assignment.identifier}')]")
+        )
+    ).click()
+
+    assert WebDriverWait(browser, timeout).until(
+        presence_of_element_located((By.XPATH, f"//h2[contains(.,'{title}')]"))
+    )
 
 
 def edit_PI_question():
@@ -609,8 +680,15 @@ def edit_PI_question():
 
 
 def create_RO_question(browser, assert_, category, discipline, teacher):
-    browser.find_element_by_id("question-section").click()
-    browser.find_element_by_link_text("Create new").click()
+    try:
+        WebDriverWait(browser, timeout).until(
+            presence_of_element_located(
+                (By.XPATH, "//h2[contains(.,'Questions')]")
+            )
+        ).click()
+    except TimeoutException:
+        assert False
+    browser.find_element_by_xpath("//span[contains(.,'Create new')]").click()
 
     # Step 1
     # ------
@@ -632,7 +710,7 @@ def create_RO_question(browser, assert_, category, discipline, teacher):
     browser.switch_to.default_content()
 
     # Discipline
-    Select(browser.find_element_by_id("id_discipline")).select_by_value("1")
+    Select(browser.find_element_by_id("id_discipline")).select_by_index(1)
 
     # Category
     input_category = browser.find_element_by_id("autofill_categories")
@@ -656,17 +734,47 @@ def create_RO_question(browser, assert_, category, discipline, teacher):
 
     # Step 2
     # ------
-    assert "Step 2: Preview" in browser.find_element_by_tag_name("h2").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 2: Preview"
+            in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
 
     browser.find_element_by_id("back").submit()
-    assert "Step 1" in browser.find_element_by_tag_name("h2").text
+
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 1" in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
 
     browser.find_element_by_id("question-create-form").submit()
-    assert "Step 2: Preview" in browser.find_element_by_tag_name("h2").text
+
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 2: Preview"
+            in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
 
     browser.find_element_by_id("back").submit()
+
+    time.sleep(1)
+
     browser.find_element_by_id("next").submit()
-    assert "Step 2: Preview" in browser.find_element_by_tag_name("h2").text
+
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "Step 2: Preview"
+            in browser.find_element_by_tag_name("h2").text
+        )
+    except TimeoutException:
+        assert False
+
     assert (
         "You currently do not have any assignments. "
         "You can create one from your account page."
@@ -675,10 +783,23 @@ def create_RO_question(browser, assert_, category, discipline, teacher):
 
     browser.find_element_by_id("done").click()
 
-    assert "My Account" in browser.find_element_by_tag_name("h1").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "My Account"
+            in browser.find_element_by_tag_name("h1").text
+        )
+    except TimeoutException:
+        assert False
 
     # New question in their list of questions
-    browser.find_element_by_id("question-section").click()
+    try:
+        WebDriverWait(browser, timeout).until(
+            presence_of_element_located(
+                (By.XPATH, "//h2[contains(.,'Questions')]")
+            )
+        ).click()
+    except TimeoutException:
+        assert False
     browser.wait_for(assert_(lambda: title in browser.page_source))
 
 
@@ -690,6 +811,7 @@ def edit_RO_question():
     # Access question edit post student answers existing
 
 
+@pytest.mark.skip(reason="Disactivated feature")
 def test_create_category(browser, assert_, teacher):
     login(browser, teacher)
     accept_cookies(browser)
@@ -697,6 +819,7 @@ def test_create_category(browser, assert_, teacher):
     create_category(browser, assert_)
 
 
+@pytest.mark.skip(reason="Disactivated feature")
 def test_create_discipline(browser, assert_, teacher):
     login(browser, teacher)
     accept_cookies(browser)

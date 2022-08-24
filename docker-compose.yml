@@ -1,10 +1,13 @@
-# To run in background with build:
-#   `docker-compose up -d --build`
+# To build and run:
+#   `docker compose build`
+#   `docker compose up`
 # To tear down (don't forget the -v to get rid of static folder):
-#   `docker-compose down -v`
+#   `docker compose down -v`
+# For a full clean of all images, etc.
+#   `docker system prune -a`
 # To watch Chrome tests:
 #   Open a VNC client
-#   Go to vnc://127.0.0.1:41960 and enter password "secret"
+#   Go to vnc://127.0.0.1:41960 or vnc://127.0.0.1:41961 or vnc://127.0.0.1:41962 and enter password "secret"
 
 # TODO:
 #   - Currently, --create-db ensures tests do not start until other services are ready, but a wait function should be added.
@@ -12,14 +15,15 @@
 # GOTCHAS:
 #   - Use `docker image prune` to avoid serving old static content or using excessive disk space
 
-version: "3.7"
-
 services:
   live_app:
-    build: .
     image: mydalite
+    container_name: live_app
+    build:
+      context: .
     command: gunicorn dalite.wsgi:application --bind 0.0.0.0:8000
     environment:
+      ALLOWED_HOST: nginx
       DALITE_DB_HOST: ${HOST:-host.docker.internal}
       DALITE_DB_NAME: dalite_ng
       EMAIL_BACKEND: django.core.mail.backends.filebased.EmailBackend
@@ -27,12 +31,16 @@ services:
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       CHANNELS_REDIS_ADDRESS: redis
       CHANNELS_REDIS_PORT: 6379
+      MEMCACHE_ADDRESS: memcached
     volumes:
       - static:/code/static
       - emails:/code/emails
 
   celery:
     image: mydalite
+    container_name: celery
+    depends_on:
+      - live_app
     command: celery -A dalite worker -l debug
     environment:
       ALLOWED_HOST: nginx
@@ -42,14 +50,18 @@ services:
       EMAIL_BACKEND: django.core.mail.backends.filebased.EmailBackend
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
+      MEMCACHE_ADDRESS: memcached
     volumes:
       - emails:/code/emails
 
   redis:
-    image: redis:5.0
+    image: redis:6
+    container_name: redis
 
+  # Database is created and populated by test_chrome runner
   test_app:
     image: mydalite
+    container_name: test_app
     command: gunicorn dalite.wsgi:application --bind 0.0.0.0:8000
     environment:
       ALLOWED_HOST: nginx
@@ -61,12 +73,20 @@ services:
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       CHANNELS_REDIS_ADDRESS: redis
       CHANNELS_REDIS_PORT: 6379
+      MEMCACHE_ADDRESS: memcached
     volumes:
       - static:/code/static
       - emails:/code/emails
 
+  memcached:
+    image: memcached:latest
+    container_name: memcached
+    expose:
+      - "11211"
+
   nginx:
     build: ./nginx
+    container_name: nginx
     ports:
       - 1337:8080
       - 1338:8081
@@ -76,65 +96,135 @@ services:
     volumes:
       - static:/static
 
-  # https://github.com/SeleniumHQ/docker-selenium
+  # https://github.com/SeleniumHQ/docker-selenium/blob/trunk/docker-compose-v3.yml
   selenium-hub:
-    image: selenium/hub:3.141.59-20200525
+    image: selenium/hub:4.2.0-20220527
     container_name: selenium-hub
     ports:
-      - 4444:4444
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
     depends_on:
       - test_app
     environment:
       - GRID_DEBUG=true
 
   chrome:
-    image: selenium/node-chrome-debug
+    image: selenium/node-chrome:4.2.0-20220527
+    container_name: chrome
+    shm_size: 2gb
     volumes:
       - /dev/shm:/dev/shm
     depends_on:
       - selenium-hub
     environment:
-      - HUB_HOST=selenium-hub
-      - HUB_PORT=4444
-      - NODE_MAX_INSTANCES=4
-      - NODE_MAX_SESSION=2
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_INSTANCES=4
+      - SE_NODE_MAX_SESSIONS=2
       - SCREEN_WIDTH=2732
       - SCREEN_HEIGHT=1536
     ports:
-      - 41960:5900
+      - "41960:5900"
 
   firefox:
-    image: selenium/node-firefox-debug
+    image: selenium/node-firefox:4.2.0-20220527
+    container_name: firefox
+    shm_size: 2gb
     volumes:
       - /dev/shm:/dev/shm
     depends_on:
       - selenium-hub
     environment:
-      - HUB_HOST=selenium-hub
-      - HUB_PORT=4444
-      - NODE_MAX_INSTANCES=4
-      - NODE_MAX_SESSION=2
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_INSTANCES=4
+      - SE_NODE_MAX_SESSIONS=2
       - SCREEN_WIDTH=2732
       - SCREEN_HEIGHT=1536
+    ports:
+      - "41961:5900"
 
-  # The test service runs all functional tests against the live test_app server.
-  test:
+  edge:
+    image: selenium/node-edge:4.2.0-20220527
+    container_name: edge
+    shm_size: 2gb
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_INSTANCES=4
+      - SE_NODE_MAX_SESSIONS=2
+      - SCREEN_WIDTH=2732
+      - SCREEN_HEIGHT=1536
+    ports:
+      - "41962:5900"
+
+  # The test services run all functional tests against the test_app live server
+  test_chrome:
     build:
       context: .
       dockerfile: ./functional_tests/Dockerfile
-    command: pytest functional_tests/teacher --reuse-db --ignore=node_modules/ -vvvv --exitfirst -s -k "test_create_collection"
+    container_name: test_chrome
+    command: python -Wa -m pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s
     depends_on:
       - selenium-hub
-      - chrome
-      - firefox
     environment:
-      ALLOWED_HOST: nginx  #
+      ALLOWED_HOST: nginx
+      BROWSER: Chrome
       DALITE_DB_HOST: ${HOST:-host.docker.internal}
-      STAGING_SERVER: nginx:8080
-      SELENIUM_HUB: selenium-hub:4444
       DJANGO_SETTINGS_MODULE: dalite.functional_test_settings
+      MEMCACHE_ADDRESS: memcached
+      SELENIUM_HUB: selenium-hub:4444
+      STAGING_SERVER: nginx:8080
     volumes:
-      - ./snapshots:/code/snapshots
+      - ./snapshots/chrome:/code/snapshots
+      - emails:/code/emails
+
+  test_firefox:
+    build:
+      context: .
+      dockerfile: ./functional_tests/Dockerfile
+    container_name: test_firefox
+    command: python -Wa -m pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s
+    depends_on:
+      - selenium-hub
+    environment:
+      ALLOWED_HOST: nginx
+      BROWSER: Firefox
+      DALITE_DB_HOST: ${HOST:-host.docker.internal}
+      DJANGO_SETTINGS_MODULE: dalite.functional_test_settings
+      MEMCACHE_ADDRESS: memcached
+      SELENIUM_HUB: selenium-hub:4444
+      STAGING_SERVER: nginx:8080
+    volumes:
+      - ./snapshots/firefox:/code/snapshots
+      - emails:/code/emails
+
+  test_edge:
+    build:
+      context: .
+      dockerfile: ./functional_tests/Dockerfile
+    container_name: test_edge
+    command: python -Wa -m pytest functional_tests/ --reuse-db --ignore=node_modules/ -vvvv -s
+    depends_on:
+      - selenium-hub
+    environment:
+      ALLOWED_HOST: nginx
+      BROWSER: Edge
+      DALITE_DB_HOST: ${HOST:-host.docker.internal}
+      DJANGO_SETTINGS_MODULE: dalite.functional_test_settings
+      MEMCACHE_ADDRESS: memcached
+      SELENIUM_HUB: selenium-hub:4444
+      STAGING_SERVER: nginx:8080
+    volumes:
+      - ./snapshots/edge:/code/snapshots
       - emails:/code/emails
 
 volumes:

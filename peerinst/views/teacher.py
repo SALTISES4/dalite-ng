@@ -5,7 +5,6 @@ from itertools import chain
 
 import pytz
 from celery.result import AsyncResult
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import redirect, render
@@ -13,13 +12,12 @@ from django.template.defaultfilters import date, linebreaks
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as translate
+from django.utils.translation import gettext_lazy as translate
 from django.views.decorators.http import (
     require_GET,
     require_POST,
     require_safe,
 )
-from pinax.forums.models import ForumThread
 from redis import ConnectionError
 
 from dalite.views.errors import response_400, response_403, response_500
@@ -33,7 +31,6 @@ from ..models import (
     RunningTask,
     StudentGroup,
     StudentGroupAssignment,
-    TeacherNotification,
     UserMessage,
 )
 from ..rationale_annotation import (
@@ -65,8 +62,6 @@ def dashboard(req, teacher):
     HttpResponse
         Html response with basic template skeleton
     """
-    teacher.last_dashboard_access = datetime.now(pytz.utc)
-
     data = {
         "urls": {
             "dalite_messages": reverse("teacher-dashboard--dalite-messages"),
@@ -87,6 +82,9 @@ def dashboard(req, teacher):
         "rationales": rationales,
         "teacher": teacher,
     }
+
+    teacher.last_dashboard_access = datetime.now(pytz.utc)
+    teacher.save()
 
     return render(req, "peerinst/teacher/dashboard.html", context)
 
@@ -364,159 +362,6 @@ def evaluate_rationale(req, teacher):
         return redirect(reverse("teacher-dashboard--rationales"))
     else:
         return HttpResponse("")
-
-
-@require_GET
-@teacher_required
-def messages(req, teacher):
-    """
-    View that returns the teacher's new messages.
-
-    Parameters
-    ----------
-    req : HttpRequest
-        Request
-    teacher : Teacher
-        Teacher instance returned by `teacher_required`
-
-    Returns
-    -------
-    JsonResponse
-        Response with json data
-            {
-                threads: [{
-                    if: int
-                        Primary key of the thread
-                    title: str
-                        Title of the thread
-                    last_reply: {
-                        author: str
-                            Author of the post
-                        content: str
-                            Text of the post
-                    }
-                    n_new: int
-                        Number of new replies since last visit of dashboard
-                    link: str
-                        Link to the thread in forums
-                }]
-            }
-    """
-    threads = [
-        s.thread
-        for s in teacher.user.forum_subscriptions.order_by(
-            "-thread__last_reply"
-        )
-    ]
-    notification_type = ContentType.objects.get(
-        app_label="pinax_forums", model="ThreadSubscription"
-    )
-    last_replies = [thread.last_reply for thread in threads]
-    data = {
-        "threads": [
-            {
-                "id": thread.pk,
-                "title": thread.title,
-                "last_reply": {
-                    "author": last_reply.author.username,
-                    "content": last_reply.content,
-                    "date": date(last_reply.created),
-                }
-                if last_reply
-                else "",
-                "n_new": TeacherNotification.objects.filter(
-                    teacher=teacher, notification_type=notification_type
-                ).count(),
-                "link": reverse(
-                    "pinax_forums:thread", kwargs={"pk": thread.pk}
-                ),
-            }
-            for thread, last_reply in zip(threads, last_replies)
-        ]
-    }
-    return JsonResponse(data)
-
-
-@require_POST
-@teacher_required
-def mark_message_read(req, teacher):
-    """
-    Unsubscribes the `teacher` from a thread (won't appear in the messages).
-
-    Parameters
-    ----------
-    req : HttpRequest
-        Request with:
-            optional parameters:
-                id: int
-                    Thread primary key
-    teacher : Teacher
-        Teacher instance returned by `teacher_required`
-
-    Returns
-    -------
-    HttpResponse
-        Error response or empty 200 response
-    """
-    args = get_json_params(req, opt_args=["id"])
-    if isinstance(args, HttpResponse):
-        return args
-    _, (id_,) = args
-
-    notification_type = ContentType.objects.get(
-        app_label="pinax_forums", model="ThreadSubscription"
-    )
-
-    if id_ is None:
-        TeacherNotification.objects.filter(
-            teacher=teacher, notification_type=notification_type
-        ).delete()
-    else:
-        TeacherNotification.objects.filter(
-            teacher=teacher, notification_type=notification_type, object_id=id_
-        ).delete()
-
-    return HttpResponse("")
-
-
-@require_POST
-@teacher_required
-def unsubscribe_from_thread(req, teacher):
-    """
-    Unsubscribes the `teacher` from a thread (won't appear in the messages).
-
-    Parameters
-    ----------
-    req : HttpRequest
-        Request with:
-            parameters:
-                id: int
-                    Thread primary key
-    teacher : Teacher
-        Teacher instance returned by `teacher_required`
-
-    Returns
-    -------
-    HttpResponse
-        Error response or empty 200 response
-    """
-    args = get_json_params(req, args=["id"])
-    if isinstance(args, HttpResponse):
-        return args
-    (id_,), _ = args
-    try:
-        thread = ForumThread.objects.get(pk=id_)
-    except ForumThread.DoesNotExist:
-        return response_400(
-            req,
-            msg=translate("The thread couldn't be found."),
-            logger_msg=(f"The thread with pk {id_} couldn't be found."),
-            log=logger.warning,
-        )
-
-    thread.subscriptions.filter(user=teacher.user).delete()
-
-    return HttpResponse("")
 
 
 @require_POST

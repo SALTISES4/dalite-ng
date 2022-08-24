@@ -2,6 +2,7 @@ import time
 
 from django.urls import reverse
 from faker import Faker
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.expected_conditions import (
     presence_of_element_located,
@@ -13,12 +14,12 @@ from functional_tests.fixtures import *  # noqa
 from .utils import accept_cookies, login
 
 fake = Faker()
-timeout = 3
+timeout = 10
 
 
 def create_collection(browser, assert_, teacher):
     # go to collection list view and click on create admin link
-    browser.get("{}{}".format(browser.server_url, reverse("collection-list")))
+    browser.get(f'{browser.server_url}{reverse("collection-list")}')
 
     browser.find_element_by_link_text("Create").click()
     # make sure that the user is on create view and has all its components
@@ -30,10 +31,8 @@ def create_collection(browser, assert_, teacher):
 
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Create a Collection" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Create a Collection"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
 
     assert (
@@ -53,7 +52,7 @@ def create_collection(browser, assert_, teacher):
 
     browser.find_element_by_id("id_title").send_keys(title)
     browser.find_element_by_id("id_description").send_keys(description)
-    Select(browser.find_element_by_id("id_discipline")).select_by_value("1")
+    Select(browser.find_element_by_id("id_discipline")).select_by_index(1)
     browser.find_element_by_id("id_private").click()
     # go to update view
     browser.find_element_by_id("id_create").click()
@@ -77,7 +76,7 @@ def create_collection(browser, assert_, teacher):
 
     assert "Collection Statistics" in browser.page_source
     assert any(
-        [title == h2.text for h2 in browser.find_elements_by_tag_name("h2")]
+        title == h2.text for h2 in browser.find_elements_by_tag_name("h2")
     )
     assert description in browser.find_element_by_id("obj.desc").text
     assert ("Created by") in browser.find_element_by_class_name(
@@ -94,10 +93,8 @@ def create_collection(browser, assert_, teacher):
 
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Edit Your Collection" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Edit Your Collection"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
 
     assert (
@@ -119,7 +116,7 @@ def create_collection(browser, assert_, teacher):
 
     browser.find_element_by_id("id_title").send_keys(title_update)
     browser.find_element_by_id("id_description").send_keys(description_update)
-    Select(browser.find_element_by_id("id_discipline")).select_by_value("1")
+    Select(browser.find_element_by_id("id_discipline")).select_by_index(1)
     browser.find_element_by_id("id_private").click()
     # update info, leave update view
     browser.find_element_by_id("id_update").click()
@@ -130,12 +127,16 @@ def create_collection(browser, assert_, teacher):
 
     assert "Collection Statistics" in browser.page_source
     assert "Collections" in browser.find_element_by_tag_name("h1").text
-    assert any(
-        [
-            title_update == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
-    )
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: any(
+                title_update == h2.text
+                for h2 in browser.find_elements_by_tag_name("h2")
+            )
+        )
+    except TimeoutException:
+        assert False
+
     assert description_update in browser.find_element_by_id("obj.desc").text
     assert ("Created by") in browser.find_element_by_class_name(
         "mdc-typography--caption"
@@ -149,11 +150,10 @@ def create_collection(browser, assert_, teacher):
 
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Delete Collection" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Delete Collection"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
+
     assert (
         "Are you sure you would like to delete your collection of assignments?"
         in browser.page_source
@@ -168,11 +168,10 @@ def create_collection(browser, assert_, teacher):
     # assure user is on correct list view
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Browse Collections" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Browse Collections"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
+
     # assure collection has been deleted
     assert browser.current_url.endswith("collection/list/")
     assert description not in browser.page_source
@@ -181,40 +180,35 @@ def create_collection(browser, assert_, teacher):
     # assure user is on list view
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Featured Collections" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Featured Collections"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
+
     # go to personal list view
     browser.find_element_by_link_text("Owned").click()
     # assure user is on list view
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Your Collections" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Your Collections"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
+
     # go to followed list view
     browser.find_element_by_link_text("Followed").click()
     # assure user is on list view
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Your Followed Collections" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Your Followed Collections"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
+
     # go to general list view
     browser.find_element_by_link_text("All").click()
     # assure user is on list view
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Browse Collections" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Browse Collections"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
 
 
@@ -224,7 +218,7 @@ def collection_buttons(
     # access group from teacher detail page
     browser.find_element_by_link_text("Back to My Account").click()
     browser.find_element_by_id("groups-section").click()
-    browser.find_element_by_class_name("md-48").click()
+    browser.find_element_by_class_name("md-36").click()
     # open assignment foldable and add assignments to collection
     browser.find_element_by_xpath("//h2[@id='assignments-title']").click()
     browser.find_element_by_id("collection-select").click()
@@ -235,10 +229,8 @@ def collection_buttons(
 
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Edit Your Collection" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Edit Your Collection"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
 
     assert (
@@ -277,11 +269,10 @@ def collection_buttons(
     # assure user is on list view
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Your Followed Collections" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Your Followed Collections"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
+
     # assure that collection is displayed in list view
     assert description in browser.page_source
     # click on collection card
@@ -300,11 +291,10 @@ def collection_buttons(
     # assure user is on list view
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Browse Collections" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Browse Collections"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
+
     # assure that collection is displayed in list view
     assert description in browser.page_source
     # go to followed collections list view
@@ -312,11 +302,10 @@ def collection_buttons(
     # assure user is on list view
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Your Followed Collections" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Your Followed Collections"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
+
     # assure that collection is not displayed in list view
     assert description not in browser.page_source
     # go to general list view
@@ -324,11 +313,10 @@ def collection_buttons(
     # assure user is on list view
     assert "Collections" in browser.find_element_by_tag_name("h1").text
     assert any(
-        [
-            "Your Collections" == h2.text
-            for h2 in browser.find_elements_by_tag_name("h2")
-        ]
+        h2.text == "Your Collections"
+        for h2 in browser.find_elements_by_tag_name("h2")
     )
+
     # assure that collection is displayed in list view
     assert description in browser.page_source
     # click on collection card
@@ -348,11 +336,14 @@ def collection_buttons(
         in browser.find_element_by_tag_name("small").text
     )
     # assure unassign is preselected
-    assert "UNASSIGN" in browser.find_element_by_tag_name("button").text
+    unassign = browser.find_element_by_xpath(
+        "//button[contains(.,'Unassign')]"
+    )
+    assert unassign
     # click on unassign button
-    browser.find_element_by_class_name("collection-toggle-assign").click()
+    unassign.click()
     # assure button changes to assign
-    assert "ASSIGN" in browser.find_element_by_tag_name("button").text
+    assert browser.find_element_by_xpath("//button[contains(.,'Assign')]")
     # go to group
     time.sleep(2)
     browser.find_element_by_id("group-title").click()
@@ -370,25 +361,45 @@ def collection_buttons(
     # go back to distribute detail view
     browser.execute_script("window.history.go(-1)")
     # assure button shows "assign "
-    assert "ASSIGN" in browser.find_element_by_class_name("mdc-button").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "ASSIGN"
+            in browser.find_element_by_class_name("mdc-button").text
+        )
+    except TimeoutException:
+        assert False
     # click on assign
     browser.find_element_by_class_name("collection-toggle-assign").click()
-    time.sleep(5)
     # assure button changes to unassign
-    assert "UNASSIGN" in browser.find_element_by_class_name("mdc-button").text
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: "UNASSIGN"
+            in browser.find_element_by_class_name("mdc-button").text
+        )
+    except TimeoutException:
+        assert False
     # go to group page
     browser.find_element_by_id(group.hash).click()
     # assure on group detail view
-    assert (
-        group.title
-        in browser.find_element_by_class_name(
-            "mdc-list-item__secondary-text"
-        ).text
-    )
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: group.title
+            in browser.find_element_by_class_name(
+                "mdc-list-item__secondary-text"
+            ).text
+        )
+    except TimeoutException:
+        assert False
     # open assignments foldable
     browser.find_element_by_xpath("//h2[@id='assignments-title']").click()
     # assure assignments have been added to group
-    assert student_group_assignment.assignment.title in browser.page_source
+    try:
+        WebDriverWait(browser, timeout).until(
+            lambda d: student_group_assignment.assignment.title
+            in browser.page_source
+        )
+    except TimeoutException:
+        assert False
 
 
 def test_create_collection(

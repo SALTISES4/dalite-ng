@@ -399,8 +399,8 @@ class TeacherTest(TestCase):
         )
         self.assertNotContains(
             response,
-            '<form id="question-create-form" enctype="multipart/form-data" '
-            'method="post">',
+            "<form id=question-create-form enctype=multipart/form-data "
+            "method=post>",
         )
 
         response = self.client.post(
@@ -452,7 +452,7 @@ class TeacherTest(TestCase):
             response.context["question"], Question.objects.get(pk=32)
         )
         self.assertContains(
-            response, '<form id="answer-choice-form" method="post">'
+            response, "<form id=answer-choice-form method=post>"
         )
 
         # ... test post (to do but need to send formset in POST) -> 302 to step
@@ -480,7 +480,7 @@ class TeacherTest(TestCase):
             "this question",
         )
         self.assertNotContains(
-            response, '<form id="answer-choice-form" method="post">'
+            response, "<form id=answer-choice-form method=post>"
         )
 
     def test_sample_answers(self):
@@ -575,7 +575,7 @@ class TeacherTest(TestCase):
         response = self.client.get(
             reverse("sample-answer-form", kwargs={"question_id": 29})
         )
-        self.assertContains(response, 'id="add_question_to_assignment"')
+        self.assertContains(response, "id=add_question_to_assignment")
 
         assignment = Assignment.objects.get(pk="Assignment1")
         self.assertNotIn(
@@ -984,24 +984,24 @@ class TeacherTest(TestCase):
         )
 
         response = self.client.get(
-            reverse("collection-update", args=str(q.pk))
+            reverse("collection-update", args=[str(q.pk)])
         )
         self.assertEqual(response.status_code, 403)
 
         response = self.client.get(
-            reverse("collection-distribute", args=str(q.pk))
+            reverse("collection-distribute", args=[str(q.pk)])
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, q.title)
 
         response = self.client.get(
-            reverse("collection-detail", args=str(q.pk))
+            reverse("collection-detail", args=[str(q.pk)])
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, q.title)
 
         response = self.client.get(
-            reverse("collection-delete", args=str(q.pk))
+            reverse("collection-delete", args=[str(q.pk)])
         )
         self.assertEqual(response.status_code, 403)
 
@@ -1023,21 +1023,21 @@ class TeacherTest(TestCase):
         )
 
         response = self.client.get(
-            reverse("collection-update", args=str(q.pk))
+            reverse("collection-update", args=[str(q.pk)])
         )
         self.assertEqual(response.status_code, 200)
 
         self.assertContains(
             response,
-            '<form enctype="multipart/form-data" id="collection-update-form" method="post">',  # noqa
+            "<form enctype=multipart/form-data id=collection-update-form method=post>",  # noqa
         )
 
         response = self.client.get(
-            reverse("collection-delete", args=str(q.pk))
+            reverse("collection-delete", args=[str(q.pk)])
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(
-            response, '<form id="collection-delete-form" method="post">'
+            response, "<form id=collection-delete-form method=post>"
         )
 
         # all list views should always return 200 for teacher

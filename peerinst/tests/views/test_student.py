@@ -167,6 +167,18 @@ def test_send_signin_link_single_account(client, student):
     assert "Email sent" in resp.content.decode()
 
 
+def test_send_signin_link_teacher_email(client, teacher):
+    data = {"email": teacher.user.email}
+    resp = client.post(reverse("student-send-signin-link"), data)
+    assert resp.status_code == 200
+    assert any(
+        t.name == "peerinst/student/login_confirmation.html"
+        for t in resp.templates
+    )
+    assert "Email sent" in resp.content.decode()
+    assert not hasattr(teacher.user, "student")
+
+
 def test_send_signin_link_multiple_accounts(client, student):
     Student.objects.create(
         student=User.objects.create_user(

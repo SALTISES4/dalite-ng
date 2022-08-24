@@ -1,0 +1,38 @@
+{% extends "peerinst/base.html" %}
+
+{% load i18n %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <style nonce="{{ request.csp_nonce }}">
+    th, td {
+      font-weight: normal;
+      text-align: left;
+    }
+    td {
+      padding-left: 20px
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <main>
+    <section>
+      <h1 class="mdc-typography--display3">Cookies
+        <svg class="underline" width=150 height=4></svg>
+      </h1>
+
+      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Policy' %}</h2>
+
+      <p>
+        {% trans 'This is a list of all cookies used by myDALITE and the purpose they serve.' %}
+      </p>
+
+      {% for cookie_group in object_list  %}
+        {% include "./_cookie_group.html" %}
+      {% endfor %}
+
+      <a href="{{ request.GET.next }}"><button class="mdc-button mdc-button--raised padded-top" type="submit">{% trans 'Go back' %}</button></a>
+    </section>
+  </main>
+{% endblock %}

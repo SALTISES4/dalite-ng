@@ -19,7 +19,7 @@
     <script src="{% static 'peerinst/js/student.min.js' %}"></script>
     <script src="{% static 'reputation/js/header/student.min.js' %}"></script>
   {% endcompress %}
-  {% if not request.session.LTI %}
+  {% if access_lti_standalone or access_standalone %}
     <script nonce="{{ request.csp_nonce }}">
       window.addEventListener("load", function() {
         student.initStudentHeader(
@@ -41,7 +41,7 @@
 {% endblock %}
 
 {% block header-right %}
-  {% if not request.session.LTI %}
+  {% if access_lti_standalone or access_standalone %}
     <div class="header header--togglable">
       <student-reputation-header
         reputation-style-url="https://static-dev.mydalite.org/CACHE/css/reputation__student.8dc7f1d499dc.css"

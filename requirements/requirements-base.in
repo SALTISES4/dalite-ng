@@ -1,40 +1,40 @@
 -r ../blink/requirements.in
 -r ../REST/requirements.in
 
+alt-profanity-check
+asgiref == 3.3.4 # [1]
+better-profanity == 0.6.1 # [2]
 bleach
 celery[redis]
-contextualSpellCheck
+# contextualSpellCheck # [3]
+django >=3.2, < 3.3
+django-analytical
 django-axes
 django-celery-beat
-django-analytical
-django-compressor >= 2.3
-django-cookie-law
+django-compressor
+django-cookie-consent
 django-csp
 django-decorator-include
 django-elasticsearch-dsl
-django-grappelli
-django-htmlmin
 django-inlinecss
-django-ipware == 2.1.0  # Temporary pin awaiting django-axes fix
+django-lti-provider
+django-minify-html
 django-permissions-policy
-django-referrer-policy
-django-samesite-none
-django < 3.0.0
-djangorestframework >= 3.11.2  # Reqd by safety
-edx-opaque-keys
-lxml >= 4.6.2  # Reqd by safety
+django-tinymce
+djangorestframework
+langdetect
 mysqlclient
-packaging
 pandas
-pillow > 8.2.0  # Reqd by safety
+pillow
 pip-lock
-pyjwt >= 2.4  # Reqd by safety
-python-memcached == 1.59
+pyjwt
+pymemcache
 pytz
 requests
 
-SALTISE_course_flow == 0.7.3
-SALTISE_user_feedback >= 1.1.1
+SALTISE_course_flow == 0.7.5
+SALTISE_user_feedback
 
--e git+https://github.com/SALTISES4/django-lti-tool-provider@dev#egg=django_lti_tool_provider
--e git+https://github.com/SALTISES4/pinax-forums@dev#egg=pinax_forums
+# 1. Temporary pin – See: https://stackoverflow.com/a/68553668
+# 2. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
+# 3. Removed until used – See: peerinst/grammar.py
