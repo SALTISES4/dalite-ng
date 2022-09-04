@@ -72,7 +72,7 @@ MIDDLEWARE = (
     "dalite.custom_middleware.resp_405_middleware",
     "dalite.custom_middleware.resp_503_middleware",
     "dalite.cookie_consent.CleanCookiesFixMiddleware",
-    # "django_minify_html.middleware.MinifyHtmlMiddleware",
+    "django_minify_html.middleware.MinifyHtmlMiddleware",
     "axes.middleware.AxesMiddleware",
 )
 
@@ -159,9 +159,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-# Analytics
-INTERNAL_IPS = ["127.0.0.1"]
 
 
 # Static files (CSS, JavaScript, Images)
