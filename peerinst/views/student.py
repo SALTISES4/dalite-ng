@@ -740,7 +740,7 @@ def send_signin_link(req):
 
     student = Student.objects.filter(student__email=email).exclude(
         Q(
-            password__startswith=UNUSABLE_PASSWORD_PREFIX
+            student__password__startswith=UNUSABLE_PASSWORD_PREFIX
         )  # Exclude new LTI accounts
     )
     context = {}
