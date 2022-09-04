@@ -4,7 +4,9 @@ import re
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template.response import TemplateResponse
@@ -736,10 +738,16 @@ def send_signin_link(req):
             log=logger.warning,
         )
 
-    student = Student.objects.filter(student__email=email)
+    student = Student.objects.filter(student__email=email).exclude(
+        Q(
+            password__startswith=UNUSABLE_PASSWORD_PREFIX
+        )  # Exclude new LTI accounts
+    )
+    context = {}
     if not student:
         student, created = Student.get_or_create(email)
-        logger.info(f"Student created with email {email}.")
+        if created:
+            logger.info(f"Student created with email {email}.")
     elif len(student) == 1:
         student = student[0]
     else:
@@ -747,7 +755,7 @@ def send_signin_link(req):
         student = student.filter(student__username=username).first()
     if student:
         err = student.send_email(mail_type="signin", request=req)
-        context = {"error": False} if err is None else {"error": True}
+        context["error"] = err is not None
     return render(req, "peerinst/student/login_confirmation.html", context)
 
 
