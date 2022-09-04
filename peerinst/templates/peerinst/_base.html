@@ -206,15 +206,17 @@
       {% endif %}
 
       <!-- Matomo analytics -->
-      {% if request|cookie_group_declined:"optional" %}
-        <script nonce="{{ request.csp_nonce }}">
-          var _paq = [];
-          _paq.push(['disableCookies']);
-        </script>
+      {% if not debug  %}
+        {% if request|cookie_group_declined:"optional" %}
+          <script nonce="{{ request.csp_nonce }}">
+            var _paq = [];
+            _paq.push(['disableCookies']);
+          </script>
+        {% endif %}
+        {% script type="text/javascript" %}
+          {% piwik %}
+        {% endscript %}
       {% endif %}
-      {% script type="text/javascript" %}
-        {% piwik %}
-      {% endscript %}
     </body>
 
   </html>
