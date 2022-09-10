@@ -6,22 +6,25 @@
   {% if question.type == "PI" %}
     <ul id="answer-choices">
       {% for label, choice in answer_choices %}
-        <li class="dense-list {% if label == first_choice_label %}first-choice{% endif %}{% if label == second_choice_label %} second-choice{% endif %}">{{ label }}. {{ choice.strip|bleach_html|safe  }}
-          {% if first_choice_label and second_choice_label %}
-            {% if label == second_choice_label %}
-              {% for c in question.answerchoice_set.all %}
-                {% if forloop.counter == forloop.parentloop.counter %}
-                  {% if not group_assignment or group_assignment.show_correct_answers %}
-                    {% if c.correct %}
-                      <i id="check" class="material-icons check-12">check</i>
-                    {% else %}
-                      <i id="check" class="material-icons check-12">close</i>
+        <li class="dense-list {% if label == first_choice_label %}first-choice{% endif %}{% if label == second_choice_label %} second-choice{% endif %}">
+          <div class='flex-label'>
+            {% if first_choice_label and second_choice_label %}
+              {% if label == second_choice_label %}
+                {% for c in question.answerchoice_set.all %}
+                  {% if forloop.counter == forloop.parentloop.counter %}
+                    {% if not group_assignment or group_assignment.show_correct_answers %}
+                      {% if c.correct %}
+                        <i id="check" class="material-icons check-12 grade-icon">check</i>
+                      {% else %}
+                        <i id="check" class="material-icons check-12 grade-icon">close</i>
+                      {% endif %}
                     {% endif %}
                   {% endif %}
-                {% endif %}
-              {% endfor %}
+                {% endfor %}
+              {% endif %}
             {% endif %}
-          {% endif %}
+            <div>{{ label }}.</div><div>{{ choice.strip|bleach_html|safe }}</div>
+          </div>
         </li>
       {% endfor %}
     </ul>

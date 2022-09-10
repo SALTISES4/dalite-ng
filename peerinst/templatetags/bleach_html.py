@@ -13,6 +13,7 @@ ALLOWED_TAGS = [
     "blockquote",
     "br",
     "code",
+    "div",
     "em",
     "i",
     "li",
@@ -41,6 +42,7 @@ ALLOWED_ATTR = {
     "a": ["href", "title", "target", "rel"],
     "abbr": ["title"],
     "acronym": ["title"],
+    "div": ["class"],
 }
 
 
