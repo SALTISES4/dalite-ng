@@ -437,9 +437,13 @@ export class RationaleTableApp extends Component {
                           alignStart
                           style={{ whiteSpace: "normal" }}
                         >
-                          <Typography use="body2">
-                            {answer.rationale}
-                          </Typography>
+                          <Typography
+                            use="body2"
+                            dangerouslySetInnerHTML={{
+                              __html: answer.rationale,
+                            }}
+                            tag="div"
+                          />
                           <div class="timestamp">
                             {moment(answer.timestamp).format("MM/DD/YY LT")}
                           </div>
@@ -455,9 +459,13 @@ export class RationaleTableApp extends Component {
                           alignStart
                           style={{ whiteSpace: "normal" }}
                         >
-                          <Typography use="body2">
-                            {answer.chosen_rationale}
-                          </Typography>
+                          <Typography
+                            use="body2"
+                            dangerouslySetInnerHTML={{
+                              __html: answer.chosen_rationale,
+                            }}
+                            tag="div"
+                          />
                         </DataTableCell>
                         <DataTableCell
                           style={{
