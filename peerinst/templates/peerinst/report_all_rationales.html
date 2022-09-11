@@ -250,7 +250,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
 
                   {% if question.type == "PI" %}
                     <td>{{ student_response.second_answer_choice }}</td>
-                    <td>{{ student_response.chosen_rationale }}</td>
+                    <td>{{ student_response.chosen_rationale.strip|bleach_html|safe }}</td>
                   {% endif %}
 
                   <td>{{ student_response.submitted }}</td>
