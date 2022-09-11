@@ -57,11 +57,23 @@ class Feedback extends Component {
           <p>
             <strong>{this.props.gettext("because")}</strong>
           </p>
-          <blockquote>{this.props.feedback.answer.rationale}</blockquote>
+          <blockquote
+            // eslint-disable-next-line
+            dangerouslySetInnerHTML={{
+              __html: this.props.feedback.answer.rationale,
+            }}
+          />
         </Fragment>
       );
     }
-    return <blockquote>{this.props.feedback.answer.rationale}</blockquote>;
+    return (
+      <blockquote
+        // eslint-disable-next-line
+      dangerouslySetInnerHTML={{
+          __html: this.props.feedback.answer.rationale,
+        }}
+      />
+    );
   };
 
   insertScore = () => {
