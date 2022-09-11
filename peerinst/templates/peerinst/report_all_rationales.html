@@ -1,6 +1,6 @@
 {% extends 'peerinst/base.html' %}
 
-{% load i18n get_value %}
+{% load bleach_html i18n get_value %}
 
 {% block stylesheets %}
   {{ block.super }}
@@ -54,7 +54,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
         <tbody>
           {% for question in gradebook_question %}
             <tr>
-              <th class="mdc-ripple-surface"><a href="#{{question.question.title}}">{{question.question.title}}</a></th>
+              <th class="mdc-ripple-surface"><a href="#{{question.question.title.strip|striptags}}">{{question.question.title.strip|striptags}}</a></th>
               {% for label in gradebook_keys %}
                 <td>{{ question|get_value:label }}</td>
               {% endfor %}
@@ -73,7 +73,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
               <th>{{ label }}</th>
             {% endfor %}
             {% for question in question_list %}
-              <th> {{ question|safe }} </th>
+              <th> {{ question|bleach_html|safe }} </th>
             {% endfor %}
           </tr>
         </thead>
@@ -88,7 +88,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
               <td>{{student.WW}}</td>
               {% for question in question_list %}
                 {% if student|get_value:question != '-' %}
-                  <td class="mdc-ripple-surface"><a href="#{{ student.student }}{{ question|safe }}">{{ student|get_value:question }}</a></td>
+                  <td class="mdc-ripple-surface"><a href="#{{ student.student }}{{ question|bleach_html|safe }}">{{ student|get_value:question }}</a></td>
                 {% else %}
                   <td>{{ student|get_value:question }}</td>
                 {% endif %}
@@ -109,14 +109,14 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
         </ul>
 
         {% for question in assignment.questions %}
-          <h4 id="{{ question.title }}" class="mdc-typography--title bold">{% trans 'Question' %}: {{ question.title|safe }}</h4>
+          <h4 id="{{ question.title.strip|striptags }}" class="mdc-typography--title bold">{% trans 'Question' %}: {{ question.title.strip|striptags }}</h4>
           <div class="admin-link">
             <a href="#question_gradebook">{% trans 'Back to top' %}</a>
           </div>
 
           <div class="mdc-card">
             <div class="mdc-typography--body1">
-              {{question.text|safe}}
+              {{ question.text|bleach_html|safe }}
             </div>
 
             {% if question.question_image %}
@@ -126,7 +126,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
             <div class="question-answers">
               <ol type='A'>
                 {% for choice in question.answer_choices %}
-                  <li class="mdc-typography--body1">{{ choice|safe }}</li>
+                  <li class="mdc-typography--body1">{{ choice.strip|bleach_html|safe }}</li>
                 {% endfor %}
               </ol>
             </div>
@@ -230,7 +230,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
                 <tr class="custom-report__rationale"
                   data-id="{{ student_response.id }}"
                   data-score="{{ student_response.score }}">
-                  <th id="{{student_response.student}}{{ question.title|safe }}" class="mdc-ripple-surface">
+                  <th id="{{student_response.student}}{{ question.title.strip|striptags }}" class="mdc-ripple-surface">
                     <a href="#{{ student_response.student }}">{{ student_response.student }}</a></th>
 
                   {% if group_school_id_needed %}
@@ -241,7 +241,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
                     <td>{{ student_response.first_answer_choice }}</td>
                   {% endif %}
 
-                  <td>{{ student_response.rationale }}</td>
+                  <td>{{ student_response.rationale.strip|bleach_html|safe }}</td>
 
                   {% if question.sequential_review %}
                     <th>{{ student_response.upvotes }}</th>
@@ -330,7 +330,7 @@ https://datatables.net/extensions/buttons/examples/styling/jqueryui.html
         id = "{{ assignment.assignment|slugify }}-{{ obj.answer_choices.first.question.pk }}";
 
         {% if obj.answer_choices %}
-          bundle.plot({{ obj.answer_choices.first.question.get_matrix|safe }},{{ obj.answer_choices.first.question.get_frequency|safe|striptags }}, id);
+          bundle.plot({{ obj.answer_choices.first.question.get_matrix|safe }},{{ obj.answer_choices.first.question.get_frequency|striptags|safe }}, id);
           bundle.selectAll("#first_choice-"+id).transition().duration(1000).attr("x",function(d){return bundle.select(this).attr("finalx");}).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
           bundle.selectAll("#second_choice-"+id).transition().delay(1000).duration(1000).attr("width",function(d){return bundle.select(this).attr("finalwidth");});
 
