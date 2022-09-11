@@ -38,7 +38,7 @@
                     </div>
                   </div>
                   {% with label=r.choice_label.strip|bleach_html|safe|capfirst %}
-                    <label class="mdc-typography--body1" for="{{ choice.id_for_label }}">{{ label }}{% if label|last not in "?!." %}.{% endif %}</label>
+                    <label class="mdc-typography--body1" for="{{ choice.id_for_label }}">{{ label }}</label>
                   {% endwith %}
                 </div>
               </li>

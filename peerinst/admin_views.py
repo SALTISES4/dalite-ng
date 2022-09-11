@@ -1,6 +1,5 @@
 import collections
 import itertools
-import re
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -534,19 +533,10 @@ class ExpertRationaleForm(QuestionPreviewForm):
     def __init__(self, answer_choices, question, *args, **kwargs):
         choice_texts = [
             mark_safe(
-                ". ".join(
-                    (
-                        pair[0],
-                        ("<br>" + "&nbsp" * 5).join(
-                            re.split(r"<br(?: /)?>", pair[1])
-                        ),
-                    )
-                )
+                f"<div class='flex-label'><div><strong>{pair[0]}.</strong></div><div>{pair[1]}</div></div>"  # noqa E501
             )
             for pair in answer_choices
         ]
-        #  choice_texts = [mark_safe(". ".join(pair)) for pair in
-        #  answer_choices]
         all_choices = enumerate(choice_texts, 1)
         correct_choices = list(
             itertools.compress(

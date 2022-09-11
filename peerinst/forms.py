@@ -1,4 +1,3 @@
-import re
 from datetime import date, datetime
 
 import bleach
@@ -70,13 +69,13 @@ class RichTextRationaleField(forms.CharField):
             _("Please provide a more detailed rationale for your choice."),
         ),
         NoProfanityValidator(
-            0.5,
+            0.7,
             _(
                 "The language filter has labeled this as possibly toxic or profane; please rephrase your rationale."  # noqa
             ),
         ),
         EnglishFrenchValidator(
-            0.9,
+            0.5,
             _("Please clarify what you've written."),
         ),
     ]
@@ -107,14 +106,7 @@ class FirstAnswerForm(forms.Form):
     def __init__(self, answer_choices, *args, **kwargs):
         choice_texts = [
             mark_safe(
-                ". ".join(
-                    (
-                        pair[0],
-                        ("<br>" + "&nbsp" * 5).join(
-                            re.split(r"<br(?: /)?>", pair[1])
-                        ),
-                    )
-                )
+                f"<div class='flex-label'><div><strong>{pair[0]}.</strong></div><div>{pair[1]}</div></div>"  # noqa E501
             )
             for pair in answer_choices
         ]
@@ -422,14 +414,6 @@ class ReportSelectForm(forms.Form):
 
 class AnswerChoiceForm(forms.ModelForm):
     text = forms.CharField(widget=TinyMCE())
-
-    def clean_text(self):
-        if self.cleaned_data["text"].startswith("<p>"):
-            return "<br>".join(
-                re.findall(r"(?<=<p>)(.+)(?=</p>)", self.cleaned_data["text"])
-            )
-        else:
-            return self.cleaned_data["text"]
 
 
 def current_year():

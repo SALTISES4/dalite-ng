@@ -239,7 +239,20 @@ h1 {
   padding-left: 15%;
 }
 
-
+.flex-label {
+  align-items: baseline;
+  column-gap: 6px;
+  cursor: pointer;
+  display: flex;
+  padding-top: 6px;
+}
+.flex-align-top {
+  align-items: flex-start;
+}
+.grade-icon {
+  align-self: flex-start;
+  margin-left: -32px;
+}
 
 .mdc-text-field--textarea .mdc-floating-label {
   background-color: $mdc-theme-background;
@@ -803,7 +816,6 @@ div.input-ripple-wrapper input {
 
 .check-12 {
   font-size: 12pt;
-  transform: translateY(3px);
 }
 
 .green {
@@ -839,6 +851,10 @@ div.input-ripple-wrapper input {
 
 .width-100 {
   width: 100%;
+}
+
+.no-padding {
+  padding: 0px;
 }
 
 .p-left-0 {

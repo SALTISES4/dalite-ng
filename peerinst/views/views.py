@@ -7,6 +7,7 @@ import urllib.parse
 import urllib.request
 from datetime import datetime
 
+import bleach
 import pytz
 from django.conf import settings
 from django.contrib import messages
@@ -49,6 +50,7 @@ from tinymce.widgets import TinyMCE
 from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
 from peerinst.elasticsearch import question_search as qs_ES
+from peerinst.templatetags.bleach_html import STRICT_TAGS
 
 # tos
 from tos.models import Consent, Tos
@@ -1122,13 +1124,25 @@ class QuestionReviewBaseView(QuestionFormView):
         if self.question.fake_attributions:
             self.add_fake_attributions(rng)
         else:
-            self.mark_rationales_safe(escape_html=True)
+            self.mark_rationales_safe(escape_html=False)
         self.stage_data.update(rationale_choices=self.rationale_choices)
 
     def mark_rationales_safe(self, escape_html):
         processor = escape if escape_html else mark_safe
         for _choice, _label, rationales in self.rationale_choices:
-            rationales[:] = [(id, processor(text)) for id, text in rationales]
+            rationales[:] = [
+                (
+                    id,
+                    processor(
+                        bleach.clean(
+                            text,
+                            tags=STRICT_TAGS,
+                            strip=True,
+                        )
+                    ),
+                )
+                for id, text in rationales
+            ]
 
     def add_fake_attributions(self, rng):
         usernames = models.FakeUsername.objects.values_list("name", flat=True)

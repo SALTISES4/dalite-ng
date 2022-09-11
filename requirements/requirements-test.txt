@@ -293,7 +293,6 @@ django==3.2.15 \
     # via
     #   -r requirements/requirements-base.txt
     #   channels
-    #   django-analytical
     #   django-appconf
     #   django-axes
     #   django-celery-beat
@@ -309,10 +308,9 @@ django==3.2.15 \
     #   djangorestframework
     #   saltise-course-flow
     #   saltise-user-feedback
-django-analytical==2.5.0 \
-    --hash=sha256:0871db04aa8c864b0b44c98b462d2b8682ba9c31ab89f50d54a5ddfdc3ff6223 \
-    --hash=sha256:bbe09b15cf22d7d4ab4cd0a5cc454aa912f08691d86886a0652081b9fd7a1ff0 \
-    --hash=sha256:d9e475567fc021ed9e3bd1fa77db11a14b12c85fbc5b56121897b0fa571e6ed6
+django-analytical==3.1.0 \
+    --hash=sha256:43de3d8ef7734732f58eba4e5e7df0dea37512dbd89727efdfb30c27a96d4ea9 \
+    --hash=sha256:6127c9196c8de3bcb4626f420d2ae670a7703152b1841b1b3e852b31a9a9d44b
     # via -r requirements/requirements-base.txt
 django-appconf==1.0.3 \
     --hash=sha256:35f13ca4d567f132b960e2cd4c832c2d03cb6543452d34e29b7ba10371ba80e3 \
@@ -1275,9 +1273,9 @@ zope-interface==5.1.0 \
     #   twisted
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==63.4.1 \
-    --hash=sha256:7c7854ee1429a240090297628dc9f75b35318d193537968e2dc14010ee2f5bca \
-    --hash=sha256:dc2662692f47d99cb8ae15a784529adeed535bcd7c277fee0beccf961522baf6
+setuptools==65.3.0 \
+    --hash=sha256:2e24e0bec025f035a2e72cdd1961119f557d78ad331bb00ff82efb2ab8da8e82 \
+    --hash=sha256:7732871f4f7fa58fb6bdcaeadb0161b2bd046c85905dbaa066bdcbcc81953b57
     # via
     #   -r requirements/requirements-base.txt
     #   django-axes

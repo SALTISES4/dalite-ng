@@ -188,6 +188,7 @@ class TestAccess(TestCase):
         """
         Check that proper lti request results in successful authentication
         """
+        user_count = User.objects.count()
         request = generate_lti_request_dalite(
             client_key=settings.LTI_STANDALONE_CLIENT_KEY,
             lis_person_contact_email_primary="new_user@mydalite.org",
@@ -201,6 +202,7 @@ class TestAccess(TestCase):
         assert response.status_code == 302
         assert response.url.endswith("/student/lti/")
         assert "LTI" in request.session.get("_auth_user_backend")
+        assert User.objects.count() == user_count + 1
 
     def test_lti_auth_new_user_without_email(self):
         """

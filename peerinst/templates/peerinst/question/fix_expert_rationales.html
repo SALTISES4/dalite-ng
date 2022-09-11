@@ -1,6 +1,6 @@
 {% extends 'peerinst/question/start.html' %}
 
-{% load static compress i18n add_class %}
+{% load static bleach_html compress i18n add_class %}
 
 {% block extra_title %}
   <h2 class="mdc-typography--display1 mdc-theme--secondary">
@@ -39,6 +39,7 @@
 {% endblock %}
 
 {% block submit_button %}{% trans 'Submit expert rationale' %}{% endblock %}
+
 {% block extra_content %}
   {% if question.type == "PI" and expert_rationales %}
     <hr class="simple-hr">
@@ -52,7 +53,7 @@
           <a href="{% url 'research-rationale-update-expert' pk=sample.id %}">
             <i class="material-icons md-24 mdc-ripple-surface icon-list click-to-edit">check_circle_outline</i>
           </a>
-          <span class='mdc-theme--primary bold'>{{ sample.first_answer_choice_label }}</span>: {{ sample.rationale|safe|striptags }}.
+          <span class='mdc-theme--primary bold'>{{ sample.first_answer_choice_label }}</span>: {{ sample.rationale|bleach_html|safe }}.
         </li>
       {% endfor %}
     </ul>

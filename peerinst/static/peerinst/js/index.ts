@@ -199,8 +199,8 @@ export function categoryForm(
     const posting = $.post(createUrl, { title });
 
     // Put the results in a div
-    posting.done(function (data, status) {
-      $("#category_form").empty().text(data);
+    posting.done(function (data) {
+      $("#category_form").empty().html(data);
 
       const formType = $("#create_new_category");
       if (formType.length) {

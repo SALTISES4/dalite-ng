@@ -125,7 +125,7 @@ TINYMCE_DEFAULT_CONFIG = {
     "theme": "silver",
     "height": 300,
     "menubar": False,
-    "plugins": "advlist,autolink,lists,charmap,preview,wordcount,link",
+    "plugins": "advlist,autolink,lists,charmap,preview,wordcount,link,paste",
     "toolbar": "undo redo | charmap | bold italic underline subscript superscript | "
     "bullist numlist | link |"
     "removeformat",
@@ -143,4 +143,5 @@ TINYMCE_DEFAULT_CONFIG = {
         {"text": "New window", "value": "_blank"},
     ],
     "link_title": False,
+    "paste_block_drop": True,
 }

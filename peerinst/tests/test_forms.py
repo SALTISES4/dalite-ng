@@ -154,6 +154,18 @@ def test_FirstAnswerForm_rationale_valid_language_equation():
     assert len(form.errors) == 0
 
 
+def test_FirstAnswerForm_french_not_profane():
+    form = FirstAnswerForm(
+        answer_choices=["A. Choice A", "B. Choice B"],
+        data={
+            "first_answer_choice": 1,
+            "rationale": "Puisque l'onde va vers la droite",
+        },
+    )
+
+    assert len(form.errors) == 0
+
+
 def test_FirstAnswerForm_rationale_html_entities():
     form = FirstAnswerForm(
         answer_choices=["A. Choice A", "B. Choice B"],
