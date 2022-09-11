@@ -9,7 +9,7 @@ from peerinst.models import (
     ShownRationale,
     StudentGroupAssignment,
 )
-from peerinst.templatetags.bleach_html import ALLOWED_TAGS
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS, STRICT_TAGS
 
 from .assignment import QuestionSerializer
 from .dynamic_serializer import DynamicFieldsModelSerializer
@@ -71,7 +71,7 @@ class AnswerSerializer(DynamicFieldsModelSerializer):
         for key in keys:
             if key in ret and ret[key]:
                 ret[key] = bleach.clean(
-                    ret[key], tags=ALLOWED_TAGS, strip=True
+                    ret[key], tags=STRICT_TAGS, strip=True
                 ).strip()
         if "answer_choice" in ret:
             if ret["answer_choice"]:

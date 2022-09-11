@@ -3,6 +3,8 @@ from .settings import *  # noqa
 AXES_ENABLED = False
 
 DEBUG = False
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
 
 WATCH = True
 

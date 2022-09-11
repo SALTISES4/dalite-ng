@@ -1,5 +1,5 @@
 {% extends 'peerinst/question/review_base.html' %}
-{% load i18n %}
+{% load bleach_html i18n %}
 
 {% block answers %}
   {{ block.super }}
@@ -15,14 +15,14 @@
           {% blocktrans %}
             You stuck with your answer choice and selected this rationale:
           {% endblocktrans %}
-          <blockquote id="chosen-rationale">{{ chosen_rationale.rationale }}</blockquote>
+          <blockquote id="chosen-rationale">{{ chosen_rationale.rationale.strip|bleach_html|safe }}</blockquote>
         {% endif %}
       {% else %}
         {% blocktrans %}
           You then changed your answer to <strong>{{ second_choice_label }}</strong>
           and selected this rationale:
         {% endblocktrans %}
-        <blockquote id="chosen-rationale">{{ chosen_rationale.rationale }}</blockquote>
+        <blockquote id="chosen-rationale">{{ chosen_rationale.rationale.strip|bleach_html|safe }}</blockquote>
       {% endif %}
     </p>
 
@@ -33,7 +33,11 @@
           {% for c in question.answerchoice_set.all %}
             {% if forloop.counter == forloop.parentloop.counter %}
               {% if c.correct %}
-                <blockquote><strong>{{ label }}. {{ choice|safe }}</strong></blockquote>
+                <blockquote>
+                  <div class='flex-label no-padding'>
+                    <div><strong>{{ label }}.</strong></div><div>{{ choice.strip|bleach_html|safe }}</div>
+                  </div>
+                </blockquote>
               {% endif %}
             {% endif %}
           {% endfor %}
@@ -46,7 +50,7 @@
       {% for expert in experts %}
         {% for option in question.answerchoice_set.all %}
           {% if option.correct and expert.first_answer_choice == forloop.counter %}
-            <blockquote><strong>{{ expert.first_answer_choice_label }}. {{ expert.rationale|safe }}</strong></blockquote>
+            <blockquote>{{ expert.rationale.strip|bleach_html|safe }}</blockquote>
           {% endif %}
         {% endfor %}
       {% empty %}
