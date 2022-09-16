@@ -378,6 +378,12 @@ django-permissions-policy==4.12.0 \
     --hash=sha256:1f10fc354110fef9270fbabbbf8d5358a6d6f5380c79f0dfba56dd41e45b1936 \
     --hash=sha256:88ee9cb345898414a6ad3f2eb0d8284c67decdfc43c6fc5331531b7c39809d8c
     # via -r requirements/requirements-base.txt
+django-ratelimit==3.0.1 \
+    --hash=sha256:73223d860abd5c5d7b9a807fabb39a6220068129b514be8d78044b52607ab154 \
+    --hash=sha256:857e797f23de948b204a31dba9d88aea3ce731b7a5d926d0240c772e19b5486f
+    # via
+    #   -r requirements/requirements-base.txt
+    #   saltise-course-flow
 django-redis==5.2.0 \
     --hash=sha256:1d037dc02b11ad7aa11f655d26dac3fb1af32630f61ef4428860a2e29ff92026 \
     --hash=sha256:8a99e5582c79f894168f5865c52bd921213253b7fd64d16733ae4591564465de
@@ -973,8 +979,8 @@ rjsmin==1.2.0 \
     # via
     #   -r requirements/requirements-base.txt
     #   django-compressor
-saltise-course-flow==0.7.5 \
-    --hash=sha256:cc1d6984c1e876633feee1c0d6631a2ce7ad7218b131eb6427700eebc806f7c4
+saltise-course-flow==0.7.6 \
+    --hash=sha256:b3cc5d8d09dffa749051d918a200635d93a1086a23f5d8c9897157c91b4462e9
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==1.1.2 \
     --hash=sha256:c57647cb83ab8bcee43f2ddc5db586f5fc20db3fb9f7a6a09b9be01de2005303
