@@ -267,7 +267,7 @@ PYLTI_CONFIG = {
 
 # CourseFlow settings
 COURSE_FLOW_RETURN_URL = {"name": "welcome", "title": "myDalite"}
-
+RATELIMIT_VIEW = "course_flow.views.ratelimited_view"
 
 # Cookie consent
 COOKIE_CONSENT_NAME = "cookie_consent"
