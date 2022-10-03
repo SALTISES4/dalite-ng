@@ -74,6 +74,7 @@ MIDDLEWARE = (
     "dalite.cookie_consent.CleanCookiesFixMiddleware",
     "django_minify_html.middleware.MinifyHtmlMiddleware",
     "axes.middleware.AxesMiddleware",
+    "ratelimit.middleware.RatelimitMiddleware",
 )
 
 ROOT_URLCONF = "dalite.urls"
