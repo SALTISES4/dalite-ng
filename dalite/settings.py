@@ -74,6 +74,7 @@ MIDDLEWARE = (
     "dalite.cookie_consent.CleanCookiesFixMiddleware",
     "django_minify_html.middleware.MinifyHtmlMiddleware",
     "axes.middleware.AxesMiddleware",
+    "ratelimit.middleware.RatelimitMiddleware",
 )
 
 ROOT_URLCONF = "dalite.urls"
@@ -267,7 +268,7 @@ PYLTI_CONFIG = {
 
 # CourseFlow settings
 COURSE_FLOW_RETURN_URL = {"name": "welcome", "title": "myDalite"}
-
+RATELIMIT_VIEW = "course_flow.views.ratelimited_view"
 
 # Cookie consent
 COOKIE_CONSENT_NAME = "cookie_consent"
