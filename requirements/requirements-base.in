@@ -7,7 +7,7 @@ better-profanity == 0.6.1 # [2]
 bleach
 celery[redis]
 # contextualSpellCheck # [3]
-django >=3.2, < 3.3
+django >=3.2.16, < 3.3
 django-analytical
 django-axes
 django-celery-beat
