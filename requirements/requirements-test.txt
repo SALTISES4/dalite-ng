@@ -979,8 +979,8 @@ rjsmin==1.2.0 \
     # via
     #   -r requirements/requirements-base.txt
     #   django-compressor
-saltise-course-flow==0.7.7 \
-    --hash=sha256:ba70899639d07fb4951a67245fd04f39718c52c266fe9fa4cc4c152b7939e50b
+saltise-course-flow==0.7.8 \
+    --hash=sha256:27a805f48af9a36d38d5d3fa3a408313fe9c1b871f933b7ca8811f388018df7f
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==1.1.2 \
     --hash=sha256:c57647cb83ab8bcee43f2ddc5db586f5fc20db3fb9f7a6a09b9be01de2005303
