@@ -6,12 +6,6 @@
 #
 --index-url https://pypi.python.org/simple
 
-aioredis==1.3.1 \
-    --hash=sha256:15f8af30b044c771aee6787e5ec24694c048184c7b9e54c3b60c750a4b93273a \
-    --hash=sha256:b61808d7e97b7cd5a92ed574937a079c9387fdadd22bfbfa7ad2fd319ecc26e3
-    # via
-    #   -r requirements/requirements-base.txt
-    #   channels-redis
 alt-profanity-check==1.1.1 \
     --hash=sha256:5143835145d524c1d18ba94367ff1825916f5bd4a1aa2f34d408145db93bb49e
     # via -r requirements/requirements-base.txt
@@ -21,9 +15,9 @@ amqp==5.0.9 \
     # via
     #   -r requirements/requirements-base.txt
     #   kombu
-asgiref==3.3.4 \
-    --hash=sha256:92906c611ce6c967347bbfea733f13d6313901d54dcca88195eaeb52b2a8e8ee \
-    --hash=sha256:d1216dfbdfb63826470995d31caed36225dcaf34f182e0fa257a4dd9e86f1b78
+asgiref==3.5.2 \
+    --hash=sha256:1d2880b792ae8757289136f1db2b7b99100ce959b2aa57fd69dab783d05afac4 \
+    --hash=sha256:4a29362a6acebe09bf1d6640db38c1dc3d9217c68e6f9f6204d72667fc19a424
     # via
     #   -r requirements/requirements-base.txt
     #   channels
@@ -36,7 +30,6 @@ async-timeout==4.0.2 \
     --hash=sha256:8ca1e4fcf50d07413d66d1a5e416e42cfdf5851c981d679a09851a6853383b3c
     # via
     #   -r requirements/requirements-base.txt
-    #   aioredis
     #   redis
 attrs==20.2.0 \
     --hash=sha256:26b54ddbbb9ee1d34d5d3668dd37d6cf74990ab23c828c2888dccdceee395594 \
@@ -46,9 +39,8 @@ attrs==20.2.0 \
     #   automat
     #   service-identity
     #   twisted
-autobahn==21.2.2 \
-    --hash=sha256:884f79c50fdc55ade2c315946a9caa145e8b10075eee9d2c2594ea5e8f5226aa \
-    --hash=sha256:bf7a9d302a34d0f719d43c57f65ca1f2f5c982dd6ea0c11e1e190ef6f43710fe
+autobahn==22.7.1 \
+    --hash=sha256:8b462ea2e6aad6b4dc0ed45fb800b6cbfeb0325e7fe6983907f122f2be4a1fe9
     # via
     #   -r requirements/requirements-base.txt
     #   daphne
@@ -163,16 +155,16 @@ cffi==1.14.2 \
     # via
     #   -r requirements/requirements-base.txt
     #   cryptography
-channels==3.0.3 \
-    --hash=sha256:056b72e51080a517a0f33a0a30003e03833b551d75394d6636c885d4edb8188f \
-    --hash=sha256:3f15bdd2138bb4796e76ea588a0a344b12a7964ea9b2e456f992fddb988a4317
+channels[daphne]==4.0.0 \
+    --hash=sha256:0ce53507a7da7b148eaa454526e0e05f7da5e5d1c23440e4886cf146981d8420 \
+    --hash=sha256:2253334ac76f67cba68c2072273f7e0e67dbdac77eeb7e318f511d2f9a53c5e4
     # via
     #   -r requirements/requirements-base.txt
     #   channels-redis
     #   saltise-course-flow
-channels-redis==3.4.1 \
-    --hash=sha256:78e4a2f2b2a744fe5a87848ec36b5ee49f522c6808cefe6c583663d0d531faa8 \
-    --hash=sha256:ba7e2ad170f273c372812dd32aaac102d68d4e508172abb1cfda3160b7333890
+channels-redis==4.0.0 \
+    --hash=sha256:122414f29f525f7b9e0c9d59cdcfc4dc1b0eecba16fbb6a1c23f1d9b58f49dcb \
+    --hash=sha256:81b59d68f53313e1aa891f23591841b684abb936b42e4d1a966d9e4dc63a95ec
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
@@ -239,9 +231,9 @@ cssutils==1.0.2 \
     # via
     #   -r requirements/requirements-base.txt
     #   pynliner
-daphne==3.0.2 \
-    --hash=sha256:76ffae916ba3aa66b46996c14fa713e46004788167a4873d647544e750e0e99f \
-    --hash=sha256:a9af943c79717bc52fe64a3c236ae5d3adccc8b5be19c881b442d2c3db233393
+daphne==4.0.0 \
+    --hash=sha256:a288ece46012b6b719c37150be67c69ebfca0793a8521bf821533bad983179b2 \
+    --hash=sha256:cce9afc8f49a4f15d4270b8cfb0e0fe811b770a5cc795474e97e4da287497666
     # via
     #   -r requirements/requirements-base.txt
     #   channels
@@ -408,56 +400,6 @@ gunicorn==20.1.0 \
     --hash=sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e \
     --hash=sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8
     # via -r requirements/requirements-prod-aws.in
-hiredis==1.1.0 \
-    --hash=sha256:06a039208f83744a702279b894c8cf24c14fd63c59cd917dcde168b79eef0680 \
-    --hash=sha256:0a909bf501459062aa1552be1461456518f367379fdc9fdb1f2ca5e4a1fdd7c0 \
-    --hash=sha256:18402d9e54fb278cb9a8c638df6f1550aca36a009d47ecf5aa263a38600f35b0 \
-    --hash=sha256:1e4cbbc3858ec7e680006e5ca590d89a5e083235988f26a004acf7244389ac01 \
-    --hash=sha256:23344e3c2177baf6975fbfa361ed92eb7d36d08f454636e5054b3faa7c2aff8a \
-    --hash=sha256:289b31885b4996ce04cadfd5fc03d034dce8e2a8234479f7c9e23b9e245db06b \
-    --hash=sha256:2c1c570ae7bf1bab304f29427e2475fe1856814312c4a1cf1cd0ee133f07a3c6 \
-    --hash=sha256:2c227c0ed371771ffda256034427320870e8ea2e4fd0c0a618c766e7c49aad73 \
-    --hash=sha256:3bb9b63d319402cead8bbd9dd55dca3b667d2997e9a0d8a1f9b6cc274db4baee \
-    --hash=sha256:3ef2183de67b59930d2db8b8e8d4d58e00a50fcc5e92f4f678f6eed7a1c72d55 \
-    --hash=sha256:43b8ed3dbfd9171e44c554cb4acf4ee4505caa84c5e341858b50ea27dd2b6e12 \
-    --hash=sha256:47bcf3c5e6c1e87ceb86cdda2ee983fa0fe56a999e6185099b3c93a223f2fa9b \
-    --hash=sha256:5263db1e2e1e8ae30500cdd75a979ff99dcc184201e6b4b820d0de74834d2323 \
-    --hash=sha256:5b1451727f02e7acbdf6aae4e06d75f66ee82966ff9114550381c3271a90f56c \
-    --hash=sha256:6996883a8a6ff9117cbb3d6f5b0dcbbae6fb9e31e1a3e4e2f95e0214d9a1c655 \
-    --hash=sha256:6c96f64a54f030366657a54bb90b3093afc9c16c8e0dfa29fc0d6dbe169103a5 \
-    --hash=sha256:7332d5c3e35154cd234fd79573736ddcf7a0ade7a986db35b6196b9171493e75 \
-    --hash=sha256:7885b6f32c4a898e825bb7f56f36a02781ac4a951c63e4169f0afcf9c8c30dfb \
-    --hash=sha256:7b0f63f10a166583ab744a58baad04e0f52cfea1ac27bfa1b0c21a48d1003c23 \
-    --hash=sha256:819f95d4eba3f9e484dd115ab7ab72845cf766b84286a00d4ecf76d33f1edca1 \
-    --hash=sha256:8968eeaa4d37a38f8ca1f9dbe53526b69628edc9c42229a5b2f56d98bb828c1f \
-    --hash=sha256:89ebf69cb19a33d625db72d2ac589d26e936b8f7628531269accf4a3196e7872 \
-    --hash=sha256:8daecd778c1da45b8bd54fd41ffcd471a86beed3d8e57a43acf7a8d63bba4058 \
-    --hash=sha256:955ba8ea73cf3ed8bd2f963b4cb9f8f0dcb27becd2f4b3dd536fd24c45533454 \
-    --hash=sha256:964f18a59f5a64c0170f684c417f4fe3e695a536612e13074c4dd5d1c6d7c882 \
-    --hash=sha256:969843fbdfbf56cdb71da6f0bdf50f9985b8b8aeb630102945306cf10a9c6af2 \
-    --hash=sha256:996021ef33e0f50b97ff2d6b5f422a0fe5577de21a8873b58a779a5ddd1c3132 \
-    --hash=sha256:9e9c9078a7ce07e6fce366bd818be89365a35d2e4b163268f0ca9ba7e13bb2f6 \
-    --hash=sha256:a04901757cb0fb0f5602ac11dda48f5510f94372144d06c2563ba56c480b467c \
-    --hash=sha256:a7bf1492429f18d205f3a818da3ff1f242f60aa59006e53dee00b4ef592a3363 \
-    --hash=sha256:aa0af2deb166a5e26e0d554b824605e660039b161e37ed4f01b8d04beec184f3 \
-    --hash=sha256:abfb15a6a7822f0fae681785cb38860e7a2cb1616a708d53df557b3d76c5bfd4 \
-    --hash=sha256:b253fe4df2afea4dfa6b1fa8c5fef212aff8bcaaeb4207e81eed05cb5e4a7919 \
-    --hash=sha256:b27f082f47d23cffc4cf1388b84fdc45c4ef6015f906cd7e0d988d9e35d36349 \
-    --hash=sha256:b33aea449e7f46738811fbc6f0b3177c6777a572207412bbbf6f525ffed001ae \
-    --hash=sha256:b44f9421c4505c548435244d74037618f452844c5d3c67719d8a55e2613549da \
-    --hash=sha256:bcc371151d1512201d0214c36c0c150b1dc64f19c2b1a8c9cb1d7c7c15ebd93f \
-    --hash=sha256:c2851deeabd96d3f6283e9c6b26e0bfed4de2dc6fb15edf913e78b79fc5909ed \
-    --hash=sha256:cdfd501c7ac5b198c15df800a3a34c38345f5182e5f80770caf362bccca65628 \
-    --hash=sha256:d2c0caffa47606d6d7c8af94ba42547bd2a441f06c74fd90a1ffe328524a6c64 \
-    --hash=sha256:dcb2db95e629962db5a355047fb8aefb012df6c8ae608930d391619dbd96fd86 \
-    --hash=sha256:e0eeb9c112fec2031927a1745788a181d0eecbacbed941fc5c4f7bc3f7b273bf \
-    --hash=sha256:e154891263306200260d7f3051982774d7b9ef35af3509d5adbbe539afd2610c \
-    --hash=sha256:e2e023a42dcbab8ed31f97c2bcdb980b7fbe0ada34037d87ba9d799664b58ded \
-    --hash=sha256:e64be68255234bb489a574c4f2f8df7029c98c81ec4d160d6cd836e7f0679390 \
-    --hash=sha256:e82d6b930e02e80e5109b678c663a9ed210680ded81c1abaf54635d88d1da298
-    # via
-    #   -r requirements/requirements-base.txt
-    #   aioredis
 html2text==2020.1.16 \
     --hash=sha256:c7c629882da0cf377d66f073329ccf34a12ed2adf0169b9285ae4e63ef54c82b \
     --hash=sha256:e296318e16b059ddb97f7a8a1d6a5c1d7af4544049a01e261731d2d5cc277bbb
@@ -827,6 +769,7 @@ redis==4.3.4 \
     # via
     #   -r requirements/requirements-base.txt
     #   celery
+    #   channels-redis
     #   django-redis
 requests==2.28.1 \
     --hash=sha256:7c5599b102feddaa661c826c56ab4fee28bfd17f5abca1ebbe3e7f19d7c97983 \
@@ -1143,6 +1086,7 @@ setuptools==65.4.1 \
     --hash=sha256:3050e338e5871e70c72983072fe34f6032ae1cdeeeb67338199c2f74e083a80e
     # via
     #   -r requirements/requirements-base.txt
+    #   autobahn
     #   django-axes
     #   gunicorn
     #   zope-interface
