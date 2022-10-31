@@ -1,7 +1,9 @@
 import base64
 import logging
 
+from django.conf import settings
 from django.contrib.admin import site
+from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -22,6 +24,7 @@ from ..models import (
     Teacher,
 )
 from ..tasks import send_mail_async
+from ..util import get_object_or_none
 
 logger = logging.getLogger("peerinst-views")
 
@@ -68,14 +71,21 @@ def verify_user(
 
     if approve:
         if request.type.type == "teacher":
-            Teacher.objects.create(user=request.user)
+            teacher = Teacher.objects.create(user=request.user)
         else:
             raise NotImplementedError(
                 "The verification for user type {request.type.type} hasn't "
                 "been implemented"
             )
-        request.user.is_active = True
-        request.user.save()
+
+        if teacher_group := get_object_or_none(
+            Group, name=settings.TEACHER_GROUP
+        ):
+            if teacher_group not in teacher.user.groups.all():
+                teacher.user.groups.add(teacher_group)
+
+        teacher.user.is_active = True
+        teacher.user.save()
 
         link = "{}://{}{}".format(
             req.scheme,
@@ -84,26 +94,26 @@ def verify_user(
                 "password_reset_confirm",
                 kwargs={
                     "uidb64": base64.urlsafe_b64encode(
-                        force_bytes(request.user.pk)
+                        force_bytes(teacher.user.pk)
                     ).decode(),
-                    "token": default_token_generator.make_token(request.user),
+                    "token": default_token_generator.make_token(teacher.user),
                 },
             ),
         )
         send_mail_async(
             translate("Please verify your myDalite account"),
-            f"Dear {request.user.username},"
+            f"Dear {teacher.user.username},"
             + "\n\nYour account has been recently activated. Please visit "
             "the following link to verify your email address and "
             "to set your password:\n\n"
             + link
             + "\n\nCheers,\nThe myDalite Team",
             "noreply@myDALITE.org",
-            [request.user.email],
+            [teacher.user.email],
             fail_silently=True,
             html_message=loader.render_to_string(
                 "registration/verification_email.html",
-                context={"username": request.user.username, "link": link},
+                context={"username": teacher.user.username, "link": link},
                 request=req,
             ),
         )

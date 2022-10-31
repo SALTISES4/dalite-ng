@@ -26,6 +26,7 @@ DEFAULT_SCHEME_HOST_PORT = "http://localhost:8000"
 
 # Application definition
 INSTALLED_APPS = (
+    "daphne",
     "user_feedback",
     "course_flow.apps.CourseFlowConfig",
     "rest_framework",

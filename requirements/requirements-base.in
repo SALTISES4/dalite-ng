@@ -2,12 +2,12 @@
 -r ../REST/requirements.in
 
 alt-profanity-check
-asgiref == 3.3.4 # [1]
-better-profanity == 0.6.1 # [2]
+asgiref
+better-profanity == 0.6.1 # [1]
 bleach
 celery[redis]
-# contextualSpellCheck # [3]
-django >=3.2, < 3.3
+# contextualSpellCheck # [2]
+django < 3.3
 django-analytical
 django-axes
 django-celery-beat
@@ -32,9 +32,8 @@ pymemcache
 pytz
 requests
 
-SALTISE_course_flow == 0.7.7
+SALTISE_course_flow == 0.7.8
 SALTISE_user_feedback
 
-# 1. Temporary pin – See: https://stackoverflow.com/a/68553668
-# 2. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
-# 3. Removed until used – See: peerinst/grammar.py
+# 1. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
+# 2. Removed until used – See: peerinst/grammar.py
