@@ -6,7 +6,7 @@ jobs:
   build:
     resource_class: medium
     docker:
-      - image: cimg/python:3.8-browsers
+      - image: cimg/python:3.8.14-browsers
         environment:
           DALITE_DB_PASSWORD: test key
           DALITE_DB_HOST: 127.0.0.1
