@@ -31,6 +31,7 @@ pyjwt
 pymemcache
 pytz
 requests
+twisted>=22.10.0rc1
 
 SALTISE_course_flow == 0.7.9
 SALTISE_user_feedback
