@@ -25,7 +25,7 @@ djangorestframework
 langdetect
 mysqlclient
 pandas
-pillow
+pillow>=9.3.0
 pip-lock
 pyjwt
 pymemcache
