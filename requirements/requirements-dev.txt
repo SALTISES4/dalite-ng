@@ -19,6 +19,10 @@ appdirs==1.4.3 \
     --hash=sha256:9e5896d1372858f8dd3344faf4e5014d21849c756c8d5701f78f8a103b372d92 \
     --hash=sha256:d8b24664561d0d34ddfaec54636d502d7cea6e29c3eaf68f3df6180863e2166e
     # via virtualenv
+appnope==0.1.3 \
+    --hash=sha256:02bd91c4de869fbb1e1c50aafc4098827a7a54ab2f39d9dcba6c9547ed920e24 \
+    --hash=sha256:265a455292d0bd8a72453494fa24df5a11eb18373a60c7c0430889f22548605e
+    # via ipython
 asgiref==3.5.2 \
     --hash=sha256:1d2880b792ae8757289136f1db2b7b99100ce959b2aa57fd69dab783d05afac4 \
     --hash=sha256:4a29362a6acebe09bf1d6640db38c1dc3d9217c68e6f9f6204d72667fc19a424
@@ -1141,8 +1145,8 @@ safety==2.0.0 \
     --hash=sha256:77cebdd128ce47b941e68a1b3bbc29fbbd2b9e98d11f179c5def64c1d05da295 \
     --hash=sha256:d739d00a9e4203cfaba34540c822a73ca1d327159ed7776b3dce09391f81c35d
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.7.10 \
-    --hash=sha256:260e3e0356db33e0afeb3e49f80893aa9b8b5cc4c5fb4d3997af3102e62ca116
+saltise-course-flow==0.8.0 \
+    --hash=sha256:6d2cc653cf57b4477008bad4618343c7efa2998d18b56f0db09eb4ee8dcc0193
     # via -r requirements/requirements-test.txt
 saltise-user-feedback==1.1.2 \
     --hash=sha256:c57647cb83ab8bcee43f2ddc5db586f5fc20db3fb9f7a6a09b9be01de2005303
