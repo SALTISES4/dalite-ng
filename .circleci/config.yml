@@ -6,7 +6,7 @@ jobs:
   build:
     resource_class: medium
     docker:
-      - image: cimg/python:3.8-browsers
+      - image: cimg/python:3.8.14-browsers
         environment:
           DALITE_DB_PASSWORD: test key
           DALITE_DB_HOST: 127.0.0.1
@@ -40,7 +40,7 @@ jobs:
           command: |
             . .venv/bin/activate
             python -m pip install safety
-            safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY
+            safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY -i 51619
       - run:
           name: Install packages
           command: |

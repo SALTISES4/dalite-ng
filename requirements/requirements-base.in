@@ -25,14 +25,15 @@ djangorestframework
 langdetect
 mysqlclient
 pandas
-pillow
+pillow>=9.3.0
 pip-lock
 pyjwt
 pymemcache
 pytz
 requests
+twisted==22.4
 
-SALTISE_course_flow == 0.7.8
+SALTISE_course_flow==0.8.0
 SALTISE_user_feedback
 
 # 1. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
