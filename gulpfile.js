@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint @typescript-eslint/no-var-requires: "off" */
 
 /* Build tools */

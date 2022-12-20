@@ -44,6 +44,7 @@
   ],
   "parser": "@babel/eslint-parser",
   "plugins": ["prettier"],
+  "root": true,
   "rules": {
     "no-invalid-this": "off",
     "arrow-parens": "off",

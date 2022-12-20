@@ -71,12 +71,12 @@ repos:
           - flake8-tidy-imports==4.8.0
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v7.30.0
+    rev: v7.32.0
     hooks:
       - id: eslint
         args: [--fix]
         additional_dependencies:
-          - eslint@7.30.0
+          - eslint@7.32.0
           - eslint-config-developit@1.2.0
           - eslint-config-google@0.14.0
           - eslint-config-preact@1.1.4
