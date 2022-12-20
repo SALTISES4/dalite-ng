@@ -120,7 +120,7 @@ repos:
         always_run: true
         exclude: ".*"
         verbose: true
-        args: ["requirements/requirements-prod-aws.txt", --ignore=49733]
+        args: ["requirements/requirements-prod-aws.txt", --ignore=51619]
 
   - repo: local
     hooks:
