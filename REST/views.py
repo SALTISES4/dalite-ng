@@ -158,6 +158,7 @@ class QuestionSearchList(generics.ListAPIView):
     def get_serializer(self, *args, **kwargs):
         kwargs["context"] = self.get_serializer_context()
         return QuestionSerializer(
+            *args,
             read_only=True,
             fields=(
                 "answer_count",
@@ -182,7 +183,6 @@ class QuestionSearchList(generics.ListAPIView):
                 "user",
                 "video_url",
             ),
-            *args,
             **kwargs,
         )
 
@@ -246,8 +246,8 @@ class TeacherView(generics.RetrieveUpdateAPIView):
         kwargs.pop("partial")
 
         return TeacherSerializer(
-            partial=True,
             *args,
+            partial=True,
             **kwargs,
         )
 
@@ -355,7 +355,7 @@ class TeacherSearch(ReadOnlyModelViewSet):
         kwargs["context"] = self.get_serializer_context()
 
         return TeacherSerializer(
-            read_only=True, fields=["pk", "user"], *args, **kwargs
+            *args, read_only=True, fields=["pk", "user"], **kwargs
         )
 
 
