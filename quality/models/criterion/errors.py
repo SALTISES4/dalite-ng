@@ -4,4 +4,4 @@ class CriterionDoesNotExistError(Exception):
             msg = (
                 "There is no criterion corresponding to that name or version."
             )
-        super(Exception, self).__init__(msg, *args, **kwargs)
+        super().__init__(msg, *args, **kwargs)

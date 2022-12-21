@@ -88,10 +88,9 @@ def get_question_aggregates(assignment, question, student_groups=None):
     )
     for choice_index in range(1, question.answerchoice_set.count() + 1):
         key = ("switches", choice_index)
-        count = switched_answers.filter(
+        if count := switched_answers.filter(
             second_answer_choice=choice_index
-        ).count()
-        if count:
+        ).count():
             sums[key] = count
     # Get a set of all user tokens.  DISTINCT queries are not implemented for
     # MySQL, so this is the only way I can think of to determine the number of
@@ -709,13 +708,9 @@ class QuestionExpertRationaleView(QuestionPreviewViewBase):
         expert_rationales = self.question.answer_set.filter(expert=True)
 
         save_allowed = all(
-            [
-                cac
-                in expert_rationales.values_list(
-                    "first_answer_choice", flat=True
-                )
-                for cac in correct_answer_choices
-            ]
+            cac
+            in expert_rationales.values_list("first_answer_choice", flat=True)
+            for cac in correct_answer_choices
         )
         assignment_id = self.request.session.get("assignment_id")
         question_id = context["question"].pk
@@ -742,7 +737,7 @@ class QuestionExpertRationaleView(QuestionPreviewViewBase):
         messages.add_message(
             self.request, messages.INFO, _("Expert rationale saved.")
         )
-        return super(QuestionPreviewViewBase, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         if self.kwargs.get("assignment_id"):
@@ -774,8 +769,7 @@ class StringListForm(forms.Form):
         cleaned_data = super().clean()
         strings = []
         for s in cleaned_data["strings"].splitlines():
-            s = s.strip()
-            if s:
+            if s := s.strip():
                 strings.append(s)
         cleaned_data["strings"] = strings
         return cleaned_data

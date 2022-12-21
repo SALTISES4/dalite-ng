@@ -49,15 +49,10 @@ from tinymce.widgets import TinyMCE
 
 from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
+from peerinst import admin, forms, models, rationale_choice
+from peerinst.admin_views import get_question_rationale_aggregates
 from peerinst.elasticsearch import question_search as qs_ES
-from peerinst.templatetags.bleach_html import STRICT_TAGS
-
-# tos
-from tos.models import Consent, Tos
-
-from .. import admin, forms, models, rationale_choice
-from ..admin_views import get_question_rationale_aggregates
-from ..mixins import (
+from peerinst.mixins import (
     LoginRequiredMixin,
     NoStudentsMixin,
     ObjectPermissionMixin,
@@ -65,9 +60,9 @@ from ..mixins import (
     student_check,
     teacher_tos_accepted_check,
 )
-from ..models import AnswerChoice  # LtiEvent,
-from ..models import (
+from peerinst.models import (
     Answer,
+    AnswerChoice,
     Assignment,
     AssignmentQuestions,
     Category,
@@ -85,9 +80,10 @@ from ..models import (
     UserType,
     UserUrl,
 )
-from ..stopwords import en, fr
-from ..tasks import mail_managers_async
-from ..util import (
+from peerinst.stopwords import en, fr
+from peerinst.tasks import mail_managers_async
+from peerinst.templatetags.bleach_html import STRICT_TAGS
+from peerinst.util import (
     SessionStageData,
     get_object_or_none,
     get_student_activity_data,
@@ -98,6 +94,10 @@ from ..util import (
     report_data_by_student,
     roundrobin,
 )
+
+# tos
+from tos.models import Consent, Tos
+
 from .decorators import ajax_login_required, ajax_user_passes_test
 
 LOGGER = logging.getLogger(__name__)
@@ -1507,9 +1507,7 @@ class AnswerSummaryChartView(View):
             # Get the label for the row, and the counts for how many students
             # chose this answer the first time, and the second time.
             answer_row = {
-                "label": "Answer {}: {}".format(
-                    question.get_choice_label(i), answer.text
-                ),
+                "label": f"Answer {question.get_choice_label(i)}: {answer.text}",
                 "before": models.Answer.objects.filter(
                     question=question,
                     first_answer_choice=i,
