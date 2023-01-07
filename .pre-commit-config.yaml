@@ -7,19 +7,19 @@ fail_fast: false
 
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.34.0
+    rev: v3.3.1
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
 
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.4.0
+    rev: 1.12.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "3.2"]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.4.0
     hooks:
       - id: check-ast
       - id: trailing-whitespace
@@ -36,46 +36,47 @@ repos:
       - id: check-json5
 
   - repo: https://github.com/rtts/djhtml
-    rev: v1.5.1
+    rev: v1.5.2
     hooks:
       - id: djhtml
         args:
           - --tabwidth=2
 
   - repo: https://github.com/thibaudcolas/curlylint
-    rev: v0.13.0
+    rev: v0.13.1
     hooks:
       - id: curlylint
 
   - repo: https://github.com/pycqa/isort
-    rev: 5.10.1
+    rev: 5.11.3
     hooks:
       - id: isort
         args: ["--profile", "black"]
 
   - repo: https://github.com/ambv/black
-    rev: 22.6.0
+    rev: 22.12.0
     hooks:
       - id: black
         exclude: "^.*/migrations/.*.py$"
         args: [--line-length=79, --safe]
 
   - repo: https://github.com/pycqa/flake8
-    rev: 4.0.1
+    rev: 5.0.4
     hooks:
       - id: flake8
         additional_dependencies:
-          - flake8-bugbear==22.7.1
+          - flake8-bugbear==22.12.6
+          - flake8-comprehensions==3.10.1
           - flake8-no-pep420==2.3.0
-          - flake8-comprehensions==3.10.0
+          - flake8-tidy-imports==4.8.0
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v7.30.0
+    rev: v7.32.0
     hooks:
       - id: eslint
         args: [--fix]
         additional_dependencies:
-          - eslint@7.30.0
+          - eslint@7.32.0
           - eslint-config-developit@1.2.0
           - eslint-config-google@0.14.0
           - eslint-config-preact@1.1.4
@@ -89,11 +90,11 @@ repos:
         types: [file]
 
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.1.0
+    rev: v2.7.1
     hooks:
       - id: prettier
         additional_dependencies:
-          - prettier@2.3.2
+          - prettier@2.8.1
         files: \.js$
         exclude: "^.*\\.min\\..*$"
 
@@ -104,11 +105,12 @@ repos:
         args: [--fix]
         exclude: "^.*\\.min\\..*$"
         additional_dependencies:
-          - stylelint@13.13.1
-          - stylelint-config-recommended-scss@4.3.0
-          - stylelint-config-recommended@5.0.0
-          - stylelint-order@4.1.0
-          - stylelint-scss@3.19.0
+          - postcss-scss@2.1.1
+          - stylelint@14.16.0
+          - stylelint-config-recommended-scss@8.0.0
+          - stylelint-config-recommended@9.0.0
+          - stylelint-order@5.0.0
+          - stylelint-scss@4.3.0
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
     rev: v1.3.0
@@ -118,7 +120,7 @@ repos:
         always_run: true
         exclude: ".*"
         verbose: true
-        args: ["requirements/requirements-prod-aws.txt", --ignore=49733]
+        args: ["requirements/requirements-prod-aws.txt", --ignore=51619]
 
   - repo: local
     hooks:

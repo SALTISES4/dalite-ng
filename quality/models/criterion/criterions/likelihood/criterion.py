@@ -1,3 +1,4 @@
+import contextlib
 import hashlib
 import json
 from functools import reduce
@@ -203,9 +204,7 @@ class LikelihoodCriterionRules(CriterionRules):
             ]
         except LikelihoodLanguage.DoesNotExist:
             raise ValueError(
-                "The language has to be one of {}".format(
-                    LikelihoodLanguage.available()
-                )
+                f"The language has to be one of {LikelihoodLanguage.available()}"
             )
 
         criterion = LikelihoodCriterionRules.objects.filter(
@@ -324,7 +323,7 @@ class LikelihoodCache(models.Model):
             ):
                 if likelihood is None:
                     _likelihood, likelihood_random = predict(rationale)
-                    try:
+                    with contextlib.suppress(IntegrityError):
                         cls.objects.create(
                             answer=pk,
                             language=language,
@@ -332,8 +331,6 @@ class LikelihoodCache(models.Model):
                             likelihood=_likelihood,
                             likelihood_random=likelihood_random,
                         )
-                    except IntegrityError:
-                        pass
                     likelihoods[i] = (_likelihood, likelihood_random)
 
         return likelihoods

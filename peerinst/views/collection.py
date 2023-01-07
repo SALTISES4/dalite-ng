@@ -17,20 +17,20 @@ from django.views.generic.edit import CreateView
 
 from dalite.views.utils import get_json_params
 from peerinst.admin_views import get_assignment_aggregates
-
-from ..mixins import (
+from peerinst.mixins import (
     LoginRequiredMixin,
     NoStudentsMixin,
     TOSAcceptanceRequiredMixin,
     student_check,
 )
-from ..models import (
+from peerinst.models import (
     Assignment,
     Collection,
     StudentGroup,
     StudentGroupAssignment,
     Teacher,
 )
+
 from .decorators import teacher_required
 
 
@@ -89,7 +89,7 @@ class CollectionDetailView(LoginRequiredMixin, NoStudentsMixin, DetailView):
             raise PermissionDenied
 
     def get_context_data(self, **kwargs):
-        context = super(DetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         collection = self.get_object()
         context["collection_data"] = collection_data(collection=collection)
         return context
@@ -114,47 +114,42 @@ def collection_paginate(request):
             )
         )
 
-    if request.method == "GET" and request.user.is_authenticated:
-        page = int(request.GET.get("page", default=1))
-        id = int(request.GET.get("collection_pk"))
-        assignments = Collection.objects.get(pk=id).assignments.all()
-
-        paginator = Paginator(list(assignments), 3)
-
-        try:
-            page_assignments = paginator.get_page(page)
-        except PageNotAnInteger:
-            page_assignments = paginator.get_page(1)
-        except EmptyPage:
-            page_assignments = paginator.get_page(paginator.num_pages)
-
-        if assignments.count() > 3:
-            is_multiple_pages = True
-        else:
-            is_multiple_pages = False
-
-        assignment_data = {}
-        context = {
-            "paginator": page_assignments,
-            "is_multiple_pages": is_multiple_pages,
-            "assignment_data": assignment_data,
-        }
-
-        for assignment in assignments:
-            (
-                context["assignment_data"][assignment.pk],
-                q_students,
-            ) = get_assignment_aggregates(assignment=assignment)
-
-        return TemplateResponse(
-            request,
-            "peerinst/collection/collection_detail_page.html",
-            context=context,
-        )
-    else:
+    if request.method != "GET" or not request.user.is_authenticated:
         return HttpResponse(
             _("An error occurred.  Retry search after logging in again.")
         )
+    page = int(request.GET.get("page", default=1))
+    id = int(request.GET.get("collection_pk"))
+    assignments = Collection.objects.get(pk=id).assignments.all()
+
+    paginator = Paginator(list(assignments), 3)
+
+    try:
+        page_assignments = paginator.get_page(page)
+    except PageNotAnInteger:
+        page_assignments = paginator.get_page(1)
+    except EmptyPage:
+        page_assignments = paginator.get_page(paginator.num_pages)
+
+    is_multiple_pages = assignments.count() > 3
+    assignment_data = {}
+    context = {
+        "paginator": page_assignments,
+        "is_multiple_pages": is_multiple_pages,
+        "assignment_data": assignment_data,
+    }
+
+    for assignment in assignments:
+        (
+            context["assignment_data"][assignment.pk],
+            q_students,
+        ) = get_assignment_aggregates(assignment=assignment)
+
+    return TemplateResponse(
+        request,
+        "peerinst/collection/collection_detail_page.html",
+        context=context,
+    )
 
 
 def collection_data(collection):
@@ -189,7 +184,7 @@ class CollectionUpdateView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
         return reverse("collection-detail", kwargs={"pk": self.object.pk})
 
     def get_context_data(self, **kwargs):
-        context = super(UpdateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["teacher"] = get_object_or_404(Teacher, user=self.request.user)
         collection = self.get_object()
         teacher = get_object_or_404(Teacher, user=self.request.user)
@@ -314,7 +309,7 @@ class CollectionDistributeDetailView(
             raise PermissionDenied
 
     def get_context_data(self, **kwargs):
-        context = super(DetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         teacher = get_object_or_404(Teacher, user=self.request.user)
         collection = self.get_object()
         context["student_groups"] = teacher.current_groups.all()
@@ -358,13 +353,11 @@ def collection_add_assignment(request, teacher):
 
     student_group = get_object_or_404(StudentGroup, pk=group_pk)
 
-    title = (student_group.title + "'s curriculum ")[:40]
-    description = (
-        "This collection contains all assignments that have been assigned to "
-        + student_group.title
-        + "'s students."
-    )[:200]
+    description = f"This collection contains all assignments that have been assigned to {student_group.title}'s students."[  # noqa E501
+        :200
+    ]
 
+    title = f"{student_group.title}'s curriculum "[:40]
     collection = Collection.objects.create(
         discipline=teacher.disciplines.first(),
         owner=teacher,

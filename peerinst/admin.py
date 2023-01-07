@@ -211,6 +211,7 @@ class QuestionFlagAdmin(admin.ModelAdmin):
         "user",
     ]
 
+    @admin.display(description="Question")
     def question_link(self, obj):
         link = reverse(
             "admin:peerinst_question_change", args=[obj.question.pk]
@@ -219,8 +220,6 @@ class QuestionFlagAdmin(admin.ModelAdmin):
 
     def flag_reason_list(self, obj):
         return "; ".join(obj.flag_reason.all().values_list("title", flat=True))
-
-    question_link.short_description = "Question"
 
 
 @admin.register(Category)
@@ -263,11 +262,9 @@ class AssignmentAdmin(admin.ModelAdmin):
     readonly_fields = ["identifier", "owner"]
 
 
+@admin.action(description=_("Show selected answers to students"))
 def publish_answers(modeladmin, request, queryset):
     queryset.update(show_to_others=True)
-
-
-publish_answers.short_description = _("Show selected answers to students")
 
 
 @admin.register(Answer)
@@ -413,14 +410,15 @@ class StudentGroupMembershipAdmin(admin.ModelAdmin):
     )
     search_fields = ["student__student__email"]
 
+    @admin.display(description="Student")
     def get_student_email(self, obj):
         return obj.student.student.email
 
-    get_student_email.short_description = "Student"
     get_student_email.order_field = "student__student_email"
 
 
 # https://djangosnippets.org/snippets/2484/
+@admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
 
     date_hierarchy = "action_time"
@@ -449,6 +447,10 @@ class LogEntryAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    @admin.display(
+        description="object",
+        ordering="object_repr",
+    )
     def object_link(self, obj):
         if obj.action_flag == DELETION:
             link = escape(obj.object_repr)
@@ -462,10 +464,6 @@ class LogEntryAdmin(admin.ModelAdmin):
                 escape(obj.object_repr),
             )
         return link
-
-    object_link.allow_tags = True
-    object_link.admin_order_field = "object_repr"
-    object_link.short_description = "object"
 
     def queryset(self, request):
         return super().queryset(request).prefetch_related("content_type")
@@ -487,7 +485,6 @@ class MessageAdmin(admin.ModelAdmin):
                 )
 
 
-admin.site.register(LogEntry, LogEntryAdmin)
 admin.site.register(models.Message, MessageAdmin)
 admin.site.register(models.MessageType)
 

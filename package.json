@@ -67,11 +67,11 @@
     "rollup-plugin-terser": "^7.0.2",
     "sass": "^1.35.2",
     "snyk": "^1.966.0",
-    "stylelint": "^13.13.1",
-    "stylelint-config-recommended": "^5.0.0",
-    "stylelint-config-recommended-scss": "^4.3.0",
-    "stylelint-order": "^4.1.0",
-    "stylelint-scss": "^3.19.0",
+    "stylelint": "^14",
+    "stylelint-config-recommended": "^9",
+    "stylelint-config-recommended-scss": "^8",
+    "stylelint-order": "^5",
+    "stylelint-scss": "^4.3",
     "typescript": "^4.3.5"
   },
   "dependencies": {
@@ -84,7 +84,7 @@
     "preact": "^10.5.14",
     "react-beautiful-dnd": "^13.1.0",
     "rmwc": "4.0.6",
-    "tinymce": "^5.10"
+    "tinymce": "^5.10.7"
   },
   "optionalDependencies": {
     "fsevents": "^2.3.2"
@@ -136,7 +136,13 @@
       "order/properties-alphabetical-order": true,
       "no-descending-specificity": null,
       "block-closing-brace-empty-line-before": "never"
-    }
+    },
+    "overrides": [
+      {
+        "files": ["**/*.scss"],
+        "customSyntax": "postcss-scss"
+      }
+    ]
   },
   "browserslist": [
     "last 5 versions and > 0.1%",

@@ -1,4 +1,5 @@
 [flake8]
+ban-relative-imports = parents
 max-line-length = 88
 ignore = D100 \  # missing docstring in module
          D101 \  # missing docstring in class

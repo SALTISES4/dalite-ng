@@ -3,8 +3,7 @@ from itertools import chain
 from django.db import models
 
 from dalite.models.custom_fields import CommaSepField, ProbabilityField
-
-from ..quality_type import QualityType, QualityUseType
+from quality.models.quality_type import QualityType, QualityUseType
 
 
 class Criterion(models.Model):
@@ -118,6 +117,6 @@ class CriterionRules(models.Model):
                 for field in self.__class__._meta.get_fields()
                 if field.name != "id"
                 and not field.name.endswith("ptr")
-                and not field.__class__.__name__ == "ManyToOneRel"
+                and field.__class__.__name__ != "ManyToOneRel"
             }.items()
         )

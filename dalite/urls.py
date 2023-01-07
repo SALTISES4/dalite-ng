@@ -42,8 +42,8 @@ urlpatterns += [
         "cookies/",
         include(
             [
-                re_path(
-                    r"^accept/$",
+                path(
+                    "accept/",
                     csp_replace(FRAME_ANCESTORS=["*"])(
                         xframe_options_exempt(
                             lti_access_allowed(

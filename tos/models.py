@@ -1,3 +1,4 @@
+import contextlib
 import hashlib
 import logging
 
@@ -27,7 +28,7 @@ class Tos(models.Model):
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.role) + "_" + str(self.version)
+        return f"{str(self.role)}_{str(self.version)}"
 
     class Meta:
         unique_together = (("role", "version"), ("role", "hash"))
@@ -58,8 +59,9 @@ class Tos(models.Model):
                 tos = Tos.objects.get(role__role=role, version=version)
             except Tos.DoesNotExist:
                 err = (
-                    "There is no terms of service with version "
-                    "{} for role {}".format(version, role)
+                    f"There is no terms of service with version {version} "
+                    f"for role {role}"
+                    ""
                 )
 
         return tos, err
@@ -181,7 +183,7 @@ class EmailConsent(models.Model):
             consent = default
 
         if not ignore_all and email_type != "all":
-            try:
+            with contextlib.suppress(IndexError):
                 consent_all = (
                     EmailConsent.objects.filter(
                         user__username=username,
@@ -193,9 +195,6 @@ class EmailConsent(models.Model):
                 )
                 if not consent_all:
                     consent = False
-            except IndexError:
-                pass
-
         return consent
 
     def __str__(self):
