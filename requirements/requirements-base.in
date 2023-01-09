@@ -38,4 +38,4 @@ SALTISE_user_feedback
 
 # 1. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
 # 2. Removed until used – See: peerinst/grammar.py
-# 3. Temporary pin for safety
+# 3. Temporary pin – Latest fails CI
