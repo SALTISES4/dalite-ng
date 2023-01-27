@@ -36,6 +36,8 @@ twisted == 22.4 # [3]
 SALTISE_course_flow == 0.8.0
 SALTISE_user_feedback
 
+-e ../Components
+
 # 1. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
 # 2. Removed until used – See: peerinst/grammar.py
 # 3. Temporary pin – Latest fails CI
