@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     "tinymce",
     "csp",
     "cookie_consent",
+    "components",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
