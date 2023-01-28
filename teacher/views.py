@@ -1,5 +1,9 @@
-from peerinst.views.views import TeacherDetailView
+from django.views.generic import DetailView
+
+from peerinst.models import Teacher
+from peerinst.views.views import TeacherBase
 
 
-class RedesignedTeacherDetailView(TeacherDetailView):
-    template_name = "components/index.html"
+class TeacherDashboardView(TeacherBase, DetailView):
+    model = Teacher
+    template_name = "teacher/dashboard.html"

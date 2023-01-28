@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     "saltise",
     "channels",
     "REST",
+    "teacher",
     "django_elasticsearch_dsl",
     "lti_provider",
     "tinymce",
