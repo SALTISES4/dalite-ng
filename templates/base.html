@@ -59,6 +59,7 @@
         src="{% static 'components/js/build/navigation.min.js' %}"
         defer="true"
       ></script>
+      {% block apps %}{% endblock %}
     </head>
     <body>
       {% block body %}{% endblock %}
