@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% load i18n static %}
+
+{% block injected_apps %}
+  {{ block.super }}
+  <div id="navigation-app"></div>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function () {
+      const navigationApp = () => {
+        return navigation.h(navigation.App, {
+          sidebarGroups:[
+            [
+              {title: "{% trans 'Search' %}", icon: "search", url: "/"},
+              {title: "{% trans 'Dashboard' %}", icon: "dashboard", url: "/"},
+            ],
+            [
+              {title: "{% trans 'Questions' %}", icon: "forum", url: "/"},
+              {title: "{% trans 'Assignments' %}", icon: "assignment", url: "/"},
+              {title: "{% trans 'Collections' %}", icon: "collections_bookmark", url: "/"}
+            ],
+            [
+              {title: "{% trans 'Student activity' %}", icon: "mark_unread_chat_alt", url: "/"},
+              {title: "Group 1", icon: "groups", url: "/"},
+              {title: "Group 2", icon: "groups", url: "/"},
+              {title: "Group 3", icon: "groups", url: "/"},
+              {title: "{% trans 'Manage groups' %}", icon: "settings", url: "/"},
+            ],
+            [
+              {title: "CourseFlow", icon: "account_tree", url: "{% url 'course_flow:home' %}"},
+            ]
+          ],
+          logo: "{% static 'components/img/logo.png' %}",
+          menuAddItems: [
+            [
+              {
+                title: "{% trans 'Question' %}",
+                icon: "question_answer",
+                url: "/"
+              },
+              {
+                title: "{% trans 'Assignment' %}",
+                icon: "assignment",
+                url: "/"
+              },
+              {
+                title: "{% trans 'Collection' %}",
+                icon: "playlist_add",
+                url: "/"
+              },
+              {
+                title: "{% trans 'Group' %}",
+                icon: "groups",
+                url: "/"
+              },
+              {
+                title: "{% trans 'Invite' %}",
+                icon: "person_add",
+                url: "/"
+              },
+            ],
+          ],
+          menuProfile: [
+            [
+              {
+                title: "{% trans 'Profile' %}",
+                icon: "account_box",
+                url: "/"
+              },
+              {
+                title: "{% trans 'Password' %}",
+                icon: "lock",
+                url: "/"
+              },
+              {
+                title: "{% trans 'Notifications' %}",
+                icon: "notifications",
+                url: "/"
+              },
+            ],
+            [
+              {
+                title: "{% trans 'Go to CourseFlow' %}",
+                icon: "account_tree",
+                url:  "{% url 'course_flow:home' %}"
+              },
+              {
+                title: "{% trans 'Sign out' %}",
+                icon: "logout",
+                url: "{% url 'logout' %}"
+              },
+            ],
+          ],
+          nonce: "{{ request.csp_nonce }}",
+          user: {
+            username: "{{ request.user.username }}",
+            avatar: "{% static 'components/img/avatar.jpg' %}",
+          }
+        });
+      };
+      navigation.render(
+        navigationApp(),
+        document.getElementById("navigation-app")
+      );
+    });
+  </script>
+{% endblock %}
