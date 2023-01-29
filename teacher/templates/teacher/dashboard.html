@@ -24,13 +24,13 @@
           gettext: gettext,
           nonce: "{{ request.csp_nonce }}",
           urls: {
-            assignments: "/",
+            assignments: "{% url 'REST:teacher' object.pk %}?field=owned_assignments",
             collections: "/",
-            questions: "/",
+            questions: "{% url 'REST:teacher' object.pk %}?field=owned_assignments",
           },
           user: {
-            username: "jsumner",
-            avatar: "{% static 'components/img/avatar.jpg' %}",
+            username: "{{ object.user.saltisemember.name }}",
+            avatar: "{{ object.user.saltisemember.picture }}",
           }
         });
       };
