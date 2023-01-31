@@ -8,15 +8,18 @@ from rest_framework import serializers
 from rest_framework.exceptions import bad_request
 
 from peerinst.models import (
+    Answer,
     Assignment,
     AssignmentQuestions,
     Category,
     Discipline,
     Question,
+    StudentGroupAssignment,
 )
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 
 from .dynamic_serializer import DynamicFieldsModelSerializer
+from .student_group import StudentGroupSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -344,4 +347,68 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
             "questions_basic",
             "title",
             "urls",
+        ]
+
+
+class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
+    author = serializers.SerializerMethodField()
+    difficulty = serializers.SerializerMethodField()
+    distributionState = serializers.SerializerMethodField()
+    groups = serializers.SerializerMethodField()
+    questionCount = serializers.SerializerMethodField()
+    answerCount = serializers.SerializerMethodField()
+    title = serializers.ReadOnlyField
+    dueDate = serializers.ReadOnlyField()
+    issueCount = serializers.SerializerMethodField()
+    progress = serializers.SerializerMethodField()
+
+    def get_author(self, obj):
+        return obj.assignment.owner.first().username
+
+    def get_difficulty(self, obj):
+        return "ToDo"  # calculate difficulty from questions
+
+    def get_distributionState(self, obj):
+        return "Distributed"
+        # FIXME: choices from components/static/_localComponents/enum.ts
+
+    def get_groups(self, obj):
+        return StudentGroupSerializer(obj.group).data
+        # expected type is list?
+
+    def get_questionCount(self, obj):
+        return obj.assignment.questions.count()
+
+    def get_answerCount(self, obj):
+        return (
+            Answer.objects.filter(
+                user_token__in=[
+                    student.student.username
+                    for student in obj.group.students.all()
+                ]
+            )
+            .filter(assignment=obj.assignment)
+            .filter(question__id=self.context["question_pk"])
+            .count()
+        )
+
+    def get_issueCount(self, obj):
+        return 1.0  # FIXME
+
+    def get_progress(self, obj):
+        return 1.0  # FIXME
+
+    class Meta:
+        model = StudentGroupAssignment
+        fields = [
+            "author",
+            "difficulty",
+            "distributionState",
+            "groups",
+            "questionCount",
+            "answerCount",
+            "title",
+            "dueDate",
+            "issueCount",
+            "progress",
         ]

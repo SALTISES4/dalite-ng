@@ -35,6 +35,7 @@ from REST.serializers import (
     DisciplineSerializer,
     FeedbackReadSerialzer,
     FeedbackWriteSerialzer,
+    GroupAssignmentSerializer,
     QuestionSerializer,
     RankSerializer,
     StudentGroupAssignmentAnswerSerializer,
@@ -56,6 +57,18 @@ class AssignmentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Assignment.objects.filter(owner=self.request.user)
+
+
+class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
+    http_method_names = ["get", "patch", "post"]
+    permission_classes = [IsAuthenticated, IsTeacher, InTeacherList]
+    renderer_classes = [JSONRenderer]
+    serializer_class = GroupAssignmentSerializer
+
+    def get_queryset(self):
+        return StudentGroupAssignment.objects.filter(
+            group__teacher=self.request.user.teacher
+        ).order_by("-distribution_data")[0:5]
 
 
 class DisciplineViewSet(viewsets.ModelViewSet):
