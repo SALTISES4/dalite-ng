@@ -12,6 +12,7 @@ from peerinst.models import (
     Assignment,
     AssignmentQuestions,
     Category,
+    Collection,
     Discipline,
     Question,
     StudentGroupAssignment,
@@ -411,3 +412,24 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
             "issueCount",
             "progress",
         ]
+
+
+class CollectionSerializer(DynamicFieldsModelSerializer):
+    title = serializers.ReadOnlyField()
+    author = serializers.SerializerMethodField()
+    description = serializers.ReadOnlyField()
+    tags = serializers.SerializerMethodField()
+    answerCount = serializers.SerializerMethodField()
+
+    def get_author(self, obj):
+        return obj.owner.user.username
+
+    def get_tags(self, obj):
+        return [""]  # FIXME
+
+    def get_answerCount(self, obj):
+        return 1  # FIXME
+
+    class Meta:
+        model = Collection
+        fields = ["title", "author", "description", "tags", "answerCount"]

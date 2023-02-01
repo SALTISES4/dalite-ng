@@ -13,6 +13,7 @@ from peerinst.models import (
     AnswerAnnotation,
     Assignment,
     AssignmentQuestions,
+    Collection,
     Discipline,
     Question,
     StudentGroup,
@@ -32,6 +33,7 @@ from REST.permissions import (
 from REST.serializers import (
     AnswerSerializer,
     AssignmentSerializer,
+    CollectionSerializer,
     DisciplineSerializer,
     FeedbackReadSerialzer,
     FeedbackWriteSerialzer,
@@ -69,6 +71,16 @@ class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
         return StudentGroupAssignment.objects.filter(
             group__teacher=self.request.user.teacher
         ).order_by("-distribution_date")[0:5]
+
+
+class CollectionViewSet(viewsets.ModelViewSet):
+    http_method_names = ["get", "patch", "post"]
+    permission_classes = [IsAuthenticated, IsTeacher, InTeacherList]
+    renderer_classes = [JSONRenderer]
+    serializer_class = CollectionSerializer
+
+    def get_queryset(self):
+        return Collection.objects.filter(owner=self.request.user.teacher)
 
 
 class DisciplineViewSet(viewsets.ModelViewSet):

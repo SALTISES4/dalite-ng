@@ -24,9 +24,9 @@
           gettext: gettext,
           nonce: "{{ request.csp_nonce }}",
           urls: {
-            assignments: "{% url 'REST:teacher' object.pk %}?field=owned_assignments",
-            collections: "/",
-            questions: "{% url 'REST:teacher' object.pk %}?field=owned_assignments",
+            assignments: "{% url 'REST:groupassignment-list' %}",
+            collections: "{% url 'REST:collection-list' %}",
+            questions: "{% url 'REST:question-list' %}",
           },
           user: {
             username: "{{ object.user.saltisemember.name }}",

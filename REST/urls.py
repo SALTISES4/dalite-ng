@@ -31,6 +31,12 @@ peerinst_api.register(
     basename="groupassignment",
 )
 
+peerinst_api.register(
+    r"collections",
+    views.CollectionViewSet,
+    basename="collection",
+)
+
 urlpatterns = [
     path("peerinst/", include(peerinst_api.urls)),
     path(
