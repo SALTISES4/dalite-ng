@@ -68,7 +68,7 @@ class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return StudentGroupAssignment.objects.filter(
             group__teacher=self.request.user.teacher
-        ).order_by("-distribution_data")[0:5]
+        ).order_by("-distribution_date")[0:5]
 
 
 class DisciplineViewSet(viewsets.ModelViewSet):

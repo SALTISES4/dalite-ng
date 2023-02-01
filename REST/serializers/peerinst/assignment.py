@@ -357,7 +357,7 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
     groups = serializers.SerializerMethodField()
     questionCount = serializers.SerializerMethodField()
     answerCount = serializers.SerializerMethodField()
-    title = serializers.ReadOnlyField
+    title = serializers.ReadOnlyField()
     dueDate = serializers.ReadOnlyField()
     issueCount = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
@@ -388,7 +388,6 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
                 ]
             )
             .filter(assignment=obj.assignment)
-            .filter(question__id=self.context["question_pk"])
             .count()
         )
 
