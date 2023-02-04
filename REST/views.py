@@ -248,6 +248,7 @@ class TeacherView(generics.RetrieveUpdateAPIView):
     RU operations for teacher
     - list assignments and questions
     - list/update favourites, questions, deleted, archived
+    - list readonly stats
     """
 
     http_method_names = ["get", "put"]

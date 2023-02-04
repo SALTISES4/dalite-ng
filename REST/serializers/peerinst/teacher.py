@@ -1,6 +1,12 @@
+from django.utils import timezone
 from rest_framework import serializers
 
-from peerinst.models import Assignment, Question, Teacher
+from peerinst.models import (
+    Assignment,
+    Question,
+    StudentGroupAssignment,
+    Teacher,
+)
 
 from .assignment import (
     AssignmentSerializer,
@@ -11,6 +17,8 @@ from .dynamic_serializer import DynamicFieldsModelSerializer
 
 
 class TeacherSerializer(DynamicFieldsModelSerializer):
+    activeAssignmentCount = serializers.SerializerMethodField()
+    activeGroupCount = serializers.SerializerMethodField()
     archived_questions = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Question.objects.all()
     )
@@ -31,6 +39,7 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
     assignment_pks = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Assignment.objects.all(), source="assignments"
     )
+    createdQuestionCount = serializers.SerializerMethodField()
     deleted_questions = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Question.objects.all()
     )
@@ -73,6 +82,24 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
     )
     user = UserSerializer(read_only=True)
 
+    def get_activeAssignmentCount(self, obj):
+        now = timezone.now()
+        return (
+            StudentGroupAssignment.objects.filter(
+                group__in=obj.current_groups.all()
+            )
+            .filter(distribution_date__lt=now)
+            .filter(due_date__gt=now)
+            .count()
+        )
+
+    def get_activeGroupCount(self, obj):
+        # TODO: Define 'active' group
+        return 0
+
+    def get_createdQuestionCount(self, obj):
+        return Question.objects.filter(user=obj.user).count()
+
     def validate(self, data):
         # Limit deleted questions to questions where user is owner
         questions = self.context["request"].user.question_set.all()
@@ -103,9 +130,12 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Teacher
         fields = [
+            "activeAssignmentCount",
+            "activeGroupCount",
             "archived_questions",
             "assignment_pks",
             "assignments",
+            "createdQuestionCount",
             "deleted_questions",
             "favourite_questions",
             "owned_assignments",

@@ -27,9 +27,10 @@
             assignments: "{% url 'REST:groupassignment-list' %}",
             collections: "{% url 'REST:collection-list' %}",
             questions: "{% url 'REST:question-list' %}",
+            teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=activeAssignmentCount&field=activeGroupCount&field=createdQuestionCount",
           },
           user: {
-            username: "{{ object.user.saltisemember.name }}",
+            username: {% if request.user.saltisemember %}"{{ request.user.saltisemember.name }}"{% else %}"{{ request.user.username }}"{% endif %},
             avatar: "{{ object.user.saltisemember.picture }}",
           }
         });

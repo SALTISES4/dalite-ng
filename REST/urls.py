@@ -24,13 +24,11 @@ peerinst_api.register(
     views.QuestionViewSet,
     basename="question",
 )
-
 peerinst_api.register(
     r"groupassignments",
     views.StudentGroupAssignmentViewSet,
     basename="groupassignment",
 )
-
 peerinst_api.register(
     r"collections",
     views.CollectionViewSet,
