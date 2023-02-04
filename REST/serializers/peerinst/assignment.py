@@ -420,6 +420,10 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
     description = serializers.ReadOnlyField()
     tags = serializers.SerializerMethodField()
     answerCount = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
+
+    def get_answerCount(self, obj):
+        return obj.answer_count
 
     def get_author(self, obj):
         return obj.owner.user.username
@@ -427,9 +431,16 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
     def get_tags(self, obj):
         return []  # FIXME
 
-    def get_answerCount(self, obj):
-        return obj.answer_count
+    def get_url(self, obj):
+        return obj.get_absolute_url()
 
     class Meta:
         model = Collection
-        fields = ["title", "author", "description", "tags", "answerCount"]
+        fields = [
+            "title",
+            "author",
+            "description",
+            "tags",
+            "answerCount",
+            "url",
+        ]
