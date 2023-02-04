@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import generics, serializers, viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -68,9 +69,15 @@ class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
     serializer_class = GroupAssignmentSerializer
 
     def get_queryset(self):
-        return StudentGroupAssignment.objects.filter(
-            group__teacher=self.request.user.teacher
-        ).order_by("-distribution_date")[0:5]
+        now = timezone.now()
+        return (
+            StudentGroupAssignment.objects.filter(
+                group__teacher=self.request.user.teacher
+            )
+            .filter(distribution_date__lt=now)
+            .filter(due_date__gt=now)
+            .order_by("-distribution_date")
+        )
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
@@ -118,6 +125,19 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class NewQuestionViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated, IsNotStudent]
+    renderer_classes = [JSONRenderer]
+    serializer_class = QuestionSerializer
+
+    def get_queryset(self):
+        if self.request.user.teacher.disciplines:
+            return Question.objects.filter(
+                discipline__in=self.request.user.teacher.disciplines.all()
+            ).order_by("-created_on")[0:4]
+        return Question.objects.order_by("-created_on")[0:4]
 
 
 class QuestionListViewSet(viewsets.ModelViewSet):
