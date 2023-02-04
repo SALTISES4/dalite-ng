@@ -22,6 +22,7 @@
       const dashboardApp = () => {
         return dashboard.h(dashboard.App, {
           gettext: gettext,
+          logo: "{% static 'components/img/logo.gif' %}",
           nonce: "{{ request.csp_nonce }}",
           urls: {
             assignments: "{% url 'REST:groupassignment-list' %}",

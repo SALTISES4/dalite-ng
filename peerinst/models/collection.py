@@ -1,5 +1,6 @@
 from django.core.cache import cache
 from django.db import models
+from django.db.models import Count, Sum
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -45,6 +46,17 @@ class Collection(models.Model):
             60,
         )
 
+    @property
+    def answer_count(self):
+        # TODO: Write test to check returned sum
+        return (
+            self.assignments.values(
+                "assignment", "assignmentquestions__question"
+            )
+            .annotate(num_answers=Count("answer"))
+            .aggregate(Sum("num_answers"))["num_answers__sum"]
+        ) or 0
+
     def __str__(self):
         return self.title
 
@@ -65,4 +77,5 @@ class Collection(models.Model):
         return
 
     def create_from_groupassignments():
+        # TODO
         return

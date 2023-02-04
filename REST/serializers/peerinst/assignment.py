@@ -425,10 +425,10 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
         return obj.owner.user.username
 
     def get_tags(self, obj):
-        return [""]  # FIXME
+        return []  # FIXME
 
     def get_answerCount(self, obj):
-        return 1  # FIXME
+        return obj.answer_count
 
     class Meta:
         model = Collection
