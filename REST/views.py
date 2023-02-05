@@ -152,11 +152,26 @@ class NewQuestionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = QuestionSerializer
 
     def get_queryset(self):
-        if self.request.user.teacher.disciplines:
-            return Question.objects.filter(
+        queryset = Question.objects.exclude(user__isnull=True).order_by(
+            "-created_on"
+        )
+
+        if self.request.user.teacher.disciplines.count() > 0:
+            queryset.filter(
                 discipline__in=self.request.user.teacher.disciplines.all()
-            ).order_by("-created_on")[:4]
-        return Question.objects.order_by("-created_on")[:4]
+            )
+
+        # Generate N valid questions from queryset
+        def valid_questions(qs, n=4):
+            count = 0
+            for q in qs:
+                if q.is_valid:
+                    yield q
+                    count += 1
+                    if count >= n:
+                        break
+
+        return valid_questions(queryset)
 
 
 class QuestionListViewSet(viewsets.ModelViewSet):
