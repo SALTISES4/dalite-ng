@@ -440,6 +440,7 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
             "title",
             "author",
             "description",
+            "featured",
             "tags",
             "answerCount",
             "url",

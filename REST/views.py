@@ -88,9 +88,24 @@ class CollectionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return (
-            Collection.objects.exclude(owner=self.request.user.teacher)
-            .filter(featured=True)
-            .order_by("-last_modified")[0:4]
+            (
+                # Featured
+                Collection.objects.exclude(owner=self.request.user.teacher)
+                .filter(featured=True)
+                .order_by("-last_modified")[:4]
+            )
+            or (
+                # Random sample
+                Collection.objects.exclude(
+                    owner=self.request.user.teacher
+                ).order_by("?")[:4]
+            )
+            or (
+                # Own
+                Collection.objects.filter(
+                    owner=self.request.user.teacher
+                ).order_by("-last_modified")[:4]
+            )
         )
 
 
@@ -140,8 +155,8 @@ class NewQuestionViewSet(viewsets.ReadOnlyModelViewSet):
         if self.request.user.teacher.disciplines:
             return Question.objects.filter(
                 discipline__in=self.request.user.teacher.disciplines.all()
-            ).order_by("-created_on")[0:4]
-        return Question.objects.order_by("-created_on")[0:4]
+            ).order_by("-created_on")[:4]
+        return Question.objects.order_by("-created_on")[:4]
 
 
 class QuestionListViewSet(viewsets.ModelViewSet):
