@@ -26,8 +26,11 @@
           nonce: "{{ request.csp_nonce }}",
           urls: {
             assignments: "{% url 'REST:groupassignment-list' %}",
+            assignmentsLink: "{% url 'group-assignments' request.user.teacher.pk %}",
             collections: "{% url 'REST:collection-list' %}",
+            collectionsLink: "{% url 'collection-list' %}",
             questions: "{% url 'REST:new-question-list' %}",
+            questionsLink: "{% url 'browse-database' %}",
             teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=activeAssignmentCount&field=activeGroupCount&field=createdQuestionCount",
           },
           user: {
