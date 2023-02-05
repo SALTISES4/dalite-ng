@@ -87,7 +87,11 @@ class CollectionViewSet(viewsets.ModelViewSet):
     serializer_class = CollectionSerializer
 
     def get_queryset(self):
-        return Collection.objects.filter(owner=self.request.user.teacher)
+        return (
+            Collection.objects.exclude(owner=self.request.user.teacher)
+            .filter(featured=True)
+            .order_by("-last_modified")[0:4]
+        )
 
 
 class DisciplineViewSet(viewsets.ModelViewSet):
