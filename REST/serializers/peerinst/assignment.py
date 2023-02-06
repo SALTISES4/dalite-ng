@@ -91,8 +91,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
     def get_difficulty(self, obj):
         d = obj.get_difficulty()
-        # TODO: check how value gets out and update component
-        return {"score": d[0], "label": d[1]}
+        return {"score": d[0], "label": d[1], "value": d[2]}
 
     def get_frequency(self, obj):
         return obj.get_frequency()
