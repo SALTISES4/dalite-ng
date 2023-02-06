@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import generics, serializers, viewsets
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -79,8 +80,13 @@ class StudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
+class SmallResultsPagination(PageNumberPagination):
+    page_size = 4
+
+
 class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [IsAuthenticated, IsTeacher, InTeacherList]
+    pagination_class = SmallResultsPagination
+    permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
     serializer_class = CollectionSerializer
 
@@ -90,19 +96,19 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
                 # Featured
                 Collection.objects.exclude(owner=self.request.user.teacher)
                 .filter(featured=True)
-                .order_by("-last_modified")[:4]
+                .order_by("-last_modified")
             )
             or (
                 # Random sample
                 Collection.objects.exclude(
                     owner=self.request.user.teacher
-                ).order_by("?")[:4]
+                ).order_by("?")
             )
             or (
                 # Own
                 Collection.objects.filter(
                     owner=self.request.user.teacher
-                ).order_by("-last_modified")[:4]
+                ).order_by("-last_modified")
             )
         )
 
