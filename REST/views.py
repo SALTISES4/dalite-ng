@@ -62,8 +62,7 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         return Assignment.objects.filter(owner=self.request.user)
 
 
-class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
-    http_method_names = ["get", "patch", "post"]
+class StudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated, IsTeacher, InTeacherList]
     renderer_classes = [JSONRenderer]
     serializer_class = GroupAssignmentSerializer
@@ -80,8 +79,7 @@ class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
         )
 
 
-class CollectionViewSet(viewsets.ModelViewSet):
-    http_method_names = ["get", "patch", "post"]
+class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated, IsTeacher, InTeacherList]
     renderer_classes = [JSONRenderer]
     serializer_class = CollectionSerializer

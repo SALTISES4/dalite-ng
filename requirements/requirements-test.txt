@@ -243,7 +243,7 @@ faker==0.9.1
     #   -r requirements/requirements-test.in
     #   factory-boy
     #   mixer
-future==0.18.2
+future==0.18.3
     # via
     #   -r requirements/requirements-base.txt
     #   django-inlinecss

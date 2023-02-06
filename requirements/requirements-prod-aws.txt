@@ -236,7 +236,7 @@ et-xmlfile==1.1.0
     # via
     #   -r requirements/requirements-base.txt
     #   openpyxl
-future==0.18.2
+future==0.18.3
     # via
     #   -r requirements/requirements-base.txt
     #   django-inlinecss
