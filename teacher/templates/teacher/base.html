@@ -98,7 +98,7 @@
           nonce: "{{ request.csp_nonce }}",
           user: {
             username: "{{ request.user.username }}",
-            avatar: "{% static 'components/img/avatar.jpg' %}",
+            avatar: "{{ avatar }}",
           }
         });
       };
