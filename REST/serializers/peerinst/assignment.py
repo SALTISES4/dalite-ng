@@ -414,11 +414,12 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
 
 
 class CollectionSerializer(DynamicFieldsModelSerializer):
-    title = serializers.ReadOnlyField()
+    answerCount = serializers.SerializerMethodField()
     author = serializers.SerializerMethodField()
     description = serializers.ReadOnlyField()
+    discipline = DisciplineSerializer(read_only=True)
     tags = serializers.SerializerMethodField()
-    answerCount = serializers.SerializerMethodField()
+    title = serializers.ReadOnlyField()
     url = serializers.SerializerMethodField()
 
     def get_answerCount(self, obj):
@@ -428,7 +429,8 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
         return obj.owner.user.username
 
     def get_tags(self, obj):
-        return []  # FIXME
+        # TODO
+        return []
 
     def get_url(self, obj):
         return obj.get_absolute_url()
@@ -436,11 +438,12 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Collection
         fields = [
-            "title",
+            "answerCount",
             "author",
             "description",
+            "discipline",
             "featured",
             "tags",
-            "answerCount",
+            "title",
             "url",
         ]
