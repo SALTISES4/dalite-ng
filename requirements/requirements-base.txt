@@ -94,7 +94,7 @@ daphne==4.0.0
     # via channels
 deprecated==1.2.13
     # via redis
-django==3.2.16
+django==3.2.17
     # via
     #   -r requirements/../blink/requirements.in
     #   -r requirements/requirements-base.in
