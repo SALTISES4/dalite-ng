@@ -35,7 +35,7 @@
           },
           user: {
             username: {% if request.user.saltisemember %}"{{ request.user.saltisemember.name }}"{% else %}"{{ request.user.username }}"{% endif %},
-            avatar: "{{ object.user.saltisemember.picture }}",
+            avatar: "{{ avatar }}",
           }
         });
       };
@@ -44,5 +44,6 @@
         document.getElementById("dashboard-app")
       );
     });
+    console.info("{{ avatar }}")
   </script>
 {% endblock %}
