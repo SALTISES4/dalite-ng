@@ -94,8 +94,7 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
         )
 
     def get_activeGroupCount(self, obj):
-        # TODO: Define 'active' group
-        return 0
+        return obj.current_groups.count()
 
     def get_createdQuestionCount(self, obj):
         return Question.objects.filter(user=obj.user).count()
