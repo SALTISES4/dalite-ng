@@ -120,7 +120,7 @@ constantly==15.1.0
     # via
     #   -r requirements/requirements-base.txt
     #   twisted
-cryptography==38.0.3
+cryptography==38.0.4
     # via
     #   -r requirements/requirements-base.txt
     #   autobahn

@@ -20,7 +20,6 @@ from peerinst.models import (
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 
 from .dynamic_serializer import DynamicFieldsModelSerializer
-from .student_group import StudentGroupSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -351,33 +350,21 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
 
 
 class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
+    active = serializers.SerializerMethodField()
     author = serializers.SerializerMethodField()
     difficulty = serializers.SerializerMethodField()
     distributionState = serializers.SerializerMethodField()
-    groups = serializers.SerializerMethodField()
+    group = serializers.SerializerMethodField()
+    pk = serializers.ReadOnlyField()
     questionCount = serializers.SerializerMethodField()
     answerCount = serializers.SerializerMethodField()
-    title = serializers.ReadOnlyField()
-    dueDate = serializers.ReadOnlyField()
+    title = serializers.SerializerMethodField()
+    due_date = serializers.ReadOnlyField()
     issueCount = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
 
-    def get_author(self, obj):
-        return obj.assignment.owner.first().username
-
-    def get_difficulty(self, obj):
-        return "ToDo"  # calculate difficulty from questions
-
-    def get_distributionState(self, obj):
-        return "Distributed"
-        # FIXME: choices from components/static/_localComponents/enum.ts
-
-    def get_groups(self, obj):
-        return StudentGroupSerializer(obj.group).data
-        # expected type is list?
-
-    def get_questionCount(self, obj):
-        return obj.assignment.questions.count()
+    def get_active(self, obj):
+        return obj.is_distributed and not obj.expired
 
     def get_answerCount(self, obj):
         return (
@@ -391,25 +378,46 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
             .count()
         )
 
+    def get_author(self, obj):
+        return obj.assignment.owner.first().username
+
+    def get_difficulty(self, obj):
+        return "ToDo"  # calculate difficulty from questions
+
+    def get_distributionState(self, obj):
+        return "Distributed"
+        # FIXME: choices from components/static/_localComponents/enum.ts
+
+    def get_group(self, obj):
+        return obj.group.title.strip()
+
     def get_issueCount(self, obj):
         return 1.0  # FIXME
 
     def get_progress(self, obj):
-        return 1.0  # FIXME
+        return 71  # FIXME
+
+    def get_questionCount(self, obj):
+        return obj.assignment.questions.count()
+
+    def get_title(self, obj):
+        return obj.assignment.title.strip()
 
     class Meta:
         model = StudentGroupAssignment
         fields = [
+            "answerCount",
+            "active",
             "author",
             "difficulty",
             "distributionState",
-            "groups",
-            "questionCount",
-            "answerCount",
-            "title",
-            "dueDate",
+            "due_date",
+            "group",
             "issueCount",
+            "pk",
             "progress",
+            "questionCount",
+            "title",
         ]
 
 

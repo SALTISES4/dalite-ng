@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -69,23 +71,24 @@ class StudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GroupAssignmentSerializer
 
     def get_queryset(self):
+        # Return all active and recently due assignments
         now = timezone.now()
         return (
             StudentGroupAssignment.objects.filter(
                 group__teacher=self.request.user.teacher
             )
             .filter(distribution_date__lt=now)
-            .filter(due_date__gt=now)
+            .filter(due_date__gt=now - timedelta(days=7))
             .order_by("-distribution_date")
         )
 
 
-class SmallResultsPagination(PageNumberPagination):
+class MinimumResultsPagination(PageNumberPagination):
     page_size = 4
 
 
 class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
-    pagination_class = SmallResultsPagination
+    pagination_class = MinimumResultsPagination
     permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
     serializer_class = CollectionSerializer
