@@ -11,16 +11,16 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from peerinst.tasks import distribute_assignment_to_students_async
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
-from quality.models import Quality
-from reputation.models import Reputation
-
-from ..tasks import distribute_assignment_to_students_async
-from ..util import (
+from peerinst.util import (
     get_average_time_spent_on_all_question_start,
     student_list_from_student_groups,
 )
-from ..utils import format_time
+from peerinst.utils import format_time
+from quality.models import Quality
+from reputation.models import Reputation
+
 from .group import StudentGroup
 from .question import Question
 
@@ -498,6 +498,23 @@ class StudentGroupAssignment(models.Model):
             }
             for i, question in enumerate(self.questions)
         ]
+
+    @property
+    def percent_completion(self):
+        from peerinst.models import Answer
+
+        # Return value between 0 and 1
+        return (
+            Answer.objects.filter(assignment=self.assignment)
+            .filter(
+                user_token__in=self.group.students.values_list(
+                    "student__username", flat=True
+                )
+            )
+            .count()
+            / (self.studentassignment_set.count() or 1)
+            / (len(self.questions) or 1)
+        )
 
     @property
     def hash(self):

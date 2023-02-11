@@ -395,10 +395,10 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
         return obj.group.title.strip()
 
     def get_issueCount(self, obj):
-        return 1.0  # FIXME
+        return 1.0  # FIXME: Do we need this?
 
     def get_progress(self, obj):
-        return 71  # FIXME
+        return f"{100 * obj.percent_completion:.0f}"
 
     def get_questionCount(self, obj):
         return obj.assignment.questions.count()
