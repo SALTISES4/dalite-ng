@@ -79,6 +79,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         return [
             {
                 "correct": obj.is_correct(i),
+                "label": ac[0],
                 "text": bleach.clean(
                     ac[1],
                     tags=ALLOWED_TAGS,
