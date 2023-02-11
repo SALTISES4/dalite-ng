@@ -24,6 +24,11 @@ def dummy_paths():
             views.page_not_found,
             name="question-update-path",
         ),
+        path(
+            "group-assignment/",
+            views.page_not_found,
+            name="group-assignment",
+        ),
     ]
 
 

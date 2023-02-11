@@ -351,17 +351,18 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
 
 class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
     active = serializers.SerializerMethodField()
+    answerCount = serializers.SerializerMethodField()
     assignment_pk = serializers.SerializerMethodField()
     author = serializers.SerializerMethodField()
     difficulty = serializers.SerializerMethodField()
     distributionState = serializers.SerializerMethodField()
-    group = serializers.SerializerMethodField()
-    questionCount = serializers.SerializerMethodField()
-    answerCount = serializers.SerializerMethodField()
-    title = serializers.SerializerMethodField()
     due_date = serializers.ReadOnlyField()
+    group = serializers.SerializerMethodField()
+    hash = serializers.ReadOnlyField()
     issueCount = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
+    questionCount = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
 
     def get_active(self, obj):
         return obj.is_distributed and not obj.expired
@@ -417,6 +418,7 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
             "distributionState",
             "due_date",
             "group",
+            "hash",
             "issueCount",
             "progress",
             "questionCount",
