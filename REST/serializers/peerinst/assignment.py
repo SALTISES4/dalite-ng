@@ -351,11 +351,11 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
 
 class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
     active = serializers.SerializerMethodField()
+    assignment_pk = serializers.SerializerMethodField()
     author = serializers.SerializerMethodField()
     difficulty = serializers.SerializerMethodField()
     distributionState = serializers.SerializerMethodField()
     group = serializers.SerializerMethodField()
-    pk = serializers.ReadOnlyField()
     questionCount = serializers.SerializerMethodField()
     answerCount = serializers.SerializerMethodField()
     title = serializers.SerializerMethodField()
@@ -377,6 +377,9 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
             .filter(assignment=obj.assignment)
             .count()
         )
+
+    def get_assignment_pk(self, obj):
+        return obj.assignment.pk
 
     def get_author(self, obj):
         return obj.assignment.owner.first().username
@@ -408,13 +411,13 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
         fields = [
             "answerCount",
             "active",
+            "assignment_pk",
             "author",
             "difficulty",
             "distributionState",
             "due_date",
             "group",
             "issueCount",
-            "pk",
             "progress",
             "questionCount",
             "title",
