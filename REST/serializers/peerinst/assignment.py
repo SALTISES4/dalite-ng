@@ -359,11 +359,11 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
     distributionState = serializers.SerializerMethodField()
     due_date = serializers.ReadOnlyField()
     group = serializers.SerializerMethodField()
-    hash = serializers.ReadOnlyField()
     issueCount = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
     questionCount = serializers.SerializerMethodField()
     title = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
 
     def get_active(self, obj):
         return obj.is_distributed and not obj.expired
@@ -408,6 +408,9 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
     def get_title(self, obj):
         return obj.assignment.title.strip()
 
+    def get_url(self, obj):
+        return obj.get_absolute_url()
+
     class Meta:
         model = StudentGroupAssignment
         fields = [
@@ -419,11 +422,11 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
             "distributionState",
             "due_date",
             "group",
-            "hash",
             "issueCount",
             "progress",
             "questionCount",
             "title",
+            "url",
         ]
 
 

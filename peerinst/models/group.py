@@ -3,6 +3,7 @@ from datetime import date
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from quality.models import Quality
@@ -80,15 +81,15 @@ class StudentGroup(models.Model):
     )
 
     def __str__(self):
-        if not self.title:
-            return self.name
-        else:
-            return self.title
+        return self.title or self.name
 
     class Meta:
         ordering = ["-creation_date"]
         verbose_name = _("group")
         verbose_name_plural = _("groups")
+
+    def get_absolute_url(self):
+        return reverse("group-details", args=(self.hash,))
 
     @staticmethod
     def get(hash_):
