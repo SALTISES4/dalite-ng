@@ -7,6 +7,11 @@
   <div id="navigation-app"></div>
 {% endblock %}
 
+{% block body %}
+  {{ block.super }}
+  {% csrf_token %}
+{% endblock %}
+
 {% block scripts %}
   {{ block.super }}
   <script nonce="{{ request.csp_nonce }}">
