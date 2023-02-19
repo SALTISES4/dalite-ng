@@ -33,7 +33,7 @@ pytz
 requests
 twisted == 22.4 # [3]
 
-SALTISE_course_flow == 0.8.1
+SALTISE_course_flow == 0.8.2
 SALTISE_user_feedback
 
 # 1. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19

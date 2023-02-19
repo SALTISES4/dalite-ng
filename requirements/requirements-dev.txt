@@ -1126,8 +1126,8 @@ safety==2.0.0 \
     --hash=sha256:77cebdd128ce47b941e68a1b3bbc29fbbd2b9e98d11f179c5def64c1d05da295 \
     --hash=sha256:d739d00a9e4203cfaba34540c822a73ca1d327159ed7776b3dce09391f81c35d
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.8.1 \
-    --hash=sha256:946c02a204c8527a6a2708164a9456d5ed71bb8e8186a7f3058b51d844790781
+saltise-course-flow==0.8.2 \
+    --hash=sha256:0f61e4b44e64bcf3e306a0fa5b61640c10c6129c439a99cfdaa3cd04f7c4922d
     # via -r requirements/requirements-test.txt
 saltise-user-feedback==1.1.2 \
     --hash=sha256:c57647cb83ab8bcee43f2ddc5db586f5fc20db3fb9f7a6a09b9be01de2005303
