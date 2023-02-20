@@ -367,11 +367,11 @@
         });
       {% endfor %}
 
-      {% for a in object.blinkassignment_set.all %}
-        document.getElementById("edit-blink-{{a.pk}}").addEventListener("click", function() {
-          window.location.href="{% url 'blink:blink-waiting' username=object.user.username assignment=a.key %}";
-        });
-      {% endfor %}
+      // {% for a in object.blinkassignment_set.all %}
+      //   document.getElementById("edit-blink-{{a.pk}}").addEventListener("click", function() {
+      //     window.location.href="{% url 'blink:blink-waiting' username=object.user.username assignment=a.key %}";
+      //   });
+      // {% endfor %}
 
       document.getElementById("edit-user-btn").addEventListener("click", function() {
         edit_user();

@@ -243,7 +243,8 @@ faker==0.9.1
     #   -r requirements/requirements-test.in
     #   factory-boy
     #   mixer
-future==0.18.3
+future==0.18.3 \
+    --hash=sha256:34a17436ed1e96697a86f9de3d15a3b0be01d8bc8de9c1dffd59fb8234ed5307
     # via
     #   -r requirements/requirements-base.txt
     #   django-inlinecss
@@ -440,7 +441,8 @@ rjsmin==1.2.0
     # via
     #   -r requirements/requirements-base.txt
     #   django-compressor
-saltise-course-flow==0.8.0
+saltise-course-flow==0.8.2 \
+    --hash=sha256:0f61e4b44e64bcf3e306a0fa5b61640c10c6129c439a99cfdaa3cd04f7c4922d
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==1.1.2
     # via -r requirements/requirements-base.txt

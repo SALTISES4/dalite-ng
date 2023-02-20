@@ -22,6 +22,7 @@ django-minify-html
 django-permissions-policy
 django-tinymce
 djangorestframework
+future>0.18.2
 langdetect
 mysqlclient
 pandas
@@ -33,7 +34,7 @@ pytz
 requests
 twisted == 22.4 # [3]
 
-SALTISE_course_flow == 0.8.0
+SALTISE_course_flow == 0.8.2
 SALTISE_user_feedback
 
 -e ../Components
