@@ -163,9 +163,7 @@ class AssignmentQuestions(models.Model):
     rank = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return "{}-{}-{}".format(
-            self.assignment.pk, self.question.pk, self.rank
-        )
+        return f"{self.assignment.pk}-{self.question.pk}-{self.rank}"
 
     class Meta:
         db_table = "peerinst_assignment_questions"
@@ -193,6 +191,9 @@ class StudentGroupAssignment(models.Model):
     quality = models.ForeignKey(
         Quality, blank=True, null=True, on_delete=models.SET_NULL
     )
+
+    def get_absolute_url(self):
+        return reverse("group-assignment", args=(self.hash,))
 
     @staticmethod
     def get(hash_):

@@ -27,12 +27,11 @@
           urls: {
             assignments: "{% url 'REST:groupassignment-list' %}",
             assignmentsLink: "{% url 'group-assignments' request.user.teacher.pk %}",
-            assignmentDetail: "{% url 'group-assignment' %}",
             collections: "{% url 'REST:collection-list' %}",
             collectionsLink: "{% url 'collection-list' %}",
-            questions: "{% url 'REST:new-question-list' %}?field=answer_count&field=category&field=difficulty&field=discipline&field=peer_impact&field=tags&field=text&field=title&field=user&field=answerchoice_set",
+            questions: "{% url 'REST:new-question-list' %}?field=answer_count&field=category&field=difficulty&field=discipline&field=peer_impact&field=tags&field=text&field=title&field=user&field=answerchoice_set&field=image&field=image_alt_text&field=video_url&field=pk",
             questionsLink: "{% url 'browse-database' %}",
-            teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=activeAssignmentCount&field=activeGroupCount&field=createdQuestionCount",
+            teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=activeAssignmentCount&field=activeGroupCount&field=createdQuestionCount&field=favourite_questions",
           },
           user: {
             username: {% if request.user.saltisemember %}"{{ request.user.saltisemember.name }}"{% else %}"{{ request.user.username }}"{% endif %},
