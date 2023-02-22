@@ -435,8 +435,9 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
     author = serializers.SerializerMethodField()
     description = serializers.ReadOnlyField()
     discipline = DisciplineSerializer(read_only=True)
-    tags = serializers.SerializerMethodField()
+    followed_by_user = serializers.SerializerMethodField()
     title = serializers.ReadOnlyField()
+    follow_url = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
 
     def get_answerCount(self, obj):
@@ -445,9 +446,17 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
     def get_author(self, obj):
         return obj.owner.user.username
 
-    def get_tags(self, obj):
-        # TODO
-        return []
+    def get_followed_by_user(self, obj):
+        if "request" in self.context and hasattr(
+            self.context["request"].user, "teacher"
+        ):
+            return self.context["request"].user.teacher in obj.followers.all()
+        return None
+
+    def get_follow_url(self, obj):
+        # Endpoint to toggle whether or not user follows this collection
+
+        return reverse("REST:collection-toggle-follow", args=(obj.pk,))
 
     def get_url(self, obj):
         return obj.get_absolute_url()
@@ -460,7 +469,9 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
             "description",
             "discipline",
             "featured",
-            "tags",
+            "followed_by_user",
+            "follow_url",
+            "pk",
             "title",
             "url",
         ]

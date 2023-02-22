@@ -182,7 +182,7 @@ def old_patterns():
             name="teacher",
         ),
         path(
-            "teacher/<int:pk>/",
+            "teacher-profile/<int:pk>/",
             views.TeacherUpdate.as_view(),
             name="teacher-update",
         ),

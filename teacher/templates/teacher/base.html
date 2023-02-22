@@ -24,9 +24,9 @@
               {title: "{% trans 'Dashboard' %}", icon: "dashboard", url: "{% url 'teacher:dashboard' request.user.teacher.pk %}"},
             ],
             [
-              {title: "{% trans 'Questions' %}", icon: "forum", url: "#"},
-              {title: "{% trans 'Assignments' %}", icon: "assignment", url: "#"},
-              {title: "{% trans 'Collections' %}", icon: "collections_bookmark", url: "#"}
+              {title: "{% trans 'Questions' %}", icon: "forum", url: "{% url 'teacher' request.user.teacher.pk %}#questions-app"},
+              {title: "{% trans 'Assignments' %}", icon: "assignment", url: "{% url 'teacher' request.user.teacher.pk %}#assignments-app"},
+              {title: "{% trans 'Collections' %}", icon: "collections_bookmark", url: "{% url 'teacher' request.user.teacher.pk %}#collection-section"}
             ],
             [
               {title: "{% trans 'Student activity' %}", icon: "mark_unread_chat_alt", url: "{% url 'student-activity' %}"},
@@ -45,17 +45,17 @@
               {
                 title: "{% trans 'Question' %}",
                 icon: "question_answer",
-                url: "#"
+                url: "{% url 'question-create' %}",
               },
               {
                 title: "{% trans 'Assignment' %}",
                 icon: "assignment",
-                url: "#"
+                url: "{% url 'assignment-create' %}",
               },
               {
                 title: "{% trans 'Collection' %}",
                 icon: "playlist_add",
-                url: "#"
+                url: "{% url 'collection-create' %}"
               },
               {
                 title: "{% trans 'Group' %}",
@@ -63,9 +63,20 @@
                 url: "{% url 'teacher-groups' request.user.teacher.pk %}"
               },
               {
+                disabled: true,
                 title: "{% trans 'Invite' %}",
                 icon: "person_add",
                 url: "#"
+              },
+            ],
+          ],
+          menuHelpItems: [
+            [
+              {
+                title: "{% trans 'Help' %}",
+                icon: "help",
+                url: "https://www.saltise.ca/professional-development/tools/mydalite/",
+                target: "_blank",
               },
             ],
           ],
@@ -74,7 +85,7 @@
               {
                 title: "{% trans 'Profile' %}",
                 icon: "account_box",
-                url: "#"
+                url: "{% url 'teacher-update' request.user.teacher.pk %}",
               },
               {
                 title: "{% trans 'Password' %}",
@@ -82,9 +93,14 @@
                 url: "{% url 'password_change' %}"
               },
               {
-                title: "{% trans 'Notifications' %}",
+                title: "{% trans 'Email & notifications' %}",
                 icon: "notifications",
-                url: "#"
+                url: "{% url 'tos:email_modify' 'teacher' %}"
+              },
+              {
+                title: "{% trans 'Terms of service' %}",
+                icon: "gavel",
+                url: "{% url 'tos:tos_modify' 'teacher' %}?next={{ request.path }}"
               },
             ],
             [
