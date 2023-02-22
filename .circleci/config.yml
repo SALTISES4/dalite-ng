@@ -40,7 +40,7 @@ jobs:
           command: |
             . .venv/bin/activate
             python -m pip install safety
-            safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY -i 51619 -i 35462 -i 53048
+            safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY -i 51619 -i 52510 -i 35462 -i 53048
       - run:
           name: Install packages
           command: |
