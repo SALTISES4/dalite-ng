@@ -10,4 +10,9 @@ urlpatterns = [
         views_teacher.TeacherDashboardView.as_view(),
         name="dashboard",
     ),
+    path(
+        "<int:pk>/search/",
+        views_teacher.SearchView.as_view(),
+        name="search",
+    ),
 ]

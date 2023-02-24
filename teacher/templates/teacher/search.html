@@ -1,0 +1,40 @@
+{% extends 'teacher/base.html' %}
+
+{% load static %}
+
+{% block apps %}
+  {{ block.super }}
+  <script
+    src="{% static 'components/js/build/search.min.js' %}"
+    defer="true"
+  ></script>
+{% endblock %}
+
+{% block injected_apps %}
+  {{ block.super }}
+  <div id="search-app"></div>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function () {
+      const searchApp = () => {
+        return search.h(search.App, {
+          gettext: gettext,
+          logo: "{% static 'components/img/logo.gif' %}",
+          nonce: "{{ request.csp_nonce }}",
+          urls: {
+          },
+          user: {
+            username: {% if request.user.saltisemember %}"{{ request.user.saltisemember.name }}"{% else %}"{{ request.user.username }}"{% endif %},
+          }
+        });
+      };
+      search.render(
+        searchApp(),
+        document.getElementById("search-app")
+      );
+    });
+  </script>
+{% endblock %}

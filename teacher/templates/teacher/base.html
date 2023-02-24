@@ -20,7 +20,7 @@
         return navigation.h(navigation.App, {
           sidebarGroups:[
             [
-              {title: "{% trans 'Search' %}", icon: "search", url: "{% url 'browse-database' %}"},
+              {title: "{% trans 'Search' %}", icon: "search", url: "{% url 'teacher:search' request.user.teacher.pk %}"},
               {title: "{% trans 'Dashboard' %}", icon: "dashboard", url: "{% url 'teacher:dashboard' request.user.teacher.pk %}"},
             ],
             [

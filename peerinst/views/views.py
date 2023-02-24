@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import random
 import time
 import urllib.error
@@ -71,6 +72,7 @@ from peerinst.models import (
     NewUserRequest,
     Question,
     RationaleOnlyQuestion,
+    SaltiseMember,
     ShownRationale,
     Student,
     StudentGroup,
@@ -1733,6 +1735,20 @@ class TeacherBase(LoginRequiredMixin, NoStudentsMixin, View):
                     return super().dispatch(*args, **kwargs)
         else:
             raise PermissionDenied
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        backup_avatar = os.path.join(
+            settings.STATIC_URL, "components/img/logo.gif"
+        )
+        try:
+            if self.request.user.saltisemember.picture:
+                context["avatar"] = self.request.user.saltisemember.picture.url
+            else:
+                context["avatar"] = backup_avatar
+        except SaltiseMember.DoesNotExist:
+            context["avatar"] = backup_avatar
+        return context
 
 
 class TeacherGroupShare(TeacherBase, DetailView):

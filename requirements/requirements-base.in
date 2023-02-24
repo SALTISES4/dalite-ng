@@ -34,7 +34,8 @@ pytz
 requests
 twisted == 22.4 # [3]
 
-SALTISE_components == 0.2
+# SALTISE_components == 0.2
+-e ../Components
 SALTISE_course_flow == 0.8.2
 SALTISE_user_feedback
 
