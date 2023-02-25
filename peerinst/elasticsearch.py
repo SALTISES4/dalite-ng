@@ -4,7 +4,7 @@ import time
 
 from elasticsearch_dsl import Q
 
-from peerinst.documents import QuestionDocument
+from peerinst.documents import AssignmentDocument, QuestionDocument
 
 logger = logging.getLogger("performance")
 pp = pprint.PrettyPrinter()
@@ -104,4 +104,23 @@ def question_search(search_string, filters=None, flagged=None):
 
         logger.debug(f"Score {i+1}: {hit.meta.score} | #{hit.pk}")
 
+    return s
+
+
+def assignment_search(search_string):
+    q = Q(
+        "multi_match",
+        query=search_string,
+        fields=[
+            "title^2",
+            "description",
+            "user.username",
+        ],
+    )
+
+    s = (
+        AssignmentDocument.search()
+        .sort("_score")
+        .query("function_score", **{"query": q, "functions": [{}]})
+    )
     return s

@@ -21,6 +21,7 @@ from elasticsearch_dsl import analyzer, token_filter, tokenizer
 
 from peerinst.models import (
     AnswerChoice,
+    Assignment,
     Category,
     Discipline,
     Question,
@@ -278,3 +279,58 @@ class QuestionDocument(Document):
             QuestionFlag,
             User,
         ]
+
+
+class AssignmentDocument(Document):
+
+    title = TextField(index=False)
+    description = TextField(index=False)
+    owner = ObjectField(
+        properties={
+            "username": TextField(analyzer=autocomplete),
+            "saltise": BooleanField(index=False),
+            "expert": BooleanField(index=False),
+        }
+    )
+
+    def prepare_title(self, instance):
+        return bleach.clean(
+            instance.title,
+            tags=ALLOWED_TAGS,
+            strip=True,
+        ).strip()
+
+    def prepare_description(self, instance):
+        return bleach.clean(
+            instance.description,
+            tags=ALLOWED_TAGS,
+            strip=True,
+        ).strip()
+
+    def prepare_user(self, instance):
+        username = ""
+        saltise = False
+        expert = False
+        if instance.user:
+            username = instance.user.username
+            if hasattr(instance.user, "saltisemember"):
+                saltise = True
+                expert = instance.user.saltisemember.expert
+        return {
+            "username": username,
+            "saltise": saltise,
+            "expert": expert,
+        }
+
+    def get_instances_from_related(self, related_instance):
+        for model in [Question, Discipline]:
+            if isinstance(related_instance, model):
+                return related_instance.question_set.all()
+
+    class Index:
+        name = "assignments"
+        settings = {"number_of_shards": 1, "number_of_replicas": 0}
+
+    class Django:
+        model = Assignment
+        related_models = [Question, Discipline]
