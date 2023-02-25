@@ -16,29 +16,36 @@
   {{ block.super }}
   <script nonce="{{ request.csp_nonce }}">
     window.addEventListener("load", function () {
+      const sidebarGroups = [
+        [
+          {title: "{% trans 'Dashboard' %}", icon: "dashboard", url: "{% url 'teacher:dashboard' request.user.teacher.pk %}"},
+          {title: "{% trans 'Search' %}", icon: "search", url: "{% url 'teacher:search' request.user.teacher.pk %}"},
+        ],
+        [
+          {title: "{% trans 'Questions' %}", icon: "forum", url: "{% url 'teacher' request.user.teacher.pk %}#questions-app"},
+          {title: "{% trans 'Assignments' %}", icon: "assignment", url: "{% url 'teacher' request.user.teacher.pk %}#assignments-app"},
+          {title: "{% trans 'Collections' %}", icon: "collections_bookmark", url: "{% url 'teacher' request.user.teacher.pk %}#collection-section"}
+        ],
+        [
+          {title: "{% trans 'Student activity' %}", icon: "mark_unread_chat_alt", url: "{% url 'student-activity' %}"},
+          {% for group in request.user.teacher.current_groups.all %}
+            {title: "{{ group.title }}", icon: "groups", url: "{{ group.get_absolute_url }}"},
+          {% endfor %}
+          {title: "{% trans 'Manage groups' %}", icon: "settings", url: "{% url 'teacher-groups' request.user.teacher.pk %}"},
+        ],
+      ];
+      const currentUrl = new URL(window.location.href);
+      sidebarGroups.forEach(arr => {
+        arr.forEach(link => {
+          const linkUrl = new URL(link.url, currentUrl.origin);
+          link.selected = currentUrl.pathname == linkUrl.pathname;
+        }
+        )
+      });
+
       const navigationApp = () => {
         return navigation.h(navigation.App, {
-          sidebarGroups:[
-            [
-              {title: "{% trans 'Search' %}", icon: "search", url: "{% url 'teacher:search' request.user.teacher.pk %}"},
-              {title: "{% trans 'Dashboard' %}", icon: "dashboard", url: "{% url 'teacher:dashboard' request.user.teacher.pk %}"},
-            ],
-            [
-              {title: "{% trans 'Questions' %}", icon: "forum", url: "{% url 'teacher' request.user.teacher.pk %}#questions-app"},
-              {title: "{% trans 'Assignments' %}", icon: "assignment", url: "{% url 'teacher' request.user.teacher.pk %}#assignments-app"},
-              {title: "{% trans 'Collections' %}", icon: "collections_bookmark", url: "{% url 'teacher' request.user.teacher.pk %}#collection-section"}
-            ],
-            [
-              {title: "{% trans 'Student activity' %}", icon: "mark_unread_chat_alt", url: "{% url 'student-activity' %}"},
-              {% for group in request.user.teacher.current_groups.all %}
-                {title: "{{ group.title }}", icon: "groups", url: "{{ group.get_absolute_url }}"},
-              {% endfor %}
-              {title: "{% trans 'Manage groups' %}", icon: "settings", url: "{% url 'teacher-groups' request.user.teacher.pk %}"},
-            ],
-            [
-              {title: "CourseFlow", icon: "account_tree", url: "{% url 'course_flow:home' %}"},
-            ]
-          ],
+          sidebarGroups,
           logo: "{% static 'components/img/logo.png' %}",
           menuAddItems: [
             [
