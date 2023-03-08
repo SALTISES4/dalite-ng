@@ -281,6 +281,7 @@ class QuestionDocument(Document):
         ]
 
 
+@registry.register_document
 class AssignmentDocument(Document):
 
     title = TextField(index=False)
