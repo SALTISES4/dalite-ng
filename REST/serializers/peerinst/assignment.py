@@ -120,7 +120,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
     def get_peer_impact(self, obj):
         pi = obj.get_peer_impact()
-        return {"score": pi[0], "label": pi[1]}
+        return {"score": pi[0], "label": pi[1], "value": pi[2]}
 
     def get_urls(self, obj):
         return {

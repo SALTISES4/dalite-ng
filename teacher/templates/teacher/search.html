@@ -25,6 +25,7 @@
           logo: "{% static 'components/img/logo.gif' %}",
           nonce: "{{ request.csp_nonce }}",
           urls: {
+            collections: "{% url 'REST:collection-list' %}",
           },
           user: {
             username: {% if request.user.saltisemember %}"{{ request.user.saltisemember.name }}"{% else %}"{{ request.user.username }}"{% endif %},
