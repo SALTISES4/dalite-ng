@@ -2243,6 +2243,7 @@ def question_search_beta(request):
                     for i in impacts
                     if _i[0] == i
                 ],
+                "hit_count": s.count(),
             }
         else:
             meta = {
@@ -2250,6 +2251,7 @@ def question_search_beta(request):
                 "difficulties": [],
                 "disciplines": [],
                 "impacts": [],
+                "hit_count": 0,
             }
 
         search_logger.info(
