@@ -26,6 +26,7 @@
           nonce: "{{ request.csp_nonce }}",
           urls: {
             collections: "{% url 'REST:collection-list' %}",
+            questions: "{% url 'question-search' %}",
           },
           user: {
             username: {% if request.user.saltisemember %}"{{ request.user.saltisemember.name }}"{% else %}"{{ request.user.username }}"{% endif %},

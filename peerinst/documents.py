@@ -141,6 +141,7 @@ class QuestionDocument(Document):
             return [
                 {
                     "correct": instance.is_correct(i),
+                    "label": ac[0],
                     "text": bleach.clean(
                         ac[1],
                         tags=ALLOWED_TAGS,
@@ -303,7 +304,7 @@ class AssignmentDocument(Document):
 
     def prepare_description(self, instance):
         return bleach.clean(
-            instance.description,
+            instance.description or "",
             tags=ALLOWED_TAGS,
             strip=True,
         ).strip()

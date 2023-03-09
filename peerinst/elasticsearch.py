@@ -118,9 +118,8 @@ def assignment_search(search_string):
         ],
     )
 
-    s = (
+    return (
         AssignmentDocument.search()
         .sort("_score")
         .query("function_score", **{"query": q, "functions": [{}]})
     )
-    return s
