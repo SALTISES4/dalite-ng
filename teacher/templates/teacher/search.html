@@ -25,8 +25,10 @@
           logo: "{% static 'components/img/logo.gif' %}",
           nonce: "{{ request.csp_nonce }}",
           urls: {
+            assignments: "{% url 'assignment-search' %}",
             collections: "{% url 'REST:collection-list' %}",
             questions: "{% url 'question-search' %}",
+            teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=favourite_questions",
           },
           user: {
             username: {% if request.user.saltisemember %}"{{ request.user.saltisemember.name }}"{% else %}"{{ request.user.username }}"{% endif %},

@@ -284,23 +284,15 @@ class QuestionDocument(Document):
 
 @registry.register_document
 class AssignmentDocument(Document):
+    answer_count = IntegerField(index=False)
+    description = TextField(analyzer=html_strip)
+    owner = TextField(analyzer=autocomplete)
+    pk = KeywordField(index=False)
+    question_count = IntegerField(index=False)
+    title = TextField(analyzer=html_strip)
 
-    title = TextField(index=False)
-    description = TextField(index=False)
-    owner = ObjectField(
-        properties={
-            "username": TextField(analyzer=autocomplete),
-            "saltise": BooleanField(index=False),
-            "expert": BooleanField(index=False),
-        }
-    )
-
-    def prepare_title(self, instance):
-        return bleach.clean(
-            instance.title,
-            tags=ALLOWED_TAGS,
-            strip=True,
-        ).strip()
+    def prepare_answer_count(self, instance):
+        return instance.answer_count
 
     def prepare_description(self, instance):
         return bleach.clean(
@@ -309,25 +301,28 @@ class AssignmentDocument(Document):
             strip=True,
         ).strip()
 
-    def prepare_user(self, instance):
-        username = ""
-        saltise = False
-        expert = False
-        if instance.user:
-            username = instance.user.username
-            if hasattr(instance.user, "saltisemember"):
-                saltise = True
-                expert = instance.user.saltisemember.expert
-        return {
-            "username": username,
-            "saltise": saltise,
-            "expert": expert,
-        }
+    def prepare_owner(self, instance):
+        if instance.owner.count() > 0:
+            return ", ".join(user.username for user in instance.owner.all())
+        return ""
+
+    def prepare_pk(self, instance):
+        return instance.pk
+
+    def prepare_question_count(self, instance):
+        return instance.questions.count()
+
+    def prepare_title(self, instance):
+        return bleach.clean(
+            instance.title,
+            tags=ALLOWED_TAGS,
+            strip=True,
+        ).strip()
 
     def get_instances_from_related(self, related_instance):
-        for model in [Question, Discipline]:
+        for model in [Question]:
             if isinstance(related_instance, model):
-                return related_instance.question_set.all()
+                return related_instance.assignment_set.all()
 
     class Index:
         name = "assignments"
@@ -335,4 +330,4 @@ class AssignmentDocument(Document):
 
     class Django:
         model = Assignment
-        related_models = [Question, Discipline]
+        related_models = [Question]

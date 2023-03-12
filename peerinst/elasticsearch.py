@@ -107,19 +107,37 @@ def question_search(search_string, filters=None, flagged=None):
     return s
 
 
-def assignment_search(search_string):
+def assignment_search(search_string, filters=None):
+
+    start = time.perf_counter()
+
     q = Q(
         "multi_match",
         query=search_string,
         fields=[
+            "owner^3",
             "title^2",
             "description",
-            "user.username",
         ],
     )
 
-    return (
+    s = (
         AssignmentDocument.search()
-        .sort("_score")
-        .query("function_score", **{"query": q, "functions": [{}]})
+        .sort("_score", "-answer_count")
+        .query("function_score", **{"query": q})
     )
+
+    end = time.perf_counter()
+
+    logger.info(
+        f"ElasticSearch time to query '{search_string}': {end - start:E}s"  # noqa E501
+    )
+    logger.info(f"Hit count: {s.count()}")
+
+    for i, hit in enumerate(s):
+        if i == 0:
+            logger.debug(f"Top result: \n{pp.pformat(hit.to_dict())}")
+
+        logger.debug(f"Score {i+1}: {hit.meta.score} | #{hit.pk}")
+
+    return s

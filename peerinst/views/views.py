@@ -52,6 +52,7 @@ from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
 from peerinst import admin, forms, models, rationale_choice
 from peerinst.admin_views import get_question_rationale_aggregates
+from peerinst.elasticsearch import assignment_search as as_ES
 from peerinst.elasticsearch import question_search as qs_ES
 from peerinst.mixins import (
     LoginRequiredMixin,
@@ -2181,6 +2182,37 @@ def collection_search_function(search_string, pre_filtered_list=None):
 
 
 # AJAX functions
+@ajax_login_required
+@ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
+def assignment_search_beta(request):
+    FILTERS = [
+        "category__title",
+        "discipline.title",
+        "difficulty.label",
+        "peer_impact.label",
+    ]
+
+    if search_string := request.GET.get("search_string", default=""):
+        start = time.perf_counter()
+
+        terms = search_string.split()
+        query = [t for t in terms if t.split("::")[0].lower() not in FILTERS]
+
+        # Search
+        s = as_ES(" ".join(query))
+
+        # Serialize
+        results = [hit.to_dict() for hit in s[:50]]
+
+        search_logger.info(
+            f"{time.perf_counter() - start:.2e}s - {search_string}"
+        )
+
+        return JsonResponse({"results": results}, safe=False)
+
+    return JsonResponse({})
+
+
 @ajax_login_required
 @ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
 def question_search_beta(request):

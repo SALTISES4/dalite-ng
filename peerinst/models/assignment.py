@@ -136,6 +136,10 @@ class Assignment(models.Model):
         verbose_name_plural = _("assignments")
 
     @property
+    def answer_count(self):
+        return sum(q.answer_count for q in self.questions.all())
+
+    @property
     def editable(self):
         return (
             not self.answer_set.filter(expert=False)
