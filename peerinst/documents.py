@@ -23,6 +23,7 @@ from peerinst.models import (
     AnswerChoice,
     Assignment,
     Category,
+    Collection,
     Discipline,
     Question,
     QuestionFlag,
@@ -331,3 +332,65 @@ class AssignmentDocument(Document):
     class Django:
         model = Assignment
         related_models = [Question]
+
+
+@registry.register_document
+class CollectionDocument(Document):
+    title = TextField(analyzer=html_strip)
+    description = TextField(analyzer=html_strip)
+    discipline = ObjectField(
+        properties={"title": TextField(analyzer=full_term)}
+    )
+    public = BooleanField()
+    owner = TextField(analyzer=autocomplete)
+
+    def prepare_owner(self, instance):
+        username = ""
+        saltise = False
+        expert = False
+        if instance.owner:
+            username = instance.owner.user.username
+            if hasattr(instance.owner.user, "saltisemember"):
+                saltise = True
+                expert = instance.owner.user.saltisemember.expert
+        return {
+            "username": username,
+            "saltise": saltise,
+            "expert": expert,
+        }
+
+    def prepare_title(self, instance):
+        return bleach.clean(
+            instance.title,
+            tags=ALLOWED_TAGS,
+            strip=True,
+        ).strip()
+
+    def prepare_description(self, instance):
+        return bleach.clean(
+            instance.description or "",
+            tags=ALLOWED_TAGS,
+            strip=True,
+        ).strip()
+
+    def prepare_discipline(self, instance):
+        """Bleach"""
+        if instance.discipline:
+            return {
+                "title": bleach.clean(
+                    instance.discipline.title,
+                    tags=[],
+                    strip=True,
+                ).strip()
+            }
+        return {"title": ""}
+
+    def prepare_public(self, instance):
+        return not instance.private
+
+    class Index:
+        name = "collections"
+        settings = {"number_of_shards": 1, "number_of_replicas": 0}
+
+    class Django:
+        model = Collection

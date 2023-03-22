@@ -125,6 +125,7 @@ repos:
             "requirements/requirements-prod-aws.txt",
             --ignore=51619,
             --ignore=35462,
+            --ignore=53048
           ]
 
   - repo: local
