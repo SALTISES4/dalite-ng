@@ -45,7 +45,7 @@ autocomplete = analyzer(
     filter=["lowercase"],
 )
 
-trigram_filter = token_filter("ngram", "ngram", min_gram=3, max_gram=3)
+trigram_filter = token_filter("ngram", "ngram", min_gram=3, max_gram=5)
 trigram = analyzer(
     "trigram", tokenizer="whitespace", filter=["lowercase", trigram_filter]
 )
@@ -73,7 +73,7 @@ class QuestionDocument(Document):
     category = NestedField(
         properties={
             "title": TextField(
-                analyzer=full_term,
+                analyzer=trigram,
             )
         }
     )  # don't break on spaces?
@@ -92,7 +92,7 @@ class QuestionDocument(Document):
         }
     )
     discipline = ObjectField(
-        properties={"title": TextField(analyzer=full_term)}
+        properties={"title": TextField(analyzer=trigram)}
     )  # don't break on spaces?
     featured = BooleanField()
     frequency = ObjectField(
@@ -267,7 +267,11 @@ class QuestionDocument(Document):
 
     class Index:
         name = "questions"
-        settings = {"number_of_shards": 1, "number_of_replicas": 0}
+        settings = {
+            "number_of_shards": 1,
+            "number_of_replicas": 0,
+            "max_ngram_diff": 3,
+        }
 
     class Django:
         model = Question
