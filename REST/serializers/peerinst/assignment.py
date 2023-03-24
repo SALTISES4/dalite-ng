@@ -435,6 +435,7 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
     author = serializers.SerializerMethodField()
     description = serializers.ReadOnlyField()
     discipline = DisciplineSerializer(read_only=True)
+    follower_count = serializers.SerializerMethodField()
     followed_by_user = serializers.SerializerMethodField()
     title = serializers.ReadOnlyField()
     follow_url = serializers.SerializerMethodField()
@@ -458,6 +459,9 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
 
         return reverse("REST:collection-toggle-follow", args=(obj.pk,))
 
+    def get_follower_count(self, obj):
+        return obj.followers.count()
+
     def get_url(self, obj):
         return obj.get_absolute_url()
 
@@ -471,6 +475,7 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
             "featured",
             "followed_by_user",
             "follow_url",
+            "follower_count",
             "pk",
             "title",
             "url",
