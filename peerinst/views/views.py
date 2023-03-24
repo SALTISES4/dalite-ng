@@ -2204,11 +2204,15 @@ def assignment_search_beta(request):
         # Serialize
         results = [hit.to_dict() for hit in s[:50]]
 
+        meta = {
+            "hit_count": s.count() if results else 0,
+        }
+
         search_logger.info(
             f"{time.perf_counter() - start:.2e}s - {search_string}"
         )
 
-        return JsonResponse({"results": results}, safe=False)
+        return JsonResponse({"results": results, "meta": meta}, safe=False)
 
     return JsonResponse({})
 
