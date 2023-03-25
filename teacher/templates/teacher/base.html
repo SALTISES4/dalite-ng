@@ -34,6 +34,14 @@
           {% endfor %}
           {title: "{% trans 'Manage groups' %}", icon: "settings", url: "{% url 'teacher-groups' request.user.teacher.pk %}"},
         ],
+        [
+          {
+            title: "{% trans 'Help & support' %}",
+            icon: "help",
+            url: "https://www.saltise.ca/professional-development/tools/mydalite/",
+            target: "_blank",
+          },
+        ],
       ];
       const currentUrl = new URL(window.location.href);
       sidebarGroups.forEach(arr => {
@@ -75,16 +83,6 @@
                 title: "{% trans 'Invite' %}",
                 icon: "person_add",
                 url: "#"
-              },
-            ],
-          ],
-          menuHelpItems: [
-            [
-              {
-                title: "{% trans 'Help' %}",
-                icon: "help",
-                url: "https://www.saltise.ca/professional-development/tools/mydalite/",
-                target: "_blank",
               },
             ],
           ],
