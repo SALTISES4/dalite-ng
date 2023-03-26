@@ -29,6 +29,11 @@
             backgroundImage: "{% static 'components/img/vector-search.svg' %}",
             collections: "{% url 'REST:collection-list' %}",
             questions: "{% url 'question-search' %}",
+            recommendations: {
+              assignments: "",
+              collections: "",
+              questions: "{% url 'REST:recommended-questions-list' %}",
+            },
             teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=favourite_questions",
           },
           user: {

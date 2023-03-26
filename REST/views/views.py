@@ -174,34 +174,6 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class NewQuestionViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [IsAuthenticated, IsNotStudent]
-    renderer_classes = [JSONRenderer]
-    serializer_class = QuestionSerializer
-
-    def get_queryset(self):
-        queryset = Question.objects.exclude(user__isnull=True).order_by(
-            "-created_on"
-        )
-
-        if self.request.user.teacher.disciplines.count() > 0:
-            queryset.filter(
-                discipline__in=self.request.user.teacher.disciplines.all()
-            )
-
-        # Generate N valid questions from queryset
-        def valid_questions(qs, n=4):
-            count = 0
-            for q in qs:
-                if q.is_valid:
-                    yield q
-                    count += 1
-                    if count >= n:
-                        break
-
-        return valid_questions(queryset)
-
-
 class QuestionListViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for adding and removing assignment questions.
@@ -227,6 +199,7 @@ class QuestionSearchList(generics.ListAPIView):
     """A simple ListView to return search results in JSON format"""
 
     pagination_class = SearchPagination
+    permission_classes = [IsAuthenticated, IsNotStudent]
     renderer_classes = [JSONRenderer]
 
     def get_queryset(self):

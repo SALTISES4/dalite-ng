@@ -25,9 +25,9 @@ peerinst_api.register(
     basename="question",
 )
 peerinst_api.register(
-    r"new-questions",
-    views.NewQuestionViewSet,
-    basename="new-question",
+    r"recommended-questions",
+    views.TeacherQuestionRecommendationViewSet,
+    basename="recommended-questions",
 )
 peerinst_api.register(
     r"groupassignments",
