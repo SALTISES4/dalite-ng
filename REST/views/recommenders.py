@@ -2,9 +2,38 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 
-from peerinst.models import Question
+from peerinst.models import Assignment, Question
 from REST.permissions import IsTeacher
-from REST.serializers import QuestionSerializer
+from REST.serializers import AssignmentSerializer, QuestionSerializer
+
+
+class TeacherAssignmentRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated, IsTeacher]
+    renderer_classes = [JSONRenderer]
+    serializer_class = AssignmentSerializer
+
+    def get_queryset(self):
+        """
+        Recommendations should be:
+        - Discipline based: don't recommend Western Civ to Chemistry teachers
+        - Popular: those with many answers or often used in assignments
+        - Timely: change based on week of course
+
+        Currently, returns newest.
+        """
+        queryset = Assignment.objects.all().order_by("-created_on")
+
+        # Generate N valid assignments from queryset
+        def valid_assignments(qs, n=4):
+            count = 0
+            for a in qs:
+                if a.is_valid:
+                    yield a
+                    count += 1
+                    if count >= n:
+                        break
+
+        return valid_assignments(queryset)
 
 
 class TeacherQuestionRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
@@ -21,7 +50,9 @@ class TeacherQuestionRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
 
         Currently, returns newest in discipline.
         """
-        queryset = Question.objects.exclude(user__isnull=True)
+        queryset = Question.objects.exclude(user__isnull=True).order_by(
+            "-created_on"
+        )
 
         if self.request.user.teacher.disciplines.count() > 0:
             queryset.filter(

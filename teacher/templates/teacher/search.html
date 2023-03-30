@@ -30,7 +30,7 @@
             collections: "{% url 'REST:collection-list' %}",
             questions: "{% url 'question-search' %}",
             recommendations: {
-              assignments: "",
+              assignments: "{% url 'REST:recommended-assignments-list' %}?field=owner&field=title&field=answer_count&field=question_count",
               collections: "",
               questions: "{% url 'REST:recommended-questions-list' %}",
             },

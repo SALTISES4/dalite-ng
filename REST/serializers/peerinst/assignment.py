@@ -249,8 +249,11 @@ class RankSerializer(serializers.ModelSerializer):
 
 
 class AssignmentSerializer(DynamicFieldsModelSerializer):
+    answer_count = serializers.ReadOnlyField()
     editable = serializers.ReadOnlyField()
     is_valid = serializers.ReadOnlyField()
+    owner = serializers.SerializerMethodField()
+    question_count = serializers.SerializerMethodField()
     question_pks = serializers.SerializerMethodField()
     questions = RankSerializer(
         source="assignmentquestions_set",
@@ -269,6 +272,14 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         source="questions",
     )
     urls = serializers.SerializerMethodField()
+
+    def get_owner(self, obj):
+        if obj.owner.count() > 0:
+            return ", ".join(user.username for user in obj.owner.all())
+        return ""
+
+    def get_question_count(self, obj):
+        return obj.questions.count()
 
     def get_question_pks(self, obj):
         return list(obj.questions.values_list("pk", flat=True))
@@ -336,12 +347,15 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Assignment
         fields = [
+            "answer_count",  #
             "conclusion_page",
             "description",
             "editable",
             "intro_page",
             "is_valid",
+            "owner",  #
             "pk",
+            "question_count",  #
             "question_pks",
             "questions",
             "questions_basic",

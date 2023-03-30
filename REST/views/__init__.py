@@ -9,6 +9,8 @@ __all__ = [
     "QuestionSearchList",
     "StudentReviewList",
     "StudentFeedbackList",
+    "TeacherAssignmentRecommendationViewSet",
+    "TeacherQuestionRecommendationViewSet",
     "TeacherView",
     "TeacherFeedbackList",
     "TeacherFeedbackDetail",
@@ -18,7 +20,10 @@ __all__ = [
     "StudentGroupAssignmentAnswers",
 ]
 
-from .recommenders import TeacherQuestionRecommendationViewSet  # noqa
+from .recommenders import (  # noqa
+    TeacherAssignmentRecommendationViewSet,
+    TeacherQuestionRecommendationViewSet,
+)
 from .views import (  # noqa
     AssignmentViewSet,
     CollectionViewSet,
