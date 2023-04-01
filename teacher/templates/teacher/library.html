@@ -1,0 +1,37 @@
+{% extends 'teacher/base.html' %}
+
+{% load static %}
+
+{% block apps %}
+  {{ block.super }}
+  <script
+    src="{% static 'components/js/build/library.min.js' %}"
+    defer="true"
+  ></script>
+{% endblock %}
+
+{% block injected_apps %}
+  {{ block.super }}
+  <div id="library-app"></div>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function () {
+      const libraryApp = () => {
+        return library.h(library.App, {
+          gettext: gettext,
+          nonce: "{{ request.csp_nonce }}",
+          urls: {
+            collections: "{% url 'REST:teacher-library-collection-list' %}",
+          },
+        });
+      };
+      library.render(
+        libraryApp(),
+        document.getElementById("library-app")
+      );
+    });
+  </script>
+{% endblock %}

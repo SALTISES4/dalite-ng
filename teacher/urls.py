@@ -15,4 +15,9 @@ urlpatterns = [
         views_teacher.SearchView.as_view(),
         name="search",
     ),
+    path(
+        "<int:pk>/library/",
+        views_teacher.LibraryView.as_view(),
+        name="library",
+    ),
 ]
