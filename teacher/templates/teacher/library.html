@@ -22,9 +22,12 @@
       const libraryApp = () => {
         return library.h(library.App, {
           gettext: gettext,
+          logo: "{% static 'components/img/logo.gif' %}",
           nonce: "{{ request.csp_nonce }}",
           urls: {
             collections: "{% url 'REST:teacher-library-collection-list' %}",
+            questions: "{% url 'REST:teacher-library-question-list' %}",
+            teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=favourite_questions",
           },
         });
       };

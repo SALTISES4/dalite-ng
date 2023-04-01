@@ -49,6 +49,11 @@ peerinst_api.register(
     views.TeacherCollectionLibraryViewSet,
     basename="teacher-library-collection",
 )
+peerinst_api.register(
+    r"teacher/library/questions",
+    views.TeacherQuestionLibraryViewSet,
+    basename="teacher-library-question",
+)
 
 urlpatterns = [
     path("peerinst/", include(peerinst_api.urls)),
