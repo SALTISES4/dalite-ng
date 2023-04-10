@@ -25,6 +25,7 @@ class TeacherAssignmentRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = (
             Assignment.objects.all()
             .exclude(owner=self.request.user)
+            .exclude(pk__in=self.request.user.teacher.assignments.all())
             .order_by("-created_on")
         )
 
@@ -59,6 +60,9 @@ class TeacherQuestionRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = (
             Question.objects.exclude(user__isnull=True)
             .exclude(user=self.request.user)
+            .exclude(
+                pk__in=self.request.user.teacher.favourite_questions.all()
+            )
             .order_by("-created_on")
         )
 
