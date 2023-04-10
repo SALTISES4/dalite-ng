@@ -115,10 +115,13 @@ def assignment_search(search_string, filters=None):
         "multi_match",
         query=search_string,
         fields=[
-            "owner^3",
             "title^2",
             "description",
         ],
+    ) | Q(
+        "nested",
+        path="owner",
+        query=Q("match", owner__username=search_string),
     )
 
     s = (

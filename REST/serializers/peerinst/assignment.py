@@ -253,7 +253,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
     editable = serializers.ReadOnlyField()
     is_valid = serializers.ReadOnlyField()
     is_owner = serializers.SerializerMethodField()
-    owner = serializers.SerializerMethodField()
+    owner = UserSerializer(many=True, read_only=True)
     question_count = serializers.SerializerMethodField()
     question_pks = serializers.SerializerMethodField()
     questions = RankSerializer(
@@ -278,11 +278,6 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         if "request" in self.context:
             return self.context["request"].user in obj.owner.all()
         return None
-
-    def get_owner(self, obj):
-        if obj.owner.count() > 0:
-            return ", ".join(user.username for user in obj.owner.all())
-        return ""
 
     def get_question_count(self, obj):
         return obj.questions.count()

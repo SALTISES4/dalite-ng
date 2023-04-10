@@ -291,7 +291,9 @@ class QuestionDocument(Document):
 class AssignmentDocument(Document):
     answer_count = IntegerField(index=False)
     description = TextField(analyzer=html_strip)
-    owner = TextField(analyzer=autocomplete)
+    owner = NestedField(
+        properties={"username": TextField(analyzer=autocomplete)}
+    )
     pk = KeywordField(index=False)
     question_count = IntegerField(index=False)
     title = TextField(analyzer=html_strip)
@@ -305,11 +307,6 @@ class AssignmentDocument(Document):
             tags=ALLOWED_TAGS,
             strip=True,
         ).strip()
-
-    def prepare_owner(self, instance):
-        if instance.owner.count() > 0:
-            return ", ".join(user.username for user in instance.owner.all())
-        return ""
 
     def prepare_pk(self, instance):
         return instance.pk
