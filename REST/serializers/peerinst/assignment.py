@@ -252,7 +252,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
     answer_count = serializers.ReadOnlyField()
     editable = serializers.ReadOnlyField()
     is_valid = serializers.ReadOnlyField()
-    owned_by_user = serializers.SerializerMethodField()
+    is_owner = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
     question_count = serializers.SerializerMethodField()
     question_pks = serializers.SerializerMethodField()
@@ -274,7 +274,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
     )
     urls = serializers.SerializerMethodField()
 
-    def get_owned_by_user(self, obj):
+    def get_is_owner(self, obj):
         if "request" in self.context:
             return self.context["request"].user in obj.owner.all()
         return None
@@ -358,8 +358,8 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
             "description",
             "editable",
             "intro_page",
+            "is_owner",
             "is_valid",
-            "owned_by_user",
             "owner",  #
             "pk",
             "question_count",  #
