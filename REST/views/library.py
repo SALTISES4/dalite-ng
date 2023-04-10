@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.viewsets import ReadOnlyModelViewSet
@@ -77,7 +78,7 @@ class TeacherLibraryQuestionViewSet(ReadOnlyModelViewSet):
         )
 
         owned_pks = Question.objects.filter(
-            user=self.request.user
+            Q(user=self.request.user) | Q(collaborators=self.request.user)
         ).values_list("pk", flat=True)
 
         pks = list(followed_pks) + [

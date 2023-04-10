@@ -60,6 +60,7 @@ class TeacherQuestionRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = (
             Question.objects.exclude(user__isnull=True)
             .exclude(user=self.request.user)
+            .exclude(collaborators=self.request.user)
             .exclude(
                 pk__in=self.request.user.teacher.favourite_questions.all()
             )
