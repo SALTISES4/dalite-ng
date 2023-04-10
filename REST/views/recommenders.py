@@ -18,10 +18,15 @@ class TeacherAssignmentRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
         - Discipline based: don't recommend Western Civ to Chemistry teachers
         - Popular: those with many answers or often used in assignments
         - Timely: change based on week of course
+        - Not your own
 
         Currently, returns newest.
         """
-        queryset = Assignment.objects.all().order_by("-created_on")
+        queryset = (
+            Assignment.objects.all()
+            .exclude(owner=self.request.user)
+            .order_by("-created_on")
+        )
 
         # Generate N valid assignments from queryset
         def valid_assignments(qs, n=4):
@@ -47,11 +52,14 @@ class TeacherQuestionRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
         - Discipline based: don't recommend Western Civ to Chemistry teachers
         - Popular: those with many answers or often used in assignments
         - Timely: change based on week of course
+        - Not your own
 
         Currently, returns newest in discipline.
         """
-        queryset = Question.objects.exclude(user__isnull=True).order_by(
-            "-created_on"
+        queryset = (
+            Question.objects.exclude(user__isnull=True)
+            .exclude(user=self.request.user)
+            .order_by("-created_on")
         )
 
         if self.request.user.teacher.disciplines.count() > 0:
