@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from peerinst.models import (
     Assignment,
+    Collection,
     Question,
     StudentGroupAssignment,
     Teacher,
@@ -38,6 +39,12 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
     # For updating
     assignment_pks = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Assignment.objects.all(), source="assignments"
+    )
+    # Allows updating
+    bookmarked_collections = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Collection.objects.all(),
+        source="followers",
     )
     createdQuestionCount = serializers.SerializerMethodField()
     deleted_questions = serializers.PrimaryKeyRelatedField(
@@ -134,6 +141,7 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
             "archived_questions",
             "assignment_pks",
             "assignments",
+            "bookmarked_collections",
             "createdQuestionCount",
             "deleted_questions",
             "favourite_questions",

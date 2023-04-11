@@ -2,13 +2,11 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 
-from peerinst.models import Assignment, Collection, Question
+from peerinst.models import Assignment, Question
 from REST.permissions import IsTeacher
-from REST.serializers import (
-    AssignmentSerializer,
-    CollectionSerializer,
-    QuestionSerializer,
-)
+from REST.serializers import AssignmentSerializer, QuestionSerializer
+
+from .views import CollectionViewSet
 
 
 class TeacherAssignmentRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
@@ -88,10 +86,8 @@ class TeacherQuestionRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
         return valid_questions(queryset)
 
 
-class TeacherCollectionRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [IsAuthenticated, IsTeacher]
-    renderer_classes = [JSONRenderer]
-    serializer_class = CollectionSerializer
+class TeacherCollectionRecommendationViewSet(CollectionViewSet):
+    pagination_class = None
 
     def get_queryset(self):
         """
@@ -104,8 +100,4 @@ class TeacherCollectionRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
         Currently, returns newest not your own or in your library.
         """
 
-        return (
-            Collection.objects.exclude(owner=self.request.user.teacher)
-            .exclude(followers=self.request.user.teacher)
-            .order_by("featured", "-created_on")
-        )
+        return super().get_queryset().order_by("featured", "-created_on")[:4]
