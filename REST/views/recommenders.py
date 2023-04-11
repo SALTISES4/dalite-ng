@@ -2,9 +2,13 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 
-from peerinst.models import Assignment, Question
+from peerinst.models import Assignment, Collection, Question
 from REST.permissions import IsTeacher
-from REST.serializers import AssignmentSerializer, QuestionSerializer
+from REST.serializers import (
+    AssignmentSerializer,
+    CollectionSerializer,
+    QuestionSerializer,
+)
 
 
 class TeacherAssignmentRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
@@ -18,13 +22,12 @@ class TeacherAssignmentRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
         - Discipline based: don't recommend Western Civ to Chemistry teachers
         - Popular: those with many answers or often used in assignments
         - Timely: change based on week of course
-        - Not your own
+        - Not your own or in your library
 
-        Currently, returns newest.
+        Currently, returns newest not your own or in your library.
         """
         queryset = (
-            Assignment.objects.all()
-            .exclude(owner=self.request.user)
+            Assignment.objects.exclude(owner=self.request.user)
             .exclude(pk__in=self.request.user.teacher.assignments.all())
             .order_by("-created_on")
         )
@@ -53,9 +56,9 @@ class TeacherQuestionRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
         - Discipline based: don't recommend Western Civ to Chemistry teachers
         - Popular: those with many answers or often used in assignments
         - Timely: change based on week of course
-        - Not your own
+        - Not your own or in your library
 
-        Currently, returns newest in discipline.
+        Currently, returns newest not your own or in your library.
         """
         queryset = (
             Question.objects.exclude(user__isnull=True)
@@ -83,3 +86,26 @@ class TeacherQuestionRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
                         break
 
         return valid_questions(queryset)
+
+
+class TeacherCollectionRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated, IsTeacher]
+    renderer_classes = [JSONRenderer]
+    serializer_class = CollectionSerializer
+
+    def get_queryset(self):
+        """
+        Recommendations should be:
+        - Discipline based: don't recommend Western Civ to Chemistry teachers
+        - Featured: SALTISE content first
+        - Popular: those with many answers or whose assignments are often used
+        - Not your own or in your library.
+
+        Currently, returns newest not your own or in your library.
+        """
+
+        return (
+            Collection.objects.exclude(owner=self.request.user.teacher)
+            .exclude(followers=self.request.user.teacher)
+            .order_by("featured", "-created_on")
+        )

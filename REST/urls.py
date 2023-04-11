@@ -30,6 +30,11 @@ peerinst_api.register(
     basename="recommended-assignments",
 )
 peerinst_api.register(
+    r"recommended-collections",
+    views.TeacherCollectionRecommendationViewSet,
+    basename="recommended-collections",
+)
+peerinst_api.register(
     r"recommended-questions",
     views.TeacherQuestionRecommendationViewSet,
     basename="recommended-questions",
