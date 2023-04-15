@@ -337,35 +337,21 @@ class AssignmentDocument(Document):
 
 @registry.register_document
 class CollectionDocument(Document):
-    title = TextField(analyzer=html_strip)
+    answerCount = IntegerField(index=False)
     description = TextField(analyzer=html_strip)
     discipline = ObjectField(
         properties={"title": TextField(analyzer=full_term)}
     )
+    follower_count = IntegerField(index=False)
+    pk = KeywordField(index=False)
     public = BooleanField()
-    owner = TextField(analyzer=autocomplete)
+    title = TextField(analyzer=html_strip)
+    user = NestedField(
+        properties={"username": TextField(analyzer=autocomplete)}
+    )
 
-    def prepare_owner(self, instance):
-        username = ""
-        saltise = False
-        expert = False
-        if instance.owner:
-            username = instance.owner.user.username
-            if hasattr(instance.owner.user, "saltisemember"):
-                saltise = True
-                expert = instance.owner.user.saltisemember.expert
-        return {
-            "username": username,
-            "saltise": saltise,
-            "expert": expert,
-        }
-
-    def prepare_title(self, instance):
-        return bleach.clean(
-            instance.title,
-            tags=ALLOWED_TAGS,
-            strip=True,
-        ).strip()
+    def prepare_answerCount(self, instance):
+        return instance.answer_count
 
     def prepare_description(self, instance):
         return bleach.clean(
@@ -386,8 +372,33 @@ class CollectionDocument(Document):
             }
         return {"title": ""}
 
+    def prepare_follower_count(self, instance):
+        return instance.followers.count()
+
     def prepare_public(self, instance):
         return not instance.private
+
+    def prepare_title(self, instance):
+        return bleach.clean(
+            instance.title,
+            tags=ALLOWED_TAGS,
+            strip=True,
+        ).strip()
+
+    def prepare_user(self, instance):
+        username = ""
+        saltise = False
+        expert = False
+        if instance.owner:
+            username = instance.owner.user.username
+            if hasattr(instance.owner.user, "saltisemember"):
+                saltise = True
+                expert = instance.owner.user.saltisemember.expert
+        return {
+            "username": username,
+            "saltise": saltise,
+            "expert": expert,
+        }
 
     class Index:
         name = "collections"

@@ -53,6 +53,7 @@ from dalite.views.errors import response_400, response_404
 from peerinst import admin, forms, models, rationale_choice
 from peerinst.admin_views import get_question_rationale_aggregates
 from peerinst.elasticsearch import assignment_search as as_ES
+from peerinst.elasticsearch import collection_search as cs_ES
 from peerinst.elasticsearch import question_search as qs_ES
 from peerinst.mixins import (
     LoginRequiredMixin,
@@ -2173,12 +2174,10 @@ def collection_search(request):
 
 def collection_search_function(search_string, pre_filtered_list=None):
 
-    query_result = pre_filtered_list.filter(
+    return pre_filtered_list.filter(
         Q(title__icontains=search_string)
         | Q(description__icontains=search_string)
     )
-
-    return query_result
 
 
 # AJAX functions
@@ -2209,7 +2208,42 @@ def assignment_search_beta(request):
         }
 
         search_logger.info(
-            f"{time.perf_counter() - start:.2e}s - {search_string}"
+            f"Assignment search: {time.perf_counter() - start:.2e}s - {search_string}"
+        )
+
+        return JsonResponse({"results": results, "meta": meta}, safe=False)
+
+    return JsonResponse({})
+
+
+@ajax_login_required
+@ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
+def collection_search_beta(request):
+    FILTERS = [
+        "category__title",
+        "discipline.title",
+        "difficulty.label",
+        "peer_impact.label",
+    ]
+
+    if search_string := request.GET.get("search_string", default=""):
+        start = time.perf_counter()
+
+        terms = search_string.split()
+        query = [t for t in terms if t.split("::")[0].lower() not in FILTERS]
+
+        # Search
+        s = cs_ES(" ".join(query))
+
+        # Serialize
+        results = [hit.to_dict() for hit in s[:50]]
+
+        meta = {
+            "hit_count": s.count() if results else 0,
+        }
+
+        search_logger.info(
+            f"Collection search: {time.perf_counter() - start:.2e}s - {search_string}"
         )
 
         return JsonResponse({"results": results, "meta": meta}, safe=False)
@@ -2291,7 +2325,7 @@ def question_search_beta(request):
             }
 
         search_logger.info(
-            f"{time.perf_counter() - start:.2e}s - {search_string}"
+            f"Question search: {time.perf_counter() - start:.2e}s - {search_string}"
         )
 
         return JsonResponse({"results": results, "meta": meta}, safe=False)

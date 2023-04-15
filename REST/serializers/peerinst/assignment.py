@@ -448,18 +448,15 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
 
 class CollectionSerializer(DynamicFieldsModelSerializer):
     answerCount = serializers.SerializerMethodField()
-    author = serializers.SerializerMethodField()
     description = serializers.ReadOnlyField()
     discipline = DisciplineSerializer(read_only=True)
     follower_count = serializers.SerializerMethodField()
     title = serializers.ReadOnlyField()
     url = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True, source="owner.user")
 
     def get_answerCount(self, obj):
         return obj.answer_count
-
-    def get_author(self, obj):
-        return obj.owner.user.username
 
     def get_follower_count(self, obj):
         return obj.followers.count()
@@ -471,7 +468,6 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
         model = Collection
         fields = [
             "answerCount",
-            "author",
             "description",
             "discipline",
             "featured",
@@ -479,4 +475,5 @@ class CollectionSerializer(DynamicFieldsModelSerializer):
             "pk",
             "title",
             "url",
+            "user",
         ]

@@ -17,11 +17,11 @@ from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.utils.html import escape, strip_tags
 from django.utils.translation import gettext_lazy as _
 
+from peerinst import rationale_choice
 from peerinst.grammar import basic_syntax
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 from reputation.models import Reputation
 
-from .. import rationale_choice
 from .search import MetaSearch
 
 
@@ -629,7 +629,7 @@ class Question(models.Model):
         )
 
     def get_start_form_class(self):
-        from ..forms import FirstAnswerForm
+        from peerinst.forms import FirstAnswerForm
 
         return FirstAnswerForm
 
@@ -801,8 +801,8 @@ class Question(models.Model):
         MIN_ANSWERS = 30
         UPPER_BOUND = 0.25
         LOWER_BOUND = 0.05
-        N = self.get_student_answers().count()
 
+        N = self.get_student_answers().count()
         if N > MIN_ANSWERS:
             peer_impact = (
                 self.get_answers_by_type(answer_type="RW").count()

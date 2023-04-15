@@ -156,6 +156,11 @@ def old_patterns():
         ),
         path(
             "collection-search/",
+            views.collection_search_beta,
+            name="collection-search-beta",
+        ),
+        path(
+            "collection-search/",
             views.collection_search,
             name="collection-search",
         ),
