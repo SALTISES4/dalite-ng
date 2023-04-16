@@ -2253,13 +2253,14 @@ def collection_search_beta(request):
 
 @ajax_login_required
 @ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
-def question_search_beta(request):
+def question_search_beta(request, page=0):
     FILTERS = [
         "category__title",
         "discipline.title",
         "difficulty.label",
         "peer_impact.label",
     ]
+    PAGINATION_LIMIT = 10
 
     search_string = request.GET.get("search_string", default="")
 
@@ -2285,7 +2286,13 @@ def question_search_beta(request):
         # Search
         s = qs_ES(" ".join(query), filters, flagged)
         # Serialize
-        results = [hit.to_dict() for hit in s[:50]]
+        if page < 0:
+            page = 0
+        if page > s.count() // PAGINATION_LIMIT:
+            page = s.count() // PAGINATION_LIMIT
+        start_index = page * PAGINATION_LIMIT
+        end_index = (page + 1) * PAGINATION_LIMIT
+        results = [hit.to_dict() for hit in s[start_index:end_index]]
         # Add metadata
         if results:
             _c = []
@@ -2314,6 +2321,8 @@ def question_search_beta(request):
                     if _i[0] == i
                 ],
                 "hit_count": s.count(),
+                "page": page,
+                "page_size": PAGINATION_LIMIT,
             }
         else:
             meta = {
@@ -2322,6 +2331,8 @@ def question_search_beta(request):
                 "disciplines": [],
                 "impacts": [],
                 "hit_count": 0,
+                "page": 0,
+                "page_size": PAGINATION_LIMIT,
             }
 
         search_logger.info(
