@@ -34,7 +34,7 @@
               collections: "{% url 'REST:recommended-collections-list' %}?field=author&field=description&field=discipline&field=featured&field=follower_count&field=pk&field=title&field=url&field=user",
               questions: "{% url 'REST:recommended-questions-list' %}?field=answer_count&field=answerchoice_set&field=category&field=difficulty&field=discipline&field=image&field=image_alt_text&field=peer_impact&field=pk&field=text&field=title&field=user&field=video_url&field=is_owner",
             },
-            teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=bookmarked_collections&field=favourite_questions&field=assignment_pks",
+            teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=bookmarked_collections&field=favourite_questions&field=assignment_pks&field=user",
           },
           user: {
             username: {% if request.user.saltisemember %}"{{ request.user.saltisemember.name }}"{% else %}"{{ request.user.username }}"{% endif %},

@@ -6,8 +6,6 @@
 #
 --index-url https://pypi.python.org/simple
 
--e file:///home/sbhatnagar/Scivero/dalite_project/CourseFlow
-    # via -r requirements/requirements-base.txt
 alt-profanity-check==1.1.1
     # via -r requirements/requirements-base.txt
 amqp==5.0.9
@@ -439,6 +437,8 @@ rjsmin==1.2.0
     # via
     #   -r requirements/requirements-base.txt
     #   django-compressor
+saltise-course-flow==0.8.3
+    # via -r requirements/requirements-base.txt
 saltise-user-feedback==1.1.2
     # via -r requirements/requirements-base.txt
 scikit-learn==1.1.1
