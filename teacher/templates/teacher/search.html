@@ -21,7 +21,10 @@
     window.addEventListener("load", function () {
       const searchApp = () => {
         return search.h(search.App, {
+          difficulties: {{ difficulties|safe }},
+          disciplines: {{ disciplines|safe }},
           gettext: gettext,
+          impacts: {{ impacts|safe }},
           logo: "{% static 'components/img/logo.gif' %}",
           nonce: "{{ request.csp_nonce }}",
           urls: {
