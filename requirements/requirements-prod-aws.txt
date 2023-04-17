@@ -821,8 +821,8 @@ s3transfer==0.6.0 \
     --hash=sha256:06176b74f3a15f61f1b4f25a1fc29a4429040b7647133a463da8fa5bd28d5ecd \
     --hash=sha256:2ed07d3866f523cc561bf4a00fc5535827981b117dd7876f036b0c1aca42c947
     # via boto3
-saltise-components==0.2.5 \
-    --hash=sha256:c59150da9097efe3986289f592647a91e5f5eab036bd62a64784a77b0e9e6737
+saltise-components==0.2.6 \
+    --hash=sha256:ac02e8121e5aec45ebad37b6b6bcbe3b6478928e957210aa2f15f0dc8ee1082a
     # via -r requirements/requirements-prod-aws.in
 saltise-course-flow==0.8.3 \
     --hash=sha256:60fb1ed7b00f39ab7777a088ccd11aba7387be9d443b96793f9defc435d26762
