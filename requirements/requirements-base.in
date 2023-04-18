@@ -3,10 +3,12 @@
 
 alt-profanity-check
 asgiref
+attrs >= 21.3.0 # [3]
 better-profanity == 0.6.1 # [1]
 bleach
 celery[redis]
 # contextualSpellCheck # [2]
+cryptography == 40.0.2 # [4]
 django >=3.2.18, < 3.3
 django-analytical
 django-axes
@@ -32,11 +34,12 @@ pyjwt
 pymemcache
 pytz
 requests
-twisted == 22.4 # [3]
+twisted
 
 SALTISE_course_flow == 0.8.3
 SALTISE_user_feedback
 
 # 1. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
 # 2. Removed until used – See: peerinst/grammar.py
-# 3. Temporary pin – Latest fails CI
+# 3. Temporary pin - See: https://github.com/twisted/twisted/issues/11839
+# 4. Temporary pin until migration to latest
