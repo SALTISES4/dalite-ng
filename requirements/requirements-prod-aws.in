@@ -7,4 +7,4 @@ gunicorn
 sentry-sdk >= 0.20.3
 watchtower
 
-SALTISE_components == 0.2.5
+SALTISE_components == 0.2.6
