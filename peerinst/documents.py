@@ -92,7 +92,7 @@ class QuestionDocument(Document):
         }
     )
     discipline = ObjectField(
-        properties={"title": TextField(analyzer=trigram)}
+        properties={"title": TextField(analyzer=full_term)}
     )  # don't break on spaces?
     featured = BooleanField()
     frequency = ObjectField(
