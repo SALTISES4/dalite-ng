@@ -157,10 +157,6 @@ decorator==4.4.2
     # via
     #   ipython
     #   traitlets
-deprecated==1.2.13
-    # via
-    #   -r requirements/requirements-test.txt
-    #   redis
 distlib==0.3.2
     # via virtualenv
 django==3.2.18
@@ -383,7 +379,6 @@ packaging==21.3
     #   -r requirements/requirements-test.txt
     #   dparse
     #   pytest
-    #   redis
     #   safety
 pandas==1.4.3
     # via
@@ -510,7 +505,7 @@ rcssmin==1.1.0
     # via
     #   -r requirements/requirements-test.txt
     #   django-compressor
-redis==4.3.4
+redis==4.5.4
     # via
     #   -r requirements/requirements-test.txt
     #   celery
@@ -645,10 +640,6 @@ webencodings==0.5.1
     # via
     #   -r requirements/requirements-test.txt
     #   bleach
-wrapt==1.14.1
-    # via
-    #   -r requirements/requirements-test.txt
-    #   deprecated
 wsproto==1.1.0
     # via
     #   -r requirements/requirements-test.txt

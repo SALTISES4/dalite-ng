@@ -138,10 +138,6 @@ daphne==4.0.0
     #   channels
 ddt==1.2.2
     # via -r requirements/requirements-test.in
-deprecated==1.2.13
-    # via
-    #   -r requirements/requirements-base.txt
-    #   redis
 django==3.2.18
     # via
     #   -r requirements/requirements-base.txt
@@ -326,10 +322,7 @@ openpyxl==3.0.9
 outcome==1.2.0
     # via trio
 packaging==21.3
-    # via
-    #   -r requirements/requirements-base.txt
-    #   pytest
-    #   redis
+    # via pytest
 pandas==1.4.3
     # via
     #   -r requirements/requirements-base.txt
@@ -425,7 +418,7 @@ rcssmin==1.1.0
     # via
     #   -r requirements/requirements-base.txt
     #   django-compressor
-redis==4.3.4
+redis==4.5.4
     # via
     #   -r requirements/requirements-base.txt
     #   celery
@@ -530,10 +523,6 @@ webencodings==0.5.1
     # via
     #   -r requirements/requirements-base.txt
     #   bleach
-wrapt==1.14.1
-    # via
-    #   -r requirements/requirements-base.txt
-    #   deprecated
 wsproto==1.1.0
     # via trio-websocket
 xlrd==2.0.1

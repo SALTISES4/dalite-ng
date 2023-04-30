@@ -1,4 +1,5 @@
 from django.db.models import Q
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.viewsets import ReadOnlyModelViewSet
@@ -36,11 +37,17 @@ class TeacherLibraryAssignmentViewSet(ReadOnlyModelViewSet):
         return Assignment.objects.filter(pk__in=pks)
 
 
+class MaximumResultsPagination(PageNumberPagination):
+    page_size = 1000
+
+
 class TeacherLibraryCollectionViewSet(CollectionViewSet):
     """
     Owned and followed collections
     - Supports bookmarking through parent class
     """
+
+    pagination_class = MaximumResultsPagination
 
     def get_queryset(self):
         # TODO: Update related name in Collection model?

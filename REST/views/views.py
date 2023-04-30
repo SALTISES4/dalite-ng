@@ -94,26 +94,8 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CollectionSerializer
 
     def get_queryset(self):
-        return (
-            (
-                # Featured
-                Collection.objects.exclude(owner=self.request.user.teacher)
-                .exclude(followers=self.request.user.teacher)
-                .filter(featured=True)
-                .order_by("-last_modified")
-            )
-            or (
-                # Random sample
-                Collection.objects.exclude(owner=self.request.user.teacher)
-                .exclude(followers=self.request.user.teacher)
-                .order_by("?")
-            )
-            or (
-                # Own
-                Collection.objects.filter(
-                    owner=self.request.user.teacher
-                ).order_by("-last_modified")
-            )
+        return Collection.objects.filter(private=False).order_by(
+            "featured", "-created_on"
         )
 
 

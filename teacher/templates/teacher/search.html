@@ -30,6 +30,7 @@
           urls: {
             assignments: "{% url 'assignment-search' %}",
             backgroundImage: "{% static 'components/img/vector-search.svg' %}",
+            collection: "{% url 'REST:collection-list' %}?field=author&field=description&field=discipline&field=featured&field=follower_count&field=pk&field=title&field=url&field=user",
             collections: "{% url 'collection-search-beta' %}",
             questions: "{% url 'question-search' %}",
             recommendations: {

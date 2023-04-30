@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 
-from peerinst.models import Assignment, Question
+from peerinst.models import Assignment, Collection, Question
 from REST.permissions import IsTeacher
 from REST.serializers import AssignmentSerializer, QuestionSerializer
 
@@ -87,8 +87,6 @@ class TeacherQuestionRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class TeacherCollectionRecommendationViewSet(CollectionViewSet):
-    pagination_class = None
-
     def get_queryset(self):
         """
         Recommendations should be:
@@ -100,4 +98,25 @@ class TeacherCollectionRecommendationViewSet(CollectionViewSet):
         Currently, returns newest not your own or in your library.
         """
 
-        return super().get_queryset().order_by("featured", "-created_on")[:4]
+        qs = super().get_queryset()
+
+        return (
+            (
+                # Featured
+                qs.exclude(owner=self.request.user.teacher)
+                .exclude(followers=self.request.user.teacher)
+                .filter(featured=True)
+            )
+            or (
+                # Random sample
+                qs.exclude(owner=self.request.user.teacher)
+                .exclude(followers=self.request.user.teacher)
+                .order_by("?")
+            )
+            or (
+                # Own
+                Collection.objects.filter(
+                    owner=self.request.user.teacher
+                ).order_by("-last_modified")
+            )
+        )
