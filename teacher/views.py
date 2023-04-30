@@ -18,12 +18,14 @@ class SearchView(TeacherBase, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context.update(
-            difficulties=[[d[0], d[1]] for d in Question.DIFFICULTY_LABELS],
+            difficulties=[
+                [d[0], d[1]] for d in Question.DIFFICULTY_LABELS[:-1]
+            ],
             disciplines=[
                 bleach.clean(d, tags=[], strip=True).strip()
                 for d in Discipline.objects.values_list("title", flat=True)
             ],
-            impacts=[[d[0], d[1]] for d in Question.PEER_IMPACT_LABELS],
+            impacts=[[d[0], d[1]] for d in Question.PEER_IMPACT_LABELS[:-1]],
         )
         return context
 
