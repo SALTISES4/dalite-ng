@@ -155,6 +155,7 @@ django==3.2.18
     #   django-permissions-policy
     #   django-redis
     #   djangorestframework
+    #   saltise-components
     #   saltise-course-flow
     #   saltise-user-feedback
 django-analytical==3.1.0
@@ -430,6 +431,8 @@ rjsmin==1.2.0
     # via
     #   -r requirements/requirements-base.txt
     #   django-compressor
+saltise-components==0.2.7
+    # via -r requirements/requirements-base.txt
 saltise-course-flow==0.8.3
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==1.1.2
