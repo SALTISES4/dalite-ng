@@ -27,6 +27,7 @@
           impacts: {{ impacts|safe }},
           logo: "{% static 'components/img/logo.gif' %}",
           nonce: "{{ request.csp_nonce }}",
+          type: "{{ type }}",
           urls: {
             assignments: "{% url 'assignment-search' %}",
             backgroundImage: "{% static 'components/img/vector-search.svg' %}",

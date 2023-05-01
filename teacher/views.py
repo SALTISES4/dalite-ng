@@ -26,6 +26,7 @@ class SearchView(TeacherBase, DetailView):
                 for d in Discipline.objects.values_list("title", flat=True)
             ],
             impacts=[[d[0], d[1]] for d in Question.PEER_IMPACT_LABELS[:-1]],
+            type=self.request.GET.get("type", ""),
         )
         return context
 
