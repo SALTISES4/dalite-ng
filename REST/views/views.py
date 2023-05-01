@@ -88,6 +88,10 @@ class MinimumResultsPagination(PageNumberPagination):
 
 
 class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A simple ReadOnlyModelViewSet to return non-private collections.
+    """
+
     pagination_class = MinimumResultsPagination
     permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
