@@ -20,4 +20,9 @@ urlpatterns = [
         views_teacher.LibraryView.as_view(),
         name="library",
     ),
+    path(
+        "<int:pk>/assignment/create/",
+        views_teacher.AssignmentCreateView.as_view(),
+        name="assignment-create",
+    ),
 ]

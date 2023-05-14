@@ -1,0 +1,166 @@
+{% extends 'teacher/base.html' %}
+
+{% load static %}
+
+{% block apps %}
+  {{ block.super }}
+  <script
+    src="{% static 'components/js/build/createAssignment.min.js' %}"
+    defer="true"
+  ></script>
+
+  <style nonce="{{ request.csp_nonce }}">
+    .rdw-inline-wrapper {
+      display: flex;
+      border-left: solid 1px;
+      border-right: solid 1px;
+      border-color: #aeaebf;
+      padding: 4px 6px;
+      gap: 10px;
+    }
+    .rdw-link-wrapper {
+      display: flex;
+      padding: 4px 6px;
+      gap: 10px;
+      position: relative;
+    }
+    .rdw-history-wrapper {
+      display: flex;
+      padding: 4px 6px;
+      gap: 10px;
+    }
+    .rdw-option-wrapper {
+      display: flex;
+      padding: 4px;
+      border-radius: 1px;
+    }
+    .rdw-history-wrapper div:first-child {
+      border-radius: 4px 0px 0px 0px;
+    }
+    .rdw-option-wrapper:hover {
+      background-color: #aeaebf61;
+    }
+    .rdw-option-active {
+      box-shadow: 1px 1px 0px #aeaebf61 inset;
+      background-color: #aeaebf61;
+    }
+    .rdw-link-modal {
+      position: absolute;
+      top: 35px;
+      left: 10px;
+      display: flex;
+      flex-direction: column;
+      width: 235px;
+      height: 205px;
+      border: 1px solid #e9ebf2;
+      padding: 15px;
+      border-radius: 3px;
+      z-index: 100;
+      background: white;
+      box-shadow: 3px 3px 5px #e9ebf2;
+      font-family: Open Sans, sans-serif;
+      font-size: 13px;
+      color: #515159;
+    }
+    .rdw-link-modal-input {
+      margin-top: 5px;
+      border-radius: 2px;
+      border: 1px solid #f1f1f1;
+      height: 25px;
+      margin-bottom: 15px;
+      padding: 0 5px;
+    }
+    .rdw-link-modal-input:focus {
+      outline: none;
+    }
+    .rdw-link-modal-buttonsection {
+      margin: 0 auto;
+    }
+    .rdw-link-modal-target-option {
+      margin-bottom: 20px;
+      display: flex;
+    }
+    .rdw-link-modal-target-option > span {
+      margin-left: 5px;
+    }
+    .rdw-link-modal-btn {
+      margin-left: 10px;
+      width: 75px;
+      height: 30px;
+      border: 1px solid #aeaebf;
+      border-radius: 2px;
+      cursor: pointer;
+      background: white;
+      text-transform: capitalize;
+      color: inherit;
+    }
+    .rdw-link-modal-btn:hover {
+      box-shadow: 0px 0px 2px #f1f1f1;
+    }
+    .rdw-link-modal-btn:active {
+      box-shadow: 1px 1px 0px #bfbdbd inset;
+    }
+    .rdw-link-modal-btn:focus {
+      outline: none !important;
+    }
+    .rdw-link-modal-btn:disabled {
+      background: #ece9e9;
+      color: #1010104d;
+    }
+    .rdw-link-modal-buttonsection button:first-of-type {
+      background: #1743b3;
+      color: #ffffff;
+      border: none;
+      border-radius: 2px;
+    }
+    .rdw-link-modal-buttonsection button:first-of-type:disabled {
+      background: #ece9e9;
+      color: #1010104d;
+    }
+    .rdw-link-decorator-wrapper {
+      position: relative;
+      cursor: pointer;
+    }
+    .rdw-link-decorator-icon {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+    }
+  </style>
+{% endblock %}
+
+{% block injected_apps %}
+  {{ block.super }}
+  <div id="assignment-create-app"></div>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function () {
+      const assignmentCreateApp = () => {
+        return createAssignment.h(createAssignment.App, {
+          gettext: gettext,
+          nonce: "{{ request.csp_nonce }}",
+          EditorIcons: {
+            boldIcon: "{% static 'components/img/editor/bold.svg' %}",
+            italicIcon: "{% static 'components/img/editor/italic.svg' %}",
+            underIcon: "{% static 'components/img/editor/under.svg' %}",
+            undoIcon: "{% static 'components/img/editor/undo.svg' %}",
+            redoIcon: "{% static 'components/img/editor/redo.svg' %}",
+            subIcon: "{% static 'components/img/editor/sub.svg' %}",
+            superIcon: "{% static 'components/img/editor/super.svg' %}",
+            linkIcon: "{% static 'components/img/editor/link.svg' %}",
+          },
+        });
+      };
+      createAssignment.render(
+        assignmentCreateApp(),
+        document.getElementById("assignment-create-app")
+      );
+    });
+  </script>
+{% endblock %}

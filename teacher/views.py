@@ -34,3 +34,8 @@ class SearchView(TeacherBase, DetailView):
 class LibraryView(TeacherBase, TemplateView):
     http_method_names = ["get"]
     template_name = "teacher/library.html"
+
+
+class AssignmentCreateView(TeacherBase, TemplateView):
+    http_method_names = ["get"]
+    template_name = "teacher/assignment/create.html"

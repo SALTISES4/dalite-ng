@@ -61,7 +61,7 @@
               {
                 title: "{% trans 'Assignment' %}",
                 icon: "assignment",
-                url: "{% url 'assignment-create' %}",
+                url: "{% url 'teacher:assignment-create' request.user.teacher.pk %}",
               },
               {
                 title: "{% trans 'Collection' %}",
