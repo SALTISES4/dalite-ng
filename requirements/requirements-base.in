@@ -9,7 +9,7 @@ bleach
 celery[redis]
 # contextualSpellCheck # [2]
 cryptography == 40.0.2 # [4]
-django >=3.2.18, < 3.3
+django >=3.2.19, < 3.3
 django-analytical
 django-axes
 django-celery-beat
