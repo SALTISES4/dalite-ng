@@ -155,6 +155,9 @@
             superIcon: "{% static 'components/img/editor/super.svg' %}",
             linkIcon: "{% static 'components/img/editor/link.svg' %}",
           },
+          urls: {
+            create: "{% url 'REST:assignment-list' %}",
+          }
         });
       };
       createAssignment.render(
