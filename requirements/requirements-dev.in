@@ -8,6 +8,6 @@ isort
 pre-commit
 safety
 
--e ../Components
+#-e ../Components
 
 # 1. Pinned to pre-commit version
