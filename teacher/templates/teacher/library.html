@@ -25,7 +25,7 @@
           logo: "{% static 'components/img/logo.gif' %}",
           nonce: "{{ request.csp_nonce }}",
           urls: {
-            assignments: "{% url 'REST:teacher-library-assignment-list' %}?field=owner&field=title&field=answer_count&field=pk&field=question_count&field=is_owner",
+            assignments: "{% url 'REST:teacher-library-assignment-list' %}?field=owner&field=title&field=answer_count&field=pk&field=question_count&field=is_owner&field=editable&field=urls",
             collections: "{% url 'REST:teacher-library-collection-list' %}?field=author&field=description&field=discipline&field=featured&field=follower_count&field=pk&field=title&field=url&field=user",
             group_assignments: "{% url 'REST:groupassignment-list' %}",
             questions: "{% url 'REST:teacher-library-question-list' %}?field=answer_count&field=answerchoice_set&field=category&field=difficulty&field=discipline&field=image&field=image_alt_text&field=peer_impact&field=pk&field=text&field=title&field=user&field=video_url&field=is_owner",

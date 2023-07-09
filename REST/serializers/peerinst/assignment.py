@@ -194,11 +194,14 @@ class RankSerializer(serializers.ModelSerializer):
             "answerchoice_set",
             "category",
             "collaborators",
+            "difficulty",  # Added for new assignment interface
             "discipline",
             "frequency",
             "image",
             "image_alt_text",
+            "is_owner",  # Added for new assignment interface
             "matrix",
+            "peer_impact",  # Added for new assignment interface
             "pk",
             "text",
             "title",
@@ -296,7 +299,13 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
                 args=(obj.pk,),
             ),
             "preview": obj.get_absolute_url(),
-            "update": reverse("assignment-update", args=(obj.pk,)),
+            "update": reverse(
+                "teacher:assignment-update",
+                args=(
+                    self.context["request"].user.teacher.pk,
+                    obj.pk,
+                ),
+            ),
         }
 
     def validate_questions(self, data):

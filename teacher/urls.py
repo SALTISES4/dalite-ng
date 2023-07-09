@@ -1,8 +1,26 @@
-from django.urls import path
+from django.urls import include, path
 
 from . import views as views_teacher
 
 app_name = "teacher"
+
+assignment_patterns = [
+    path(
+        "<str:identifier>/",
+        views_teacher.AssignmentDetailView.as_view(),
+        name="assignment-detail",
+    ),
+    path(
+        "create/",
+        views_teacher.AssignmentCreateView.as_view(),
+        name="assignment-create",
+    ),
+    path(
+        "update/<str:identifier>/",
+        views_teacher.AssignmentUpdateView.as_view(),
+        name="assignment-update",
+    ),
+]
 
 urlpatterns = [
     path(
@@ -20,9 +38,5 @@ urlpatterns = [
         views_teacher.LibraryView.as_view(),
         name="library",
     ),
-    path(
-        "<int:pk>/assignment/create/",
-        views_teacher.AssignmentCreateView.as_view(),
-        name="assignment-create",
-    ),
+    path("<int:pk>/assignment/", include(assignment_patterns)),
 ]

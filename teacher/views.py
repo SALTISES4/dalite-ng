@@ -1,7 +1,7 @@
 import bleach
 from django.views.generic import DetailView, TemplateView
 
-from peerinst.models import Discipline, Question, Teacher
+from peerinst.models import Assignment, Discipline, Question, Teacher
 from peerinst.views.views import TeacherBase
 
 
@@ -39,3 +39,42 @@ class LibraryView(TeacherBase, TemplateView):
 class AssignmentCreateView(TeacherBase, TemplateView):
     http_method_names = ["get"]
     template_name = "teacher/assignment/create.html"
+
+
+class AssignmentDetailView(TeacherBase, DetailView):
+    http_method_names = ["get"]
+    model = Assignment
+    pk_url_kwarg = "identifier"
+    queryset = Assignment.objects.all()  # Limit to 'valid' assignments?
+    template_name = "teacher/assignment/preview.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        assignment = self.get_object()
+        context.update(
+            owner=[u.username for u in assignment.owner.all()],
+        )
+        return context
+
+
+class AssignmentUpdateView(TeacherBase, DetailView):
+    http_method_names = ["get"]
+    model = Assignment
+    pk_url_kwarg = "identifier"
+    template_name = "teacher/assignment/update.html"
+
+    def get_queryset(self):
+        """
+        Limit access to a user's own assignments
+        """
+        return Assignment.objects.filter(owner=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        assignment = self.get_object()
+        context.update(
+            editable=assignment.editable
+            and self.request.user in assignment.owner.all(),
+            owner=[u.username for u in assignment.owner.all()],
+        )
+        return context
