@@ -40,9 +40,9 @@ peerinst_api.register(
     basename="recommended-questions",
 )
 peerinst_api.register(
-    r"groupassignments",
-    views.StudentGroupAssignmentViewSet,
-    basename="groupassignment",
+    r"studentgroupassignments/recent",
+    views.RecentStudentGroupAssignmentViewSet,
+    basename="recent-studentgroupassignment",
 )
 peerinst_api.register(
     r"collections",

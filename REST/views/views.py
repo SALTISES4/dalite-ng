@@ -65,13 +65,16 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         return Assignment.objects.filter(owner=self.request.user)
 
 
-class StudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
+class RecentStudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Readonly access to a teacher's active and recently due studentgroupassignments.
+    """
+
     permission_classes = [IsAuthenticated, IsTeacher, InTeacherList]
     renderer_classes = [JSONRenderer]
     serializer_class = GroupAssignmentSerializer
 
     def get_queryset(self):
-        # Return all active and recently due assignments
         now = timezone.now()
         return (
             StudentGroupAssignment.objects.filter(
@@ -80,6 +83,25 @@ class StudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
             .filter(distribution_date__lt=now)
             .filter(due_date__gt=now - timedelta(days=7))
             .order_by("-distribution_date")
+        )
+
+
+class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
+    """
+    CRU access to a teacher's studentgroupassignments
+    """
+
+    permission_classes = [IsAuthenticated, IsTeacher]
+    renderer_classes = [JSONRenderer]
+    serializer_class = GroupAssignmentSerializer
+
+    def get_queryset(self):
+        """
+        Use queryset to limit access to assignments associated
+        with a teacher's groups (as opposed to using permission_classes)
+        """
+        return StudentGroupAssignment.objects.filter(
+            group__teacher=self.request.user.teacher
         )
 
 

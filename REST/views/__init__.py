@@ -7,8 +7,11 @@ __all__ = [
     "QuestionListViewSet",
     "QuestionSerializer",
     "QuestionSearchList",
+    "RecentStudentGroupAssignmentViewSet",
     "StudentReviewList",
     "StudentFeedbackList",
+    "StudentGroupAssignmentAnswers",
+    "StudentGroupUpdateView",
     "TeacherCollectionRecommendationViewSet",
     "TeacherLibraryAssignmentViewSet",
     "TeacherAssignmentRecommendationViewSet",
@@ -20,8 +23,6 @@ __all__ = [
     "TeacherFeedbackDetail",
     "TeacherFeedbackThroughAnswerDetail",
     "TeacherSearch",
-    "StudentGroupUpdateView",
-    "StudentGroupAssignmentAnswers",
 ]
 
 from .library import (  # noqa
@@ -42,9 +43,9 @@ from .views import (  # noqa
     QuestionSearchList,
     QuestionSerializer,
     QuestionViewSet,
+    RecentStudentGroupAssignmentViewSet,
     StudentFeedbackList,
     StudentGroupAssignmentAnswers,
-    StudentGroupAssignmentViewSet,
     StudentGroupUpdateView,
     StudentReviewList,
     TeacherFeedbackDetail,
