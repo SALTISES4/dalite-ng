@@ -20,6 +20,7 @@ from peerinst.models import (
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 
 from .dynamic_serializer import DynamicFieldsModelSerializer
+from .student_group import StudentGroupSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -383,7 +384,7 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
     difficulty = serializers.SerializerMethodField()
     distributionState = serializers.SerializerMethodField()
     due_date = serializers.ReadOnlyField()
-    group = serializers.SerializerMethodField()
+    group = StudentGroupSerializer()
     issueCount = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
     questionCount = serializers.SerializerMethodField()
@@ -409,7 +410,9 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
         return obj.assignment.pk
 
     def get_author(self, obj):
-        return obj.assignment.owner.first().username
+        if obj.assignment.owner.exists():
+            return obj.assignment.owner.first().username
+        return None
 
     def get_difficulty(self, obj):
         return "ToDo"  # calculate difficulty from questions
@@ -417,9 +420,6 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
     def get_distributionState(self, obj):
         return "Distributed"
         # FIXME: choices from components/static/_localComponents/enum.ts
-
-    def get_group(self, obj):
-        return obj.group.title.strip()
 
     def get_issueCount(self, obj):
         return 1.0  # FIXME: Do we need this?
@@ -448,6 +448,7 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
             "due_date",
             "group",
             "issueCount",
+            "pk",
             "progress",
             "questionCount",
             "title",

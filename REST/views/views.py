@@ -91,6 +91,15 @@ class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
     CRU access to a teacher's studentgroupassignments
     """
 
+    http_method_names = [
+        "get",
+        "post",
+        "put",
+        "patch",
+        "head",
+        "options",
+        "trace",
+    ]
     permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
     serializer_class = GroupAssignmentSerializer

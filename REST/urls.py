@@ -45,6 +45,11 @@ peerinst_api.register(
     basename="recent-studentgroupassignment",
 )
 peerinst_api.register(
+    r"studentgroupassignments",
+    views.StudentGroupAssignmentViewSet,
+    basename="studentgroupassignment",
+),
+peerinst_api.register(
     r"collections",
     views.CollectionViewSet,
     basename="collection",

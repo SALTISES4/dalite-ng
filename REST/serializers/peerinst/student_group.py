@@ -6,4 +6,4 @@ from .dynamic_serializer import DynamicFieldsModelSerializer
 class StudentGroupSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = StudentGroup
-        fields = ["teacher"]
+        fields = ["pk", "teacher", "title"]
