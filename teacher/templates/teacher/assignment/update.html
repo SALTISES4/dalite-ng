@@ -33,9 +33,9 @@
           },
           editableByUser: {{ editable|yesno:"true,false" }},
           urls: {
-            groups: "",
+            groups: "{% url 'REST:groupassignment-list' %}",
             questions: "{% url 'REST:assignment-detail' object.identifier %}?field=questions",
-            teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=favourite_questions",
+            teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=favourite_questions&field=current_groups",
           },
         });
       };

@@ -47,6 +47,7 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
         source="followers",
     )
     createdQuestionCount = serializers.SerializerMethodField()
+    current_groups = serializers.SerializerMethodField()
     deleted_questions = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Question.objects.all()
     )
@@ -106,6 +107,18 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
     def get_createdQuestionCount(self, obj):
         return Question.objects.filter(user=obj.user).count()
 
+    def get_current_groups(self, obj):
+        return [
+            {
+                "pk": g.pk,
+                "name": g.name,
+                "title": g.title,
+                "semester": g.semester,
+                "year": g.year,
+            }
+            for g in obj.current_groups.all()
+        ]
+
     def validate(self, data):
         # Limit deleted questions to questions where user is owner
         questions = self.context["request"].user.question_set.all()
@@ -143,6 +156,7 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
             "assignments",
             "bookmarked_collections",
             "createdQuestionCount",
+            "current_groups",
             "deleted_questions",
             "favourite_questions",
             "owned_assignments",
