@@ -1,7 +1,7 @@
 -r requirements-base.txt
 
 boto3
-django-ses
+django-ses>=3.5.0
 django-storages
 gunicorn
 sentry-sdk >= 0.20.3
