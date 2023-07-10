@@ -5,7 +5,8 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from rest_framework import generics, serializers, viewsets
+from rest_framework import generics, serializers, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
@@ -106,12 +107,23 @@ class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Use queryset to limit access to assignments associated
-        with a teacher's groups (as opposed to using permission_classes)
+        Use queryset to limit access to StudentGroupAssignments associated
+        with a teacher's StudentGroups (as opposed to using permission_classes)
         """
         return StudentGroupAssignment.objects.filter(
             group__teacher=self.request.user.teacher
         )
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="assignment/(?P<assignment_pk>[a-z0-9]+)",
+    )
+    def for_assignment(self, request, assignment_pk=None):
+        # Return objects associated with a specific assignment for teacher
+        queryset = self.get_queryset().filter(assignment__pk=assignment_pk)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MinimumResultsPagination(PageNumberPagination):

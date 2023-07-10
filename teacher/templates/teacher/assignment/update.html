@@ -33,7 +33,8 @@
           },
           editableByUser: {{ editable|yesno:"true,false" }},
           urls: {
-            groups: "{% url 'REST:studentgroupassignment-list' %}?field=group&field=due_date&field=progress&field=title",
+            distribute: "{% url 'REST:studentgroupassignment-list' %}",
+            studentgroupassignments: "{% url 'REST:studentgroupassignment-for-assignment' object.pk %}?field=group&field=due_date&field=progress&field=title",
             questions: "{% url 'REST:assignment-detail' object.identifier %}?field=questions",
             teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=favourite_questions&field=current_groups",
           },
