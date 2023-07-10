@@ -376,10 +376,10 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         ]
 
 
-class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
+class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
     active = serializers.SerializerMethodField()
     answerCount = serializers.SerializerMethodField()
-    assignment_pk = serializers.SerializerMethodField()
+    assignment = AssignmentSerializer(fields=["pk"])
     author = serializers.SerializerMethodField()
     difficulty = serializers.SerializerMethodField()
     distributionState = serializers.SerializerMethodField()
@@ -439,9 +439,9 @@ class GroupAssignmentSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = StudentGroupAssignment
         fields = [
-            "answerCount",
             "active",
-            "assignment_pk",
+            "answerCount",
+            "assignment",
             "author",
             "difficulty",
             "distributionState",

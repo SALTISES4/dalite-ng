@@ -3,13 +3,13 @@ __all__ = [
     "AnswerSerializer",
     "CollectionSerializer",
     "DisciplineSerializer",
-    "FeedbackWriteSerialzer",
     "FeedbackReadSerialzer",
-    "GroupAssignmentSerializer",
+    "FeedbackWriteSerialzer",
     "QuestionSerializer",
     "RankSerializer",
-    "StudentGroupSerializer",
     "StudentGroupAssignmentAnswerSerializer",
+    "StudentGroupAssignmentSerializer",
+    "StudentGroupSerializer",
     "TeacherSerializer",
 ]
 
@@ -20,10 +20,10 @@ from .peerinst import (  # noqa
     DisciplineSerializer,
     FeedbackReadSerialzer,
     FeedbackWriteSerialzer,
-    GroupAssignmentSerializer,
     QuestionSerializer,
     RankSerializer,
     StudentGroupAssignmentAnswerSerializer,
+    StudentGroupAssignmentSerializer,
     StudentGroupSerializer,
     TeacherSerializer,
 )

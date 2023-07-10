@@ -42,10 +42,10 @@ from REST.serializers import (
     DisciplineSerializer,
     FeedbackReadSerialzer,
     FeedbackWriteSerialzer,
-    GroupAssignmentSerializer,
     QuestionSerializer,
     RankSerializer,
     StudentGroupAssignmentAnswerSerializer,
+    StudentGroupAssignmentSerializer,
     StudentGroupSerializer,
     TeacherSerializer,
 )
@@ -73,7 +73,7 @@ class RecentStudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
 
     permission_classes = [IsAuthenticated, IsTeacher, InTeacherList]
     renderer_classes = [JSONRenderer]
-    serializer_class = GroupAssignmentSerializer
+    serializer_class = StudentGroupAssignmentSerializer
 
     def get_queryset(self):
         now = timezone.now()
@@ -103,7 +103,7 @@ class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
     ]
     permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
-    serializer_class = GroupAssignmentSerializer
+    serializer_class = StudentGroupAssignmentSerializer
 
     def get_queryset(self):
         """
