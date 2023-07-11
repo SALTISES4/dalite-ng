@@ -6,14 +6,14 @@ app_name = "teacher"
 
 assignment_patterns = [
     path(
-        "<str:identifier>/",
-        views_teacher.AssignmentDetailView.as_view(),
-        name="assignment-detail",
-    ),
-    path(
         "create/",
         views_teacher.AssignmentCreateView.as_view(),
         name="assignment-create",
+    ),
+    path(
+        "<str:identifier>/",
+        views_teacher.AssignmentDetailView.as_view(),
+        name="assignment-detail",
     ),
     path(
         "update/<str:identifier>/",
