@@ -31,7 +31,9 @@ pip-lock
 pyjwt
 pymemcache
 pytz
-requests
+redis >= 4.3.6
+requests >= 2.31.0
+sqlparse >= 0.4.4
 twisted == 22.4 # [3]
 
 SALTISE_course_flow == 0.8.6
