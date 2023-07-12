@@ -45,7 +45,7 @@ jobs:
           name: Install packages
           command: |
             . .venv/bin/activate
-            python -m pip install -r requirements/requirements-dev.txt
+            python -m pip install -r requirements/requirements-dev.txt --no-deps
             python -m pip freeze
             # python -m spacy download en_core_web_sm
             npm install --no-optional
