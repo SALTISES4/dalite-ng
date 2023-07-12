@@ -35,11 +35,11 @@ redis >= 4.3.6
 requests >= 2.31.0
 scipy >= 1.10.0rc1
 sqlparse >= 0.4.4
-twisted >=22.10.0rc1  # [3]
+twisted == 22.4  # [3]
 
 SALTISE_course_flow == 0.8.6
 SALTISE_user_feedback
 
 # 1. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
 # 2. Removed until used – See: peerinst/grammar.py
-# 3. Temporary pin for safety
+# 3. Temporary pin - see https://github.com/twisted/twisted/issues/11839, requires ignore of vulnerability ID 51619
