@@ -33,6 +33,7 @@ pymemcache
 pytz
 redis >= 4.3.6
 requests >= 2.31.0
+scipy >= 1.10.0rc1
 sqlparse >= 0.4.4
 twisted >=22.10.0rc1  # [3]
 
