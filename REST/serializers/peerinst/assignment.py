@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import bad_request
 
@@ -15,6 +16,7 @@ from peerinst.models import (
     Collection,
     Discipline,
     Question,
+    StudentGroup,
     StudentGroupAssignment,
 )
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
@@ -386,12 +388,21 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
 class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
     active = serializers.SerializerMethodField()
     answerCount = serializers.SerializerMethodField()
-    assignment = AssignmentSerializer(fields=["pk", "urls"])
+    assignment = AssignmentSerializer(fields=["pk", "urls"], read_only=True)
+    assignment_pk = serializers.PrimaryKeyRelatedField(
+        queryset=Assignment.objects.all(),
+        source="assignment",
+        required=True,
+    )
     author = serializers.SerializerMethodField()
     difficulty = serializers.SerializerMethodField()
     distributionState = serializers.SerializerMethodField()
-    due_date = serializers.ReadOnlyField()
-    group = StudentGroupSerializer()
+    group = StudentGroupSerializer(read_only=True)
+    group_pk = serializers.PrimaryKeyRelatedField(
+        queryset=StudentGroup.objects.all(),
+        source="group",
+        required=True,
+    )
     issueCount = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
     questionCount = serializers.SerializerMethodField()
@@ -443,21 +454,65 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
     def get_url(self, obj):
         return obj.get_absolute_url()
 
+    def validate_assignment_pk(self, assignment):
+        if not assignment.is_valid:
+            raise serializers.ValidationError("Invalid assignment")
+        return assignment
+
+    def validate_due_date(self, due_date):
+        """
+        Check due_date is in the future
+        """
+        if due_date < timezone.now():
+            raise serializers.ValidationError("Invalid due date (in the past)")
+        return due_date
+
+    def validate_group_pk(self, student_group):
+        """
+        Check that teacher owns group and that group is "assignable"
+        (see Teacher model)
+        """
+        teacher = self.context["request"].user.teacher
+
+        if (
+            teacher
+            and teacher in student_group.teacher.all()
+            and student_group in teacher.assignable_groups.all()
+        ):
+            return student_group
+
+        raise serializers.ValidationError("Invalid student group")
+
+    def validate(self, data):
+        """
+        Impose unique_together on assignment and group
+        """
+        if StudentGroupAssignment.objects.filter(
+            assignment=data["assignment"], group=data["group"]
+        ).exists():
+            raise serializers.ValidationError(
+                "Assignment already distributed to group"
+            )
+        return data
+
     class Meta:
         model = StudentGroupAssignment
         fields = [
             "active",
             "answerCount",
             "assignment",
+            "assignment_pk",
             "author",
             "difficulty",
             "distributionState",
             "due_date",
             "group",
+            "group_pk",
             "issueCount",
             "pk",
             "progress",
             "questionCount",
+            "show_correct_answers",
             "title",
             "url",
         ]

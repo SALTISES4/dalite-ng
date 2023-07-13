@@ -90,6 +90,7 @@ class RecentStudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
 class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
     """
     CRU access to a teacher's studentgroupassignments
+    On create, need to check that teacher owns group
     """
 
     http_method_names = [

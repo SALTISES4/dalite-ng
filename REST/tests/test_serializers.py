@@ -1,11 +1,19 @@
+import datetime
 import json
 from unittest import mock
 
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 
-from peerinst.models import Assignment, AssignmentQuestions, Question
+from functional_tests.fixtures import realistic_assignment, realistic_questions
+from peerinst.models import (
+    Assignment,
+    AssignmentQuestions,
+    Question,
+    StudentGroup,
+)
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.student import login_student
 from peerinst.tests.fixtures.teacher import login_teacher
@@ -487,3 +495,188 @@ def test_teacher_questions(client, questions, teachers):
     for method in disallowed:
         response = getattr(client, method)(url)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+
+@pytest.mark.django_db
+def test_studentgroupassignment_access_and_basic_fields(
+    client, realistic_assignment, group, teachers, user
+):
+    """
+    Requirements:
+    1. Must be authenticated
+    2. Must be teacher and own student group
+    3. Must return error for nonsense group_pk
+    4. Must return error for nonsense assignment_pk (or invalid???)
+    5. Must return error due_date in the past
+    6. Must return error for "unassignable" group
+    """
+    assert realistic_assignment.is_valid
+
+    url = reverse("REST:studentgroupassignment-list")
+    data = {
+        "assignment_pk": realistic_assignment.pk,
+        "due_date": timezone.now() + datetime.timedelta(days=1),
+        "group_pk": group.pk,
+        "show_correct_answers": True,
+    }
+
+    # 1. Authentication required
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    # 2. Teacher required, teacher must own group and group must be current
+    client.force_login(user)
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    login_teacher(client, teachers[0])
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    group.teacher.add(teachers[0])
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    teachers[0].current_groups.add(group)
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+
+    # 3. Nonsense assignment_pk should return error
+    data = {
+        "assignment_pk": "Nonsense",
+        "due_date": timezone.now(),
+        "group_pk": group.pk,
+        "show_correct_answers": True,
+    }
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    # 4. Nonsense group_pk should return error
+    data = {
+        "assignment_pk": realistic_assignment.pk,
+        "due_date": timezone.now(),
+        "group_pk": 182394761298374612872364,
+        "show_correct_answers": True,
+    }
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    # 5. dues_date in the past should return error
+    past_datetime = timezone.now() - datetime.timedelta(days=1)
+    data = {
+        "assignment_pk": realistic_assignment.pk,
+        "due_date": past_datetime,
+        "group_pk": group.pk,
+        "show_correct_answers": True,
+    }
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    # 6. Unassignable group should return error
+    group.mode_created = StudentGroup.MODE_CREATED_CHOICES[0][1]
+    group.save()
+    data = {
+        "assignment_pk": realistic_assignment.pk,
+        "due_date": timezone.now() + datetime.timedelta(days=1),
+        "group_pk": group.pk,
+        "show_correct_answers": True,
+    }
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test_studentgroupassignment_invalid_assignment(
+    client, assignment, group, teacher
+):
+    """
+    Requirements:
+    1. Must return error if assignment is not valid
+    """
+    assert not assignment.is_valid
+
+    login_teacher(client, teacher)
+    group.teacher.add(teacher)
+    teacher.current_groups.add(group)
+    url = reverse("REST:studentgroupassignment-list")
+    data = {
+        "assignment_pk": assignment.pk,
+        "due_date": timezone.now() + datetime.timedelta(days=1),
+        "group_pk": group.pk,
+        "show_correct_answers": True,
+    }
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test_studentgroupassignment_uniquetogether_assignment_and_group(
+    client, assignment, group, teacher
+):
+    """
+    Requirements:
+    1. Must return error if assignment and group aren't unique together
+    """
+    login_teacher(client, teacher)
+    group.teacher.add(teacher)
+    teacher.current_groups.add(group)
+    url = reverse("REST:studentgroupassignment-list")
+    data = {
+        "assignment_pk": assignment.pk,
+        "due_date": timezone.now() + datetime.timedelta(days=1),
+        "group_pk": group.pk,
+        "show_correct_answers": True,
+    }
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST

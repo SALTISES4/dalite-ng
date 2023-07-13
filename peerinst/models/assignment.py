@@ -152,7 +152,7 @@ class Assignment(models.Model):
 
     @property
     def is_valid(self):
-        return not any(
+        return self.questions.count() > 0 and not any(
             [
                 Question.is_missing_answer_choices(self.questions.all()),
                 Question.is_missing_sample_answers(self.questions.all()),
