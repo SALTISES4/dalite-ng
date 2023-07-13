@@ -46,7 +46,7 @@ class AssignmentDetailView(TeacherBase, DetailView):
     model = Assignment
     pk_url_kwarg = "identifier"
     queryset = Assignment.objects.all()  # Limit to 'valid' assignments?
-    template_name = "teacher/assignment/preview.html"
+    template_name = "teacher/assignment/detail.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()

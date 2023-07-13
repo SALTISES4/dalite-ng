@@ -307,6 +307,13 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
                     obj.pk,
                 ),
             ),
+            "view": reverse(
+                "teacher:assignment-detail",
+                args=(
+                    self.context["request"].user.teacher.pk,
+                    obj.pk,
+                ),
+            ),
         }
 
     def validate_questions(self, data):

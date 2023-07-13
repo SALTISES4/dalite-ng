@@ -11,14 +11,14 @@ assignment_patterns = [
         name="assignment-create",
     ),
     path(
-        "<str:identifier>/",
-        views_teacher.AssignmentDetailView.as_view(),
-        name="assignment-detail",
-    ),
-    path(
         "update/<str:identifier>/",
         views_teacher.AssignmentUpdateView.as_view(),
         name="assignment-update",
+    ),
+    path(
+        "view/<str:identifier>/",
+        views_teacher.AssignmentDetailView.as_view(),
+        name="assignment-detail",
     ),
 ]
 
