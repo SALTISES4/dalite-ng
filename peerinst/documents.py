@@ -297,6 +297,12 @@ class AssignmentDocument(Document):
     pk = KeywordField(index=False)
     question_count = IntegerField(index=False)
     title = TextField(analyzer=html_strip)
+    urls = ObjectField(
+        properties={
+            "preview": TextField(index=False),
+            "view": TextField(index=False),
+        }
+    )
 
     def prepare_answer_count(self, instance):
         return instance.answer_count
@@ -320,6 +326,11 @@ class AssignmentDocument(Document):
             tags=ALLOWED_TAGS,
             strip=True,
         ).strip()
+
+    def prepare_urls(self, instance):
+        return {
+            "preview": instance.get_absolute_url(),
+        }
 
     def get_instances_from_related(self, related_instance):
         for model in [Question]:
