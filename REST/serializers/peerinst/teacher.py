@@ -15,6 +15,7 @@ from .assignment import (
     UserSerializer,
 )
 from .dynamic_serializer import DynamicFieldsModelSerializer
+from .student_group import StudentGroupSerializer
 
 
 class TeacherSerializer(DynamicFieldsModelSerializer):
@@ -22,6 +23,11 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
     activeGroupCount = serializers.SerializerMethodField()
     archived_questions = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Question.objects.all()
+    )
+    assignable_groups = StudentGroupSerializer(
+        fields=["name", "pk", "semester", "title", "year"],
+        many=True,
+        read_only=True,
     )
     assignments = AssignmentSerializer(
         fields=[
@@ -47,7 +53,11 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
         source="followers",
     )
     createdQuestionCount = serializers.SerializerMethodField()
-    current_groups = serializers.SerializerMethodField()
+    current_groups = StudentGroupSerializer(
+        fields=["name", "pk", "semester", "title", "year"],
+        many=True,
+        read_only=True,
+    )
     deleted_questions = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Question.objects.all()
     )
@@ -107,18 +117,6 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
     def get_createdQuestionCount(self, obj):
         return Question.objects.filter(user=obj.user).count()
 
-    def get_current_groups(self, obj):
-        return [
-            {
-                "pk": g.pk,
-                "name": g.name,
-                "title": g.title,
-                "semester": g.semester,
-                "year": g.year,
-            }
-            for g in obj.current_groups.all()
-        ]
-
     def validate(self, data):
         # Limit deleted questions to questions where user is owner
         questions = self.context["request"].user.question_set.all()
@@ -152,6 +150,7 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
             "activeAssignmentCount",
             "activeGroupCount",
             "archived_questions",
+            "assignable_groups",
             "assignment_pks",
             "assignments",
             "bookmarked_collections",

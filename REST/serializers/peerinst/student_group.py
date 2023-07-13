@@ -13,4 +13,4 @@ class StudentGroupSerializer(DynamicFieldsModelSerializer):
 
     class Meta:
         model = StudentGroup
-        fields = ["pk", "teacher", "title", "url"]
+        fields = ["pk", "name", "semester", "teacher", "title", "url", "year"]
