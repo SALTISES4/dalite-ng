@@ -495,6 +495,11 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
             )
         return data
 
+    def create(self, validated_data):
+        sga = super().create(validated_data)
+        sga.distribute()
+        return sga
+
     class Meta:
         model = StudentGroupAssignment
         fields = [
