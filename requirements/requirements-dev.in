@@ -3,9 +3,8 @@
 black
 django-sslserver
 flake8 == 5.0.4 # [1]
-ipython
 isort
 pre-commit
-safety
+safety >= 2.2.0
 
 # 1. Pinned to pre-commit version
