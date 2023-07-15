@@ -31,7 +31,8 @@
             pk: "{{ object.identifier }}",
             title: "{{ object.title }}",
           },
-          editableByUser: {{ editable|yesno:"true,false" }},
+          metaEditableByUser: {{ meta_editable|yesno:"true,false" }},
+          questionsEditableByUser: {{ questions_editable|yesno:"true,false" }},
           urls: {
             assignment: "{% url 'REST:assignment-detail' object.identifier %}?field=questions&field=is_valid",
             distribute: "{% url 'REST:studentgroupassignment-list' %}",

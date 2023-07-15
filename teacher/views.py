@@ -58,6 +58,13 @@ class AssignmentDetailView(TeacherBase, DetailView):
 
 
 class AssignmentUpdateView(TeacherBase, DetailView):
+    """
+    Update view should account for three levels of editability:
+    - None at all: non-owners
+    - Meta fields only: owners where assignment.editable is false
+    - All fields: owners where assignment.editable is true
+    """
+
     http_method_names = ["get"]
     model = Assignment
     pk_url_kwarg = "identifier"
@@ -72,9 +79,10 @@ class AssignmentUpdateView(TeacherBase, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         assignment = self.get_object()
+        user_is_owner = self.request.user in assignment.owner.all()
         context.update(
-            editable=assignment.editable
-            and self.request.user in assignment.owner.all(),
+            meta_editable=user_is_owner,
+            questions_editable=assignment.editable and user_is_owner,
             owner=[u.username for u in assignment.owner.all()],
         )
         return context
