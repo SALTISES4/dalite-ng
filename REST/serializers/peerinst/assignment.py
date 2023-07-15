@@ -1,3 +1,5 @@
+import logging
+
 import bleach
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
@@ -23,6 +25,8 @@ from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 
 from .dynamic_serializer import DynamicFieldsModelSerializer
 from .student_group import StudentGroupSerializer
+
+logger = logging.getLogger("REST")
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -456,7 +460,10 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
 
     def validate_assignment_pk(self, assignment):
         if not assignment.is_valid:
-            raise serializers.ValidationError("Invalid assignment")
+            logger.error(
+                f"Assignment {assignment} is not valid and cannot be distributed."
+            )
+            raise serializers.ValidationError("Assignment is not valid.")
         return assignment
 
     def validate_due_date(self, due_date):
@@ -464,7 +471,10 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
         Check due_date is in the future
         """
         if due_date < timezone.now():
-            raise serializers.ValidationError("Invalid due date (in the past)")
+            logger.error(f"Invalid due_date: {due_date}")
+            raise serializers.ValidationError(
+                "Invalid due date (in the past)."
+            )
         return due_date
 
     def validate_group_pk(self, student_group):
@@ -481,17 +491,23 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
         ):
             return student_group
 
-        raise serializers.ValidationError("Invalid student group")
+        logger.error(f"Invalid student group: {student_group}")
+        raise serializers.ValidationError("Invalid student group.")
 
     def validate(self, data):
         """
         Impose unique_together on assignment and group
         """
+        assignment = data["assignment"]
+        group = data["group"]
         if StudentGroupAssignment.objects.filter(
-            assignment=data["assignment"], group=data["group"]
+            assignment=assignment, group=group
         ).exists():
+            logger.error(
+                f"Assignment {assignment} already distributed to {group}."
+            )
             raise serializers.ValidationError(
-                "Assignment already distributed to group"
+                f"Assignment already distributed to {group}."
             )
         return data
 

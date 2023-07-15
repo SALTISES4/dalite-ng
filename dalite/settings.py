@@ -409,6 +409,12 @@ LOGGING = {
         },
     },
     "handlers": {
+        "console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
         "file_debug_log": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
@@ -583,6 +589,11 @@ LOGGING = {
         "performance": {
             "handlers": ["performance_console_log"],
             "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "REST": {
+            "handlers": ["console_log"],
+            "level": "DEBUG",
             "propagate": True,
         },
         "validation": {

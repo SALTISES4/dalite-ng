@@ -118,7 +118,7 @@ class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=["get"],
-        url_path="assignment/(?P<assignment_pk>[a-z0-9_-]+)",
+        url_path="assignment/(?P<assignment_pk>[a-zA-Z0-9_-]+)",
     )
     def for_assignment(self, request, assignment_pk=None):
         # Return objects associated with a specific assignment for teacher
