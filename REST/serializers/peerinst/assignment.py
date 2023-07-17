@@ -345,7 +345,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         Only used to reorder questions and change meta data.
         Adding/deleting questions is handled by serializer for through table.
         """
-        if instance.editable:
+        if instance.editable and "assignmentquestions_set" in validated_data:
             for i, aq in enumerate(instance.assignmentquestions_set.all()):
                 aq.rank = validated_data["assignmentquestions_set"][i]["rank"]
                 aq.save()
