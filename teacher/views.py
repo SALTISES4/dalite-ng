@@ -60,7 +60,7 @@ class AssignmentDetailView(TeacherBase, DetailView):
 class AssignmentUpdateView(TeacherBase, DetailView):
     """
     Update view should account for three levels of editability:
-    - None at all: non-owners
+    - None at all: non-owners >>> get_queryset will yield 404
     - Meta fields only: owners where assignment.editable is false
     - All fields: owners where assignment.editable is true
     """
@@ -81,8 +81,7 @@ class AssignmentUpdateView(TeacherBase, DetailView):
         assignment = self.get_object()
         user_is_owner = self.request.user in assignment.owner.all()
         context.update(
-            meta_editable=user_is_owner,
-            questions_editable=assignment.editable and user_is_owner,
+            editable=assignment.editable,
             owner=[u.username for u in assignment.owner.all()],
         )
         return context

@@ -342,7 +342,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        Only used to reorder questions.
+        Only used to reorder questions and change meta data.
         Adding/deleting questions is handled by serializer for through table.
         """
         if instance.editable:
@@ -350,8 +350,12 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
                 aq.rank = validated_data["assignmentquestions_set"][i]["rank"]
                 aq.save()
 
-            return instance
-        raise PermissionDenied
+        instance.description = validated_data["description"]
+        instance.intro_page = validated_data["intro_page"]
+        instance.conclusion_page = validated_data["conclusion_page"]
+        instance.save()
+
+        return instance
 
     def to_representation(self, instance):
         """Bleach fields"""
