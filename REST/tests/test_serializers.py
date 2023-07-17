@@ -17,6 +17,7 @@ from peerinst.models import (
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.student import login_student
 from peerinst.tests.fixtures.teacher import login_teacher
+from REST.serializers import AssignmentSerializer
 
 
 @pytest.mark.django_db
@@ -344,6 +345,41 @@ def test_assignmentquestions_detail(client, assignments, student, teachers):
 
 
 @pytest.mark.django_db
+def test_assignment_to_internal_value():
+    """
+    Bleach all fields
+    """
+    dangerous_string = "<script><p>OK</p></script>"
+    assignment = AssignmentSerializer(
+        data={
+            "pk": "123",
+            "title": dangerous_string,
+            "description": dangerous_string,
+        }
+    )
+
+    assert assignment.is_valid()
+    assert assignment.validated_data["title"] == "OK"
+    assert assignment.validated_data["description"] == "<p>OK</p>"
+
+
+@pytest.mark.django_db
+def test_assignment_to_representation(realistic_assignment):
+    """
+    Bleach all fields
+    """
+    dangerous_string = "<script><p>OK</p></script>"
+    realistic_assignment.title = dangerous_string
+    realistic_assignment.description = dangerous_string
+    assignment = AssignmentSerializer(
+        realistic_assignment, fields=["title", "description"]
+    )
+
+    assert assignment.data["title"] == "OK"
+    assert assignment.data["description"] == "<p>OK</p>"
+
+
+@pytest.mark.django_db
 def test_discipline_list(client, disciplines, student, teacher):
     """
     Requirements:
@@ -651,18 +687,20 @@ def test_studentgroupassignment_invalid_assignment(
 
 @pytest.mark.django_db
 def test_studentgroupassignment_uniquetogether_assignment_and_group(
-    client, assignment, group, teacher
+    client, realistic_assignment, group, teacher
 ):
     """
     Requirements:
     1. Must return error if assignment and group aren't unique together
     """
+    assert realistic_assignment.is_valid
+
     login_teacher(client, teacher)
     group.teacher.add(teacher)
     teacher.current_groups.add(group)
     url = reverse("REST:studentgroupassignment-list")
     data = {
-        "assignment_pk": assignment.pk,
+        "assignment_pk": realistic_assignment.pk,
         "due_date": timezone.now() + datetime.timedelta(days=1),
         "group_pk": group.pk,
         "show_correct_answers": True,

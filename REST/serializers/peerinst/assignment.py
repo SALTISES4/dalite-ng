@@ -345,21 +345,42 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         Only used to reorder questions and change meta data.
         Adding/deleting questions is handled by serializer for through table.
         """
-        if instance.editable and "assignmentquestions_set" in validated_data:
-            for i, aq in enumerate(instance.assignmentquestions_set.all()):
-                aq.rank = validated_data["assignmentquestions_set"][i]["rank"]
-                aq.save()
+        if "assignmentquestions_set" in validated_data:
+            if instance.editable:
+                for i, aq in enumerate(instance.assignmentquestions_set.all()):
+                    aq.rank = validated_data["assignmentquestions_set"][i][
+                        "rank"
+                    ]
+                    aq.save()
+            else:
+                raise PermissionDenied
 
-        instance.description = validated_data["description"]
-        instance.intro_page = validated_data["intro_page"]
-        instance.conclusion_page = validated_data["conclusion_page"]
+        for field in ["conclusion_page", "description", "intro_page", "title"]:
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+
         instance.save()
 
         return instance
 
     def to_representation(self, instance):
-        """Bleach fields"""
+        """Bleach on the way out"""
         ret = super().to_representation(instance)
+        for field in ["conclusion_page", "description", "intro_page"]:
+            if field in ret and ret[field]:
+                ret[field] = bleach.clean(
+                    ret[field], tags=ALLOWED_TAGS, strip=True
+                ).strip()
+        for field in ["title"]:
+            if field in ret and ret[field]:
+                ret[field] = bleach.clean(
+                    ret[field], tags=[], strip=True
+                ).strip()
+        return ret
+
+    def to_internal_value(self, data):
+        """Bleach on the way in"""
+        ret = super().to_internal_value(data)
         for field in ["conclusion_page", "description", "intro_page"]:
             if field in ret and ret[field]:
                 ret[field] = bleach.clean(
