@@ -33,7 +33,7 @@
             intro_page: "{{ object.intro_page|default_if_none:''|bleach_html|safe }}",
             owner: {{ owner|safe }},
             pk: "{{ object.identifier }}",
-            title: "{{ object.title }}",
+            title: "{{ object.title|bleach_html|safe }}",
           },
           EditorIcons: {
             boldIcon: "{% static 'components/img/editor/bold.svg' %}",
