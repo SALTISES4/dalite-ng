@@ -30,6 +30,7 @@
             studentgroupassignments: "{% url 'REST:recent-studentgroupassignment-list' %}",
             questions: "{% url 'REST:teacher-library-question-list' %}?field=answer_count&field=answerchoice_set&field=category&field=difficulty&field=discipline&field=image&field=image_alt_text&field=peer_impact&field=pk&field=text&field=title&field=user&field=video_url&field=is_owner",
             teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=bookmarked_collections&field=favourite_questions&field=assignment_pks&field=user",
+            add_to_assignment: "{% url 'REST:assignment_question-list' %}"
           },
           user: {
             username: "{{ request.user.username }}",
