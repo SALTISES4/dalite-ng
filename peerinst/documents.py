@@ -6,6 +6,7 @@ Object serialization must match with REST API for component compatability.
 
 import bleach
 from django.contrib.auth.models import User
+from django.urls import reverse
 from django_elasticsearch_dsl import Document
 from django_elasticsearch_dsl.fields import (
     BooleanField,
@@ -121,6 +122,11 @@ class QuestionDocument(Document):
     pk = KeywordField()
     text = TextField(analyzer=html_strip)
     title = TextField(analyzer=html_strip)
+    urls = ObjectField(
+        properties={
+            "addable_assignments": TextField(index=False),
+        }
+    )
     user = ObjectField(
         properties={
             "username": TextField(analyzer=autocomplete),
@@ -233,6 +239,13 @@ class QuestionDocument(Document):
             tags=ALLOWED_TAGS,
             strip=True,
         ).strip()
+
+    def prepare_urls(self, instance):
+        return {
+            "addable_assignments": reverse(
+                "REST:assignment-for-question", args=(instance.pk,)
+            ),
+        }
 
     def prepare_user(self, instance):
         username = ""
