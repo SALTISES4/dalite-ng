@@ -23,7 +23,11 @@ if __name__ == "__main__":
         ) from e
 
     # Should always have one of dev OR prod requirements
-    requirements = ["requirements-dev", "requirements-prod-aws"]
+    requirements = [
+        "requirements-dev",
+        "requirements-test",
+        "requirements-prod-aws",
+    ]
 
     venv_check = list(map(check_mismatches, requirements))
     if min(venv_check) > 0:
