@@ -38,6 +38,7 @@ scipy >= 1.10.0rc1
 sqlparse >= 0.4.4
 twisted == 22.4  # [3]
 
+SALTISE_components == 0.2.8
 SALTISE_course_flow == 0.8.6
 SALTISE_user_feedback
 
