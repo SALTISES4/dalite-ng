@@ -4,11 +4,9 @@ import bleach
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Max
-from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import serializers
-from rest_framework.exceptions import bad_request
 
 from peerinst.models import (
     Answer,
@@ -215,47 +213,46 @@ class RankSerializer(serializers.ModelSerializer):
             "user",
         ),
     )
+    question_pk = serializers.PrimaryKeyRelatedField(
+        queryset=Question.objects.all(),
+        source="question",
+        required=True,
+    )
 
     def create(self, validated_data):
-        """Custom create method to add questions to an assignment based on pk
+        """
+        Custom create method to add questions to an assignment based on pk
         Required POST data:
             - assignment (validated normally)
-            - question_pk (validated here)
+            - question_pk (validated normally)
         """
-
         assignment = validated_data["assignment"]
+        question = validated_data["question"]
         if (
             assignment.editable
             and self.context["request"].user in assignment.owner.all()
         ):
-            if "question_pk" in self.context["request"].data:
-                question_pk = self.context["request"].data["question_pk"]
-                if assignment.questions.all():
-                    added_question = AssignmentQuestions.objects.create(
-                        assignment=assignment,
-                        question=get_object_or_404(Question, pk=question_pk),
-                        rank=assignment.questions.aggregate(
-                            Max("assignmentquestions__rank")
-                        )["assignmentquestions__rank__max"]
-                        + 1,
-                    )
-                else:
-                    added_question = AssignmentQuestions.objects.create(
-                        assignment=assignment,
-                        question=get_object_or_404(Question, pk=question_pk),
-                        rank=1,
-                    )
-                if added_question:
-                    return added_question
-                else:
-                    raise bad_request
+            if assignment.questions.all():
+                added_question = AssignmentQuestions.objects.create(
+                    assignment=assignment,
+                    question=question,
+                    rank=assignment.questions.aggregate(
+                        Max("assignmentquestions__rank")
+                    )["assignmentquestions__rank__max"]
+                    + 1,
+                )
             else:
-                raise bad_request
+                added_question = AssignmentQuestions.objects.create(
+                    assignment=assignment,
+                    question=question,
+                    rank=1,
+                )
+            return added_question
         raise PermissionDenied
 
     class Meta:
         model = AssignmentQuestions
-        fields = ["assignment", "question", "rank", "pk"]
+        fields = ["assignment", "question", "question_pk", "rank", "pk"]
 
 
 class AssignmentSerializer(DynamicFieldsModelSerializer):
