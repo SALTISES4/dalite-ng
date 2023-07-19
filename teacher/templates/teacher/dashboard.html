@@ -25,10 +25,11 @@
           logo: "{% static 'components/img/logo.gif' %}",
           nonce: "{{ request.csp_nonce }}",
           urls: {
+            add_to_assignment: "{% url 'REST:assignment_question-list' %}",
             collection: "{% url 'REST:collection-list' %}?field=author&field=description&field=discipline&field=featured&field=follower_count&field=pk&field=title&field=url&field=user",
             collections: "{% url 'REST:recommended-collections-list' %}?field=author&field=description&field=discipline&field=featured&field=follower_count&field=pk&field=title&field=url&field=user",
             collectionsLink: "{% url 'teacher:search' request.user.teacher.pk %}?type=Collection",
-            questions: "{% url 'REST:recommended-questions-list' %}?field=answer_count&field=category&field=difficulty&field=discipline&field=peer_impact&field=tags&field=text&field=title&field=user&field=answerchoice_set&field=image&field=image_alt_text&field=video_url&field=pk&field=is_owner",
+            questions: "{% url 'REST:recommended-questions-list' %}?field=answer_count&field=category&field=difficulty&field=discipline&field=peer_impact&field=tags&field=text&field=title&field=user&field=answerchoice_set&field=image&field=image_alt_text&field=video_url&field=pk&field=is_owner&field=urls",
             questionsLink: "{% url 'teacher:search' request.user.teacher.pk %}?type=Question",
             studentgroupassignments: "{% url 'REST:recent-studentgroupassignment-list' %}",
             studentgroupassignmentsLink: "{% url 'group-assignments' request.user.teacher.pk %}",
