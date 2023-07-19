@@ -19,7 +19,7 @@
       const sidebarGroups = [
         [
           {title: "{% trans 'Dashboard' %}", icon: "dashboard", url: "{% url 'teacher:dashboard' request.user.teacher.pk %}"},
-          {title: "{% trans 'Search' %}", icon: "search", url: "{% url 'teacher:search' request.user.teacher.pk %}"},
+          {title: "{% trans 'Search' %}", icon: "search", url: "{% url 'teacher:search' %}"},
           {title: "{% trans 'My Library' %}", icon: "collections_bookmark", url: "{% url 'teacher:library' request.user.teacher.pk %}"},
           {title: "{% trans 'Reports' %}", icon: "assessment", url: "{% url 'report_selector' %}"},
         ],
@@ -61,7 +61,7 @@
               {
                 title: "{% trans 'Assignment' %}",
                 icon: "assignment",
-                url: "{% url 'teacher:assignment-create' request.user.teacher.pk %}",
+                url: "{% url 'teacher:assignment-create' %}",
               },
               {
                 title: "{% trans 'Collection' %}",

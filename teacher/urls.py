@@ -29,14 +29,14 @@ urlpatterns = [
         name="dashboard",
     ),
     path(
-        "<int:pk>/search/",
-        views_teacher.SearchView.as_view(),
-        name="search",
-    ),
-    path(
         "<int:pk>/library/",
         views_teacher.LibraryView.as_view(),
         name="library",
     ),
-    path("<int:pk>/assignment/", include(assignment_patterns)),
+    path("assignment/", include(assignment_patterns)),
+    path(
+        "search/",
+        views_teacher.SearchView.as_view(),
+        name="search",
+    ),
 ]

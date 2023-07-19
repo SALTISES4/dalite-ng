@@ -3,6 +3,7 @@ from django.views.generic import DetailView, TemplateView
 
 from peerinst.models import Assignment, Discipline, Question, Teacher
 from peerinst.views.views import TeacherBase
+from teacher.mixins import TeacherRequiredMixin
 
 
 class TeacherDashboardView(TeacherBase, DetailView):
@@ -10,38 +11,17 @@ class TeacherDashboardView(TeacherBase, DetailView):
     template_name = "teacher/dashboard.html"
 
 
-class SearchView(TeacherBase, DetailView):
-    http_method_names = ["get"]
-    model = Teacher
-    template_name = "teacher/search.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context.update(
-            difficulties=[
-                [d[0], d[1]] for d in Question.DIFFICULTY_LABELS[:-1]
-            ],
-            disciplines=[
-                bleach.clean(d, tags=[], strip=True).strip()
-                for d in Discipline.objects.values_list("title", flat=True)
-            ],
-            impacts=[[d[0], d[1]] for d in Question.PEER_IMPACT_LABELS[:-1]],
-            type=self.request.GET.get("type", ""),
-        )
-        return context
-
-
 class LibraryView(TeacherBase, TemplateView):
     http_method_names = ["get"]
     template_name = "teacher/library.html"
 
 
-class AssignmentCreateView(TeacherBase, TemplateView):
+class AssignmentCreateView(TeacherRequiredMixin, TemplateView):
     http_method_names = ["get"]
     template_name = "teacher/assignment/create.html"
 
 
-class AssignmentDetailView(TeacherBase, DetailView):
+class AssignmentDetailView(TeacherRequiredMixin, DetailView):
     http_method_names = ["get"]
     model = Assignment
     pk_url_kwarg = "identifier"
@@ -57,7 +37,7 @@ class AssignmentDetailView(TeacherBase, DetailView):
         return context
 
 
-class AssignmentUpdateView(TeacherBase, DetailView):
+class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
     """
     Update view should account for three levels of editability:
     - None at all: non-owners >>> get_queryset will yield 404
@@ -83,5 +63,26 @@ class AssignmentUpdateView(TeacherBase, DetailView):
         context.update(
             editable=assignment.editable,
             owner=[u.username for u in assignment.owner.all()],
+        )
+        return context
+
+
+class SearchView(TeacherRequiredMixin, TemplateView):
+    http_method_names = ["get"]
+    model = Teacher
+    template_name = "teacher/search.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context.update(
+            difficulties=[
+                [d[0], d[1]] for d in Question.DIFFICULTY_LABELS[:-1]
+            ],
+            disciplines=[
+                bleach.clean(d, tags=[], strip=True).strip()
+                for d in Discipline.objects.values_list("title", flat=True)
+            ],
+            impacts=[[d[0], d[1]] for d in Question.PEER_IMPACT_LABELS[:-1]],
+            type=self.request.GET.get("type", ""),
         )
         return context

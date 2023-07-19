@@ -308,17 +308,11 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
             "preview": obj.get_absolute_url(),
             "update": reverse(
                 "teacher:assignment-update",
-                args=(
-                    self.context["request"].user.teacher.pk,
-                    obj.pk,
-                ),
+                args=(obj.pk,),
             ),
             "view": reverse(
                 "teacher:assignment-detail",
-                args=(
-                    self.context["request"].user.teacher.pk,
-                    obj.pk,
-                ),
+                args=(obj.pk,),
             ),
         }
 
