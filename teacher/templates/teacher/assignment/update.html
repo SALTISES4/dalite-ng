@@ -28,9 +28,9 @@
           gettext: gettext,
           nonce: "{{ request.csp_nonce }}",
           assignment: {
-            conclusion_page: "{{ object.conclusion_page|default_if_none:''|bleach_html|safe }}",
-            description: "{{ object.description|default_if_none:''|bleach_html|safe }}",
-            intro_page: "{{ object.intro_page|default_if_none:''|bleach_html|safe }}",
+            conclusion_page: {% spaceless %}"{{ object.conclusion_page|default_if_none:''|bleach_html|safe }}"{% endspaceless %},
+            description: {% spaceless %}"{{ object.description|default_if_none:''|bleach_html|safe }}"{% endspaceless %},
+            intro_page: {% spaceless %}"{{ object.intro_page|default_if_none:''|bleach_html|safe }}"{% endspaceless %},
             owner: {{ owner|safe }},
             pk: "{{ object.identifier }}",
             title: "{{ object.title|bleach_html|safe }}",
