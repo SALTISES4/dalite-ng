@@ -45,10 +45,10 @@
             superIcon: "{% static 'components/img/editor/super.svg' %}",
             linkIcon: "{% static 'components/img/editor/link.svg' %}",
           },
-          metaEditableByUser: "true",
-          questionsEditableByUser: {{ editable|yesno:"true,false" }},
+          metaEditableByUser: {{ meta_editable_by_user|yesno:"true,false" }},
+          questionsEditableByUser: {{ questions_editable_by_user|yesno:"true,false" }},
           urls: {
-            assignment: "{% url 'REST:assignment-detail' object.identifier %}?field=questions&field=is_valid&field=intro_page&field=conclusion_page&field=description&field=title",
+            assignment: {% if meta_editable_by_user or questions_editable_by_user %}"{% url 'REST:teacher-assignment-detail' object.identifier %}?field=questions&field=is_valid&field=intro_page&field=conclusion_page&field=description&field=title"{% else %}"{% url 'REST:assignment-detail' object.identifier %}?field=questions&field=is_valid&field=intro_page&field=conclusion_page&field=description&field=title"{% endif %},
             distribute: "{% url 'REST:studentgroupassignment-list' %}",
             studentgroupassignments: "{% url 'REST:studentgroupassignment-for-assignment' object.pk %}?field=group&field=due_date&field=progress&field=title",
             teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=favourite_questions&field=assignable_groups",

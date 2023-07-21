@@ -1,6 +1,5 @@
 __all__ = [
     "AssignmentViewSet",
-    "StudentGroupAssignmentViewSet",
     "CollectionViewSet",
     "DisciplineViewSet",
     "QuestionViewSet",
@@ -13,6 +12,7 @@ __all__ = [
     "StudentGroupAssignmentViewSet",
     "StudentGroupUpdateView",
     "StudentReviewList",
+    "TeacherAssignmentViewSet",
     "TeacherCollectionRecommendationViewSet",
     "TeacherLibraryAssignmentViewSet",
     "TeacherAssignmentRecommendationViewSet",
@@ -50,6 +50,7 @@ from .views import (  # noqa
     StudentGroupAssignmentViewSet,
     StudentGroupUpdateView,
     StudentReviewList,
+    TeacherAssignmentViewSet,
     TeacherFeedbackDetail,
     TeacherFeedbackList,
     TeacherFeedbackThroughAnswerDetail,

@@ -140,7 +140,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                 "sample-answer-form", args=(obj.pk,)
             ),
             "addable_assignments": reverse(
-                "REST:assignment-for-question", args=(obj.pk,)
+                "REST:teacher-assignment-for-question", args=(obj.pk,)
             ),
             "copy_question": reverse("question-clone", args=(obj.pk,)),
             "fix": reverse("question-fix", args=(obj.pk,)),

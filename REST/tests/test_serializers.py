@@ -67,7 +67,7 @@ def test_dynamic_serializer_querystring(client, assignments, teacher):
 
 
 @pytest.mark.django_db
-def test_assignment_list(client, assignments, student, teacher):
+def test_teacher_assignment_list(client, assignments, student, teacher):
     """
     Requirements:
     1. Must be authenticated
@@ -80,7 +80,7 @@ def test_assignment_list(client, assignments, student, teacher):
     assignments[0].owner.add(teacher.user)
 
     # 1. Must be authenticated
-    url = reverse("REST:assignment-list") + "?format=json"
+    url = reverse("REST:teacher-assignment-list") + "?format=json"
 
     response = client.get(url)
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -139,7 +139,7 @@ def test_assignment_detail(client, assignments, questions, teacher):
 
     # 1. Must be authenticated
     url = (
-        reverse("REST:assignment-detail", args=[assignments[0].pk])
+        reverse("REST:teacher-assignment-detail", args=[assignments[0].pk])
         + "?format=json"
     )
 
@@ -160,7 +160,7 @@ def test_assignment_detail(client, assignments, questions, teacher):
         )
 
     response = client.get(
-        reverse("REST:assignment-detail", args=[assignments[1].pk])
+        reverse("REST:teacher-assignment-detail", args=[assignments[1].pk])
         + "?format=json"
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -187,7 +187,7 @@ def test_assignment_detail(client, assignments, questions, teacher):
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     response = client.patch(
-        reverse("REST:assignment-detail", args=[assignments[1].pk]),
+        reverse("REST:teacher-assignment-detail", args=[assignments[1].pk]),
         {
             "title": assignments[1].title,
             "questions": retrieved_assignment["questions"],

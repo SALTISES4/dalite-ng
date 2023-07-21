@@ -53,7 +53,12 @@ peerinst_api.register(
     r"collections",
     views.CollectionViewSet,
     basename="collection",
-)
+),
+peerinst_api.register(
+    r"teacher/assignments",
+    views.TeacherAssignmentViewSet,
+    basename="teacher-assignment",
+),
 peerinst_api.register(
     r"teacher/library/assignments",
     views.TeacherLibraryAssignmentViewSet,

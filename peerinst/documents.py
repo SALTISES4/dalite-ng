@@ -243,7 +243,7 @@ class QuestionDocument(Document):
     def prepare_urls(self, instance):
         return {
             "addable_assignments": reverse(
-                "REST:assignment-for-question", args=(instance.pk,)
+                "REST:teacher-assignment-for-question", args=(instance.pk,)
             ),
         }
 
@@ -313,7 +313,7 @@ class AssignmentDocument(Document):
     urls = ObjectField(
         properties={
             "preview": TextField(index=False),
-            "view": TextField(index=False),
+            "update": TextField(index=False),
         }
     )
 
@@ -343,6 +343,10 @@ class AssignmentDocument(Document):
     def prepare_urls(self, instance):
         return {
             "preview": instance.get_absolute_url(),
+            "update": reverse(
+                "teacher:assignment-update",
+                args=(instance.pk,),
+            ),
         }
 
     def get_instances_from_related(self, related_instance):

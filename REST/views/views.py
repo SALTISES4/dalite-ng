@@ -51,10 +51,21 @@ from REST.serializers import (
 )
 
 
-class AssignmentViewSet(viewsets.ModelViewSet):
+class AssignmentViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    A simple ViewSet for creating and viewing assignments, and editing question
-    order.
+    Readonly endpoint for assignment objects.
+    """
+
+    permission_classes = [IsAuthenticated, IsTeacher]
+    queryset = Assignment.objects.all()
+    renderer_classes = [JSONRenderer]
+    serializer_class = AssignmentSerializer
+
+
+class TeacherAssignmentViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for creating and viewing assignments one's own
+    assignments and editing question order.
     """
 
     http_method_names = ["get", "patch", "post"]
