@@ -32,7 +32,7 @@
             questions: "{% url 'REST:recommended-questions-list' %}?field=answer_count&field=category&field=difficulty&field=discipline&field=peer_impact&field=tags&field=text&field=title&field=user&field=answerchoice_set&field=image&field=image_alt_text&field=video_url&field=pk&field=is_owner&field=urls",
             questionsLink: "{% url 'teacher:search' %}?type=Question",
             studentgroupassignments: "{% url 'REST:recent-studentgroupassignment-list' %}",
-            studentgroupassignmentsLink: "{% url 'group-assignments' request.user.teacher.pk %}",
+            studentgroupassignmentsLink: "{% url 'teacher:library' request.user.teacher.pk %}?view=2",
             teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=bookmarked_collections&field=activeAssignmentCount&field=activeGroupCount&field=createdQuestionCount&field=favourite_questions&field=user",
           },
           user: {
