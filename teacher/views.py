@@ -1,5 +1,6 @@
 import bleach
 from django import http
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from django.views.generic import DetailView, TemplateView
@@ -61,9 +62,12 @@ class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
         context = super().get_context_data()
         assignment = self.get_object()
         context.update(
+            LTI_key=str(settings.LTI_BASIC_CLIENT_KEY),
+            LTI_secret=str(settings.LTI_BASIC_CLIENT_SECRET),
+            LTI_launch_url=str("https://" + self.request.get_host() + "/lti/"),
             meta_editable_by_user=True,
-            questions_editable_by_user=assignment.editable,
             owner=[u.username for u in assignment.owner.all()],
+            questions_editable_by_user=assignment.editable,
         )
         return context
 
@@ -92,7 +96,6 @@ class AssignmentDetailView(AssignmentUpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        assignment = self.get_object()
         context.update(
             meta_editable_by_user=False,
             questions_editable_by_user=False,
