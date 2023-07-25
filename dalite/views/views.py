@@ -1,6 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.generic import TemplateView
 
 
 def admin_index_wrapper(request):
@@ -19,3 +20,11 @@ def admin_index_wrapper(request):
         return render(
             request, "peerinst/cookie_help.html", {"host": request.get_host()}
         )
+
+
+class StyleGuideView(TemplateView):
+    """
+    Render the styleguide app from Components
+    """
+
+    template_name = "styleguide.html"

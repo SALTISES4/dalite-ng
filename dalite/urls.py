@@ -156,6 +156,7 @@ urlpatterns += i18n_patterns(
         name="admin_index_wrapper",
     ),
     path("admin/", admin.site.urls),
+    path("styleguide/", views.StyleGuideView.as_view(), name="styleguide"),
     path("tinymce/", include("tinymce.urls")),
 )
 
