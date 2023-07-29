@@ -223,6 +223,13 @@ class RankSerializer(serializers.ModelSerializer):
         required=True,
     )
 
+    def get_unique_together_validators(self):
+        """
+        Have to override the unique_together constraint in order
+        to support update as nested field in AssignmentSerializer
+        """
+        return []
+
     def create(self, validated_data):
         """
         Custom create method to add questions to an assignment based on pk
