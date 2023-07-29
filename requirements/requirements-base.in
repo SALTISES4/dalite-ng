@@ -39,7 +39,7 @@ sqlparse >= 0.4.4
 twisted == 22.4  # [3]
 
 SALTISE_components == 0.2.8
-SALTISE_course_flow == 0.8.6
+SALTISE_course_flow == 0.8.7
 SALTISE_user_feedback
 
 # 1. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
