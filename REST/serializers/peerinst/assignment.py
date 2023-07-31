@@ -354,8 +354,6 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
                         "rank"
                     ]
                     aq.save()
-            else:
-                raise PermissionDenied
 
         for field in ["conclusion_page", "description", "intro_page", "title"]:
             if field in validated_data:
@@ -435,6 +433,9 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
         required=True,
     )
     issueCount = serializers.SerializerMethodField()
+    order = serializers.CharField(
+        max_length=1000
+    )  # Arbitrary upper limit as safeguard
     progress = serializers.SerializerMethodField()
     questionCount = serializers.SerializerMethodField()
     title = serializers.SerializerMethodField()
@@ -521,6 +522,12 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
         logger.error(f"Invalid student group: {student_group}")
         raise serializers.ValidationError("Invalid student group.")
 
+    def validate_order(self, data):
+        logger.info(f"Order: {data}")
+        # TODO: Reimplement custom validation in model through validators and update
+        # raise serializers.ValidationError("Invalid question order.")
+        return data
+
     def validate(self, data):
         """
         Impose unique_together on assignment and group
@@ -557,6 +564,7 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
             "group",
             "group_pk",
             "issueCount",
+            "order",
             "pk",
             "progress",
             "questionCount",

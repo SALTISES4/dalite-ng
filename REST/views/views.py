@@ -28,7 +28,6 @@ from peerinst.models import (
 from peerinst.util import question_search_function
 from REST.pagination import SearchPagination
 from REST.permissions import (
-    InAssignmentOwnerList,
     InOwnerList,
     InTeacherList,
     IsAdminUserOrReadOnly,
@@ -217,7 +216,7 @@ class QuestionListViewSet(viewsets.ModelViewSet):
 
     http_method_names = ["delete", "get", "post"]
     serializer_class = RankSerializer
-    permission_classes = [IsAuthenticated, IsNotStudent, InAssignmentOwnerList]
+    permission_classes = [IsAuthenticated, IsTeacher]
 
     def get_queryset(self):
         return AssignmentQuestions.objects.filter(
