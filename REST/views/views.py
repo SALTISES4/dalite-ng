@@ -208,6 +208,17 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="rationales",
+    )
+    def rationales(self, request, pk):
+        return Response(
+            self.get_object().get_most_convincing_rationales(),
+            status=status.HTTP_200_OK,
+        )
+
 
 class QuestionListViewSet(viewsets.ModelViewSet):
     """
