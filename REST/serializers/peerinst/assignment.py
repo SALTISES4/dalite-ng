@@ -215,6 +215,7 @@ class RankSerializer(serializers.ModelSerializer):
             "pk",
             "text",
             "title",
+            "type",
             "urls",  # Added for new assignment interface
             "user",
         ),
