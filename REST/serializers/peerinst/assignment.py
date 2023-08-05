@@ -144,6 +144,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             ),
             "copy_question": reverse("question-clone", args=(obj.pk,)),
             "fix": reverse("question-fix", args=(obj.pk,)),
+            "rationales": reverse("REST:question-rationales", args=(obj.pk,)),
         }
 
     class Meta:
