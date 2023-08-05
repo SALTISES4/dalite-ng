@@ -245,6 +245,10 @@ class QuestionDocument(Document):
             "addable_assignments": reverse(
                 "REST:teacher-assignment-for-question", args=(instance.pk,)
             ),
+            "matrix": reverse("REST:question-matrix", args=(instance.pk,)),
+            "rationales": reverse(
+                "REST:question-rationales", args=(instance.pk,)
+            ),
         }
 
     def prepare_user(self, instance):

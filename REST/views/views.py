@@ -211,11 +211,20 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
     @action(
         detail=True,
         methods=["get"],
-        url_path="rationales",
     )
     def rationales(self, request, pk):
         return Response(
             self.get_object().get_most_convincing_rationales(),
+            status=status.HTTP_200_OK,
+        )
+
+    @action(
+        detail=True,
+        methods=["get"],
+    )
+    def matrix(self, request, pk):
+        return Response(
+            self.get_object().get_matrix(),
             status=status.HTTP_200_OK,
         )
 
