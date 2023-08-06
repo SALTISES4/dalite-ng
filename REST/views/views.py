@@ -63,7 +63,7 @@ class AssignmentViewSet(viewsets.ReadOnlyModelViewSet):
 
 class TeacherAssignmentViewSet(viewsets.ModelViewSet):
     """
-    A simple ViewSet for creating and viewing assignments one's own
+    A simple ViewSet for creating and viewing one's own
     assignments and editing question order.
     """
 
@@ -227,6 +227,20 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
             self.get_object().get_matrix(),
             status=status.HTTP_200_OK,
         )
+
+
+class TeacherQuestionViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for creating and updating a user's questions.
+    """
+
+    http_method_names = ["get", "patch", "post"]
+    permission_classes = [IsAuthenticated, IsTeacher]
+    renderer_classes = [JSONRenderer]
+    serializer_class = QuestionSerializer
+
+    def get_queryset(self):
+        return Question.objects.filter(user=self.request.user)
 
 
 class QuestionListViewSet(viewsets.ModelViewSet):

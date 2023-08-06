@@ -1,42 +1,51 @@
 from django.urls import include, path
 
-from . import views as views_teacher
+from . import views
 
 app_name = "teacher"
 
 assignment_patterns = [
     path(
         "create/",
-        views_teacher.AssignmentCreateView.as_view(),
+        views.AssignmentCreateView.as_view(),
         name="assignment-create",
     ),
     path(
         "update/<str:identifier>/",
-        views_teacher.AssignmentUpdateView.as_view(),
+        views.AssignmentUpdateView.as_view(),
         name="assignment-update",
     ),
     path(
         "view/<str:identifier>/",
-        views_teacher.AssignmentDetailView.as_view(),
+        views.AssignmentDetailView.as_view(),
         name="assignment-detail",
+    ),
+]
+
+question_patterns = [
+    path(
+        "create/",
+        views.QuestionCreateView.as_view(),
+        name="question-create",
     ),
 ]
 
 urlpatterns = [
     path(
         "<int:pk>/",
-        views_teacher.TeacherDashboardView.as_view(),
+        views.DashboardView.as_view(),
         name="dashboard",
     ),
     path(
         "<int:pk>/library/",
-        views_teacher.LibraryView.as_view(),
+        views.LibraryView.as_view(),
         name="library",
     ),
     path("assignment/", include(assignment_patterns)),
+    path("question/", include(question_patterns)),
     path(
         "search/",
-        views_teacher.SearchView.as_view(),
+        views.SearchView.as_view(),
         name="search",
     ),
 ]

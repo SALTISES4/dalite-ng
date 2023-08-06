@@ -5,7 +5,7 @@
 {% block apps %}
   {{ block.super }}
   <script
-    src="{% static 'components/js/build/createAssignment.min.js' %}"
+    src="{% static 'components/js/build/createQuestions1.min.js' %}"
     defer="true"
   ></script>
 
@@ -16,15 +16,15 @@
 
 {% block injected_apps %}
   {{ block.super }}
-  <div id="assignment-create-app"></div>
+  <div id="question-create-app"></div>
 {% endblock %}
 
 {% block scripts %}
   {{ block.super }}
   <script nonce="{{ request.csp_nonce }}">
     window.addEventListener("load", function () {
-      const assignmentCreateApp = () => {
-        return createAssignment.h(createAssignment.App, {
+      const questionCreateApp = () => {
+        return createQuestions1.h(createQuestions1.App, {
           gettext: gettext,
           nonce: "{{ request.csp_nonce }}",
           EditorIcons: {
@@ -38,13 +38,13 @@
             linkIcon: "{% static 'components/img/editor/link.svg' %}",
           },
           urls: {
-            create: "{% url 'REST:teacher-assignment-list' %}",
+            create: "{% url 'REST:teacher-question-list' %}",
           }
         });
       };
-      createAssignment.render(
-        assignmentCreateApp(),
-        document.getElementById("assignment-create-app")
+      createQuestions1.render(
+        questionCreateApp(),
+        document.getElementById("question-create-app")
       );
     });
   </script>

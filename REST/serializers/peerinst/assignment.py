@@ -148,6 +148,26 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "rationales": reverse("REST:question-rationales", args=(obj.pk,)),
         }
 
+    def create(self, validated_data):
+        """Attach user"""
+        question = super().create(validated_data)
+        question.user = self.context["request"].user
+        question.save()
+        return question
+
+    def to_representation(self, instance):
+        """Bleach on the way out"""
+        ret = super().to_representation(instance)
+        if "title" in ret:
+            ret["title"] = bleach.clean(
+                ret["title"], tags=ALLOWED_TAGS, strip=True
+            ).strip()
+        if "text" in ret:
+            ret["text"] = bleach.clean(
+                ret["text"], tags=ALLOWED_TAGS, strip=True
+            ).strip()
+        return ret
+
     class Meta:
         model = Question
         fields = [
@@ -181,19 +201,6 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "user",
             "video_url",
         ]
-
-    def to_representation(self, instance):
-        """Bleach HTML-supported fields"""
-        ret = super().to_representation(instance)
-        if "title" in ret:
-            ret["title"] = bleach.clean(
-                ret["title"], tags=ALLOWED_TAGS, strip=True
-            ).strip()
-        if "text" in ret:
-            ret["text"] = bleach.clean(
-                ret["text"], tags=ALLOWED_TAGS, strip=True
-            ).strip()
-        return ret
 
 
 class RankSerializer(serializers.ModelSerializer):
