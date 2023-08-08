@@ -71,7 +71,7 @@
               {
                 title: "{% trans 'Group' %}",
                 icon: "groups",
-                url: "{% url 'teacher-groups' request.user.teacher.pk %}"
+                url: "{% url 'teacher:group-create' %}"
               },
               {
                 disabled: true,

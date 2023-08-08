@@ -1,0 +1,24 @@
+{% extends 'teacher/base.html' %}
+
+{% load static %}
+
+{% block apps %}
+  {{ block.super }}
+
+  <style nonce="{{ request.csp_nonce }}">
+    {% include 'teacher/html_editor_styles.html' %}
+  </style>
+{% endblock %}
+
+{% block injected_apps %}
+  {{ block.super }}
+  <div id="group-create-app"></div>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function () {
+    });
+  </script>
+{% endblock %}

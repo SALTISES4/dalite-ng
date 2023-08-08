@@ -30,6 +30,14 @@ question_patterns = [
     ),
 ]
 
+group_patterns = [
+    path(
+        "create/",
+        views.GroupCreateView.as_view(),
+        name="group-create",
+    )
+]
+
 urlpatterns = [
     path(
         "<int:pk>/",
@@ -42,6 +50,7 @@ urlpatterns = [
         name="library",
     ),
     path("assignment/", include(assignment_patterns)),
+    path("group/", include(group_patterns)),
     path("question/", include(question_patterns)),
     path(
         "search/",
