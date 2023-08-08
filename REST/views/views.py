@@ -91,6 +91,21 @@ class TeacherAssignmentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class TeacherGroupViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for creating and viewing one's own
+    groups
+    """
+
+    http_method_names = ["get", "patch", "post"]
+    permission_classes = [IsAuthenticated, IsTeacher, InOwnerList]
+    renderer_classes = [JSONRenderer]
+    serializer_class = StudentGroupSerializer
+
+    def get_queryset(self):
+        return Teacher.objects.get(user=self.request.user).current_groups.all()
+
+
 class RecentStudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Readonly access to a teacher's active and recently due studentgroupassignments.

@@ -60,6 +60,11 @@ peerinst_api.register(
     basename="teacher-assignment",
 ),
 peerinst_api.register(
+    r"teacher/groups",
+    views.TeacherGroupViewSet,
+    basename="teacher-group",
+),
+peerinst_api.register(
     r"teacher/questions",
     views.TeacherQuestionViewSet,
     basename="teacher-question",

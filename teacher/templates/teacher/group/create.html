@@ -5,9 +5,11 @@
 {% block apps %}
   {{ block.super }}
 
-  <style nonce="{{ request.csp_nonce }}">
-    {% include 'teacher/html_editor_styles.html' %}
-  </style>
+  <script
+    src="{% static 'components/js/build/createStudentGroup.min.js' %}"
+    defer="true">
+  </script>
+
 {% endblock %}
 
 {% block injected_apps %}
@@ -19,6 +21,19 @@
   {{ block.super }}
   <script nonce="{{ request.csp_nonce }}">
     window.addEventListener("load", function () {
+      const studentGroupCreateApp = () => {
+        return createStudentGroup.h(createStudentGroup.App, {
+          gettext: gettext,
+          nonce: "{{ request.csp_nonce }}",
+          urls: {
+            create: "{% url 'REST:teacher-group-list' %}",
+          }
+        });
+      };
+      createStudentGroup.render(
+        studentGroupCreateApp(),
+        document.getElementById("group-create-app")
+      );
     });
   </script>
 {% endblock %}
