@@ -1,0 +1,36 @@
+{% extends 'teacher/base.html' %}
+
+{% load static %}
+
+{% block apps %}
+  {{ block.super }}
+  <script
+    src="{% static 'components/js/build/updateStudentGroup.min.js' %}"
+    defer="true"
+  ></script>
+{% endblock %}
+
+{% block injected_apps %}
+  {{ block.super }}
+  <div id="group-update-app"></div>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function (){
+      const groupUpdateApp = () => {
+        return updateStudentGroup.h(updateStudentGroup.App, {
+          gettext: gettext,
+          group: {
+            name: "{{ object.name }}",
+          },
+        });
+      };
+      updateStudentGroup.render(
+        groupUpdateApp(),
+        document.getElementById("group-update-app")
+      );
+    });
+  </script>
+{% endblock %}

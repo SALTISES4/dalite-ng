@@ -35,7 +35,12 @@ group_patterns = [
         "create/",
         views.GroupCreateView.as_view(),
         name="group-create",
-    )
+    ),
+    path(
+        "update/<str:hash>/",
+        views.GroupUpdateView.as_view(),
+        name="group-update",
+    ),
 ]
 
 urlpatterns = [
