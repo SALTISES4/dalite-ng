@@ -217,6 +217,7 @@ class RankSerializer(serializers.ModelSerializer):
             "image",
             "image_alt_text",
             "is_owner",  # Added for new assignment interface
+            "is_valid",  # Added for new assignment interface
             "matrix",
             "peer_impact",  # Added for new assignment interface
             "pk",
