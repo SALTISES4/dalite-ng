@@ -155,6 +155,7 @@ class Assignment(models.Model):
         return self.questions.count() > 0 and not any(
             [
                 Question.is_missing_answer_choices(self.questions.all()),
+                Question.is_missing_expert_rationale(self.questions.all()),
                 Question.is_missing_sample_answers(self.questions.all()),
                 Question.is_flagged(self.questions.all()),
             ]
