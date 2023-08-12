@@ -89,7 +89,7 @@ class StudentGroup(models.Model):
         verbose_name_plural = _("groups")
 
     def get_absolute_url(self):
-        return reverse("group-details", args=(self.hash,))
+        return reverse("teacher:group-update", args=(self.hash,))
 
     @staticmethod
     def get(hash_):
