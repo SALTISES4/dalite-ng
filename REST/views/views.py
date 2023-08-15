@@ -103,7 +103,12 @@ class TeacherGroupViewSet(viewsets.ModelViewSet):
     serializer_class = StudentGroupSerializer
 
     def get_queryset(self):
-        return Teacher.objects.get(user=self.request.user).current_groups.all()
+        return Teacher.objects.get(
+            user=self.request.user
+        ).studentgroup_set.all()
+
+    def get_object(self):
+        return StudentGroup.get(self.kwargs.get("pk"))
 
 
 class RecentStudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):

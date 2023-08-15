@@ -5,7 +5,7 @@
 {% block apps %}
   {{ block.super }}
   <script
-    src="{% static 'components/js/build/updateStudentGroup.min.js' %}"
+    src="{% static 'components/js/build/updateGroup.min.js' %}"
     defer="true"
   ></script>
 {% endblock %}
@@ -20,18 +20,21 @@
   <script nonce="{{ request.csp_nonce }}">
     window.addEventListener("load", function (){
       const groupUpdateApp = () => {
-        return updateStudentGroup.h(updateStudentGroup.App, {
+        return updateGroup.h(updateGroup.App, {
           gettext: gettext,
           nonce : "{{ request.csp_nonce }}",
           group: {
             name: "{{ object.name }}",
             title: "{{ object.title }}",
-            semester: "{{ object.semester }}"
+            semester: "{{ object.semester }}",
             year: "{{ object.year }}",
           },
+          urls: {
+            group: "{% url 'REST:teacher-group-detail' object.hash %}"
+          }
         });
       };
-      updateStudentGroup.render(
+      updateGroup.render(
         groupUpdateApp(),
         document.getElementById("group-update-app")
       );
