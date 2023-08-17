@@ -1075,8 +1075,8 @@ safety==2.3.5 \
     --hash=sha256:2227fcac1b22b53c1615af78872b48348661691450aa25d6704a5504dbd1f7e2 \
     --hash=sha256:a60c11f8952f412cbb165d70cb1f673a3b43a2ba9a93ce11f97e6a4de834aa3a
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.8.6 \
-    --hash=sha256:acf8e38e1dbd0b91f7505a286f99db394dcce68d7de1bdb38dd68bdf110c967d
+saltise-course-flow==0.8.9 \
+    --hash=sha256:34804b8bfecdfb0a7c0e5e1026db67b8c5fb88e465749ac5cca46606f5ff62ec
     # via -r requirements/requirements-test.txt
 saltise-user-feedback==1.1.2 \
     --hash=sha256:c57647cb83ab8bcee43f2ddc5db586f5fc20db3fb9f7a6a09b9be01de2005303
@@ -1280,6 +1280,12 @@ wsproto==1.1.0 \
 xlrd==2.0.1 \
     --hash=sha256:6a33ee89877bd9abc1158129f6e94be74e2679636b8a205b43b85206c3f0bbdd \
     --hash=sha256:f72f148f54442c6b056bf931dbc34f986fd0c3b0b6b5a58d013c9aef274d0c88
+    # via
+    #   -r requirements/requirements-test.txt
+    #   saltise-course-flow
+xlsxwriter==3.1.2 \
+    --hash=sha256:331508ff39d610ecdaf979e458840bc1eab6e6a02cfd5d08f044f0f73636236f \
+    --hash=sha256:78751099a770273f1c98b8d6643351f68f98ae8e6acf9d09d37dc6798f8cd3de
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
