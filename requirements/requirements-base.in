@@ -26,7 +26,7 @@ django-tinymce
 djangorestframework
 future>0.18.2
 langdetect
-mysqlclient
+PyMySQL # mysqlclient
 pandas
 pillow
 pip-lock
