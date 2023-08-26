@@ -368,7 +368,7 @@ CSP_OBJECT_SRC = [
     "openstax.org",
     "www.geogebra.org",
 ]
-
+CSP_FRAME_SRC = CSP_OBJECT_SRC
 CSP_FRAME_ANCESTORS = [
     "'self'",
     "moodle.dawsoncollege.qc.ca",
