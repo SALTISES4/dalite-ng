@@ -298,6 +298,8 @@ msgpack==1.0.5
     # via
     #   -r requirements/requirements-base.txt
     #   channels-redis
+mysqlclient==2.2.0
+    # via -r requirements/requirements-base.txt
 nameparser==1.1.2
     # via
     #   -r requirements/requirements-base.txt
@@ -361,8 +363,6 @@ pylti==0.7.0
     #   -r requirements/requirements-base.txt
     #   django-lti-provider
 pymemcache==4.0.0
-    # via -r requirements/requirements-base.txt
-pymysql==1.1.0
     # via -r requirements/requirements-base.txt
 pynliner==0.8.0
     # via

@@ -208,6 +208,8 @@ minify-html==0.11.1
     # via django-minify-html
 msgpack==1.0.5
     # via channels-redis
+mysqlclient==2.2.0
+    # via -r requirements/requirements-base.in
 nameparser==1.1.2
     # via django-lti-provider
 numpy==1.24.4
@@ -246,8 +248,6 @@ pyjwt==2.8.0
 pylti==0.7.0
     # via django-lti-provider
 pymemcache==4.0.0
-    # via -r requirements/requirements-base.in
-pymysql==1.1.0
     # via -r requirements/requirements-base.in
 pynliner==0.8.0
     # via django-inlinecss
