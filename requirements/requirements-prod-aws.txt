@@ -663,15 +663,6 @@ msgpack==1.0.5 \
     # via
     #   -r requirements/requirements-base.txt
     #   channels-redis
-mysqlclient==2.2.0 \
-    --hash=sha256:004fe1d30d2c2ff8072f8ea513bcec235fd9b896f70dad369461d0ad7e570e98 \
-    --hash=sha256:04368445f9c487d8abb7a878e3d23e923e6072c04a6c320f9e0dc8a82efba14e \
-    --hash=sha256:530ece9995a36cadb6211b9787f0c9e05cdab6702549bdb4236af5e9b535ed6a \
-    --hash=sha256:5670679ff1be1cc3fef0fa81bf39f0cd70605ba121141050f02743eb878ac114 \
-    --hash=sha256:68837b6bb23170acffb43ae411e47533a560b6360c06dac39aa55700972c93b2 \
-    --hash=sha256:955dba905a7443ce4788c63fdb9f8d688316260cf60b20ff51ac3b1c77616ede \
-    --hash=sha256:9c6b142836c7dba4f723bf9c93cc46b6e5081d65b2af807f400dda9eb85a16d0
-    # via -r requirements/requirements-base.txt
 nameparser==1.1.2 \
     --hash=sha256:ea2e01d1d9d04c0648be230f161f27316a1b5be431a1cc64e8799fac548fb3bc \
     --hash=sha256:f4b6c7c1048d528bd6aa2b27cf42a06447d2b31e45a95b20449513078f1d86ef
@@ -864,6 +855,10 @@ pylti==0.7.0 \
 pymemcache==4.0.0 \
     --hash=sha256:27bf9bd1bbc1e20f83633208620d56de50f14185055e49504f4f5e94e94aff94 \
     --hash=sha256:f507bc20e0dc8d562f8df9d872107a278df049fa496805c1431b926f3ddd0eab
+    # via -r requirements/requirements-base.txt
+pymysql==1.1.0 \
+    --hash=sha256:4f13a7df8bf36a51e81dd9f3605fede45a4878fe02f9236349fd82a3f0612f96 \
+    --hash=sha256:8969ec6d763c856f7073c4c64662882675702efcb114b4bcbb955aea3a069fa7
     # via -r requirements/requirements-base.txt
 pynliner==0.8.0 \
     --hash=sha256:32da16ed8ba1fec775909e39f0ffa8e6e02a674b889286c9a2370c3c03f617a5 \
@@ -1188,9 +1183,9 @@ zope-interface==6.0 \
     #   twisted
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==68.1.0 \
-    --hash=sha256:d59c97e7b774979a5ccb96388efc9eb65518004537e85d52e81eaee89ab6dd91 \
-    --hash=sha256:e13e1b0bc760e9b0127eda042845999b2f913e12437046e663b833aa96d89715
+setuptools==68.1.2 \
+    --hash=sha256:3d4dfa6d95f1b101d695a6160a7626e15583af71a5f52176efa5d39a054d475d \
+    --hash=sha256:3d8083eed2d13afc9426f227b24fd1659489ec107c0e86cec2ffdde5c92e790b
     # via
     #   -r requirements/requirements-base.txt
     #   autobahn
