@@ -225,7 +225,7 @@ CHANNEL_LAYERS = {
 
 
 # Axes
-AXES_ONLY_USER_FAILURES = True
+AXES_LOCKOUT_PARAMETERS = ["ip_address", "username"]
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = datetime.timedelta(minutes=5)
 AXES_LOCKOUT_TEMPLATE = "registration/lockout.html"
@@ -368,7 +368,7 @@ CSP_OBJECT_SRC = [
     "openstax.org",
     "www.geogebra.org",
 ]
-
+CSP_FRAME_SRC = CSP_OBJECT_SRC
 CSP_FRAME_ANCESTORS = [
     "'self'",
     "moodle.dawsoncollege.qc.ca",

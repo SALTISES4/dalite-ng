@@ -10,15 +10,13 @@
     # via
     #   -r requirements/requirements-dev.in
     #   -r requirements/requirements-test.txt
-alt-profanity-check==1.1.1
+alt-profanity-check==1.3.0
     # via -r requirements/requirements-test.txt
-amqp==5.0.9
+amqp==5.1.1
     # via
     #   -r requirements/requirements-test.txt
     #   kombu
-appdirs==1.4.3
-    # via virtualenv
-asgiref==3.5.2
+asgiref==3.7.2
     # via
     #   -r requirements/requirements-test.txt
     #   channels
@@ -26,12 +24,7 @@ asgiref==3.5.2
     #   daphne
     #   django
     #   saltise-course-flow
-async-generator==1.10
-    # via
-    #   -r requirements/requirements-test.txt
-    #   trio
-    #   trio-websocket
-async-timeout==4.0.2
+async-timeout==4.0.3
     # via
     #   -r requirements/requirements-test.txt
     #   redis
@@ -40,41 +33,42 @@ attrs==23.1.0
     #   -r requirements/requirements-test.txt
     #   automat
     #   outcome
-    #   pytest
     #   service-identity
     #   trio
     #   twisted
-autobahn==22.7.1
+autobahn==23.1.2
     # via
     #   -r requirements/requirements-test.txt
     #   daphne
-automat==20.2.0
+automat==22.10.0
     # via
     #   -r requirements/requirements-test.txt
     #   twisted
-backports-zoneinfo==0.2.1
+backports-zoneinfo[tzdata]==0.2.1
     # via
     #   -r requirements/requirements-test.txt
+    #   celery
     #   django-celery-beat
     #   django-timezone-field
-beautifulsoup4==4.8.2
+    #   kombu
+beautifulsoup4==4.12.2
     # via
     #   -r requirements/requirements-test.txt
     #   pynliner
 better-profanity==0.6.1
     # via -r requirements/requirements-test.txt
-billiard==3.6.4.0
+billiard==4.1.0
     # via
     #   -r requirements/requirements-test.txt
     #   celery
-black==22.12.0
+black==23.7.0
     # via -r requirements/requirements-dev.in
-bleach==5.0.1
+bleach==6.0.0
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
     #   saltise-user-feedback
-celery[redis]==5.2.7
+celery[redis]==5.3.1
     # via
     #   -r requirements/requirements-test.txt
     #   django-celery-beat
@@ -86,26 +80,26 @@ certifi==2023.7.22
     #   elasticsearch
     #   requests
     #   urllib3
-cffi==1.14.2
+cffi==1.15.1
     # via
     #   -r requirements/requirements-test.txt
     #   cryptography
-cfgv==3.1.0
+cfgv==3.4.0
     # via pre-commit
 channels[daphne]==4.0.0
     # via
     #   -r requirements/requirements-test.txt
     #   channels-redis
     #   saltise-course-flow
-channels-redis==4.0.0
+channels-redis==4.1.0
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-charset-normalizer==2.0.12
+charset-normalizer==3.2.0
     # via
     #   -r requirements/requirements-test.txt
     #   requests
-click==8.0.3
+click==8.1.6
     # via
     #   -r requirements/requirements-test.txt
     #   black
@@ -122,7 +116,7 @@ click-plugins==1.1.1
     # via
     #   -r requirements/requirements-test.txt
     #   celery
-click-repl==0.2.0
+click-repl==0.3.0
     # via
     #   -r requirements/requirements-test.txt
     #   celery
@@ -130,18 +124,22 @@ constantly==15.1.0
     # via
     #   -r requirements/requirements-test.txt
     #   twisted
-coverage==6.0b1
+coverage[toml]==7.3.0
     # via
     #   -r requirements/requirements-test.txt
     #   pytest-cov
-cryptography==40.0.2
+cron-descriptor==1.4.0
+    # via
+    #   -r requirements/requirements-test.txt
+    #   django-celery-beat
+cryptography==41.0.3
     # via
     #   -r requirements/requirements-test.txt
     #   autobahn
     #   pyopenssl
     #   service-identity
     #   urllib3
-cssutils==1.0.2
+cssutils==2.7.1
     # via
     #   -r requirements/requirements-test.txt
     #   pynliner
@@ -149,9 +147,9 @@ daphne==4.0.0
     # via
     #   -r requirements/requirements-test.txt
     #   channels
-ddt==1.2.2
+ddt==1.6.0
     # via -r requirements/requirements-test.txt
-distlib==0.3.2
+distlib==0.3.7
     # via virtualenv
 django==3.2.20
     # via
@@ -170,26 +168,27 @@ django==3.2.20
     #   django-permissions-policy
     #   django-redis
     #   django-sslserver
+    #   django-timezone-field
     #   djangorestframework
     #   saltise-components
     #   saltise-course-flow
     #   saltise-user-feedback
 django-analytical==3.1.0
     # via -r requirements/requirements-test.txt
-django-appconf==1.0.3
+django-appconf==1.0.5
     # via
     #   -r requirements/requirements-test.txt
     #   django-compressor
     #   django-cookie-consent
-django-axes==5.36.0
+django-axes==6.1.0
     # via -r requirements/requirements-test.txt
-django-celery-beat==2.3.0
+django-celery-beat==2.5.0
     # via -r requirements/requirements-test.txt
-django-compressor==4.1
+django-compressor==4.4
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-django-cookie-consent==0.3.1
+django-cookie-consent==0.4.0
     # via -r requirements/requirements-test.txt
 django-csp==3.7
     # via
@@ -197,52 +196,48 @@ django-csp==3.7
     #   saltise-course-flow
 django-decorator-include==3.0
     # via -r requirements/requirements-test.txt
-django-elasticsearch-dsl==7.2.2
+django-elasticsearch-dsl==7.3
     # via -r requirements/requirements-test.txt
 django-inlinecss==0.3.0
     # via -r requirements/requirements-test.txt
-django-ipware==4.0.2
-    # via
-    #   -r requirements/requirements-test.txt
-    #   django-axes
 django-lti-provider==1.0.0
     # via -r requirements/requirements-test.txt
-django-minify-html==1.3.0
+django-minify-html==1.6.0
     # via -r requirements/requirements-test.txt
-django-model-utils==4.1.1
+django-model-utils==4.3.1
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-django-permissions-policy==4.12.0
+django-permissions-policy==4.17.0
     # via -r requirements/requirements-test.txt
 django-ratelimit==3.0.1
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-django-redis==5.2.0
+django-redis==5.3.0
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
 django-sslserver==0.22
     # via -r requirements/requirements-dev.in
-django-timezone-field==5.0
+django-timezone-field==5.1
     # via
     #   -r requirements/requirements-test.txt
     #   django-celery-beat
-django-tinymce==3.4.0
+django-tinymce==3.6.1
     # via -r requirements/requirements-test.txt
-djangorestframework==3.13.1
+djangorestframework==3.14.0
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
     #   saltise-user-feedback
 dparse==0.6.3
     # via safety
-elasticsearch==7.13.1
+elasticsearch==7.13.4
     # via
     #   -r requirements/requirements-test.txt
     #   elasticsearch-dsl
-elasticsearch-dsl==7.3.0
+elasticsearch-dsl==7.4.1
     # via
     #   -r requirements/requirements-test.txt
     #   django-elasticsearch-dsl
@@ -250,14 +245,20 @@ et-xmlfile==1.1.0
     # via
     #   -r requirements/requirements-test.txt
     #   openpyxl
-factory-boy==3.2.0
+exceptiongroup==1.1.3
+    # via
+    #   -r requirements/requirements-test.txt
+    #   pytest
+    #   trio
+    #   trio-websocket
+factory-boy==3.3.0
     # via -r requirements/requirements-test.txt
-faker==0.9.1
+faker==12.0.1
     # via
     #   -r requirements/requirements-test.txt
     #   factory-boy
     #   mixer
-filelock==3.0.12
+filelock==3.12.2
     # via virtualenv
 flake8==5.0.4
     # via -r requirements/requirements-dev.in
@@ -265,7 +266,7 @@ future==0.18.3
     # via
     #   -r requirements/requirements-test.txt
     #   django-inlinecss
-h11==0.13.0
+h11==0.14.0
     # via
     #   -r requirements/requirements-test.txt
     #   wsproto
@@ -273,7 +274,7 @@ html2text==2020.1.16
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-httplib2==0.20.4
+httplib2==0.22.0
     # via
     #   -r requirements/requirements-test.txt
     #   django-lti-provider
@@ -284,9 +285,9 @@ hyperlink==21.0.0
     #   -r requirements/requirements-test.txt
     #   autobahn
     #   twisted
-identify==2.5.1
+identify==2.5.26
     # via pre-commit
-idna==2.10
+idna==3.4
     # via
     #   -r requirements/requirements-test.txt
     #   hyperlink
@@ -294,18 +295,22 @@ idna==2.10
     #   trio
     #   twisted
     #   urllib3
-incremental==21.3.0
+incremental==22.10.0
     # via
     #   -r requirements/requirements-test.txt
     #   twisted
-isort==5.11.3
+iniconfig==2.0.0
+    # via
+    #   -r requirements/requirements-test.txt
+    #   pytest
+isort==5.12.0
     # via -r requirements/requirements-dev.in
-joblib==1.2.0
+joblib==1.3.2
     # via
     #   -r requirements/requirements-test.txt
     #   alt-profanity-check
     #   scikit-learn
-kombu==5.2.3
+kombu==5.3.1
     # via
     #   -r requirements/requirements-test.txt
     #   celery
@@ -313,33 +318,29 @@ langdetect==1.0.9
     # via -r requirements/requirements-test.txt
 mccabe==0.7.0
     # via flake8
-minify-html==0.9.2
+minify-html==0.11.1
     # via
     #   -r requirements/requirements-test.txt
     #   django-minify-html
-mixer==6.1.3
+mixer==7.2.2
     # via -r requirements/requirements-test.txt
-mock==4.0.1
+mock==5.1.0
     # via -r requirements/requirements-test.txt
-more-itertools==8.2.0
-    # via
-    #   -r requirements/requirements-test.txt
-    #   pytest
-msgpack==1.0.0
+msgpack==1.0.5
     # via
     #   -r requirements/requirements-test.txt
     #   channels-redis
-mypy-extensions==0.4.3
+mypy-extensions==1.0.0
     # via black
-mysqlclient==2.1.1
+mysqlclient==2.2.0
     # via -r requirements/requirements-test.txt
-nameparser==1.1.1
+nameparser==1.1.2
     # via
     #   -r requirements/requirements-test.txt
     #   django-lti-provider
-nodeenv==1.3.5
+nodeenv==1.8.0
     # via pre-commit
-numpy==1.22.4
+numpy==1.24.4
     # via
     #   -r requirements/requirements-test.txt
     #   pandas
@@ -350,11 +351,11 @@ oauth2==1.9.0.post1
     #   -r requirements/requirements-test.txt
     #   django-lti-provider
     #   pylti
-oauthlib==3.1.0
+oauthlib==3.2.2
     # via
     #   -r requirements/requirements-test.txt
     #   django-lti-provider
-openpyxl==3.0.9
+openpyxl==3.1.2
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
@@ -362,82 +363,81 @@ outcome==1.2.0
     # via
     #   -r requirements/requirements-test.txt
     #   trio
-packaging==21.3
+packaging==23.1
     # via
     #   -r requirements/requirements-test.txt
+    #   black
     #   dparse
     #   pytest
+    #   pytest-rerunfailures
     #   safety
-pandas==1.4.3
+pandas==2.0.3
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-pathspec==0.9.0
+pathspec==0.11.2
     # via black
-pillow==9.3.0
+pillow==10.0.0
     # via -r requirements/requirements-test.txt
-pip-lock==2.9.0
+pip-lock==2.11.0
     # via -r requirements/requirements-test.txt
-platformdirs==2.5.2
-    # via black
-pluggy==0.13.1
+platformdirs==3.10.0
+    # via
+    #   black
+    #   virtualenv
+pluggy==1.2.0
     # via
     #   -r requirements/requirements-test.txt
     #   pytest
-pre-commit==2.19.0
+pre-commit==3.3.3
     # via -r requirements/requirements-dev.in
-prompt-toolkit==3.0.24
+prompt-toolkit==3.0.39
     # via
     #   -r requirements/requirements-test.txt
     #   click-repl
-py==1.10.0
-    # via
-    #   -r requirements/requirements-test.txt
-    #   pytest
-pyasn1==0.4.8
+pyasn1==0.5.0
     # via
     #   -r requirements/requirements-test.txt
     #   pyasn1-modules
     #   service-identity
-pyasn1-modules==0.2.8
+pyasn1-modules==0.3.0
     # via
     #   -r requirements/requirements-test.txt
     #   service-identity
 pycodestyle==2.9.1
     # via flake8
-pycparser==2.20
+pycparser==2.21
     # via
     #   -r requirements/requirements-test.txt
     #   cffi
 pyflakes==2.5.0
     # via flake8
-pyjwt==2.4.0
+pyjwt==2.8.0
     # via -r requirements/requirements-test.txt
 pylti==0.7.0
     # via
     #   -r requirements/requirements-test.txt
     #   django-lti-provider
-pymemcache==3.5.2
+pymemcache==4.0.0
     # via -r requirements/requirements-test.txt
 pynliner==0.8.0
     # via
     #   -r requirements/requirements-test.txt
     #   django-inlinecss
-pyopenssl==23.1.1
+pyopenssl==23.2.0
     # via
     #   -r requirements/requirements-test.txt
     #   twisted
     #   urllib3
-pyparsing==2.4.6
+pyparsing==3.1.1
     # via
     #   -r requirements/requirements-test.txt
     #   httplib2
-    #   packaging
 pysocks==1.7.1
     # via
     #   -r requirements/requirements-test.txt
     #   urllib3
-pytest==5.3.5
+pytest==7.4.0
     # via
     #   -r requirements/requirements-test.txt
     #   pytest-cov
@@ -446,42 +446,42 @@ pytest==5.3.5
     #   pytest-rerunfailures
 pytest-celery==0.0.0
     # via -r requirements/requirements-test.txt
-pytest-cov==2.8.1
+pytest-cov==4.1.0
     # via -r requirements/requirements-test.txt
-pytest-django==3.8.0
+pytest-django==4.5.2
     # via -r requirements/requirements-test.txt
-pytest-mock==3.8.2
+pytest-mock==3.11.1
     # via -r requirements/requirements-test.txt
-pytest-rerunfailures==10.2
+pytest-rerunfailures==12.0
     # via -r requirements/requirements-test.txt
-python-crontab==2.4.0
+python-crontab==3.0.0
     # via
     #   -r requirements/requirements-test.txt
     #   django-celery-beat
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
     #   -r requirements/requirements-test.txt
+    #   celery
     #   elasticsearch-dsl
     #   faker
     #   pandas
     #   python-crontab
-pytz==2022.1
+pytz==2023.3
     # via
     #   -r requirements/requirements-test.txt
-    #   celery
     #   django
     #   django-timezone-field
     #   djangorestframework
     #   pandas
-pyyaml==5.4.1
+pyyaml==6.0.1
     # via
     #   -r requirements/requirements-test.txt
     #   pre-commit
-rcssmin==1.1.0
+rcssmin==1.1.1
     # via
     #   -r requirements/requirements-test.txt
     #   django-compressor
-redis==4.6.0
+redis==5.0.0
     # via
     #   -r requirements/requirements-test.txt
     #   celery
@@ -491,21 +491,21 @@ requests==2.31.0
     # via
     #   -r requirements/requirements-test.txt
     #   safety
-rjsmin==1.2.0
+rjsmin==1.2.1
     # via
     #   -r requirements/requirements-test.txt
     #   django-compressor
-ruamel-yaml==0.17.21
+ruamel-yaml==0.17.32
     # via safety
-ruamel-yaml-clib==0.2.6
+ruamel-yaml-clib==0.2.7
     # via ruamel-yaml
-safety==2.3.5
+safety==2.3.4
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.8.8
+saltise-course-flow==0.8.9
     # via -r requirements/requirements-test.txt
 saltise-user-feedback==1.1.2
     # via -r requirements/requirements-test.txt
-scikit-learn==1.1.1
+scikit-learn==1.3.0
     # via
     #   -r requirements/requirements-test.txt
     #   alt-profanity-check
@@ -515,26 +515,21 @@ scipy==1.10.1
     #   scikit-learn
 selenium==4.2.0
     # via -r requirements/requirements-test.txt
-service-identity==18.1.0
+service-identity==23.1.0
     # via
     #   -r requirements/requirements-test.txt
     #   twisted
-six==1.15.0
+six==1.16.0
     # via
     #   -r requirements/requirements-test.txt
     #   automat
     #   bleach
-    #   click-repl
-    #   django-appconf
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl
-    #   faker
     #   langdetect
     #   pylti
-    #   pymemcache
     #   python-dateutil
-    #   virtualenv
-sniffio==1.2.0
+sniffio==1.3.0
     # via
     #   -r requirements/requirements-test.txt
     #   trio
@@ -542,7 +537,7 @@ sortedcontainers==2.4.0
     # via
     #   -r requirements/requirements-test.txt
     #   trio
-soupsieve==2.0
+soupsieve==2.4.1
     # via
     #   -r requirements/requirements-test.txt
     #   beautifulsoup4
@@ -550,26 +545,23 @@ sqlparse==0.4.4
     # via
     #   -r requirements/requirements-test.txt
     #   django
-text-unidecode==1.2
-    # via
-    #   -r requirements/requirements-test.txt
-    #   faker
-threadpoolctl==3.1.0
+threadpoolctl==3.2.0
     # via
     #   -r requirements/requirements-test.txt
     #   scikit-learn
-toml==0.10.2
-    # via pre-commit
 tomli==2.0.1
     # via
+    #   -r requirements/requirements-test.txt
     #   black
+    #   coverage
     #   dparse
-trio==0.21.0
+    #   pytest
+trio==0.22.2
     # via
     #   -r requirements/requirements-test.txt
     #   selenium
     #   trio-websocket
-trio-websocket==0.9.2
+trio-websocket==0.10.3
     # via
     #   -r requirements/requirements-test.txt
     #   selenium
@@ -577,43 +569,51 @@ twisted[tls]==22.4.0
     # via
     #   -r requirements/requirements-test.txt
     #   daphne
-txaio==21.2.1
+txaio==23.1.1
     # via
     #   -r requirements/requirements-test.txt
     #   autobahn
-typing-extensions==4.2.0
+typing-extensions==4.7.1
     # via
     #   -r requirements/requirements-test.txt
+    #   asgiref
     #   black
+    #   kombu
     #   twisted
-tzdata==2022.1
+tzdata==2023.3
     # via
     #   -r requirements/requirements-test.txt
+    #   backports-zoneinfo
+    #   celery
     #   django-celery-beat
-urllib3[secure,socks]==1.26.11
+    #   pandas
+urllib3[secure,socks]==1.26.16
     # via
     #   -r requirements/requirements-test.txt
     #   elasticsearch
     #   requests
     #   selenium
+urllib3-secure-extra==0.1.0
+    # via
+    #   -r requirements/requirements-test.txt
+    #   urllib3
 vine==5.0.0
     # via
     #   -r requirements/requirements-test.txt
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.4.7
+virtualenv==20.24.3
     # via pre-commit
-wcwidth==0.2.5
+wcwidth==0.2.6
     # via
     #   -r requirements/requirements-test.txt
     #   prompt-toolkit
-    #   pytest
 webencodings==0.5.1
     # via
     #   -r requirements/requirements-test.txt
     #   bleach
-wsproto==1.1.0
+wsproto==1.2.0
     # via
     #   -r requirements/requirements-test.txt
     #   trio-websocket
@@ -625,7 +625,7 @@ xlsxwriter==3.1.2
     # via
     #   -r requirements/requirements-test.txt
     #   saltise-course-flow
-zope-interface==5.1.0
+zope-interface==6.0
     # via
     #   -r requirements/requirements-test.txt
     #   twisted
