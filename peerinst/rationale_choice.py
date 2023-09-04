@@ -316,7 +316,7 @@ def prefer_expert_and_highly_voted(
 
 prefer_expert_and_highly_voted.version = "v1.0"
 prefer_expert_and_highly_voted.verbose_name = _(
-    "Prefer expert and highly votes rationales"
+    "Prefer expert and highly voted rationales"
 )
 prefer_expert_and_highly_voted.description = _(
     """The two answer choices presented will include the answer the user chose.
