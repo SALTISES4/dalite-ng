@@ -363,6 +363,7 @@ CSP_OBJECT_SRC = [
     "*.courseflow.ca",
     "phet.colorado.edu",
     "*.youtube.com",
+    "*.youtube-nocookie.com",
     "*.vimeo.com",
     "docs.google.com",
     "openstax.org",
