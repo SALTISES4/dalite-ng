@@ -6,3 +6,7 @@ django-storages
 gunicorn
 sentry-sdk >= 1.14.0
 watchtower
+
+mysqlclient
+
+SALTISE_components == 0.2.10

@@ -6,10 +6,8 @@
 #
 --index-url https://pypi.python.org/simple
 
--e file:///Users/jonathonsumner/Development/Components
-    # via
-    #   -r requirements/requirements-dev.in
-    #   -r requirements/requirements-test.txt
+-e file:///Users/jsumner/Development/MYDALITE/Components
+    # via -r requirements/requirements-dev.in
 alt-profanity-check==1.3.0
     # via -r requirements/requirements-test.txt
 amqp==5.1.1
@@ -233,7 +231,7 @@ djangorestframework==3.14.0
     #   saltise-user-feedback
 dparse==0.6.3
     # via safety
-elasticsearch==7.17.9
+elasticsearch==7.13.4
     # via
     #   -r requirements/requirements-test.txt
     #   elasticsearch-dsl
@@ -419,7 +417,7 @@ pylti==0.7.0
 pymemcache==4.0.0
     # via -r requirements/requirements-test.txt
 pymysql==1.1.0
-    # via -r requirements/requirements-test.txt
+    # via -r requirements/requirements-dev.in
 pynliner==0.8.0
     # via
     #   -r requirements/requirements-test.txt

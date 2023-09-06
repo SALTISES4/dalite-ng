@@ -490,9 +490,9 @@ djangorestframework==3.14.0 \
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
     #   saltise-user-feedback
-elasticsearch==7.17.9 \
-    --hash=sha256:0e2454645dc00517dee4c6de3863411a9c5f1955d013c5fefa29123dadc92f98 \
-    --hash=sha256:66c4ece2adfe7cc120e2b6a6798a1fd5c777aecf82eec39bb95cef7cfc7ea2b3
+elasticsearch==7.13.4 \
+    --hash=sha256:52dda85f76eeb85ec873bf9ffe0ba6849e544e591f66d4048a5e48016de268e0 \
+    --hash=sha256:5920df0ab2630778680376d86bea349dc99860977eec9b6d2bd0860f337313f2
     # via
     #   -r requirements/requirements-base.txt
     #   elasticsearch-dsl
@@ -1188,9 +1188,9 @@ zope-interface==6.0 \
     #   twisted
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==68.1.0 \
-    --hash=sha256:d59c97e7b774979a5ccb96388efc9eb65518004537e85d52e81eaee89ab6dd91 \
-    --hash=sha256:e13e1b0bc760e9b0127eda042845999b2f913e12437046e663b833aa96d89715
+setuptools==68.1.2 \
+    --hash=sha256:3d4dfa6d95f1b101d695a6160a7626e15583af71a5f52176efa5d39a054d475d \
+    --hash=sha256:3d8083eed2d13afc9426f227b24fd1659489ec107c0e86cec2ffdde5c92e790b
     # via
     #   -r requirements/requirements-base.txt
     #   autobahn
