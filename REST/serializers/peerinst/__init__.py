@@ -1,6 +1,7 @@
 __all__ = [
     "AssignmentSerializer",
     "AnswerSerializer",
+    "CategorySerializer",
     "CollectionSerializer",
     "DisciplineSerializer",
     "FeedbackReadSerialzer",
@@ -21,6 +22,7 @@ from .answer import (  # noqa
 )
 from .assignment import (  # noqa
     AssignmentSerializer,
+    CategorySerializer,
     CollectionSerializer,
     DisciplineSerializer,
     QuestionSerializer,

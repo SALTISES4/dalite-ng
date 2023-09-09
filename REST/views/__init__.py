@@ -1,5 +1,6 @@
 __all__ = [
     "AssignmentViewSet",
+    "CategoryViewSet",
     "CollectionViewSet",
     "DisciplineViewSet",
     "QuestionViewSet",
@@ -38,6 +39,7 @@ from .recommenders import (  # noqa
 )
 from .views import (  # noqa
     AssignmentViewSet,
+    CategoryViewSet,
     CollectionViewSet,
     DisciplineViewSet,
     QuestionListViewSet,
