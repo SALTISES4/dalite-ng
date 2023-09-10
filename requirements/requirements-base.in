@@ -27,7 +27,6 @@ djangorestframework
 elasticsearch<7.14.0
 future>0.18.2
 langdetect
-mysqlclient # PyMySQL
 pandas
 pillow
 pip-lock
@@ -40,7 +39,6 @@ scipy >= 1.10.0rc1
 sqlparse >= 0.4.4
 twisted == 22.4  # [3]
 
-SALTISE_components == 0.2.10
 SALTISE_course_flow == 0.8.9
 SALTISE_user_feedback
 

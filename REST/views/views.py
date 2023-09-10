@@ -18,6 +18,7 @@ from peerinst.models import (
     AnswerAnnotation,
     Assignment,
     AssignmentQuestions,
+    Category,
     Collection,
     Discipline,
     Question,
@@ -37,6 +38,7 @@ from REST.permissions import (
 from REST.serializers import (
     AnswerSerializer,
     AssignmentSerializer,
+    CategorySerializer,
     CollectionSerializer,
     DisciplineSerializer,
     FeedbackReadSerialzer,
@@ -190,6 +192,23 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
         return Collection.objects.filter(private=False).order_by(
             "featured", "-created_on"
         )
+
+
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Searchable read-only endpoint for categories.
+    """
+
+    permission_classes = [IsAuthenticated, IsTeacher]
+    renderer_classes = [JSONRenderer]
+    serializer_class = CategorySerializer
+
+    def get_queryset(self):
+        queryset = Category.objects.all()
+        search_term = self.request.query_params.get("title")
+        if search_term is not None:
+            queryset = queryset.filter(title__icontains=search_term)
+        return queryset
 
 
 class DisciplineViewSet(viewsets.ModelViewSet):
@@ -505,7 +524,6 @@ class TeacherFeedbackThroughAnswerDetail(TeacherFeedbackDetail):
 
 
 class TeacherSearch(ReadOnlyModelViewSet):
-
     permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
     serializer_class = TeacherSerializer
