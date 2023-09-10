@@ -1,9 +1,3 @@
-"""
-ElasticSearch endpoint
-
-Object serialization must match with REST API for component compatability.
-"""
-
 import bleach
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -18,38 +12,21 @@ from django_elasticsearch_dsl.fields import (
     TextField,
 )
 from django_elasticsearch_dsl.registries import registry
-from elasticsearch_dsl import analyzer, token_filter, tokenizer
 
+from elastic.documents.analyzers import (
+    autocomplete,
+    full_term,
+    html_strip,
+    trigram,
+)
 from peerinst.models import (
     AnswerChoice,
-    Assignment,
     Category,
-    Collection,
     Discipline,
     Question,
     QuestionFlag,
 )
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
-
-html_strip = analyzer(
-    "html_strip",
-    tokenizer="whitespace",
-    filter=["lowercase", "stop", "snowball"],
-    char_filter=["html_strip"],
-)
-
-full_term = analyzer("full_term", tokenizer="keyword", filter=["lowercase"])
-
-autocomplete = analyzer(
-    "autocomplete",
-    tokenizer=tokenizer("autocomplete", "edge_ngram", min_gram=3, max_gram=50),
-    filter=["lowercase"],
-)
-
-trigram_filter = token_filter("ngram", "ngram", min_gram=3, max_gram=5)
-trigram = analyzer(
-    "trigram", tokenizer="whitespace", filter=["lowercase", trigram_filter]
-)
 
 
 @registry.register_document
@@ -302,139 +279,3 @@ class QuestionDocument(Document):
             QuestionFlag,
             User,
         ]
-
-
-@registry.register_document
-class AssignmentDocument(Document):
-    answer_count = IntegerField(index=False)
-    description = TextField(analyzer=html_strip)
-    owner = NestedField(
-        properties={"username": TextField(analyzer=autocomplete)}
-    )
-    pk = KeywordField(index=False)
-    question_count = IntegerField(index=False)
-    title = TextField(analyzer=html_strip)
-    urls = ObjectField(
-        properties={
-            "preview": TextField(index=False),
-            "update": TextField(index=False),
-        }
-    )
-
-    def prepare_answer_count(self, instance):
-        return instance.answer_count
-
-    def prepare_description(self, instance):
-        return bleach.clean(
-            instance.description or "",
-            tags=ALLOWED_TAGS,
-            strip=True,
-        ).strip()
-
-    def prepare_pk(self, instance):
-        return instance.pk
-
-    def prepare_question_count(self, instance):
-        return instance.questions.count()
-
-    def prepare_title(self, instance):
-        return bleach.clean(
-            instance.title,
-            tags=ALLOWED_TAGS,
-            strip=True,
-        ).strip()
-
-    def prepare_urls(self, instance):
-        return {
-            "preview": instance.get_absolute_url(),
-            "update": reverse(
-                "teacher:assignment-update",
-                args=(instance.pk,),
-            ),
-        }
-
-    def get_instances_from_related(self, related_instance):
-        for model in [Question]:
-            if isinstance(related_instance, model):
-                return related_instance.assignment_set.all()
-
-    class Index:
-        name = "assignments"
-        settings = {"number_of_shards": 1, "number_of_replicas": 0}
-
-    class Django:
-        model = Assignment
-        related_models = [Question]
-
-
-@registry.register_document
-class CollectionDocument(Document):
-    answerCount = IntegerField(index=False)
-    description = TextField(analyzer=html_strip)
-    discipline = ObjectField(
-        properties={"title": TextField(analyzer=full_term)}
-    )
-    follower_count = IntegerField(index=False)
-    pk = KeywordField(index=False)
-    public = BooleanField()
-    title = TextField(analyzer=html_strip)
-    user = NestedField(
-        properties={"username": TextField(analyzer=autocomplete)}
-    )
-
-    def prepare_answerCount(self, instance):
-        return instance.answer_count
-
-    def prepare_description(self, instance):
-        return bleach.clean(
-            instance.description or "",
-            tags=ALLOWED_TAGS,
-            strip=True,
-        ).strip()
-
-    def prepare_discipline(self, instance):
-        """Bleach"""
-        if instance.discipline:
-            return {
-                "title": bleach.clean(
-                    instance.discipline.title,
-                    tags=[],
-                    strip=True,
-                ).strip()
-            }
-        return {"title": ""}
-
-    def prepare_follower_count(self, instance):
-        return instance.followers.count()
-
-    def prepare_public(self, instance):
-        return not instance.private
-
-    def prepare_title(self, instance):
-        return bleach.clean(
-            instance.title,
-            tags=ALLOWED_TAGS,
-            strip=True,
-        ).strip()
-
-    def prepare_user(self, instance):
-        username = ""
-        saltise = False
-        expert = False
-        if instance.owner:
-            username = instance.owner.user.username
-            if hasattr(instance.owner.user, "saltisemember"):
-                saltise = True
-                expert = instance.owner.user.saltisemember.expert
-        return {
-            "username": username,
-            "saltise": saltise,
-            "expert": expert,
-        }
-
-    class Index:
-        name = "collections"
-        settings = {"number_of_shards": 1, "number_of_replicas": 0}
-
-    class Django:
-        model = Collection
