@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django_elasticsearch_dsl_drf.viewsets import BaseDocumentViewSet
 from rest_framework import generics, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -13,12 +14,12 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
+from peerinst.documents import CategoryDocument
 from peerinst.models import (
     Answer,
     AnswerAnnotation,
     Assignment,
     AssignmentQuestions,
-    Category,
     Collection,
     Discipline,
     Question,
@@ -174,21 +175,19 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class CategoryViewSet(BaseDocumentViewSet):
     """
     Searchable read-only endpoint for categories.
     """
 
+    document = CategoryDocument
+    lookup_field = "title"
     permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
+    search_fields = ("title",)
     serializer_class = CategorySerializer
 
-    def get_queryset(self):
-        queryset = Category.objects.all()
-        search_term = self.request.query_params.get("title")
-        if search_term is not None:
-            queryset = queryset.filter(title__icontains=search_term)
-        return queryset
+    # TODO: filter!
 
 
 class DisciplineViewSet(viewsets.ModelViewSet):

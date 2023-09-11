@@ -13,12 +13,6 @@ from django_elasticsearch_dsl.fields import (
 )
 from django_elasticsearch_dsl.registries import registry
 
-from elastic.documents.analyzers import (
-    autocomplete,
-    full_term,
-    html_strip,
-    trigram,
-)
 from peerinst.models import (
     AnswerChoice,
     Category,
@@ -27,6 +21,8 @@ from peerinst.models import (
     QuestionFlag,
 )
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
+
+from .analyzers import autocomplete, full_term, html_strip, trigram
 
 
 @registry.register_document
@@ -263,7 +259,7 @@ class QuestionDocument(Document):
         name = "questions"
         settings = {
             "number_of_shards": 1,
-            "number_of_replicas": 0,
+            "number_of_replicas": 1,
             "max_ngram_diff": 3,
         }
 

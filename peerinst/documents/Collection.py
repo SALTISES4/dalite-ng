@@ -10,9 +10,10 @@ from django_elasticsearch_dsl.fields import (
 )
 from django_elasticsearch_dsl.registries import registry
 
-from elastic.documents.analyzers import autocomplete, full_term, html_strip
 from peerinst.models import Collection
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
+
+from .analyzers import autocomplete, full_term, html_strip
 
 
 @registry.register_document
@@ -82,7 +83,7 @@ class CollectionDocument(Document):
 
     class Index:
         name = "collections"
-        settings = {"number_of_shards": 1, "number_of_replicas": 0}
+        settings = {"number_of_shards": 1, "number_of_replicas": 1}
 
     class Django:
         model = Collection

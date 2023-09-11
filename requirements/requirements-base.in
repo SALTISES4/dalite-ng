@@ -18,12 +18,14 @@ django-compressor
 django-cookie-consent
 django-csp
 django-decorator-include
+django-elasticsearch-dsl
 django-inlinecss
 django-lti-provider
 django-minify-html
 django-permissions-policy
 django-tinymce
 djangorestframework
+elasticsearch<7.14.0
 future>0.18.2
 langdetect
 pandas

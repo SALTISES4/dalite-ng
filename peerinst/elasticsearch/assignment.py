@@ -4,7 +4,7 @@ import time
 
 from elasticsearch_dsl import Q
 
-from elastic.documents.peerinst import AssignmentDocument
+from peerinst.documents import AssignmentDocument
 
 logger = logging.getLogger("performance")
 pp = pprint.PrettyPrinter()

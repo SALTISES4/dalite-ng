@@ -335,6 +335,7 @@ django==3.2.20 \
     #   django-lti-provider
     #   django-minify-html
     #   django-model-utils
+    #   django-nine
     #   django-permissions-policy
     #   django-redis
     #   django-timezone-field
@@ -382,7 +383,13 @@ django-decorator-include==3.0 \
 django-elasticsearch-dsl==7.3 \
     --hash=sha256:084a790edf26131a7897d13a3b5c08a6e129ca145b2b3fcbc2b2d4e902a919c1 \
     --hash=sha256:c1be1c6d25ee6e99dc246282a4f6de8cc0630d0f8d9863ed512c0baa9d21be94
-    # via -r requirements/../elastic/requirements.in
+    # via
+    #   -r requirements/../elastic/requirements.in
+    #   django-elasticsearch-dsl-drf
+django-elasticsearch-dsl-drf==0.22.5 \
+    --hash=sha256:b444f168535ff99244cc995ec354a31abcbf3fc03bd7b11ec1a3f43c7208f63a \
+    --hash=sha256:fc0b3960e16f6c06de4f2ca4daf1134376fce4d496c1ddc218c23daddf6bcaa0
+    # via -r requirements/../REST/requirements.in
 django-inlinecss==0.3.0 \
     --hash=sha256:5a014278b017a07d9d0babe2bf1bc75a52e184fb0ed26e333e8ff0d8e777b9e2 \
     --hash=sha256:eddcb295a35fcddf4fce26f9c232c472a9283b954aaf084641d0718415bd694b
@@ -399,6 +406,10 @@ django-model-utils==4.3.1 \
     --hash=sha256:2e2e4f13e4f14613134a9777db7ad4265f59a1d8f1384107bcaa3028fe3c87c1 \
     --hash=sha256:8c0b0177bab909a8635b602d960daa67e80607aa5469217857271a60726d7a4b
     # via saltise-course-flow
+django-nine==0.2.7 \
+    --hash=sha256:304e0f83cea5a35359375fc919d00f9917b655c1d388244cbfc7363f59489177 \
+    --hash=sha256:4d93208ca5bb4a63bf65cf098a82ee469127b04ebde698d72fe12d258b73c291
+    # via django-elasticsearch-dsl-drf
 django-permissions-policy==4.17.0 \
     --hash=sha256:cb2f0d2772ddab63dabd50331fa823d0cea06c89932d412c8c6aa5fc239b364f \
     --hash=sha256:e317143f8c8ef7ff30dc20bc1343f8f299c9e4423148957d9f0fc2bae04b0ebe
@@ -425,6 +436,7 @@ djangorestframework==3.14.0 \
     # via
     #   -r requirements/../REST/requirements.in
     #   -r requirements/requirements-base.in
+    #   django-elasticsearch-dsl-drf
     #   saltise-course-flow
     #   saltise-user-feedback
 elasticsearch==7.13.4 \
@@ -432,11 +444,14 @@ elasticsearch==7.13.4 \
     --hash=sha256:5920df0ab2630778680376d86bea349dc99860977eec9b6d2bd0860f337313f2
     # via
     #   -r requirements/../elastic/requirements.in
+    #   django-elasticsearch-dsl-drf
     #   elasticsearch-dsl
 elasticsearch-dsl==7.4.1 \
     --hash=sha256:07ee9c87dc28cc3cae2daa19401e1e18a172174ad9e5ca67938f752e3902a1d5 \
     --hash=sha256:97f79239a252be7c4cce554c29e64695d7ef6a4828372316a5e5ff815e7a7498
-    # via django-elasticsearch-dsl
+    # via
+    #   django-elasticsearch-dsl
+    #   django-elasticsearch-dsl-drf
 et-xmlfile==1.1.0 \
     --hash=sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c \
     --hash=sha256:a2ba85d1d6a74ef63837eed693bcb89c3f752169b0e3e7ae5b16ca5e1b3deada
@@ -623,6 +638,10 @@ openpyxl==3.1.2 \
     --hash=sha256:a6f5977418eff3b2d5500d54d9db50c8277a368436f4e4f8ddb1be3422870184 \
     --hash=sha256:f91456ead12ab3c6c2e9491cf33ba6d08357d802192379bb482f1033ade496f5
     # via saltise-course-flow
+packaging==23.1 \
+    --hash=sha256:994793af429502c4ea2ebf6bf664629d07c1a9fe974af92966e4b8d2df7edc61 \
+    --hash=sha256:a392980d2b6cffa644431898be54b0045151319d1e7ec34f0cfed48767dd334f
+    # via django-nine
 pandas==2.0.3 \
     --hash=sha256:04dbdbaf2e4d46ca8da896e1805bc04eb85caa9a82e259e8eed00254d5e0c682 \
     --hash=sha256:1168574b036cd8b93abc746171c9b4f1b83467438a5e45909fed645cf8692dbc \
@@ -904,6 +923,7 @@ six==1.16.0 \
     #   automat
     #   bleach
     #   django-elasticsearch-dsl
+    #   django-elasticsearch-dsl-drf
     #   elasticsearch-dsl
     #   langdetect
     #   pylti

@@ -5,7 +5,7 @@ from functools import reduce
 
 from elasticsearch_dsl import Q
 
-from elastic.documents.peerinst import QuestionDocument
+from peerinst.documents import QuestionDocument
 
 logger = logging.getLogger("performance")
 pp = pprint.PrettyPrinter()

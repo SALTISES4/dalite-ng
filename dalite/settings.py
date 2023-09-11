@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     "REST",
     "teacher",
     "django_elasticsearch_dsl",
+    "django_elasticsearch_dsl_drf",
     "lti_provider",
     "tinymce",
     "csp",

@@ -6,13 +6,14 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Max
 from django.urls import reverse
 from django.utils import timezone
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from rest_framework import serializers
 
+from peerinst.documents import CategoryDocument
 from peerinst.models import (
     Answer,
     Assignment,
     AssignmentQuestions,
-    Category,
     Collection,
     Discipline,
     Question,
@@ -27,9 +28,9 @@ from .student_group import StudentGroupSerializer
 logger = logging.getLogger("REST")
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(DocumentSerializer):
     class Meta:
-        model = Category
+        document = CategoryDocument
         fields = ["title"]
 
     def to_representation(self, instance):

@@ -153,6 +153,7 @@ django==3.2.20
     #   django-lti-provider
     #   django-minify-html
     #   django-model-utils
+    #   django-nine
     #   django-permissions-policy
     #   django-redis
     #   django-timezone-field
@@ -183,6 +184,10 @@ django-csp==3.7
 django-decorator-include==3.0
     # via -r requirements/requirements-base.txt
 django-elasticsearch-dsl==7.3
+    # via
+    #   -r requirements/requirements-base.txt
+    #   django-elasticsearch-dsl-drf
+django-elasticsearch-dsl-drf==0.22.5
     # via -r requirements/requirements-base.txt
 django-inlinecss==0.3.0
     # via -r requirements/requirements-base.txt
@@ -194,6 +199,10 @@ django-model-utils==4.3.1
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
+django-nine==0.2.7
+    # via
+    #   -r requirements/requirements-base.txt
+    #   django-elasticsearch-dsl-drf
 django-permissions-policy==4.17.0
     # via -r requirements/requirements-base.txt
 django-ratelimit==3.0.1
@@ -213,16 +222,19 @@ django-tinymce==3.6.1
 djangorestframework==3.14.0
     # via
     #   -r requirements/requirements-base.txt
+    #   django-elasticsearch-dsl-drf
     #   saltise-course-flow
     #   saltise-user-feedback
 elasticsearch==7.13.4
     # via
     #   -r requirements/requirements-base.txt
+    #   django-elasticsearch-dsl-drf
     #   elasticsearch-dsl
 elasticsearch-dsl==7.4.1
     # via
     #   -r requirements/requirements-base.txt
     #   django-elasticsearch-dsl
+    #   django-elasticsearch-dsl-drf
 et-xmlfile==1.1.0
     # via
     #   -r requirements/requirements-base.txt
@@ -324,6 +336,8 @@ outcome==1.2.0
     # via trio
 packaging==23.1
     # via
+    #   -r requirements/requirements-base.txt
+    #   django-nine
     #   pytest
     #   pytest-rerunfailures
 pandas==2.0.3
@@ -454,6 +468,7 @@ six==1.16.0
     #   automat
     #   bleach
     #   django-elasticsearch-dsl
+    #   django-elasticsearch-dsl-drf
     #   elasticsearch-dsl
     #   langdetect
     #   pylti

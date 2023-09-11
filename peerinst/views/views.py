@@ -50,11 +50,11 @@ from tinymce.widgets import TinyMCE
 
 from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
-from elastic.search.peerinst import assignment_search as as_ES
-from elastic.search.peerinst import collection_search as cs_ES
-from elastic.search.peerinst import question_search as qs_ES
 from peerinst import admin, forms, models, rationale_choice
 from peerinst.admin_views import get_question_rationale_aggregates
+from peerinst.elasticsearch import assignment_search as as_ES
+from peerinst.elasticsearch import collection_search as cs_ES
+from peerinst.elasticsearch import question_search as qs_ES
 from peerinst.mixins import (
     LoginRequiredMixin,
     NoStudentsMixin,
