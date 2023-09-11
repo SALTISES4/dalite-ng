@@ -80,7 +80,6 @@ bleach==6.0.0 \
     --hash=sha256:1a1a85c1595e07d8db14c5f09f09e6433502c51c595970edc090551f0db99414 \
     --hash=sha256:33c16e3353dbd13028ab4799a0f89a83f113405c766e9c122df8a06f5b85b3f4
     # via
-    #   -r requirements/../elastic/requirements.in
     #   -r requirements/requirements-base.in
     #   saltise-course-flow
     #   saltise-user-feedback
@@ -384,7 +383,7 @@ django-elasticsearch-dsl==7.3 \
     --hash=sha256:084a790edf26131a7897d13a3b5c08a6e129ca145b2b3fcbc2b2d4e902a919c1 \
     --hash=sha256:c1be1c6d25ee6e99dc246282a4f6de8cc0630d0f8d9863ed512c0baa9d21be94
     # via
-    #   -r requirements/../elastic/requirements.in
+    #   -r requirements/requirements-base.in
     #   django-elasticsearch-dsl-drf
 django-elasticsearch-dsl-drf==0.22.5 \
     --hash=sha256:b444f168535ff99244cc995ec354a31abcbf3fc03bd7b11ec1a3f43c7208f63a \
@@ -443,7 +442,7 @@ elasticsearch==7.13.4 \
     --hash=sha256:52dda85f76eeb85ec873bf9ffe0ba6849e544e591f66d4048a5e48016de268e0 \
     --hash=sha256:5920df0ab2630778680376d86bea349dc99860977eec9b6d2bd0860f337313f2
     # via
-    #   -r requirements/../elastic/requirements.in
+    #   -r requirements/requirements-base.in
     #   django-elasticsearch-dsl-drf
     #   elasticsearch-dsl
 elasticsearch-dsl==7.4.1 \
