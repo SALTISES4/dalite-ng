@@ -1,15 +1,17 @@
 from django_elasticsearch_dsl import Document
-from django_elasticsearch_dsl.fields import TextField
+from django_elasticsearch_dsl.fields import SearchAsYouTypeField, TextField
 from django_elasticsearch_dsl.registries import registry
 
 from peerinst.models import Category
 
-from .analyzers import full_term
-
 
 @registry.register_document
 class CategoryDocument(Document):
-    title = TextField(analyzer=full_term)
+    title = TextField(
+        fields={
+            "raw": SearchAsYouTypeField(),
+        },
+    )
 
     class Index:
         name = "categories"

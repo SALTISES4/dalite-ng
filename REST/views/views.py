@@ -6,6 +6,10 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django_elasticsearch_dsl_drf.filter_backends import (
+    FilteringFilterBackend,
+    SearchFilterBackend,
+)
 from django_elasticsearch_dsl_drf.viewsets import BaseDocumentViewSet
 from rest_framework import filters, generics, serializers, status, viewsets
 from rest_framework.decorators import action
@@ -180,22 +184,27 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
 class ORMBackupBaseDocumentViewSet(BaseDocumentViewSet):
     """
     Check for Elastic connection and, if not available, default
-    to an ORM search.
+    to a Django ORM search.
     """
 
     elastic = None
+    filter_backends = []
 
     def __init__(self, *args, **kwargs):
         print(1)
         try:
             # Assume Elasticsearch is available
             self.elastic = True
-            super().__init__(*args, **kwargs)
-            print(2)
+            self.filter_backends = [
+                FilteringFilterBackend,
+                SearchFilterBackend,
+            ]
+            return super().__init__(*args, **kwargs)
         except urllib3.exceptions.NewConnectionError:
             # Elasticsearch is unavailable
             self.elastic = False
-            print(3)
+            self.filter_backends = [filters.SearchFilter]
+            print(2)
             return
 
     def get_object(self):
@@ -208,26 +217,26 @@ class ORMBackupBaseDocumentViewSet(BaseDocumentViewSet):
     def get_queryset(self):
         if self.elastic:
             return super().get_queryset()
-
-        # TODO: filter!
         return self.queryset or self.document.Django.model.objects.all()
 
 
 class CategoryViewSet(ORMBackupBaseDocumentViewSet):
     """
     Searchable read-only endpoint for categories.
-
-    Ideal behaviour here is to try Elastic, if that fails
-    default to simple Django ORM search.
     """
 
-    document = CategoryDocument
-    lookup_field = "title"
+    # DRF
     permission_classes = [IsAuthenticated, IsTeacher]
+    queryset = Category.objects.all()
     renderer_classes = [JSONRenderer]
-    filter_backends = [filters.SearchFilter]
     search_fields = ("title",)
     serializer_class = CategorySerializer
+
+    # DSL
+    pagination_class = None
+    document = CategoryDocument
+    filter_fields = {"title": "title.raw"}
+    lookup_field = "title"
 
 
 class DisciplineViewSet(viewsets.ModelViewSet):
