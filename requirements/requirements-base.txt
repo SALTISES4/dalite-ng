@@ -330,6 +330,7 @@ django==3.2.20 \
     #   django-cookie-consent
     #   django-csp
     #   django-decorator-include
+    #   django-filter
     #   django-inlinecss
     #   django-lti-provider
     #   django-minify-html
@@ -388,6 +389,10 @@ django-elasticsearch-dsl==7.3 \
 django-elasticsearch-dsl-drf==0.22.5 \
     --hash=sha256:b444f168535ff99244cc995ec354a31abcbf3fc03bd7b11ec1a3f43c7208f63a \
     --hash=sha256:fc0b3960e16f6c06de4f2ca4daf1134376fce4d496c1ddc218c23daddf6bcaa0
+    # via -r requirements/../REST/requirements.in
+django-filter==23.2 \
+    --hash=sha256:2fe15f78108475eda525692813205fa6f9e8c1caf1ae65daa5862d403c6dbf00 \
+    --hash=sha256:d12d8e0fc6d3eb26641e553e5d53b191eb8cec611427d4bdce0becb1f7c172b5
     # via -r requirements/../REST/requirements.in
 django-inlinecss==0.3.0 \
     --hash=sha256:5a014278b017a07d9d0babe2bf1bc75a52e184fb0ed26e333e8ff0d8e777b9e2 \

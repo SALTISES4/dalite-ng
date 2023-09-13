@@ -207,7 +207,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-
 # Channels
 ASGI_APPLICATION = "dalite.routing.application"
 CHANNEL_LAYERS = {

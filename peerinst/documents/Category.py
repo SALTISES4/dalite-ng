@@ -1,6 +1,7 @@
 from django_elasticsearch_dsl import Document
 from django_elasticsearch_dsl.fields import SearchAsYouTypeField, TextField
 from django_elasticsearch_dsl.registries import registry
+from elasticsearch_dsl import analyzer
 
 from peerinst.models import Category
 
@@ -9,7 +10,13 @@ from peerinst.models import Category
 class CategoryDocument(Document):
     title = TextField(
         fields={
-            "raw": SearchAsYouTypeField(),
+            "raw": SearchAsYouTypeField(
+                analyzer=analyzer(
+                    "search-as-you-type",
+                    tokenizer="standard",
+                    filter=["lowercase"],
+                ),
+            ),
         },
     )
 

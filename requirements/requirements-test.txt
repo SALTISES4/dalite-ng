@@ -149,6 +149,7 @@ django==3.2.20
     #   django-cookie-consent
     #   django-csp
     #   django-decorator-include
+    #   django-filter
     #   django-inlinecss
     #   django-lti-provider
     #   django-minify-html
@@ -188,6 +189,8 @@ django-elasticsearch-dsl==7.3
     #   -r requirements/requirements-base.txt
     #   django-elasticsearch-dsl-drf
 django-elasticsearch-dsl-drf==0.22.5
+    # via -r requirements/requirements-base.txt
+django-filter==23.2
     # via -r requirements/requirements-base.txt
 django-inlinecss==0.3.0
     # via -r requirements/requirements-base.txt

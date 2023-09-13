@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-import urllib3
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -11,7 +10,8 @@ from django_elasticsearch_dsl_drf.filter_backends import (
     SearchFilterBackend,
 )
 from django_elasticsearch_dsl_drf.viewsets import BaseDocumentViewSet
-from rest_framework import filters, generics, serializers, status, viewsets
+from django_filters import rest_framework as filters
+from rest_framework import generics, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -191,28 +191,23 @@ class ORMBackupBaseDocumentViewSet(BaseDocumentViewSet):
     filter_backends = []
 
     def __init__(self, *args, **kwargs):
-        print(1)
-        try:
-            # Assume Elasticsearch is available
+        super().__init__(*args, **kwargs)
+        if self.client.ping():
+            # Elasticsearch is available; set up DSL-DRF filtering
             self.elastic = True
             self.filter_backends = [
                 FilteringFilterBackend,
                 SearchFilterBackend,
             ]
-            return super().__init__(*args, **kwargs)
-        except urllib3.exceptions.NewConnectionError:
-            # Elasticsearch is unavailable
+        else:
+            # Elasticsearch is unavailable; set up ORM filtering
             self.elastic = False
-            self.filter_backends = [filters.SearchFilter]
-            print(2)
-            return
+            self.filter_backends = (filters.DjangoFilterBackend,)
 
     def get_object(self):
         if self.elastic:
             return super().get_object()
-
-        # Default to the super method of the ReadOnlyModelViewSet class
-        return super().super().get_object()
+        return ReadOnlyModelViewSet.get_object(self)
 
     def get_queryset(self):
         if self.elastic:
@@ -220,23 +215,39 @@ class ORMBackupBaseDocumentViewSet(BaseDocumentViewSet):
         return self.queryset or self.document.Django.model.objects.all()
 
 
+class TitleWildcardFilter(filters.FilterSet):
+    title__wildcard = filters.CharFilter(field_name="title", method="wildcard")
+
+    def wildcard(self, queryset, name, value):
+        return queryset.filter(
+            **{
+                f"{name}__icontains": value.replace("*", " ").strip(),
+            }
+        )
+
+
 class CategoryViewSet(ORMBackupBaseDocumentViewSet):
     """
     Searchable read-only endpoint for categories.
+
+    Supports ?title__wildcard url filtering.
     """
 
-    # DRF
+    lookup_field = "title"
     permission_classes = [IsAuthenticated, IsTeacher]
-    queryset = Category.objects.all()
     renderer_classes = [JSONRenderer]
-    search_fields = ("title",)
     serializer_class = CategorySerializer
 
-    # DSL
-    pagination_class = None
+    # DRF/django-filter
+    filterset_class = TitleWildcardFilter
+    queryset = Category.objects.all()
+
+    # DRF/DSL
     document = CategoryDocument
+    document_uid_field = "title"
     filter_fields = {"title": "title.raw"}
-    lookup_field = "title"
+    lookup_url_kwarg = "title"
+    pagination_class = None
 
 
 class DisciplineViewSet(viewsets.ModelViewSet):
