@@ -5,12 +5,6 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django_elasticsearch_dsl_drf.filter_backends import (
-    FilteringFilterBackend,
-    SearchFilterBackend,
-)
-from django_elasticsearch_dsl_drf.viewsets import BaseDocumentViewSet
-from django_filters import rest_framework as filters
 from rest_framework import generics, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -19,13 +13,11 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from peerinst.documents import CategoryDocument
 from peerinst.models import (
     Answer,
     AnswerAnnotation,
     Assignment,
     AssignmentQuestions,
-    Category,
     Collection,
     Discipline,
     Question,
@@ -45,7 +37,6 @@ from REST.permissions import (
 from REST.serializers import (
     AnswerSerializer,
     AssignmentSerializer,
-    CategorySerializer,
     CollectionSerializer,
     DisciplineSerializer,
     FeedbackReadSerialzer,
@@ -179,75 +170,6 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
         return Collection.objects.filter(private=False).order_by(
             "featured", "-created_on"
         )
-
-
-class ORMBackupBaseDocumentViewSet(BaseDocumentViewSet):
-    """
-    Check for Elastic connection and, if not available, default
-    to a Django ORM search.
-    """
-
-    elastic = None
-    filter_backends = []
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.client.ping():
-            # Elasticsearch is available; set up DSL-DRF filtering
-            self.elastic = True
-            self.filter_backends = [
-                FilteringFilterBackend,
-                SearchFilterBackend,
-            ]
-        else:
-            # Elasticsearch is unavailable; set up ORM filtering
-            self.elastic = False
-            self.filter_backends = (filters.DjangoFilterBackend,)
-
-    def get_object(self):
-        if self.elastic:
-            return super().get_object()
-        return ReadOnlyModelViewSet.get_object(self)
-
-    def get_queryset(self):
-        if self.elastic:
-            return super().get_queryset()
-        return self.queryset or self.document.Django.model.objects.all()
-
-
-class TitleWildcardFilter(filters.FilterSet):
-    title__wildcard = filters.CharFilter(field_name="title", method="wildcard")
-
-    def wildcard(self, queryset, name, value):
-        return queryset.filter(
-            **{
-                f"{name}__icontains": value.replace("*", " ").strip(),
-            }
-        )
-
-
-class CategoryViewSet(ORMBackupBaseDocumentViewSet):
-    """
-    Searchable read-only endpoint for categories.
-
-    Supports ?title__wildcard url filtering.
-    """
-
-    lookup_field = "title"
-    permission_classes = [IsAuthenticated, IsTeacher]
-    renderer_classes = [JSONRenderer]
-    serializer_class = CategorySerializer
-
-    # DRF/django-filter
-    filterset_class = TitleWildcardFilter
-    queryset = Category.objects.all()
-
-    # DRF/DSL
-    document = CategoryDocument
-    document_uid_field = "title"
-    filter_fields = {"title": "title.raw"}
-    lookup_url_kwarg = "title"
-    pagination_class = None
 
 
 class DisciplineViewSet(viewsets.ModelViewSet):

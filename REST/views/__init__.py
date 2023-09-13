@@ -37,9 +37,9 @@ from .recommenders import (  # noqa
     TeacherCollectionRecommendationViewSet,
     TeacherQuestionRecommendationViewSet,
 )
+from .search.peerinst import CategoryViewSet  # noqa
 from .views import (  # noqa
     AssignmentViewSet,
-    CategoryViewSet,
     CollectionViewSet,
     DisciplineViewSet,
     QuestionListViewSet,

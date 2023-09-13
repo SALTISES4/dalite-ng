@@ -35,6 +35,7 @@ class CategorySerializer(DocumentSerializer):
 
     def to_representation(self, instance):
         """Bleach"""
+        # TEST
         ret = super().to_representation(instance)
         ret["title"] = bleach.clean(ret["title"], tags=[], strip=True).strip()
         return ret
