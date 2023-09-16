@@ -1,7 +1,4 @@
-from django_elasticsearch_dsl_drf.filter_backends import (
-    FilteringFilterBackend,
-    SearchFilterBackend,
-)
+from django_elasticsearch_dsl_drf.filter_backends import FilteringFilterBackend
 from django_elasticsearch_dsl_drf.viewsets import BaseDocumentViewSet
 from django_filters import rest_framework as filters
 from rest_framework.viewsets import ReadOnlyModelViewSet
@@ -21,10 +18,7 @@ class ORMBackupBaseDocumentViewSet(BaseDocumentViewSet):
         if self.client.ping():
             # Elasticsearch is available; set up DSL-DRF filtering
             self.elastic = True
-            self.filter_backends = [
-                FilteringFilterBackend,
-                SearchFilterBackend,
-            ]
+            self.filter_backends = (FilteringFilterBackend,)
         else:
             # Elasticsearch is unavailable; set up ORM filtering
             self.elastic = False

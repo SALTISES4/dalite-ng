@@ -13,7 +13,7 @@ class CategoryViewSet(ORMBackupBaseDocumentViewSet):
     """
     Searchable read-only endpoint for categories.
 
-    Supports ?title__wildcard url filtering.
+    Supports retrieve, list and ?title__wildcard filtering.
     """
 
     lookup_field = "title"
