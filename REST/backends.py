@@ -4,6 +4,14 @@ from django_filters import rest_framework as filters
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 
+class DjangoFilterExtraKwargsBackend(filters.DjangoFilterBackend):
+    def get_filterset_kwargs(self, request, queryset, view):
+        kwargs = super().get_filterset_kwargs(request, queryset, view)
+        if hasattr(view, "dsl_orm_filter_map"):
+            kwargs.update(field_map=view.dsl_orm_filter_map)
+        return kwargs
+
+
 class ORMBackupBaseDocumentViewSet(BaseDocumentViewSet):
     """
     Check for Elastic connection and, if not available, default
@@ -22,7 +30,7 @@ class ORMBackupBaseDocumentViewSet(BaseDocumentViewSet):
         else:
             # Elasticsearch is unavailable; set up ORM filtering
             self.elastic = False
-            self.filter_backends = (filters.DjangoFilterBackend,)
+            self.filter_backends = (DjangoFilterExtraKwargsBackend,)
 
     def get_object(self):
         if self.elastic:

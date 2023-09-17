@@ -4,7 +4,7 @@ from rest_framework.renderers import JSONRenderer
 from peerinst.documents import CategoryDocument
 from peerinst.models import Category
 from REST.backends import ORMBackupBaseDocumentViewSet
-from REST.filters import TitleWildcardFilter
+from REST.filters import WildcardFilter
 from REST.permissions import IsTeacher
 from REST.serializers import CategorySerializer
 
@@ -22,8 +22,11 @@ class CategoryViewSet(ORMBackupBaseDocumentViewSet):
 
     # DRF/django-filter
     lookup_field = "title"
-    filterset_class = TitleWildcardFilter
+    filterset_class = WildcardFilter
     queryset = Category.objects.all()
+
+    # Link between approaches
+    dsl_orm_filter_map = {"title": "title"}
 
     # DRF/DSL
     document = CategoryDocument
