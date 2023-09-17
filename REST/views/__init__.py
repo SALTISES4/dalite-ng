@@ -1,6 +1,5 @@
 __all__ = [
     "AssignmentViewSet",
-    "CategoryViewSet",
     "CollectionViewSet",
     "DisciplineViewSet",
     "QuestionViewSet",
@@ -8,6 +7,8 @@ __all__ = [
     "QuestionSerializer",
     "QuestionSearchList",
     "RecentStudentGroupAssignmentViewSet",
+    "SearchCategoryViewSet",
+    "SearchTeacherViewSet",
     "StudentFeedbackList",
     "StudentGroupAssignmentAnswers",
     "StudentGroupAssignmentViewSet",
@@ -37,7 +38,10 @@ from .recommenders import (  # noqa
     TeacherCollectionRecommendationViewSet,
     TeacherQuestionRecommendationViewSet,
 )
-from .search.peerinst import CategoryViewSet  # noqa
+from .search.peerinst import (  # noqa
+    SearchCategoryViewSet,
+    SearchTeacherViewSet,
+)
 from .views import (  # noqa
     AssignmentViewSet,
     CollectionViewSet,

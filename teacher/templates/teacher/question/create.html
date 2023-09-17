@@ -39,8 +39,9 @@
           },
           urls: {
             create: "{% url 'REST:teacher-question-list' %}",
-            categories: "{% url 'REST:category-list' %}", // Swap for elastic
+            categories: "{% url 'REST:search-category-list' %}",
             disciplines: "{% url 'REST:discipline-list' %}",
+            teachers: "{% url 'REST:search-teacher-list' %}"
           }
         });
       };

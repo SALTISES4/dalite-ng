@@ -11,7 +11,9 @@ __all__ = [
     "StudentGroupAssignmentAnswerSerializer",
     "StudentGroupAssignmentSerializer",
     "StudentGroupSerializer",
+    "TeacherSearchSerializer",
     "TeacherSerializer",
+    "UserSerializer",
 ]
 
 from .peerinst import (  # noqa
@@ -27,5 +29,7 @@ from .peerinst import (  # noqa
     StudentGroupAssignmentAnswerSerializer,
     StudentGroupAssignmentSerializer,
     StudentGroupSerializer,
+    TeacherSearchSerializer,
     TeacherSerializer,
+    UserSerializer,
 )

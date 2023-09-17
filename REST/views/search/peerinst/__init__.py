@@ -1,3 +1,4 @@
-__all__ = ["CategoryViewSet"]
+__all__ = ["SearchCategoryViewSet", "SearchTeacherViewSet"]
 
-from .category import CategoryViewSet
+from .category import CategoryViewSet as SearchCategoryViewSet
+from .teacher import TeacherViewSet as SearchTeacherViewSet

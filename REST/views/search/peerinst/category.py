@@ -16,12 +16,12 @@ class CategoryViewSet(ORMBackupBaseDocumentViewSet):
     Supports retrieve, list and ?title__wildcard filtering.
     """
 
-    lookup_field = "title"
     permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
     serializer_class = CategorySerializer
 
     # DRF/django-filter
+    lookup_field = "title"
     filterset_class = TitleWildcardFilter
     queryset = Category.objects.all()
 
@@ -30,4 +30,5 @@ class CategoryViewSet(ORMBackupBaseDocumentViewSet):
     document_uid_field = "title"
     filter_fields = {"title": "title.raw"}
     lookup_url_kwarg = "title"
+    nested_filter_fields = {}
     pagination_class = None

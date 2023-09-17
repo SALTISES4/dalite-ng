@@ -1,6 +1,8 @@
 from django.utils import timezone
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from rest_framework import serializers
 
+from peerinst.documents import TeacherDocument
 from peerinst.models import (
     Assignment,
     Collection,
@@ -16,6 +18,20 @@ from .assignment import (
 )
 from .dynamic_serializer import DynamicFieldsModelSerializer
 from .student_group import StudentGroupSerializer
+
+
+class TeacherSearchSerializer(DocumentSerializer):
+    username = serializers.SerializerMethodField()
+
+    def get_username(self, obj):
+        try:
+            return obj.user.username
+        except AttributeError:
+            return obj.to_dict()["username"]
+
+    class Meta:
+        document = TeacherDocument
+        fields = ["username"]
 
 
 class TeacherSerializer(DynamicFieldsModelSerializer):

@@ -10,11 +10,6 @@ peerinst_api.register(
     r"assignments", views.AssignmentViewSet, basename="assignment"
 )
 peerinst_api.register(
-    r"categories",
-    views.CategoryViewSet,
-    basename="category",
-)
-peerinst_api.register(
     r"disciplines",
     views.DisciplineViewSet,
     basename="discipline",
@@ -84,6 +79,20 @@ peerinst_api.register(
     views.TeacherLibraryQuestionViewSet,
     basename="teacher-library-question",
 )
+
+search_patterns = [
+    # Elasticsearch-backed read-only search endpoints
+    peerinst_api.register(
+        r"search/categories",
+        views.SearchCategoryViewSet,
+        basename="search-category",
+    ),
+    peerinst_api.register(
+        r"search/teachers",
+        views.SearchTeacherViewSet,
+        basename="search-teacher",
+    ),
+]
 
 urlpatterns = [
     path("peerinst/", include(peerinst_api.urls)),

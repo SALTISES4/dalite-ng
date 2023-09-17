@@ -3,9 +3,11 @@ __all__ = [
     "CategoryDocument",
     "CollectionDocument",
     "QuestionDocument",
+    "TeacherDocument",
 ]
 
-from .Assignment import AssignmentDocument  # noqa
-from .Category import CategoryDocument  # noqa
-from .Collection import CollectionDocument  # noqa
-from .Question import QuestionDocument  # noqa
+from .Assignment import AssignmentDocument
+from .Category import CategoryDocument
+from .Collection import CollectionDocument
+from .Question import QuestionDocument
+from .Teacher import TeacherDocument
