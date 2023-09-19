@@ -15,6 +15,12 @@ from .assignment import QuestionSerializer
 from .dynamic_serializer import DynamicFieldsModelSerializer
 
 
+class AnswerChoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnswerChoice
+        fields = ["question", "text", "correct"]
+
+
 class AnswerSerializer(DynamicFieldsModelSerializer):
     answer_choice = serializers.SerializerMethodField()
     chosen_rationale = serializers.SerializerMethodField()

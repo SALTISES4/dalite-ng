@@ -36,3 +36,10 @@ PYLTI_CONFIG = {
 }
 
 ROOT_URLCONF = "dalite.test_urls"
+
+try:
+    import pymysql
+
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass

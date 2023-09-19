@@ -14,10 +14,11 @@ __all__ = [
     "StudentGroupAssignmentViewSet",
     "StudentGroupUpdateView",
     "StudentReviewList",
+    "TeacherAnswerChoiceCreateUpdateViewSet",
+    "TeacherAssignmentRecommendationViewSet",
     "TeacherAssignmentViewSet",
     "TeacherCollectionRecommendationViewSet",
     "TeacherLibraryAssignmentViewSet",
-    "TeacherAssignmentRecommendationViewSet",
     "TeacherLibraryCollectionViewSet",
     "TeacherLibraryQuestionViewSet",
     "TeacherQuestionRecommendationViewSet",
@@ -28,6 +29,10 @@ __all__ = [
     "TeacherFeedbackThroughAnswerDetail",
     "TeacherSearch",
 ]
+from .content_creation.peerinst import (  # noqa
+    TeacherAnswerChoiceCreateUpdateViewSet,
+    TeacherQuestionCreateUpdateViewSet,
+)
 from .library import (  # noqa
     TeacherLibraryAssignmentViewSet,
     TeacherLibraryCollectionViewSet,
@@ -60,7 +65,6 @@ from .views import (  # noqa
     TeacherFeedbackDetail,
     TeacherFeedbackList,
     TeacherFeedbackThroughAnswerDetail,
-    TeacherQuestionCreateUpdateViewSet,
     TeacherSearch,
     TeacherView,
 )
