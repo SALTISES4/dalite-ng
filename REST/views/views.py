@@ -1,17 +1,22 @@
 from datetime import timedelta
 
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import generics, serializers, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.mixins import (
+    CreateModelMixin,
+    RetrieveModelMixin,
+    UpdateModelMixin,
+)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from peerinst.models import (
     Answer,
@@ -229,18 +234,45 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class TeacherQuestionViewSet(viewsets.ModelViewSet):
+class TeacherQuestionCreateUpdateViewSet(
+    CreateModelMixin,
+    RetrieveModelMixin,
+    UpdateModelMixin,
+    GenericViewSet,
+):
     """
-    ViewSet for creating and updating a user's questions.
+    Question create, retrieve and update for teacher
+
+    - Only editable questions can be retrieved
+    - Attaches user on create
+    - Validates editability before allowing update
+
+    TODO: Consider if we need a TOS check
     """
 
-    http_method_names = ["get", "patch", "post"]
     permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
     serializer_class = QuestionSerializer
 
     def get_queryset(self):
-        return Question.objects.filter(user=self.request.user)
+        """
+        A user can only retrieve or update questions where
+        they are either the owner or a collaborator
+        """
+        queryset = Question.objects.filter(
+            Q(user=self.request.user) | Q(collaborators=self.request.user)
+        )
+        """
+        And where there are no *student* answers
+        """
+        answers = (
+            Answer.objects.filter(question=OuterRef("pk"))
+            .exclude(expert=True)
+            .exclude(user_token__exact="")
+        )
+        queryset = queryset.filter(~Exists(answers))
+
+        return queryset
 
 
 class QuestionListViewSet(viewsets.ModelViewSet):

@@ -21,7 +21,7 @@ __all__ = [
     "TeacherLibraryCollectionViewSet",
     "TeacherLibraryQuestionViewSet",
     "TeacherQuestionRecommendationViewSet",
-    "TeacherQuestionViewSet",
+    "TeacherQuestionCreateUpdateViewSet",
     "TeacherView",
     "TeacherFeedbackList",
     "TeacherFeedbackDetail",
@@ -60,7 +60,7 @@ from .views import (  # noqa
     TeacherFeedbackDetail,
     TeacherFeedbackList,
     TeacherFeedbackThroughAnswerDetail,
-    TeacherQuestionViewSet,
+    TeacherQuestionCreateUpdateViewSet,
     TeacherSearch,
     TeacherView,
 )
