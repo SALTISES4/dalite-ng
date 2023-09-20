@@ -77,6 +77,7 @@ def realistic_assignment(assignment, realistic_questions):
             first_answer_choice=i + 1,
             rationale="rationale",
             second_answer_choice=i + 1,
+            user_token="student1",
         )
         Answer.objects.create(
             question=q,

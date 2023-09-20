@@ -14,6 +14,7 @@ from peerinst.models import (
     Answer,
     Assignment,
     AssignmentQuestions,
+    Category,
     Collection,
     Discipline,
     Question,
@@ -63,9 +64,32 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     answerchoice_set = serializers.SerializerMethodField()
     assignment_count = serializers.ReadOnlyField()
     category = CategorySerializer(many=True, read_only=True)
+    category_pk = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field="title",
+        many=True,
+        source="category",
+        allow_null=True,
+        required=False,
+    )
     collaborators = UserSerializer(many=True, read_only=True)
+    collaborators_pk = serializers.SlugRelatedField(
+        queryset=User.objects.filter(teacher__isnull=False),
+        slug_field="username",
+        many=True,
+        source="collaborators",
+        allow_null=True,
+        required=False,
+    )
     difficulty = serializers.SerializerMethodField()
     discipline = DisciplineSerializer(read_only=True)
+    discipline_pk = serializers.PrimaryKeyRelatedField(
+        queryset=Discipline.objects.all(),
+        many=False,
+        source="discipline",
+        allow_null=True,
+        required=False,
+    )
     flag_reasons = serializers.ReadOnlyField()
     frequency = serializers.SerializerMethodField()
     is_editable = serializers.SerializerMethodField()
@@ -177,9 +201,12 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "answer_style",
             "assignment_count",
             "category",
+            "category_pk",
             "collaborators",
+            "collaborators_pk",
             "difficulty",
             "discipline",
+            "discipline_pk",
             "flag_reasons",
             "frequency",
             "image",

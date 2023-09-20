@@ -9,7 +9,7 @@ class TeacherQuestionCreateUpdateViewSet(TeacherCreateUpdateViewSet):
     """
     Question create, retrieve and update for teacher
 
-    - Attaches user on create
+    - Attaches user on create via serializer
     - Validates editability before retrieve
     - Validates editability before update
     """
