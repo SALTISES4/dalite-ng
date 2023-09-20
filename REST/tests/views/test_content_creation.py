@@ -1,6 +1,9 @@
 import json
+import os
 
 import pytest
+from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from faker import Faker
 from rest_framework import status
@@ -300,3 +303,55 @@ def test_teacherquestioncreateupdateviewset_create_with_collaborators(
     assert teachers[2].user.username in [
         x["username"] for x in data["collaborators"]
     ]
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_create_image_png(client, teacher):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-question-create-update-list")
+    response = client.post(
+        url,
+        data={
+            "text": fake.paragraph(),
+            "title": fake.sentence(),
+            "image": SimpleUploadedFile(
+                name="sample-file.jpg",
+                content=open(
+                    os.path.join(
+                        settings.BASE_DIR,
+                        "peerinst/static/peerinst/img/SALTISE-badge.png",
+                    ),
+                    "rb",
+                ).read(),
+            ),
+        },
+    )
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_create_image_svg(client, teacher):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-question-create-update-list")
+    response = client.post(
+        url,
+        data={
+            "text": fake.paragraph(),
+            "title": fake.sentence(),
+            "image": SimpleUploadedFile(
+                name="sample-file.jpg",
+                content=open(
+                    os.path.join(
+                        settings.BASE_DIR,
+                        "peerinst/static/peerinst/img/thumbs-up.svg",
+                    ),
+                    "rb",
+                ).read(),
+            ),
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST

@@ -7,6 +7,7 @@ from django.db.models import Max
 from django.urls import reverse
 from django.utils import timezone
 from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
+from PIL import Image
 from rest_framework import serializers
 
 from peerinst.documents import CategoryDocument
@@ -92,6 +93,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     )
     flag_reasons = serializers.ReadOnlyField()
     frequency = serializers.SerializerMethodField()
+    image = serializers.ImageField()
     is_editable = serializers.SerializerMethodField()
     is_not_flagged = serializers.ReadOnlyField()
     is_not_missing_answer_choices = serializers.ReadOnlyField()
@@ -172,6 +174,26 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "matrix": reverse("REST:question-matrix", args=(obj.pk,)),
             "rationales": reverse("REST:question-rationales", args=(obj.pk,)),
         }
+
+    def validate_image(self, value):
+        ALLOWED_IMAGE_FORMATS = ["PNG", "GIF", "JPEG"]
+        ALLOWED_IMAGE_SIZE = 1e6
+        with Image.open(value, formats=ALLOWED_IMAGE_FORMATS) as image:
+            image.load()
+
+            if image.format not in ALLOWED_IMAGE_FORMATS:
+                raise serializers.ValidationError(
+                    "Invalid image file format.  Allowed formats are "
+                    + ", ".join(ALLOWED_IMAGE_FORMATS)
+                    + "."
+                )
+
+            if value.size > ALLOWED_IMAGE_SIZE:
+                raise serializers.ValidationError(
+                    f"Invalid image file size.  Max size is {ALLOWED_IMAGE_SIZE/1e6} MB"
+                )
+
+        return value
 
     def create(self, validated_data):
         """Attach user"""
