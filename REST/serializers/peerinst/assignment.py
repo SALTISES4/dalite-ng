@@ -93,7 +93,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     )
     flag_reasons = serializers.ReadOnlyField()
     frequency = serializers.SerializerMethodField()
-    image = serializers.ImageField()
+    image = serializers.ImageField(required=False)
     is_editable = serializers.SerializerMethodField()
     is_not_flagged = serializers.ReadOnlyField()
     is_not_missing_answer_choices = serializers.ReadOnlyField()
