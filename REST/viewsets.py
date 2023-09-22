@@ -17,8 +17,15 @@ class TeacherCreateUpdateViewSet(
     GenericViewSet,
 ):
     """
+    - No list √
+    - No PUT √
+    - No DELETE √
+    - Login required √
+    - Teacher required √
+
     TODO: Consider if we need a TOS check
     """
 
     permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
+    http_method_names = ["get", "post", "patch"]

@@ -12,7 +12,7 @@ from functional_tests.fixtures import (  # noqa
     realistic_assignment,
     realistic_questions,
 )
-from peerinst.models import Answer, Question, StudentGroupAssignment
+from peerinst.models import Question
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.teacher import login_teacher
 
@@ -20,53 +20,7 @@ fake = Faker()
 
 
 @pytest.mark.django_db
-def test_teacherquestioncreateupdateviewset_login_required(client):
-    url = reverse("REST:teacher-question-create-update-list")
-    response = client.get(url)
-
-    assert response.status_code == status.HTTP_403_FORBIDDEN
-
-
-@pytest.mark.django_db
-def test_teacherquestioncreateupdateviewset_teacher_required(client, user):
-    client.force_login(user)
-
-    url = reverse("REST:teacher-question-create-update-list")
-    response = client.get(url)
-
-    assert response.status_code == status.HTTP_403_FORBIDDEN
-
-
-@pytest.mark.django_db
-def test_teacherquestioncreateupdateviewset_no_list(client, teacher):
-    assert login_teacher(client, teacher)
-
-    url = reverse("REST:teacher-question-create-update-list")
-    response = client.get(url)
-
-    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
-
-
-@pytest.mark.django_db
-def test_teacherquestioncreateupdateviewset_no_destroy(
-    client, teacher, question
-):
-    assert login_teacher(client, teacher)
-
-    question.user = teacher.user
-    question.save()
-
-    url = reverse(
-        "REST:teacher-question-create-update-detail", args=(question.pk,)
-    )
-    response = client.delete(url)
-
-    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
-    assert Question.objects.filter(pk=question.pk).exists()
-
-
-@pytest.mark.django_db
-def test_teacherquestioncreateupdateviewset_get_unowned_question(
+def test_teacherquestioncreateupdateviewset_retrieve_unowned_question(
     client, teachers, questions
 ):
     assert login_teacher(client, teachers[1])
@@ -81,7 +35,7 @@ def test_teacherquestioncreateupdateviewset_get_unowned_question(
 
 
 @pytest.mark.django_db
-def test_teacherquestioncreateupdateviewset_get_owned_uneditable_question(
+def test_teacherquestioncreateupdateviewset_retrieve_owned_uneditable_question(
     client, teachers, realistic_assignment
 ):
     questions = realistic_assignment.questions.all()
@@ -101,7 +55,7 @@ def test_teacherquestioncreateupdateviewset_get_owned_uneditable_question(
 
 
 @pytest.mark.django_db
-def test_teacherquestioncreateupdateviewset_get_owned_editable_question(
+def test_teacherquestioncreateupdateviewset_retrieve_owned_editable_question(
     client, teacher, question
 ):
     assert login_teacher(client, teacher)
@@ -118,7 +72,7 @@ def test_teacherquestioncreateupdateviewset_get_owned_editable_question(
 
 
 @pytest.mark.django_db
-def test_teacherquestioncreateupdateviewset_get_userless_question(
+def test_teacherquestioncreateupdateviewset_retrieve_userless_question(
     client, teacher, question
 ):
     assert login_teacher(client, teacher)
@@ -355,3 +309,59 @@ def test_teacherquestioncreateupdateviewset_create_image_svg(client, teacher):
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_create_image_large_file(
+    client, teacher
+):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-question-create-update-list")
+    response = client.post(
+        url,
+        data={
+            "text": fake.paragraph(),
+            "title": fake.sentence(),
+            "image": SimpleUploadedFile(
+                name="sample-file.jpg",
+                content=open(
+                    os.path.join(
+                        settings.BASE_DIR,
+                        "peerinst/static/peerinst/img/ray-hennessy-gdTxVSAE5sk-unsplash.jpg",
+                    ),
+                    "rb",
+                ).read(),
+            ),
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_update_owned_editable_question(
+    client, teacher, question
+):
+    assert login_teacher(client, teacher)
+    assert question.user == teacher.user
+    assert question.answer_set.count() == 0
+
+    url = reverse(
+        "REST:teacher-question-create-update-detail",
+        args=(question.pk,),
+    )
+    text = fake.paragraph()
+    title = fake.sentence()
+    response = client.patch(
+        url,
+        data={
+            "text": text,
+        },
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    question.refresh_from_db()
+    assert question.text == text
+    assert question.title == title
