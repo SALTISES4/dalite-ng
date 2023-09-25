@@ -9,7 +9,7 @@ bleach
 celery[redis]
 certifi >= 2023.07.22
 # contextualSpellCheck # [2]
-django < 3.3, >=3.2.19
+django < 3.3, >=3.2.21
 django-analytical
 django-axes
 django-celery-beat
