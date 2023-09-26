@@ -6,6 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Max
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from PIL import Image
 from rest_framework import serializers
@@ -13,6 +14,7 @@ from rest_framework import serializers
 from peerinst.documents import CategoryDocument
 from peerinst.models import (
     Answer,
+    AnswerChoice,
     Assignment,
     AssignmentQuestions,
     Category,
@@ -31,27 +33,27 @@ logger = logging.getLogger("REST")
 
 
 class CategorySerializer(DocumentSerializer):
+    def to_representation(self, instance):
+        """Bleach on the way out"""
+        ret = super().to_representation(instance)
+        ret["title"] = bleach.clean(ret["title"], tags=[], strip=True).strip()
+        return ret
+
     class Meta:
         document = CategoryDocument
         fields = ["title"]
 
+
+class DisciplineSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
-        """Bleach"""
+        """Bleach on the way out"""
         ret = super().to_representation(instance)
         ret["title"] = bleach.clean(ret["title"], tags=[], strip=True).strip()
         return ret
 
-
-class DisciplineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discipline
         fields = ["title", "pk"]
-
-    def to_representation(self, instance):
-        """Bleach"""
-        ret = super().to_representation(instance)
-        ret["title"] = bleach.clean(ret["title"], tags=[], strip=True).strip()
-        return ret
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -60,9 +62,34 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["username"]
 
 
+class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
+    def to_internal_value(self, data):
+        """Bleached in model save()"""
+        return super().to_internal_value(data)
+
+    def to_representation(self, instance):
+        """Bleach on the way out"""
+        ret = super().to_representation(instance)
+        if "text" in ret and ret["text"]:
+            ret["text"] = bleach.clean(
+                ret["text"], tags=ALLOWED_TAGS, strip=True
+            ).strip()
+        return ret
+
+    class Meta:
+        model = AnswerChoice
+        fields = [
+            "correct",
+            "question",
+            "text",
+        ]
+
+
 class QuestionSerializer(DynamicFieldsModelSerializer):
     answer_count = serializers.ReadOnlyField()
-    answerchoice_set = serializers.SerializerMethodField()
+    answerchoice_set = AnswerChoiceSerializer(
+        fields=["correct", "text"], many=True
+    )
     assignment_count = serializers.ReadOnlyField()
     category = CategorySerializer(many=True, read_only=True)
     category_pk = serializers.SlugRelatedField(
@@ -92,7 +119,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         required=False,
     )
     flag_reasons = serializers.ReadOnlyField()
-    frequency = serializers.SerializerMethodField()
+    frequency = serializers.ReadOnlyField(source="get_frequency")
     image = serializers.ImageField(required=False)
     is_editable = serializers.SerializerMethodField()
     is_not_flagged = serializers.ReadOnlyField()
@@ -101,32 +128,17 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     is_not_missing_sample_answers = serializers.ReadOnlyField()
     is_owner = serializers.SerializerMethodField()
     is_valid = serializers.ReadOnlyField()
-    matrix = serializers.SerializerMethodField()
-    most_convincing_rationales = serializers.SerializerMethodField()
+    matrix = serializers.ReadOnlyField(source="get_matrix")
+    most_convincing_rationales = serializers.ReadOnlyField(
+        source="get_most_convincing_rationales"
+    )
     peer_impact = serializers.SerializerMethodField()
     urls = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
 
-    def get_answerchoice_set(self, obj):
-        return [
-            {
-                "correct": obj.is_correct(i),
-                "label": ac[0],
-                "text": bleach.clean(
-                    ac[1],
-                    tags=ALLOWED_TAGS,
-                    strip=True,
-                ).strip(),
-            }
-            for i, ac in enumerate(obj.get_choices(), 1)
-        ]
-
     def get_difficulty(self, obj):
         d = obj.get_difficulty()
         return {"score": d[0], "label": d[1], "value": d[2]}
-
-    def get_frequency(self, obj):
-        return obj.get_frequency()
 
     def get_is_editable(self, obj):
         if "request" in self.context:
@@ -143,12 +155,6 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                 or self.context["request"].user in obj.collaborators.all()
             )
         return False
-
-    def get_matrix(self, obj):
-        return obj.get_matrix()
-
-    def get_most_convincing_rationales(self, obj):
-        return obj.get_most_convincing_rationales()
 
     def get_peer_impact(self, obj):
         pi = obj.get_peer_impact()
@@ -196,11 +202,36 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         return value
 
     def create(self, validated_data):
-        """Attach user"""
+        answerchoice_data = validated_data.pop("answerchoice_set")
+
+        """Create question and attach user"""
         question = super().create(validated_data)
         question.user = self.context["request"].user
         question.save()
+
+        """Create answer choices and attach question"""
+        [
+            AnswerChoice.objects.create(question=question, **data)
+            for data in answerchoice_data
+        ]
+
+        """Create expert rationales for each correct answer choice"""
+
         return question
+
+    def validate_answerchoice_set(self, value):
+        """
+        Check at least one answer choice is marked correct
+        """
+        if sum(x["correct"] for x in value) == 0:
+            raise serializers.ValidationError(
+                _("At least one answer choice must be correct")
+            )
+        return value
+
+    def to_internal_value(self, data):
+        """Bleached in model save()"""
+        return super().to_internal_value(data)
 
     def to_representation(self, instance):
         """Bleach on the way out"""
@@ -213,6 +244,11 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             ret["text"] = bleach.clean(
                 ret["text"], tags=ALLOWED_TAGS, strip=True
             ).strip()
+
+        """Add answer_choice labels"""
+        if "answerchoice_set" in ret and ret["answerchoice_set"]:
+            for i, ac in enumerate(ret["answerchoice_set"], 1):
+                ac.update(label=instance.get_choice_label(i))
         return ret
 
     class Meta:

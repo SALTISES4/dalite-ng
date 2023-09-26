@@ -100,10 +100,14 @@ def test_teacherquestioncreateupdateviewset_create_attaches_user(
     title = fake.sentence()
     response = client.post(
         url,
-        {
+        data={
             "text": fake.paragraph(),
             "title": title,
+            "answerchoice_set": [
+                {"correct": True, "text": fake.sentence()},
+            ],
         },
+        content_type="application/json",
     )
 
     assert response.status_code == status.HTTP_201_CREATED
@@ -119,10 +123,14 @@ def test_teacherquestioncreateupdateviewset_create_text_bleached(
     url = reverse("REST:teacher-question-create-update-list")
     response = client.post(
         url,
-        {
+        data={
             "text": "<script>This is a forbidden tag</script>",
             "title": fake.sentence(),
+            "answerchoice_set": [
+                {"correct": True, "text": fake.sentence()},
+            ],
         },
+        content_type="application/json",
     )
     data = json.loads(response.content)
 
@@ -139,10 +147,14 @@ def test_teacherquestioncreateupdateviewset_create_text_required(
     url = reverse("REST:teacher-question-create-update-list")
     response = client.post(
         url,
-        {
+        data={
             "text": "",
             "title": fake.sentence(),
+            "answerchoice_set": [
+                {"correct": True, "text": fake.sentence()},
+            ],
         },
+        content_type="application/json",
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -157,10 +169,14 @@ def test_teacherquestioncreateupdateviewset_create_title_bleached(
     url = reverse("REST:teacher-question-create-update-list")
     response = client.post(
         url,
-        {
+        data={
             "text": fake.paragraph(),
             "title": "<script>This is a forbidden tag</script>",
+            "answerchoice_set": [
+                {"correct": True, "text": fake.sentence()},
+            ],
         },
+        content_type="application/json",
     )
     data = json.loads(response.content)
 
@@ -179,10 +195,14 @@ def test_teacherquestioncreateupdateviewset_create_title_required(
     url = reverse("REST:teacher-question-create-update-list")
     response = client.post(
         url,
-        {
+        data={
             "text": text,
             "title": "",
+            "answerchoice_set": [
+                {"correct": True, "text": fake.sentence()},
+            ],
         },
+        content_type="application/json",
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -197,11 +217,15 @@ def test_teacherquestioncreateupdateviewset_create_with_categories(
     url = reverse("REST:teacher-question-create-update-list")
     response = client.post(
         url,
-        {
+        data={
             "category_pk": [category.title],
             "text": fake.paragraph(),
             "title": fake.sentence(),
+            "answerchoice_set": [
+                {"correct": True, "text": fake.sentence()},
+            ],
         },
+        content_type="application/json",
     )
     data = json.loads(response.content)
 
@@ -218,16 +242,19 @@ def test_teacherquestioncreateupdateviewset_create_with_discipline(
     url = reverse("REST:teacher-question-create-update-list")
     response = client.post(
         url,
-        {
+        data={
             "discipline_pk": discipline.pk,
             "text": fake.paragraph(),
             "title": fake.sentence(),
+            "answerchoice_set": [
+                {"correct": True, "text": fake.sentence()},
+            ],
         },
+        content_type="application/json",
     )
-    data = json.loads(response.content)
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert discipline.title == data["discipline"]["title"]
+    assert discipline.title == response.data["discipline"]["title"]
 
 
 @pytest.mark.django_db
@@ -239,14 +266,18 @@ def test_teacherquestioncreateupdateviewset_create_with_collaborators(
     url = reverse("REST:teacher-question-create-update-list")
     response = client.post(
         url,
-        {
+        data={
             "collaborators_pk": [
                 teachers[1].user.username,
                 teachers[2].user.username,
             ],
             "text": fake.paragraph(),
             "title": fake.sentence(),
+            "answerchoice_set": [
+                {"correct": True, "text": fake.sentence()},
+            ],
         },
+        content_type="application/json",
     )
     data = json.loads(response.content)
 
@@ -279,6 +310,8 @@ def test_teacherquestioncreateupdateviewset_create_image_png(client, teacher):
                     "rb",
                 ).read(),
             ),
+            "answerchoice_set[0]correct": True,
+            "answerchoice_set[0]text": fake.sentence(),
         },
     )
 
@@ -305,6 +338,8 @@ def test_teacherquestioncreateupdateviewset_create_image_svg(client, teacher):
                     "rb",
                 ).read(),
             ),
+            "answerchoice_set[0]correct": True,
+            "answerchoice_set[0]text": fake.sentence(),
         },
     )
 
@@ -333,6 +368,8 @@ def test_teacherquestioncreateupdateviewset_create_image_large_file(
                     "rb",
                 ).read(),
             ),
+            "answerchoice_set[0]correct": True,
+            "answerchoice_set[0]text": fake.sentence(),
         },
     )
 
@@ -357,6 +394,7 @@ def test_teacherquestioncreateupdateviewset_update_owned_editable_question(
         url,
         data={
             "text": text,
+            "title": title,
         },
         content_type="application/json",
     )
@@ -365,3 +403,30 @@ def test_teacherquestioncreateupdateviewset_update_owned_editable_question(
     question.refresh_from_db()
     assert question.text == text
     assert question.title == title
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_create_answerchoices_none_correct(
+    client, teacher
+):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-question-create-update-list")
+
+    response = client.post(
+        url,
+        data={
+            "text": fake.paragraph(),
+            "title": fake.sentence(),
+            "answerchoice_set": [
+                {"correct": False, "text": fake.sentence()},
+            ],
+        },
+        content_type="application/json",
+    )
+
+    assert (
+        "At least one answer choice must be correct"
+        in response.data["answerchoice_set"]
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST

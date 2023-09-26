@@ -18,13 +18,13 @@ __all__ = [
 ]
 
 from .answer import (  # noqa
-    AnswerChoiceSerializer,
     AnswerSerializer,
     FeedbackReadSerialzer,
     FeedbackWriteSerialzer,
     StudentGroupAssignmentAnswerSerializer,
 )
 from .assignment import (  # noqa
+    AnswerChoiceSerializer,
     AssignmentSerializer,
     CategorySerializer,
     CollectionSerializer,
