@@ -363,9 +363,9 @@ daphne==4.0.0 \
     # via
     #   -r requirements/requirements-base.txt
     #   channels
-django==3.2.20 \
-    --hash=sha256:a477ab326ae7d8807dc25c186b951ab8c7648a3a23f9497763c37307a2b5ef87 \
-    --hash=sha256:dec2a116787b8e14962014bf78e120bba454135108e1af9e9b91ade7b2964c40
+django==3.2.21 \
+    --hash=sha256:a5de4c484e7b7418e6d3e52a5b8794f0e6b9f9e4ce3c037018cf1c489fa87f3c \
+    --hash=sha256:d31b06c58aa2cd73998ca5966bc3001243d3c4e77ee2d0c479bced124765fd99
     # via
     #   -r requirements/requirements-base.txt
     #   channels
@@ -1003,11 +1003,11 @@ s3transfer==0.6.2 \
     --hash=sha256:b014be3a8a2aab98cfe1abc7229cc5a9a0cf05eb9c1f2b86b230fd8df3f78084 \
     --hash=sha256:cab66d3380cca3e70939ef2255d01cd8aece6a4907a9528740f668c4b0611861
     # via boto3
-saltise-components==0.2.10 \
-    --hash=sha256:ca42b6c528972b33cd5bcd5967a787a950e19ca7a8f426e872bde3159837216a
-    # via -r requirements/requirements-prod-aws.in
-saltise-course-flow==0.8.9 \
-    --hash=sha256:34804b8bfecdfb0a7c0e5e1026db67b8c5fb88e465749ac5cca46606f5ff62ec
+saltise-components==0.2.11 \
+    --hash=sha256:7893fd4363aecfbcbedfe6b1fec9cf31751dd761419ca374e6c960ca6c22e26b
+    # via -r requirements/requirements-base.txt
+saltise-course-flow==0.8.10 \
+    --hash=sha256:3b8327a2fcc642544a15bd0970389fc02d819b6945ae94f426a2bcda529916b0
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==1.1.2 \
     --hash=sha256:c57647cb83ab8bcee43f2ddc5db586f5fc20db3fb9f7a6a09b9be01de2005303
