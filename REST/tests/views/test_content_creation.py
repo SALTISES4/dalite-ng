@@ -105,6 +105,7 @@ def test_teacherquestioncreateupdateviewset_create_attaches_user(
             "title": title,
             "answerchoice_set": [
                 {"correct": True, "text": fake.sentence()},
+                {"correct": False, "text": fake.sentence()},
             ],
         },
         content_type="application/json",
@@ -128,6 +129,7 @@ def test_teacherquestioncreateupdateviewset_create_text_bleached(
             "title": fake.sentence(),
             "answerchoice_set": [
                 {"correct": True, "text": fake.sentence()},
+                {"correct": False, "text": fake.sentence()},
             ],
         },
         content_type="application/json",
@@ -152,6 +154,7 @@ def test_teacherquestioncreateupdateviewset_create_text_required(
             "title": fake.sentence(),
             "answerchoice_set": [
                 {"correct": True, "text": fake.sentence()},
+                {"correct": False, "text": fake.sentence()},
             ],
         },
         content_type="application/json",
@@ -174,6 +177,7 @@ def test_teacherquestioncreateupdateviewset_create_title_bleached(
             "title": "<script>This is a forbidden tag</script>",
             "answerchoice_set": [
                 {"correct": True, "text": fake.sentence()},
+                {"correct": False, "text": fake.sentence()},
             ],
         },
         content_type="application/json",
@@ -200,6 +204,7 @@ def test_teacherquestioncreateupdateviewset_create_title_required(
             "title": "",
             "answerchoice_set": [
                 {"correct": True, "text": fake.sentence()},
+                {"correct": False, "text": fake.sentence()},
             ],
         },
         content_type="application/json",
@@ -223,6 +228,7 @@ def test_teacherquestioncreateupdateviewset_create_with_categories(
             "title": fake.sentence(),
             "answerchoice_set": [
                 {"correct": True, "text": fake.sentence()},
+                {"correct": False, "text": fake.sentence()},
             ],
         },
         content_type="application/json",
@@ -248,6 +254,7 @@ def test_teacherquestioncreateupdateviewset_create_with_discipline(
             "title": fake.sentence(),
             "answerchoice_set": [
                 {"correct": True, "text": fake.sentence()},
+                {"correct": False, "text": fake.sentence()},
             ],
         },
         content_type="application/json",
@@ -275,6 +282,7 @@ def test_teacherquestioncreateupdateviewset_create_with_collaborators(
             "title": fake.sentence(),
             "answerchoice_set": [
                 {"correct": True, "text": fake.sentence()},
+                {"correct": False, "text": fake.sentence()},
             ],
         },
         content_type="application/json",
@@ -312,6 +320,8 @@ def test_teacherquestioncreateupdateviewset_create_image_png(client, teacher):
             ),
             "answerchoice_set[0]correct": True,
             "answerchoice_set[0]text": fake.sentence(),
+            "answerchoice_set[1]correct": False,
+            "answerchoice_set[1]text": fake.sentence(),
         },
     )
 
@@ -340,6 +350,8 @@ def test_teacherquestioncreateupdateviewset_create_image_svg(client, teacher):
             ),
             "answerchoice_set[0]correct": True,
             "answerchoice_set[0]text": fake.sentence(),
+            "answerchoice_set[1]correct": False,
+            "answerchoice_set[1]text": fake.sentence(),
         },
     )
 
@@ -370,6 +382,8 @@ def test_teacherquestioncreateupdateviewset_create_image_large_file(
             ),
             "answerchoice_set[0]correct": True,
             "answerchoice_set[0]text": fake.sentence(),
+            "answerchoice_set[1]correct": False,
+            "answerchoice_set[1]text": fake.sentence(),
         },
     )
 
@@ -420,6 +434,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_none_correct(
             "title": fake.sentence(),
             "answerchoice_set": [
                 {"correct": False, "text": fake.sentence()},
+                {"correct": False, "text": fake.sentence()},
             ],
         },
         content_type="application/json",
@@ -427,6 +442,33 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_none_correct(
 
     assert (
         "At least one answer choice must be correct"
+        in response.data["answerchoice_set"]
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_create_answerchoices_less_than_2(
+    client, teacher
+):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-question-create-update-list")
+
+    response = client.post(
+        url,
+        data={
+            "text": fake.paragraph(),
+            "title": fake.sentence(),
+            "answerchoice_set": [
+                {"correct": True, "text": fake.sentence()},
+            ],
+        },
+        content_type="application/json",
+    )
+
+    assert (
+        "At least two answer choices are required"
         in response.data["answerchoice_set"]
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST

@@ -221,6 +221,13 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
     def validate_answerchoice_set(self, value):
         """
+        Check at least two answer choices
+        """
+        if len(value) < 2:
+            raise serializers.ValidationError(
+                _("At least two answer choices are required")
+            )
+        """
         Check at least one answer choice is marked correct
         """
         if sum(x["correct"] for x in value) == 0:
