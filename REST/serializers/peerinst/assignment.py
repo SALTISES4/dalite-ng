@@ -62,10 +62,28 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["username"]
 
 
+class SampleAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = [
+            "expert",
+            "rationale",
+        ]
+
+
 class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
-    def to_internal_value(self, data):
-        """Bleached in model save()"""
-        return super().to_internal_value(data)
+    expert_answer = SampleAnswerSerializer(required=False, write_only=True)
+    sample_answer = SampleAnswerSerializer(write_only=True)
+
+    def validate(self, data):
+        """
+        Check correct answer choices have an expert rationale
+        """
+        if data["correct"] and "expert_answer" not in data:
+            raise serializers.ValidationError(
+                _("An expert rationale is required for each correct answer")
+            )
+        return data
 
     def to_representation(self, instance):
         """Bleach on the way out"""
@@ -80,7 +98,9 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
         model = AnswerChoice
         fields = [
             "correct",
+            "expert_answer",
             "question",
+            "sample_answer",
             "text",
         ]
 
@@ -88,7 +108,7 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
 class QuestionSerializer(DynamicFieldsModelSerializer):
     answer_count = serializers.ReadOnlyField()
     answerchoice_set = AnswerChoiceSerializer(
-        fields=["correct", "text"], many=True
+        fields=["correct", "expert_answer", "sample_answer", "text"], many=True
     )
     assignment_count = serializers.ReadOnlyField()
     category = CategorySerializer(many=True, read_only=True)
@@ -209,13 +229,27 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         question.user = self.context["request"].user
         question.save()
 
-        """Create answer choices and attach question"""
-        [
-            AnswerChoice.objects.create(question=question, **data)
-            for data in answerchoice_data
-        ]
+        """Create answer choices, sample answers and expert rationales"""
+        for i, data in enumerate(answerchoice_data, 1):
+            sample_answer = data.pop("sample_answer")
+            expert_answer = None
+            if "expert_answer" in data:
+                expert_answer = data.pop("expert_answer")
 
-        """Create expert rationales for each correct answer choice"""
+            AnswerChoice.objects.create(question=question, **data)
+            Answer.objects.create(
+                expert=False,
+                first_answer_choice=i,
+                question=question,
+                rationale=sample_answer["rationale"],
+            )
+            if expert_answer:
+                Answer.objects.create(
+                    expert=True,
+                    first_answer_choice=i,
+                    question=question,
+                    rationale=expert_answer["rationale"],
+                )
 
         return question
 
@@ -227,6 +261,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             raise serializers.ValidationError(
                 _("At least two answer choices are required")
             )
+
         """
         Check at least one answer choice is marked correct
         """
