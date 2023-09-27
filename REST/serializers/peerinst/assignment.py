@@ -221,6 +221,16 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
         return value
 
+    def validate_text(self, value):
+        """
+        Field is already bleached and trimmed
+        - strip remaining tags and check text length
+        """
+        text = bleach.clean(value, tags=[], strip=True)
+        if len(text) > 8000:
+            raise serializers.ValidationError(_("Text too long"))
+        return value
+
     def create(self, validated_data):
         answerchoice_data = validated_data.pop("answerchoice_set")
 
@@ -272,8 +282,14 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         return value
 
     def to_internal_value(self, data):
-        """Bleached in model save()"""
-        return super().to_internal_value(data)
+        """Bleach on the way in"""
+        ret = super().to_internal_value(data)
+        for field in ["title", "text"]:
+            if field in ret and ret[field]:
+                ret[field] = bleach.clean(
+                    ret[field], tags=ALLOWED_TAGS, strip=True
+                ).strip()
+        return ret
 
     def to_representation(self, instance):
         """Bleach on the way out"""

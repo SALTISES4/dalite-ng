@@ -191,6 +191,39 @@ def test_teacherquestioncreateupdateviewset_create_text_required(
 
 
 @pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_create_text_too_long(
+    client, teacher
+):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-question-create-update-list")
+    response = client.post(
+        url,
+        data={
+            "text": fake.text(9000),
+            "title": fake.sentence(),
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answer": {"rationale": fake.paragraph()},
+                    "sample_answer": {"rationale": fake.paragraph()},
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answer": {"rationale": fake.paragraph()},
+                },
+            ],
+        },
+        content_type="application/json",
+    )
+
+    assert "Text too long" in response.data["text"]
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
 def test_teacherquestioncreateupdateviewset_create_title_bleached(
     client, teacher
 ):
