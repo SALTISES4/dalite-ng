@@ -685,3 +685,44 @@ def test_teacherquestioncreateupdateviewset_create_check_sample_and_expert(
     assert sample_answer_1.rationale == sample_rationale_1
     assert sample_answer_2.rationale == sample_rationale_2
     assert expert_answer.rationale == expert_rationale_1
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_create_answer_rationale_too_long(
+    client, teacher
+):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-question-create-update-list")
+
+    response = client.post(
+        url,
+        data={
+            "text": fake.paragraph(),
+            "title": fake.sentence(),
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answer": {"rationale": fake.text(5000)},
+                    "sample_answer": {"rationale": fake.paragraph()},
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answer": {"rationale": fake.text(5000)},
+                },
+            ],
+        },
+        content_type="application/json",
+    )
+
+    assert (
+        "Rationale text too long"
+        in response.data["answerchoice_set"][0]["expert_answer"]["rationale"]
+    )
+    assert (
+        "Rationale text too long"
+        in response.data["answerchoice_set"][1]["sample_answer"]["rationale"]
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST

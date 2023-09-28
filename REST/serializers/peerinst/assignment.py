@@ -24,7 +24,7 @@ from peerinst.models import (
     StudentGroup,
     StudentGroupAssignment,
 )
-from peerinst.templatetags.bleach_html import ALLOWED_TAGS
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS, STRICT_TAGS
 
 from .dynamic_serializer import DynamicFieldsModelSerializer
 from .student_group import StudentGroupSerializer
@@ -63,6 +63,23 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SampleAnswerSerializer(serializers.ModelSerializer):
+    def validate_rationale(self, value):
+        """
+        Check rationale <= 4000 characters
+        """
+        if len(value) > 4000:
+            raise serializers.ValidationError(_("Rationale text too long"))
+        return value
+
+    def to_representation(self, instance):
+        """Bleach on the way out"""
+        ret = super().to_representation(instance)
+        if "rationale" in ret and ret["rationale"]:
+            ret["rationale"] = bleach.clean(
+                ret["rationale"], tags=STRICT_TAGS, strip=True
+            ).strip()
+        return ret
+
     class Meta:
         model = Answer
         fields = [
@@ -201,6 +218,24 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "rationales": reverse("REST:question-rationales", args=(obj.pk,)),
         }
 
+    def validate_answerchoice_set(self, value):
+        """
+        Check at least two answer choices
+        """
+        if len(value) < 2:
+            raise serializers.ValidationError(
+                _("At least two answer choices are required")
+            )
+
+        """
+        Check at least one answer choice is marked correct
+        """
+        if sum(x["correct"] for x in value) == 0:
+            raise serializers.ValidationError(
+                _("At least one answer choice must be correct")
+            )
+        return value
+
     def validate_image(self, value):
         ALLOWED_IMAGE_FORMATS = ["PNG", "GIF", "JPEG"]
         ALLOWED_IMAGE_SIZE = 1e6
@@ -223,10 +258,9 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
     def validate_text(self, value):
         """
-        Field is already bleached and trimmed
-        - strip remaining tags and check text length
+        Check stripped text length <= 8000
         """
-        text = bleach.clean(value, tags=[], strip=True)
+        text = bleach.clean(value, tags=[], strip=True).strip()
         if len(text) > 8000:
             raise serializers.ValidationError(_("Text too long"))
         return value
@@ -262,34 +296,6 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                 )
 
         return question
-
-    def validate_answerchoice_set(self, value):
-        """
-        Check at least two answer choices
-        """
-        if len(value) < 2:
-            raise serializers.ValidationError(
-                _("At least two answer choices are required")
-            )
-
-        """
-        Check at least one answer choice is marked correct
-        """
-        if sum(x["correct"] for x in value) == 0:
-            raise serializers.ValidationError(
-                _("At least one answer choice must be correct")
-            )
-        return value
-
-    def to_internal_value(self, data):
-        """Bleach on the way in"""
-        ret = super().to_internal_value(data)
-        for field in ["title", "text"]:
-            if field in ret and ret[field]:
-                ret[field] = bleach.clean(
-                    ret[field], tags=ALLOWED_TAGS, strip=True
-                ).strip()
-        return ret
 
     def to_representation(self, instance):
         """Bleach on the way out"""

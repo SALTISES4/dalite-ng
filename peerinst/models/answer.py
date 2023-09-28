@@ -5,16 +5,13 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from peerinst.templatetags.bleach_html import ALLOWED_TAGS
+from peerinst.models import Assignment, GradingScheme, Question
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS, STRICT_TAGS
 from quality.models import Quality
-
-from .assignment import Assignment
-from .question import GradingScheme, Question
 
 
 class AnswerMayShowManager(models.Manager):
     def get_queryset(self):
-
         return (
             super()
             .get_queryset()
@@ -124,6 +121,12 @@ class Answer(models.Model):
         )
 
     def save(self, *args, **kwargs):
+        """Bleach"""
+        self.rationale = bleach.clean(
+            self.text,
+            tags=STRICT_TAGS,
+            strip=True,
+        ).strip()
         super().save(*args, **kwargs)
 
     def show_chosen_rationale(self):
@@ -315,7 +318,7 @@ class RationaleOnlyQuestion(Question):
         return
 
     def get_start_form_class(self):
-        from ..forms import RationaleOnlyForm
+        from peerinst.forms import RationaleOnlyForm
 
         return RationaleOnlyForm
 
