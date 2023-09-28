@@ -5,9 +5,11 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from peerinst.models import Assignment, GradingScheme, Question
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS, STRICT_TAGS
 from quality.models import Quality
+
+from .assignment import Assignment
+from .question import GradingScheme, Question
 
 
 class AnswerMayShowManager(models.Manager):
