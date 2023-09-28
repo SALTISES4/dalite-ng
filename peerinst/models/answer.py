@@ -125,7 +125,7 @@ class Answer(models.Model):
     def save(self, *args, **kwargs):
         """Bleach"""
         self.rationale = bleach.clean(
-            self.text,
+            self.rationale,
             tags=STRICT_TAGS,
             strip=True,
         ).strip()
