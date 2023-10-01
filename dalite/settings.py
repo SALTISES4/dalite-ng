@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     "REST",
     "teacher",
     "django_elasticsearch_dsl",
+    "django_elasticsearch_dsl_drf",
     "lti_provider",
     "tinymce",
     "csp",
@@ -205,7 +206,6 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ]
 }
-
 
 # Channels
 ASGI_APPLICATION = "dalite.routing.application"

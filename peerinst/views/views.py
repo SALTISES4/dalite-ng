@@ -114,7 +114,6 @@ logger_auth = logging.getLogger("peerinst-auth")
 # Views related to Auth
 @require_safe
 def landing_page(request):
-
     disciplines = {}
 
     disciplines["All"] = {}
@@ -304,7 +303,6 @@ def access_denied_and_logout(request):
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
 @user_passes_test(lambda u: hasattr(u, "teacher"))  # Teacher is required
 def browse_database(request):
-
     return TemplateResponse(
         request,
         "peerinst/browse_database.html",
@@ -723,7 +721,6 @@ def answer_choice_form(request, question_id):
 
     # Check permissions
     if request.user.has_perm("peerinst.change_question", question):
-
         # Check if student answers exist
         if not question.is_editable:
             return TemplateResponse(
@@ -929,7 +926,6 @@ class QuestionMixin:
         return context
 
     def send_grade(self):
-
         if not self.request.session.get("access_type") == StudentGroup.LTI:
             # We are running outside of a basic LTI context, so we don't need to
             # send a grade.
@@ -1201,7 +1197,6 @@ class QuestionReviewBaseView(QuestionFormView):
 
 
 class QuestionSequentialReviewView(QuestionReviewBaseView):
-
     template_name = "peerinst/question/sequential_review.html"
     form_class = forms.SequentialReviewForm
 
@@ -1709,7 +1704,6 @@ class TeacherBase(LoginRequiredMixin, NoStudentsMixin, View):
             self.request.user
             == get_object_or_404(models.Teacher, pk=kwargs["pk"]).user
         ):
-
             # Check for any TOS
             if Consent.get(self.request.user.username, "teacher") is None:
                 return HttpResponseRedirect(
@@ -1968,7 +1962,6 @@ class TeacherGroups(TeacherBase, ListView):
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
 def teacher_toggle_favourite(request):
-
     if request.is_ajax():
         # Ajax only
         question = get_object_or_404(Question, pk=request.POST.get("pk"))
@@ -2063,7 +2056,6 @@ def collection_unassign(request):
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
 def student_activity(request):
-
     teacher = request.user.teacher
 
     all_answers_by_group, json_data = get_student_activity_data(
@@ -2173,7 +2165,6 @@ def collection_search(request):
 
 
 def collection_search_function(search_string, pre_filtered_list=None):
-
     return pre_filtered_list.filter(
         Q(title__icontains=search_string)
         | Q(description__icontains=search_string)
@@ -2345,7 +2336,6 @@ def question_search_beta(request, page=0):
 
 
 def question_search(request):
-
     start = time.perf_counter()
 
     if not Teacher.objects.filter(user=request.user).exists():

@@ -1,1 +1,3 @@
 djangorestframework
+django-elasticsearch-dsl-drf
+django-filter

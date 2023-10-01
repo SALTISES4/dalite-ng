@@ -6,10 +6,15 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Max
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
+from PIL import Image
 from rest_framework import serializers
 
+from peerinst.documents import CategoryDocument
 from peerinst.models import (
     Answer,
+    AnswerChoice,
     Assignment,
     AssignmentQuestions,
     Category,
@@ -19,7 +24,7 @@ from peerinst.models import (
     StudentGroup,
     StudentGroupAssignment,
 )
-from peerinst.templatetags.bleach_html import ALLOWED_TAGS
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS, STRICT_TAGS
 
 from .dynamic_serializer import DynamicFieldsModelSerializer
 from .student_group import StudentGroupSerializer
@@ -27,28 +32,28 @@ from .student_group import StudentGroupSerializer
 logger = logging.getLogger("REST")
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ["title"]
-
+class CategorySerializer(DocumentSerializer):
     def to_representation(self, instance):
-        """Bleach"""
+        """Bleach on the way out"""
         ret = super().to_representation(instance)
         ret["title"] = bleach.clean(ret["title"], tags=[], strip=True).strip()
         return ret
+
+    class Meta:
+        document = CategoryDocument
+        fields = ["title"]
 
 
 class DisciplineSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Discipline
-        fields = ["title", "pk"]
-
     def to_representation(self, instance):
-        """Bleach"""
+        """Bleach on the way out"""
         ret = super().to_representation(instance)
         ret["title"] = bleach.clean(ret["title"], tags=[], strip=True).strip()
         return ret
+
+    class Meta:
+        model = Discipline
+        fields = ["title", "pk"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -57,16 +62,102 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["username"]
 
 
+class SampleAnswerSerializer(serializers.ModelSerializer):
+    def validate_rationale(self, value):
+        """
+        Check rationale <= 4000 characters
+        """
+        if len(value) > 4000:
+            raise serializers.ValidationError(_("Rationale text too long"))
+        return value
+
+    def to_representation(self, instance):
+        """Bleach on the way out"""
+        ret = super().to_representation(instance)
+        if "rationale" in ret and ret["rationale"]:
+            ret["rationale"] = bleach.clean(
+                ret["rationale"], tags=STRICT_TAGS, strip=True
+            ).strip()
+        return ret
+
+    class Meta:
+        model = Answer
+        fields = [
+            "expert",
+            "rationale",
+        ]
+
+
+class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
+    expert_answer = SampleAnswerSerializer(required=False, write_only=True)
+    sample_answer = SampleAnswerSerializer(write_only=True)
+
+    def validate(self, data):
+        """
+        Check correct answer choices have an expert rationale
+        """
+        if data["correct"] and "expert_answer" not in data:
+            raise serializers.ValidationError(
+                _("An expert rationale is required for each correct answer")
+            )
+        return data
+
+    def to_representation(self, instance):
+        """Bleach on the way out"""
+        ret = super().to_representation(instance)
+        if "text" in ret and ret["text"]:
+            ret["text"] = bleach.clean(
+                ret["text"], tags=ALLOWED_TAGS, strip=True
+            ).strip()
+        return ret
+
+    class Meta:
+        model = AnswerChoice
+        fields = [
+            "correct",
+            "expert_answer",
+            "question",
+            "sample_answer",
+            "text",
+        ]
+
+
 class QuestionSerializer(DynamicFieldsModelSerializer):
     answer_count = serializers.ReadOnlyField()
-    answerchoice_set = serializers.SerializerMethodField()
+    answerchoice_set = AnswerChoiceSerializer(
+        fields=["correct", "expert_answer", "sample_answer", "text"], many=True
+    )
     assignment_count = serializers.ReadOnlyField()
     category = CategorySerializer(many=True, read_only=True)
+    category_pk = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field="title",
+        many=True,
+        source="category",
+        allow_null=True,
+        required=False,
+    )
     collaborators = UserSerializer(many=True, read_only=True)
+    collaborators_pk = serializers.SlugRelatedField(
+        queryset=User.objects.filter(teacher__isnull=False),
+        slug_field="username",
+        many=True,
+        source="collaborators",
+        allow_null=True,
+        required=False,
+    )
     difficulty = serializers.SerializerMethodField()
     discipline = DisciplineSerializer(read_only=True)
+    discipline_pk = serializers.PrimaryKeyRelatedField(
+        queryset=Discipline.objects.all(),
+        many=False,
+        source="discipline",
+        allow_null=True,
+        required=False,
+    )
     flag_reasons = serializers.ReadOnlyField()
-    frequency = serializers.SerializerMethodField()
+    frequency = serializers.ReadOnlyField(source="get_frequency")
+    image = serializers.ImageField(required=False)
     is_editable = serializers.SerializerMethodField()
     is_not_flagged = serializers.ReadOnlyField()
     is_not_missing_answer_choices = serializers.ReadOnlyField()
@@ -74,32 +165,17 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     is_not_missing_sample_answers = serializers.ReadOnlyField()
     is_owner = serializers.SerializerMethodField()
     is_valid = serializers.ReadOnlyField()
-    matrix = serializers.SerializerMethodField()
-    most_convincing_rationales = serializers.SerializerMethodField()
+    matrix = serializers.ReadOnlyField(source="get_matrix")
+    most_convincing_rationales = serializers.ReadOnlyField(
+        source="get_most_convincing_rationales"
+    )
     peer_impact = serializers.SerializerMethodField()
     urls = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
 
-    def get_answerchoice_set(self, obj):
-        return [
-            {
-                "correct": obj.is_correct(i),
-                "label": ac[0],
-                "text": bleach.clean(
-                    ac[1],
-                    tags=ALLOWED_TAGS,
-                    strip=True,
-                ).strip(),
-            }
-            for i, ac in enumerate(obj.get_choices(), 1)
-        ]
-
     def get_difficulty(self, obj):
         d = obj.get_difficulty()
         return {"score": d[0], "label": d[1], "value": d[2]}
-
-    def get_frequency(self, obj):
-        return obj.get_frequency()
 
     def get_is_editable(self, obj):
         if "request" in self.context:
@@ -116,12 +192,6 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                 or self.context["request"].user in obj.collaborators.all()
             )
         return False
-
-    def get_matrix(self, obj):
-        return obj.get_matrix()
-
-    def get_most_convincing_rationales(self, obj):
-        return obj.get_most_convincing_rationales()
 
     def get_peer_impact(self, obj):
         pi = obj.get_peer_impact()
@@ -148,11 +218,83 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "rationales": reverse("REST:question-rationales", args=(obj.pk,)),
         }
 
+    def validate_answerchoice_set(self, value):
+        """
+        Check at least two answer choices
+        """
+        if len(value) < 2:
+            raise serializers.ValidationError(
+                _("At least two answer choices are required")
+            )
+
+        """
+        Check at least one answer choice is marked correct
+        """
+        if sum(x["correct"] for x in value) == 0:
+            raise serializers.ValidationError(
+                _("At least one answer choice must be correct")
+            )
+        return value
+
+    def validate_image(self, value):
+        ALLOWED_IMAGE_FORMATS = ["PNG", "GIF", "JPEG"]
+        ALLOWED_IMAGE_SIZE = 1e6
+        with Image.open(value, formats=ALLOWED_IMAGE_FORMATS) as image:
+            image.load()
+
+            if image.format not in ALLOWED_IMAGE_FORMATS:
+                raise serializers.ValidationError(
+                    "Invalid image file format.  Allowed formats are "
+                    + ", ".join(ALLOWED_IMAGE_FORMATS)
+                    + "."
+                )
+
+            if value.size > ALLOWED_IMAGE_SIZE:
+                raise serializers.ValidationError(
+                    f"Invalid image file size.  Max size is {ALLOWED_IMAGE_SIZE/1e6} MB"
+                )
+
+        return value
+
+    def validate_text(self, value):
+        """
+        Check stripped text length <= 8000
+        """
+        text = bleach.clean(value, tags=[], strip=True).strip()
+        if len(text) > 8000:
+            raise serializers.ValidationError(_("Text too long"))
+        return value
+
     def create(self, validated_data):
-        """Attach user"""
+        answerchoice_data = validated_data.pop("answerchoice_set")
+
+        """Create question and attach user"""
         question = super().create(validated_data)
         question.user = self.context["request"].user
         question.save()
+
+        """Create answer choices, sample answers and expert rationales"""
+        for i, data in enumerate(answerchoice_data, 1):
+            sample_answer = data.pop("sample_answer")
+            expert_answer = None
+            if "expert_answer" in data:
+                expert_answer = data.pop("expert_answer")
+
+            AnswerChoice.objects.create(question=question, **data)
+            Answer.objects.create(
+                expert=False,
+                first_answer_choice=i,
+                question=question,
+                rationale=sample_answer["rationale"],
+            )
+            if expert_answer:
+                Answer.objects.create(
+                    expert=True,
+                    first_answer_choice=i,
+                    question=question,
+                    rationale=expert_answer["rationale"],
+                )
+
         return question
 
     def to_representation(self, instance):
@@ -166,6 +308,11 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             ret["text"] = bleach.clean(
                 ret["text"], tags=ALLOWED_TAGS, strip=True
             ).strip()
+
+        """Add answer_choice labels"""
+        if "answerchoice_set" in ret and ret["answerchoice_set"]:
+            for i, ac in enumerate(ret["answerchoice_set"], 1):
+                ac.update(label=instance.get_choice_label(i))
         return ret
 
     class Meta:
@@ -176,9 +323,12 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "answer_style",
             "assignment_count",
             "category",
+            "category_pk",
             "collaborators",
+            "collaborators_pk",
             "difficulty",
             "discipline",
+            "discipline_pk",
             "flag_reasons",
             "frequency",
             "image",

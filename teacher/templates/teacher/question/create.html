@@ -5,7 +5,7 @@
 {% block apps %}
   {{ block.super }}
   <script
-    src="{% static 'components/js/build/createQuestions1.min.js' %}"
+    src="{% static 'components/js/build/createQuestion.min.js' %}"
     defer="true"
   ></script>
 
@@ -24,7 +24,7 @@
   <script nonce="{{ request.csp_nonce }}">
     window.addEventListener("load", function () {
       const questionCreateApp = () => {
-        return createQuestions1.h(createQuestions1.App, {
+        return createQuestion.h(createQuestion.App, {
           gettext: gettext,
           nonce: "{{ request.csp_nonce }}",
           EditorIcons: {
@@ -38,13 +38,14 @@
             linkIcon: "{% static 'components/img/editor/link.svg' %}",
           },
           urls: {
-            create: "{% url 'REST:teacher-question-list' %}",
-            categories: "{% url 'REST:category-list' %}", // Swap for elastic
+            create: "{% url 'REST:teacher-question-create-update-list' %}",
+            categories: "{% url 'REST:search-category-list' %}",
             disciplines: "{% url 'REST:discipline-list' %}",
+            teachers: "{% url 'REST:search-teacher-list' %}"
           }
         });
       };
-      createQuestions1.render(
+      createQuestion.render(
         questionCreateApp(),
         document.getElementById("question-create-app")
       );

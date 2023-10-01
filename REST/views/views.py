@@ -18,7 +18,6 @@ from peerinst.models import (
     AnswerAnnotation,
     Assignment,
     AssignmentQuestions,
-    Category,
     Collection,
     Discipline,
     Question,
@@ -38,7 +37,6 @@ from REST.permissions import (
 from REST.serializers import (
     AnswerSerializer,
     AssignmentSerializer,
-    CategorySerializer,
     CollectionSerializer,
     DisciplineSerializer,
     FeedbackReadSerialzer,
@@ -194,23 +192,6 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Searchable read-only endpoint for categories.
-    """
-
-    permission_classes = [IsAuthenticated, IsTeacher]
-    renderer_classes = [JSONRenderer]
-    serializer_class = CategorySerializer
-
-    def get_queryset(self):
-        queryset = Category.objects.all()
-        search_term = self.request.query_params.get("title")
-        if search_term is not None:
-            queryset = queryset.filter(title__icontains=search_term)
-        return queryset
-
-
 class DisciplineViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet to serve list of current disciplines.
@@ -266,20 +247,6 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
             self.get_object().get_matrix(),
             status=status.HTTP_200_OK,
         )
-
-
-class TeacherQuestionViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for creating and updating a user's questions.
-    """
-
-    http_method_names = ["get", "patch", "post"]
-    permission_classes = [IsAuthenticated, IsTeacher]
-    renderer_classes = [JSONRenderer]
-    serializer_class = QuestionSerializer
-
-    def get_queryset(self):
-        return Question.objects.filter(user=self.request.user)
 
 
 class QuestionListViewSet(viewsets.ModelViewSet):

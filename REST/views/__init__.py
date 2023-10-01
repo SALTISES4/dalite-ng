@@ -1,6 +1,5 @@
 __all__ = [
     "AssignmentViewSet",
-    "CategoryViewSet",
     "CollectionViewSet",
     "DisciplineViewSet",
     "QuestionViewSet",
@@ -8,26 +7,33 @@ __all__ = [
     "QuestionSerializer",
     "QuestionSearchList",
     "RecentStudentGroupAssignmentViewSet",
+    "SearchCategoryViewSet",
+    "SearchTeacherViewSet",
     "StudentFeedbackList",
     "StudentGroupAssignmentAnswers",
     "StudentGroupAssignmentViewSet",
     "StudentGroupUpdateView",
     "StudentReviewList",
+    "TeacherAnswerChoiceCreateUpdateViewSet",
+    "TeacherAssignmentRecommendationViewSet",
     "TeacherAssignmentViewSet",
     "TeacherGroupViewSet",
     "TeacherCollectionRecommendationViewSet",
     "TeacherLibraryAssignmentViewSet",
-    "TeacherAssignmentRecommendationViewSet",
     "TeacherLibraryCollectionViewSet",
     "TeacherLibraryQuestionViewSet",
     "TeacherQuestionRecommendationViewSet",
-    "TeacherQuestionViewSet",
+    "TeacherQuestionCreateUpdateViewSet",
     "TeacherView",
     "TeacherFeedbackList",
     "TeacherFeedbackDetail",
     "TeacherFeedbackThroughAnswerDetail",
     "TeacherSearch",
 ]
+from .content_creation.peerinst import (  # noqa
+    TeacherAnswerChoiceCreateUpdateViewSet,
+    TeacherQuestionCreateUpdateViewSet,
+)
 from .library import (  # noqa
     TeacherLibraryAssignmentViewSet,
     TeacherLibraryCollectionViewSet,
@@ -38,9 +44,12 @@ from .recommenders import (  # noqa
     TeacherCollectionRecommendationViewSet,
     TeacherQuestionRecommendationViewSet,
 )
+from .search.peerinst import (  # noqa
+    SearchCategoryViewSet,
+    SearchTeacherViewSet,
+)
 from .views import (  # noqa
     AssignmentViewSet,
-    CategoryViewSet,
     CollectionViewSet,
     DisciplineViewSet,
     QuestionListViewSet,
@@ -58,7 +67,6 @@ from .views import (  # noqa
     TeacherFeedbackList,
     TeacherFeedbackThroughAnswerDetail,
     TeacherGroupViewSet,
-    TeacherQuestionViewSet,
     TeacherSearch,
     TeacherView,
 )

@@ -3,8 +3,8 @@ from .settings import *  # noqa
 AXES_ENABLED = False
 
 DEBUG = False
-COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = True
+COMPRESS_ENABLED = False
+COMPRESS_OFFLINE = False
 
 WATCH = True
 
@@ -36,3 +36,10 @@ PYLTI_CONFIG = {
 }
 
 ROOT_URLCONF = "dalite.test_urls"
+
+try:
+    import pymysql
+
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass

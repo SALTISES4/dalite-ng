@@ -363,9 +363,9 @@ daphne==4.0.0 \
     # via
     #   -r requirements/requirements-base.txt
     #   channels
-django==3.2.20 \
-    --hash=sha256:a477ab326ae7d8807dc25c186b951ab8c7648a3a23f9497763c37307a2b5ef87 \
-    --hash=sha256:dec2a116787b8e14962014bf78e120bba454135108e1af9e9b91ade7b2964c40
+django==3.2.21 \
+    --hash=sha256:a5de4c484e7b7418e6d3e52a5b8794f0e6b9f9e4ce3c037018cf1c489fa87f3c \
+    --hash=sha256:d31b06c58aa2cd73998ca5966bc3001243d3c4e77ee2d0c479bced124765fd99
     # via
     #   -r requirements/requirements-base.txt
     #   channels
@@ -375,10 +375,12 @@ django==3.2.20 \
     #   django-cookie-consent
     #   django-csp
     #   django-decorator-include
+    #   django-filter
     #   django-inlinecss
     #   django-lti-provider
     #   django-minify-html
     #   django-model-utils
+    #   django-nine
     #   django-permissions-policy
     #   django-redis
     #   django-ses
@@ -430,6 +432,16 @@ django-decorator-include==3.0 \
 django-elasticsearch-dsl==7.3 \
     --hash=sha256:084a790edf26131a7897d13a3b5c08a6e129ca145b2b3fcbc2b2d4e902a919c1 \
     --hash=sha256:c1be1c6d25ee6e99dc246282a4f6de8cc0630d0f8d9863ed512c0baa9d21be94
+    # via
+    #   -r requirements/requirements-base.txt
+    #   django-elasticsearch-dsl-drf
+django-elasticsearch-dsl-drf==0.22.5 \
+    --hash=sha256:b444f168535ff99244cc995ec354a31abcbf3fc03bd7b11ec1a3f43c7208f63a \
+    --hash=sha256:fc0b3960e16f6c06de4f2ca4daf1134376fce4d496c1ddc218c23daddf6bcaa0
+    # via -r requirements/requirements-base.txt
+django-filter==23.2 \
+    --hash=sha256:2fe15f78108475eda525692813205fa6f9e8c1caf1ae65daa5862d403c6dbf00 \
+    --hash=sha256:d12d8e0fc6d3eb26641e553e5d53b191eb8cec611427d4bdce0becb1f7c172b5
     # via -r requirements/requirements-base.txt
 django-inlinecss==0.3.0 \
     --hash=sha256:5a014278b017a07d9d0babe2bf1bc75a52e184fb0ed26e333e8ff0d8e777b9e2 \
@@ -449,6 +461,12 @@ django-model-utils==4.3.1 \
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
+django-nine==0.2.7 \
+    --hash=sha256:304e0f83cea5a35359375fc919d00f9917b655c1d388244cbfc7363f59489177 \
+    --hash=sha256:4d93208ca5bb4a63bf65cf098a82ee469127b04ebde698d72fe12d258b73c291
+    # via
+    #   -r requirements/requirements-base.txt
+    #   django-elasticsearch-dsl-drf
 django-permissions-policy==4.17.0 \
     --hash=sha256:cb2f0d2772ddab63dabd50331fa823d0cea06c89932d412c8c6aa5fc239b364f \
     --hash=sha256:e317143f8c8ef7ff30dc20bc1343f8f299c9e4423148957d9f0fc2bae04b0ebe
@@ -488,6 +506,7 @@ djangorestframework==3.14.0 \
     --hash=sha256:eb63f58c9f218e1a7d064d17a70751f528ed4e1d35547fdade9aaf4cd103fd08
     # via
     #   -r requirements/requirements-base.txt
+    #   django-elasticsearch-dsl-drf
     #   saltise-course-flow
     #   saltise-user-feedback
 elasticsearch==7.13.4 \
@@ -495,6 +514,7 @@ elasticsearch==7.13.4 \
     --hash=sha256:5920df0ab2630778680376d86bea349dc99860977eec9b6d2bd0860f337313f2
     # via
     #   -r requirements/requirements-base.txt
+    #   django-elasticsearch-dsl-drf
     #   elasticsearch-dsl
 elasticsearch-dsl==7.4.1 \
     --hash=sha256:07ee9c87dc28cc3cae2daa19401e1e18a172174ad9e5ca67938f752e3902a1d5 \
@@ -502,6 +522,7 @@ elasticsearch-dsl==7.4.1 \
     # via
     #   -r requirements/requirements-base.txt
     #   django-elasticsearch-dsl
+    #   django-elasticsearch-dsl-drf
 et-xmlfile==1.1.0 \
     --hash=sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c \
     --hash=sha256:a2ba85d1d6a74ef63837eed693bcb89c3f752169b0e3e7ae5b16ca5e1b3deada
@@ -671,7 +692,7 @@ mysqlclient==2.2.0 \
     --hash=sha256:68837b6bb23170acffb43ae411e47533a560b6360c06dac39aa55700972c93b2 \
     --hash=sha256:955dba905a7443ce4788c63fdb9f8d688316260cf60b20ff51ac3b1c77616ede \
     --hash=sha256:9c6b142836c7dba4f723bf9c93cc46b6e5081d65b2af807f400dda9eb85a16d0
-    # via -r requirements/requirements-base.txt
+    # via -r requirements/requirements-prod-aws.in
 nameparser==1.1.2 \
     --hash=sha256:ea2e01d1d9d04c0648be230f161f27316a1b5be431a1cc64e8799fac548fb3bc \
     --hash=sha256:f4b6c7c1048d528bd6aa2b27cf42a06447d2b31e45a95b20449513078f1d86ef
@@ -734,7 +755,10 @@ openpyxl==3.1.2 \
 packaging==23.1 \
     --hash=sha256:994793af429502c4ea2ebf6bf664629d07c1a9fe974af92966e4b8d2df7edc61 \
     --hash=sha256:a392980d2b6cffa644431898be54b0045151319d1e7ec34f0cfed48767dd334f
-    # via gunicorn
+    # via
+    #   -r requirements/requirements-base.txt
+    #   django-nine
+    #   gunicorn
 pandas==2.0.3 \
     --hash=sha256:04dbdbaf2e4d46ca8da896e1805bc04eb85caa9a82e259e8eed00254d5e0c682 \
     --hash=sha256:1168574b036cd8b93abc746171c9b4f1b83467438a5e45909fed645cf8692dbc \
@@ -979,11 +1003,11 @@ s3transfer==0.6.2 \
     --hash=sha256:b014be3a8a2aab98cfe1abc7229cc5a9a0cf05eb9c1f2b86b230fd8df3f78084 \
     --hash=sha256:cab66d3380cca3e70939ef2255d01cd8aece6a4907a9528740f668c4b0611861
     # via boto3
-saltise-components==0.2.10 \
-    --hash=sha256:ca42b6c528972b33cd5bcd5967a787a950e19ca7a8f426e872bde3159837216a
+saltise-components==0.2.11 \
+    --hash=sha256:7893fd4363aecfbcbedfe6b1fec9cf31751dd761419ca374e6c960ca6c22e26b
     # via -r requirements/requirements-base.txt
-saltise-course-flow==0.8.9 \
-    --hash=sha256:34804b8bfecdfb0a7c0e5e1026db67b8c5fb88e465749ac5cca46606f5ff62ec
+saltise-course-flow==0.8.10 \
+    --hash=sha256:3b8327a2fcc642544a15bd0970389fc02d819b6945ae94f426a2bcda529916b0
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==1.1.2 \
     --hash=sha256:c57647cb83ab8bcee43f2ddc5db586f5fc20db3fb9f7a6a09b9be01de2005303
@@ -1056,6 +1080,7 @@ six==1.16.0 \
     #   automat
     #   bleach
     #   django-elasticsearch-dsl
+    #   django-elasticsearch-dsl-drf
     #   elasticsearch-dsl
     #   langdetect
     #   pylti
