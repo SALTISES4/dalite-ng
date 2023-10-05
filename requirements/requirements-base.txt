@@ -863,8 +863,8 @@ rjsmin==1.2.1 \
     --hash=sha256:f0895b360dccf7e2d6af8762a52985e3fbaa56778de1bf6b20dbc96134253807 \
     --hash=sha256:f7cd33602ec0f393a0058e883284496bb4dbbdd34e0bbe23b594c8933ddf9b65
     # via django-compressor
-saltise-components==0.2.11 \
-    --hash=sha256:7893fd4363aecfbcbedfe6b1fec9cf31751dd761419ca374e6c960ca6c22e26b
+saltise-components==0.2.12 \
+    --hash=sha256:bd5be4c8b003dd509775ce39bdcb6c56d2d285ea7ed171c0b05c99320b3dd6d7
     # via -r requirements/requirements-base.in
 saltise-course-flow==0.8.10 \
     --hash=sha256:3b8327a2fcc642544a15bd0970389fc02d819b6945ae94f426a2bcda529916b0
