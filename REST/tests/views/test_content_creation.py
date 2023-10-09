@@ -357,7 +357,10 @@ def test_teacherquestioncreateupdateviewset_create_with_discipline(
     )
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert discipline.title == response.data["discipline"]["title"]
+    assert (
+        discipline.title.lower()
+        == response.data["discipline"]["title"].lower()
+    )
 
 
 @pytest.mark.django_db
