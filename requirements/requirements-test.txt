@@ -139,7 +139,7 @@ daphne==4.0.0
     #   channels
 ddt==1.6.0
     # via -r requirements/requirements-test.in
-django==3.2.21
+django==3.2.22
     # via
     #   -r requirements/requirements-base.txt
     #   channels
@@ -528,7 +528,7 @@ tzdata==2023.3
     #   celery
     #   django-celery-beat
     #   pandas
-urllib3[secure,socks]==1.26.16
+urllib3[secure,socks]==1.26.17
     # via
     #   -r requirements/requirements-base.txt
     #   elasticsearch
