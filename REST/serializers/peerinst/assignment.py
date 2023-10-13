@@ -1,4 +1,5 @@
 import logging
+from string import capwords
 
 import bleach
 from django.contrib.auth.models import User
@@ -36,7 +37,9 @@ class CategorySerializer(DocumentSerializer):
     def to_representation(self, instance):
         """Bleach on the way out"""
         ret = super().to_representation(instance)
-        ret["title"] = bleach.clean(ret["title"], tags=[], strip=True).strip()
+        ret["title"] = capwords(
+            bleach.clean(ret["title"], tags=[], strip=True).strip()
+        )
         return ret
 
     class Meta:
@@ -48,7 +51,9 @@ class DisciplineSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """Bleach on the way out"""
         ret = super().to_representation(instance)
-        ret["title"] = bleach.clean(ret["title"], tags=[], strip=True).strip()
+        ret["title"] = capwords(
+            bleach.clean(ret["title"], tags=[], strip=True).strip()
+        )
         return ret
 
     class Meta:
