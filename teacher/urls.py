@@ -28,6 +28,11 @@ question_patterns = [
         views.QuestionCreateView.as_view(),
         name="question-create",
     ),
+    path(
+        "update/<int:pk>/",
+        views.QuestionUpdateView.as_view(),
+        name="question-update",
+    ),
 ]
 
 urlpatterns = [

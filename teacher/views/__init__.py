@@ -5,6 +5,7 @@ __all__ = [
     "DashboardView",
     "LibraryView",
     "QuestionCreateView",
+    "QuestionUpdateView",
     "SearchView",
 ]
 
@@ -15,5 +16,5 @@ from .assignment import (  # noqa
 )
 from .dashboard import DashboardView  # noqa
 from .library import LibraryView  # noqa
-from .question import QuestionCreateView  # noqa
+from .question import QuestionCreateView, QuestionUpdateView  # noqa
 from .search import SearchView  # noqa

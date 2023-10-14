@@ -37,6 +37,7 @@
             superIcon: "{% static 'components/img/editor/super.svg' %}",
             linkIcon: "{% static 'components/img/editor/link.svg' %}",
           },
+          {% if object %}pk: {{ object.pk }},{% endif %}
           urls: {
             create: "{% url 'REST:teacher-question-create-update-list' %}",
             categories: "{% url 'REST:search-category-list' %}",

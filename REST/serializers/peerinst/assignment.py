@@ -221,6 +221,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "fix": reverse("question-fix", args=(obj.pk,)),
             "matrix": reverse("REST:question-matrix", args=(obj.pk,)),
             "rationales": reverse("REST:question-rationales", args=(obj.pk,)),
+            "update": reverse("teacher:question-update", args=(obj.pk,)),
         }
 
     def validate_answerchoice_set(self, value):
