@@ -171,6 +171,18 @@ class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path=r"studentgroup/(?P<group_hash>[ a-zA-Z0-9_-]+)",
+    )
+    def for_group(self, request, group_hash=None):
+        # Return objects associated with specific group
+        group = StudentGroup.get(hash_=group_hash)
+        queryset = self.get_queryset().filter(group=group)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class MinimumResultsPagination(PageNumberPagination):
     page_size = 4
