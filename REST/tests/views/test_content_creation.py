@@ -108,12 +108,12 @@ def test_teacherquestioncreateupdateviewset_create_attaches_user(
                     "correct": True,
                     "text": fake.sentence(),
                     "expert_answer": {"rationale": fake.paragraph()},
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
             ],
         },
@@ -141,12 +141,12 @@ def test_teacherquestioncreateupdateviewset_create_text_bleached(
                     "correct": True,
                     "text": fake.sentence(),
                     "expert_answer": {"rationale": fake.paragraph()},
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
             ],
         },
@@ -175,12 +175,12 @@ def test_teacherquestioncreateupdateviewset_create_text_required(
                     "correct": True,
                     "text": fake.sentence(),
                     "expert_answer": {"rationale": fake.paragraph()},
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
             ],
         },
@@ -207,12 +207,12 @@ def test_teacherquestioncreateupdateviewset_create_text_too_long(
                     "correct": True,
                     "text": fake.sentence(),
                     "expert_answer": {"rationale": fake.paragraph()},
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
             ],
         },
@@ -240,12 +240,12 @@ def test_teacherquestioncreateupdateviewset_create_title_bleached(
                     "correct": True,
                     "text": fake.sentence(),
                     "expert_answer": {"rationale": fake.paragraph()},
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
             ],
         },
@@ -276,12 +276,12 @@ def test_teacherquestioncreateupdateviewset_create_title_required(
                     "correct": True,
                     "text": fake.sentence(),
                     "expert_answer": {"rationale": fake.paragraph()},
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
             ],
         },
@@ -309,12 +309,12 @@ def test_teacherquestioncreateupdateviewset_create_with_categories(
                     "correct": True,
                     "text": fake.sentence(),
                     "expert_answer": {"rationale": fake.paragraph()},
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
             ],
         },
@@ -344,12 +344,12 @@ def test_teacherquestioncreateupdateviewset_create_with_discipline(
                     "correct": True,
                     "text": fake.sentence(),
                     "expert_answer": {"rationale": fake.paragraph()},
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
             ],
         },
@@ -384,12 +384,12 @@ def test_teacherquestioncreateupdateviewset_create_with_collaborators(
                     "correct": True,
                     "text": fake.sentence(),
                     "expert_answer": {"rationale": fake.paragraph()},
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
             ],
         },
@@ -429,11 +429,11 @@ def test_teacherquestioncreateupdateviewset_create_image_png(client, teacher):
             ),
             "answerchoice_set[0]correct": True,
             "answerchoice_set[0]text": fake.sentence(),
-            "answerchoice_set[0]sample_answer.rationale": fake.sentence(),
+            "answerchoice_set[0]sample_answers[0]rationale": fake.sentence(),
             "answerchoice_set[0]expert_answer.rationale": fake.sentence(),
             "answerchoice_set[1]correct": False,
             "answerchoice_set[1]text": fake.sentence(),
-            "answerchoice_set[1]sample_answer.rationale": fake.sentence(),
+            "answerchoice_set[1]sample_answers[0]rationale": fake.sentence(),
         },
     )
 
@@ -462,11 +462,11 @@ def test_teacherquestioncreateupdateviewset_create_image_svg(client, teacher):
             ),
             "answerchoice_set[0]correct": True,
             "answerchoice_set[0]text": fake.sentence(),
-            "answerchoice_set[0]sample_answer.rationale": fake.sentence(),
+            "answerchoice_set[0]sample_answers[0]rationale": fake.sentence(),
             "answerchoice_set[0]expert_answer.rationale": fake.sentence(),
             "answerchoice_set[1]correct": False,
             "answerchoice_set[1]text": fake.sentence(),
-            "answerchoice_set[1]sample_answer.rationale": fake.sentence(),
+            "answerchoice_set[1]sample_answers[0]rationale": fake.sentence(),
         },
     )
 
@@ -497,11 +497,11 @@ def test_teacherquestioncreateupdateviewset_create_image_large_file(
             ),
             "answerchoice_set[0]correct": True,
             "answerchoice_set[0]text": fake.sentence(),
-            "answerchoice_set[0]sample_answer.rationale": fake.sentence(),
+            "answerchoice_set[0]sample_answers[0]rationale": fake.sentence(),
             "answerchoice_set[0]expert_answer.rationale": fake.sentence(),
             "answerchoice_set[1]correct": False,
             "answerchoice_set[1]text": fake.sentence(),
-            "answerchoice_set[1]sample_answer.rationale": fake.sentence(),
+            "answerchoice_set[1]sample_answers[0]rationale": fake.sentence(),
         },
     )
 
@@ -554,12 +554,12 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_none_correct(
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
             ],
         },
@@ -591,7 +591,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_less_than_2(
                     "correct": True,
                     "text": fake.sentence(),
                     "expert_answer": {"rationale": fake.paragraph()},
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
             ],
         },
@@ -622,12 +622,12 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_missing_expert(
                 {
                     "correct": True,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
             ],
         },
@@ -635,7 +635,44 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_missing_expert(
     )
 
     assert (
-        "An expert rationale is required for each correct answer"
+        "An expert rationale is required for each correct answer choice"
+        in response.data["answerchoice_set"][0]["non_field_errors"]
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_create_answerchoices_missing_sample(
+    client, teacher
+):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-question-create-update-list")
+
+    response = client.post(
+        url,
+        data={
+            "text": fake.paragraph(),
+            "title": fake.sentence(),
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
+        },
+        content_type="application/json",
+    )
+
+    assert (
+        "An sample rationale is required for each answer choice"
         in response.data["answerchoice_set"][0]["non_field_errors"]
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -662,12 +699,12 @@ def test_teacherquestioncreateupdateviewset_create_check_sample_and_expert(
                     "correct": True,
                     "text": fake.sentence(),
                     "expert_answer": {"rationale": expert_rationale_1},
-                    "sample_answer": {"rationale": sample_rationale_1},
+                    "sample_answers": [{"rationale": sample_rationale_1}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": sample_rationale_2},
+                    "sample_answers": [{"rationale": sample_rationale_2}],
                 },
             ],
         },
@@ -708,12 +745,12 @@ def test_teacherquestioncreateupdateviewset_create_answer_rationale_too_long(
                     "correct": True,
                     "text": fake.sentence(),
                     "expert_answer": {"rationale": fake.text(5000)},
-                    "sample_answer": {"rationale": fake.paragraph()},
+                    "sample_answers": [{"rationale": fake.paragraph()}],
                 },
                 {
                     "correct": False,
                     "text": fake.sentence(),
-                    "sample_answer": {"rationale": fake.text(5000)},
+                    "sample_answers": [{"rationale": fake.text(5000)}],
                 },
             ],
         },
@@ -726,6 +763,8 @@ def test_teacherquestioncreateupdateviewset_create_answer_rationale_too_long(
     )
     assert (
         "Rationale text too long"
-        in response.data["answerchoice_set"][1]["sample_answer"]["rationale"]
+        in response.data["answerchoice_set"][1]["sample_answers"][0][
+            "rationale"
+        ]
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST

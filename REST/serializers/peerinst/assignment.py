@@ -89,13 +89,15 @@ class SampleAnswerSerializer(serializers.ModelSerializer):
         model = Answer
         fields = [
             "expert",
+            "pk",
             "rationale",
         ]
+        read_only_fields = ["pk"]
 
 
 class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
-    expert_answer = SampleAnswerSerializer(required=False, write_only=True)
-    sample_answer = SampleAnswerSerializer(write_only=True)
+    expert_answer = SampleAnswerSerializer(required=False)
+    sample_answers = SampleAnswerSerializer(many=True)
 
     def validate(self, data):
         """
@@ -103,7 +105,16 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
         """
         if data["correct"] and "expert_answer" not in data:
             raise serializers.ValidationError(
-                _("An expert rationale is required for each correct answer")
+                _(
+                    "An expert rationale is required for each correct answer choice"
+                )
+            )
+        """
+        Check each answer choice has at least one sample rationale
+        """
+        if len(data["sample_answers"]) == 0:
+            raise serializers.ValidationError(
+                _("An sample rationale is required for each answer choice")
             )
         return data
 
@@ -122,7 +133,7 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
             "correct",
             "expert_answer",
             "question",
-            "sample_answer",
+            "sample_answers",
             "text",
         ]
 
@@ -130,7 +141,13 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
 class QuestionSerializer(DynamicFieldsModelSerializer):
     answer_count = serializers.ReadOnlyField()
     answerchoice_set = AnswerChoiceSerializer(
-        fields=["correct", "expert_answer", "sample_answer", "text"], many=True
+        fields=[
+            "correct",
+            "expert_answer",
+            "sample_answers",
+            "text",
+        ],
+        many=True,
     )
     assignment_count = serializers.ReadOnlyField()
     category = CategorySerializer(many=True, read_only=True)
@@ -281,18 +298,19 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
         """Create answer choices, sample answers and expert rationales"""
         for i, data in enumerate(answerchoice_data, 1):
-            sample_answer = data.pop("sample_answer")
+            sample_answers = data.pop("sample_answers")
             expert_answer = None
             if "expert_answer" in data:
                 expert_answer = data.pop("expert_answer")
 
             AnswerChoice.objects.create(question=question, **data)
-            Answer.objects.create(
-                expert=False,
-                first_answer_choice=i,
-                question=question,
-                rationale=sample_answer["rationale"],
-            )
+            for sample_answer in sample_answers:
+                Answer.objects.create(
+                    expert=False,
+                    first_answer_choice=i,
+                    question=question,
+                    rationale=sample_answer["rationale"],
+                )
             if expert_answer:
                 Answer.objects.create(
                     expert=True,

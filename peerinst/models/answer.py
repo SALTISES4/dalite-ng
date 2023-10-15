@@ -28,6 +28,35 @@ class AnswerChoice(models.Model):
     text = models.CharField(_("Text"), max_length=500)
     correct = models.BooleanField(_("Correct?"))
 
+    @property
+    def rank(self):
+        return (
+            list(
+                self.question.answerchoice_set.values_list("pk", flat=True)
+            ).index(self.pk)
+            + 1
+        )
+
+    @property
+    def expert_answer(self):
+        """Return expert answer for this answer choice"""
+        return Answer.objects.filter(
+            first_answer_choice=self.rank,
+            question=self.question,
+            user_token__exact="",
+            expert=True,
+        ).first()
+
+    @property
+    def sample_answers(self):
+        """Return list of sample answers for this answer choice"""
+        return Answer.objects.filter(
+            first_answer_choice=self.rank,
+            question=self.question,
+            user_token__exact="",
+            expert=False,
+        ).all()
+
     def save(self, *args, **kwargs):
         """Bleach"""
         self.text = bleach.clean(
