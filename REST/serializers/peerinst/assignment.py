@@ -394,6 +394,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "matrix",
             "most_convincing_rationales",
             "peer_impact",
+            "rationale_selection_algorithm",
             "pk",
             "text",
             "title",
