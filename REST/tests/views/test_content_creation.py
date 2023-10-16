@@ -165,6 +165,7 @@ def test_teacherquestioncreateupdateviewset_create_text_required(
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
+    count = Question.objects.count()
     response = client.post(
         url,
         data={
@@ -188,6 +189,7 @@ def test_teacherquestioncreateupdateviewset_create_text_required(
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -197,6 +199,7 @@ def test_teacherquestioncreateupdateviewset_create_text_too_long(
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
+    count = Question.objects.count()
     response = client.post(
         url,
         data={
@@ -221,6 +224,7 @@ def test_teacherquestioncreateupdateviewset_create_text_too_long(
 
     assert "Text too long" in response.data["text"]
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -266,6 +270,7 @@ def test_teacherquestioncreateupdateviewset_create_title_required(
     text = fake.paragraph()
 
     url = reverse("REST:teacher-question-create-update-list")
+    count = Question.objects.count()
     response = client.post(
         url,
         data={
@@ -289,6 +294,7 @@ def test_teacherquestioncreateupdateviewset_create_title_required(
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -445,6 +451,7 @@ def test_teacherquestioncreateupdateviewset_create_image_svg(client, teacher):
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
+    count = Question.objects.count()
     response = client.post(
         url,
         data={
@@ -471,6 +478,7 @@ def test_teacherquestioncreateupdateviewset_create_image_svg(client, teacher):
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -480,6 +488,7 @@ def test_teacherquestioncreateupdateviewset_create_image_large_file(
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
+    count = Question.objects.count()
     response = client.post(
         url,
         data={
@@ -506,6 +515,7 @@ def test_teacherquestioncreateupdateviewset_create_image_large_file(
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -520,6 +530,7 @@ def test_teacherquestioncreateupdateviewset_update_owned_editable_question(
         "REST:teacher-question-create-update-detail",
         args=(question.pk,),
     )
+    count = Question.objects.count()
     text = fake.paragraph()
     title = fake.sentence()
     response = client.patch(
@@ -535,6 +546,7 @@ def test_teacherquestioncreateupdateviewset_update_owned_editable_question(
     question.refresh_from_db()
     assert question.text == text
     assert question.title == title
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -550,6 +562,7 @@ def test_teacherquestioncreateupdateviewset_update_answerchoices(
         "REST:teacher-question-create-update-detail",
         args=(question.pk,),
     )
+    count = Question.objects.count()
     text = fake.paragraph()
     title = fake.sentence()
     response = client.patch(
@@ -567,6 +580,7 @@ def test_teacherquestioncreateupdateviewset_update_answerchoices(
     question.refresh_from_db()
     assert question.text == text
     assert question.title == title
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -576,7 +590,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_none_correct(
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
-
+    count = Question.objects.count()
     response = client.post(
         url,
         data={
@@ -603,6 +617,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_none_correct(
         in response.data["answerchoice_set"]
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -612,7 +627,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_less_than_2(
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
-
+    count = Question.objects.count()
     response = client.post(
         url,
         data={
@@ -635,6 +650,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_less_than_2(
         in response.data["answerchoice_set"]
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -644,7 +660,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_missing_expert(
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
-
+    count = Question.objects.count()
     response = client.post(
         url,
         data={
@@ -671,6 +687,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_missing_expert(
         in response.data["answerchoice_set"][0]["non_field_errors"]
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -680,7 +697,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_empty_expert(
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
-
+    count = Question.objects.count()
     response = client.post(
         url,
         data={
@@ -708,6 +725,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_empty_expert(
         in response.data["answerchoice_set"][0]["non_field_errors"]
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -717,7 +735,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_missing_sample(
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
-
+    count = Question.objects.count()
     response = client.post(
         url,
         data={
@@ -744,6 +762,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_missing_sample(
         in response.data["answerchoice_set"][0]["sample_answers"]
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -753,7 +772,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_empty_sample(
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
-
+    count = Question.objects.count()
     response = client.post(
         url,
         data={
@@ -781,6 +800,7 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_empty_sample(
         in response.data["answerchoice_set"][0]["non_field_errors"]
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -790,6 +810,7 @@ def test_teacherquestioncreateupdateviewset_create_check_sample_and_expert(
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
+    count = Question.objects.count()
     title = fake.sentence()
     expert_rationale_1 = fake.paragraph()
     sample_rationale_1 = fake.paragraph()
@@ -830,6 +851,7 @@ def test_teacherquestioncreateupdateviewset_create_check_sample_and_expert(
     assert sample_answer_1.rationale == sample_rationale_1
     assert sample_answer_2.rationale == sample_rationale_2
     assert expert_answer.rationale == expert_rationale_1
+    assert Question.objects.count() == count + 1
 
 
 @pytest.mark.django_db
@@ -839,7 +861,7 @@ def test_teacherquestioncreateupdateviewset_create_answer_rationale_too_long(
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
-
+    count = Question.objects.count()
     response = client.post(
         url,
         data={
@@ -875,3 +897,4 @@ def test_teacherquestioncreateupdateviewset_create_answer_rationale_too_long(
         ]
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count

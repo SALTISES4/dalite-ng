@@ -10,6 +10,7 @@ class TeacherQuestionCreateUpdateViewSet(TeacherCreateUpdateViewSet):
     Question create, retrieve and update for teacher
 
     - Attaches user on create via serializer √
+    - Teacher can only access their own content √
     - Validates editability before retrieve or update √
     """
 
@@ -31,6 +32,6 @@ class TeacherQuestionCreateUpdateViewSet(TeacherCreateUpdateViewSet):
             .exclude(expert=True)
             .exclude(user_token__exact="")
         )
-        queryset = queryset.filter(~Exists(answers))
+        queryset = queryset.filter(~Exists(answers)).distinct()
 
         return queryset

@@ -27,6 +27,6 @@ class QuestionUpdateView(TeacherRequiredMixin, DetailView):
             .exclude(expert=True)
             .exclude(user_token__exact="")
         )
-        queryset = queryset.filter(~Exists(answers))
+        queryset = queryset.filter(~Exists(answers)).distinct()
 
         return queryset
