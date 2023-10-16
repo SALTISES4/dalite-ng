@@ -38,14 +38,14 @@ class AnswerChoice(models.Model):
         )
 
     @property
-    def expert_answer(self):
+    def expert_answers(self):
         """Return expert answer for this answer choice"""
         return Answer.objects.filter(
             first_answer_choice=self.rank,
             question=self.question,
             user_token__exact="",
             expert=True,
-        ).first()
+        ).all()
 
     @property
     def sample_answers(self):
