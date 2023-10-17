@@ -142,6 +142,13 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
         ]
 
 
+class NullableM2MFormDataSerializer(serializers.SlugRelatedField):
+    def to_internal_value(self, data):
+        if data == "[]":
+            return None
+        return super().to_internal_value(data)
+
+
 class QuestionSerializer(DynamicFieldsModelSerializer):
     answer_count = serializers.ReadOnlyField()
     answerchoice_set = AnswerChoiceSerializer(
@@ -155,7 +162,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     )
     assignment_count = serializers.ReadOnlyField()
     category = CategorySerializer(many=True, read_only=True)
-    category_pk = serializers.SlugRelatedField(
+    category_pk = NullableM2MFormDataSerializer(
         queryset=Category.objects.all(),
         slug_field="title",
         many=True,
@@ -164,7 +171,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         required=False,
     )
     collaborators = UserSerializer(many=True, read_only=True)
-    collaborators_pk = serializers.SlugRelatedField(
+    collaborators_pk = NullableM2MFormDataSerializer(
         queryset=User.objects.filter(teacher__isnull=False),
         slug_field="username",
         many=True,
@@ -340,7 +347,14 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             answerchoice_data = validated_data.pop("answerchoice_set")
 
         for field in validated_data.keys():
-            setattr(question, field, validated_data[field])
+            if (
+                type(validated_data[field]) is list
+                or type(validated_data[field]) is tuple
+            ):
+                _field = getattr(question, field)
+                _field.set(validated_data[field])
+            else:
+                setattr(question, field, validated_data[field])
         question.save()
 
         if answerchoice_data:
