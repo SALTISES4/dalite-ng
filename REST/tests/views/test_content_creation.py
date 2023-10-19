@@ -7,12 +7,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from faker import Faker
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from functional_tests.fixtures import (  # noqa
     realistic_assignment,
     realistic_questions,
 )
-from peerinst.models import Answer, Question
+from peerinst.models import Answer, Category, Question
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.teacher import login_teacher
 
@@ -550,6 +551,52 @@ def test_teacherquestioncreateupdateviewset_update_owned_editable_question(
 
 
 @pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_update_remove_categories(
+    client, category, question, teacher
+):
+    assert login_teacher(client, teacher)
+
+    url = reverse(
+        "REST:teacher-question-create-update-detail",
+        args=(question.pk,),
+    )
+
+    # JSON
+    question.category.add(category)
+    assert question.category.count() == 1
+    response = client.patch(
+        url,
+        data={
+            "category_pk": [],
+        },
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["category"] == []
+    question.refresh_from_db()
+    assert question.category.count() == 0
+
+    # FormData - Use DRF client
+    _client = APIClient()
+    assert login_teacher(_client, teacher)
+    question.category.add(category)
+    assert question.category.count() == 1
+    response = _client.patch(
+        url,
+        data={
+            "category_pk": "[]",
+        },
+        format="multipart",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["category"] == []
+    question.refresh_from_db()
+    assert question.category.count() == 0
+
+
+@pytest.mark.django_db
 def test_teacherquestioncreateupdateviewset_update_answerchoices(
     client, teacher, question
 ):
@@ -562,9 +609,7 @@ def test_teacherquestioncreateupdateviewset_update_answerchoices(
         "REST:teacher-question-create-update-detail",
         args=(question.pk,),
     )
-    count = Question.objects.count()
-    text = fake.paragraph()
-    title = fake.sentence()
+
     response = client.patch(
         url,
         data={
