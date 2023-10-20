@@ -577,7 +577,7 @@ def test_teacherquestioncreateupdateviewset_update_remove_categories(
     question.refresh_from_db()
     assert question.category.count() == 0
 
-    # FormData - Use DRF client
+    # FormData - Use DRF client for multipart format
     _client = APIClient()
     assert login_teacher(_client, teacher)
     question.category.add(category)
@@ -594,38 +594,6 @@ def test_teacherquestioncreateupdateviewset_update_remove_categories(
     assert response.data["category"] == []
     question.refresh_from_db()
     assert question.category.count() == 0
-
-
-@pytest.mark.django_db
-def test_teacherquestioncreateupdateviewset_update_answerchoices(
-    client, teacher, question
-):
-    # TODO: complete
-    assert login_teacher(client, teacher)
-    assert question.user == teacher.user
-    assert question.answer_set.count() == 0
-
-    url = reverse(
-        "REST:teacher-question-create-update-detail",
-        args=(question.pk,),
-    )
-
-    response = client.patch(
-        url,
-        data={
-            "text": text,
-            "title": title,
-        },
-        content_type="application/json",
-    )
-
-    print(response.content)
-
-    assert response.status_code == status.HTTP_200_OK
-    question.refresh_from_db()
-    assert question.text == text
-    assert question.title == title
-    assert Question.objects.count() == count
 
 
 @pytest.mark.django_db
@@ -849,12 +817,14 @@ def test_teacherquestioncreateupdateviewset_create_answerchoices_empty_sample(
 
 
 @pytest.mark.django_db
-def test_teacherquestioncreateupdateviewset_create_check_sample_and_expert(
+def test_teacherquestioncreateupdateviewset_create_check_sample_and_expert_and_update(
     client, teacher
 ):
     assert login_teacher(client, teacher)
 
+    # Create
     url = reverse("REST:teacher-question-create-update-list")
+
     count = Question.objects.count()
     title = fake.sentence()
     expert_rationale_1 = fake.paragraph()
@@ -884,6 +854,7 @@ def test_teacherquestioncreateupdateviewset_create_check_sample_and_expert(
 
     assert response.status_code == status.HTTP_201_CREATED
 
+    ac_set = response.data["answerchoice_set"]
     question = Question.objects.get(title=title)
     sample_answer_1 = Answer.objects.get(
         question=question, first_answer_choice=1, expert=False
@@ -897,6 +868,83 @@ def test_teacherquestioncreateupdateviewset_create_check_sample_and_expert(
     assert sample_answer_2.rationale == sample_rationale_2
     assert expert_answer.rationale == expert_rationale_1
     assert Question.objects.count() == count + 1
+
+    # Update
+    url = reverse(
+        "REST:teacher-question-create-update-detail",
+        args=(question.pk,),
+    )
+
+    # - Add another incorrect choice
+    sample_rationale_3 = fake.paragraph()
+    ac_set.append(
+        {
+            "correct": False,
+            "text": fake.sentence(),
+            "sample_answers": [{"rationale": sample_rationale_3}],
+        }
+    )
+
+    response = client.patch(
+        url,
+        data={"answerchoice_set": ac_set},
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    question.refresh_from_db()
+    assert question.answerchoice_set.count() == 3
+
+    # - Update first choice: text
+    ac_set = response.data["answerchoice_set"]
+    text = fake.sentence()
+    ac_set[0].update(text=text)
+
+    response = client.patch(
+        url,
+        data={"answerchoice_set": ac_set},
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    question.refresh_from_db()
+    assert question.answerchoice_set.first().text == text
+
+    # - Update first choice: update first expert rationale
+    ac_set = response.data["answerchoice_set"]
+    expert_rationale_2 = fake.paragraph()
+    ac_set[0]["expert_answers"][0].update(rationale=expert_rationale_2)
+
+    response = client.patch(
+        url,
+        data={"answerchoice_set": ac_set},
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    question.refresh_from_db()
+    assert (
+        question.answerchoice_set.first().expert_answers.first().rationale
+        == expert_rationale_2
+    )
+
+    # - Update first choice: update first sample rationale
+    ac_set = response.data["answerchoice_set"]
+    sample_rationale_4 = fake.paragraph()
+    ac_set[0]["sample_answers"][0]["rationale"] = sample_rationale_4
+
+    response = client.patch(
+        url,
+        data={"answerchoice_set": ac_set},
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    question.refresh_from_db()
+    assert (
+        question.answerchoice_set.first().sample_answers.first().rationale
+        == sample_rationale_4
+    )
 
 
 @pytest.mark.django_db

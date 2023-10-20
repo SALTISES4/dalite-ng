@@ -68,6 +68,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SampleAnswerSerializer(serializers.ModelSerializer):
+    pk = serializers.IntegerField(read_only=False, required=False)
+
     def validate_rationale(self, value):
         """
         Check rationale <= 4000 characters
@@ -96,6 +98,7 @@ class SampleAnswerSerializer(serializers.ModelSerializer):
 
 
 class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
+    pk = serializers.IntegerField(required=False)
     expert_answers = SampleAnswerSerializer(many=True, required=False)
     sample_answers = SampleAnswerSerializer(many=True)
 
@@ -136,6 +139,7 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
         fields = [
             "correct",
             "expert_answers",
+            "pk",
             "question",
             "sample_answers",
             "text",
@@ -155,6 +159,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         fields=[
             "correct",
             "expert_answers",
+            "pk",
             "sample_answers",
             "text",
         ],
@@ -317,7 +322,6 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                 expert_answers = []
 
             AnswerChoice.objects.create(question=question, **data)
-
             for sample_answer in sample_answers:
                 Answer.objects.create(
                     expert=False,
@@ -338,14 +342,16 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     def update(self, question, validated_data):
         """
         If answerchoice_set is present:
-        - If pk is provided, instance will be updated
-        - If pk is missing, instance will be created
+        - If _pk is provided, instance will be updated
+        - If _pk is missing, instance will be created
         - If existing answerchoice is missing, it will be deleted with related models
+        - Same logic for sample and expert answers
         """
         answerchoice_data = None
         if "answerchoice_set" in validated_data:
             answerchoice_data = validated_data.pop("answerchoice_set")
 
+        # Update question
         for field in validated_data.keys():
             if (
                 type(validated_data[field]) is list
@@ -355,10 +361,107 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                 _field.set(validated_data[field])
             else:
                 setattr(question, field, validated_data[field])
+
         question.save()
 
         if answerchoice_data:
-            pass
+            for i, data in enumerate(answerchoice_data, 1):
+                sample_answers = data.pop("sample_answers")
+
+                if "expert_answers" in data:
+                    expert_answers = data.pop("expert_answers")
+                else:
+                    expert_answers = []
+
+                if "pk" in data:
+                    # Update answer choice and related models
+                    ac = AnswerChoice.objects.get(pk=data["pk"])
+                    ac.correct = data["correct"]
+                    ac.text = data["text"]
+                    ac.save()
+
+                    # Sample answers
+                    existing = set(
+                        ac.sample_answers.values_list("pk", flat=True)
+                    )
+                    to_update = []
+                    to_create = []
+                    for sample_answer in sample_answers:
+                        if "pk" not in sample_answer:
+                            to_create.append(sample_answer)
+                            break
+                        if sample_answer["pk"] in existing:
+                            to_update.append(sample_answer)
+
+                    to_delete = existing - {s["pk"] for s in to_update}
+
+                    for sample_answer in to_update:
+                        s = Answer.objects.get(pk=sample_answer["pk"])
+                        s.rationale = sample_answer["rationale"]
+                        s.save()
+
+                    for sample_answer in to_create:
+                        Answer.objects.create(
+                            expert=False,
+                            first_answer_choice=i,
+                            question=question,
+                            rationale=sample_answer["rationale"],
+                        )
+
+                    for pk in to_delete:
+                        s = Answer.objects.get(pk=pk)
+                        s.delete()
+
+                    # Expert answers
+                    existing = set(
+                        ac.expert_answers.values_list("pk", flat=True)
+                    )
+                    to_update = []
+                    to_create = []
+                    for expert_answer in expert_answers:
+                        if "pk" not in expert_answer:
+                            to_create.append(expert_answer)
+                            break
+                        if expert_answer["pk"] in existing:
+                            to_update.append(expert_answer)
+
+                    to_delete = existing - {e["pk"] for e in to_update}
+
+                    for expert_answer in to_update:
+                        e = Answer.objects.get(pk=expert_answer["pk"])
+                        e.rationale = expert_answer["rationale"]
+                        e.save()
+
+                    for expert_answer in to_create:
+                        Answer.objects.create(
+                            expert=True,
+                            first_answer_choice=i,
+                            question=question,
+                            rationale=expert_answer["rationale"],
+                        )
+
+                    if len(to_create) > 0 or len(existing) > len(to_delete):
+                        for pk in to_delete:
+                            e = Answer.objects.get(pk=pk)
+                            e.delete()
+
+                else:
+                    # Create answer choice and related models
+                    AnswerChoice.objects.create(question=question, **data)
+                    for sample_answer in sample_answers:
+                        Answer.objects.create(
+                            expert=False,
+                            first_answer_choice=i,
+                            question=question,
+                            rationale=sample_answer["rationale"],
+                        )
+                    for expert_answer in expert_answers:
+                        Answer.objects.create(
+                            expert=True,
+                            first_answer_choice=i,
+                            question=question,
+                            rationale=expert_answer["rationale"],
+                        )
 
         return question
 
