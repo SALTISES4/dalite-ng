@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import random
 import time
 import urllib.error
@@ -51,6 +52,8 @@ from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
 from peerinst import admin, forms, models, rationale_choice
 from peerinst.admin_views import get_question_rationale_aggregates
+from peerinst.elasticsearch import assignment_search as as_ES
+from peerinst.elasticsearch import collection_search as cs_ES
 from peerinst.elasticsearch import question_search as qs_ES
 from peerinst.mixins import (
     LoginRequiredMixin,
@@ -71,6 +74,7 @@ from peerinst.models import (
     NewUserRequest,
     Question,
     RationaleOnlyQuestion,
+    SaltiseMember,
     ShownRationale,
     Student,
     StudentGroup,
@@ -110,7 +114,6 @@ logger_auth = logging.getLogger("peerinst-auth")
 # Views related to Auth
 @require_safe
 def landing_page(request):
-
     disciplines = {}
 
     disciplines["All"] = {}
@@ -300,7 +303,6 @@ def access_denied_and_logout(request):
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
 @user_passes_test(lambda u: hasattr(u, "teacher"))  # Teacher is required
 def browse_database(request):
-
     return TemplateResponse(
         request,
         "peerinst/browse_database.html",
@@ -719,7 +721,6 @@ def answer_choice_form(request, question_id):
 
     # Check permissions
     if request.user.has_perm("peerinst.change_question", question):
-
         # Check if student answers exist
         if not question.is_editable:
             return TemplateResponse(
@@ -925,7 +926,6 @@ class QuestionMixin:
         return context
 
     def send_grade(self):
-
         if not self.request.session.get("access_type") == StudentGroup.LTI:
             # We are running outside of a basic LTI context, so we don't need to
             # send a grade.
@@ -1197,7 +1197,6 @@ class QuestionReviewBaseView(QuestionFormView):
 
 
 class QuestionSequentialReviewView(QuestionReviewBaseView):
-
     template_name = "peerinst/question/sequential_review.html"
     form_class = forms.SequentialReviewForm
 
@@ -1705,7 +1704,6 @@ class TeacherBase(LoginRequiredMixin, NoStudentsMixin, View):
             self.request.user
             == get_object_or_404(models.Teacher, pk=kwargs["pk"]).user
         ):
-
             # Check for any TOS
             if Consent.get(self.request.user.username, "teacher") is None:
                 return HttpResponseRedirect(
@@ -1733,6 +1731,20 @@ class TeacherBase(LoginRequiredMixin, NoStudentsMixin, View):
                     return super().dispatch(*args, **kwargs)
         else:
             raise PermissionDenied
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        backup_avatar = os.path.join(
+            settings.STATIC_URL, "components/img/logo.gif"
+        )
+        try:
+            if self.request.user.saltisemember.picture:
+                context["avatar"] = self.request.user.saltisemember.picture.url
+            else:
+                context["avatar"] = backup_avatar
+        except SaltiseMember.DoesNotExist:
+            context["avatar"] = backup_avatar
+        return context
 
 
 class TeacherGroupShare(TeacherBase, DetailView):
@@ -1950,7 +1962,6 @@ class TeacherGroups(TeacherBase, ListView):
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
 def teacher_toggle_favourite(request):
-
     if request.is_ajax():
         # Ajax only
         question = get_object_or_404(Question, pk=request.POST.get("pk"))
@@ -2045,7 +2056,6 @@ def collection_unassign(request):
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
 def student_activity(request):
-
     teacher = request.user.teacher
 
     all_answers_by_group, json_data = get_student_activity_data(
@@ -2155,25 +2165,93 @@ def collection_search(request):
 
 
 def collection_search_function(search_string, pre_filtered_list=None):
-
-    query_result = pre_filtered_list.filter(
+    return pre_filtered_list.filter(
         Q(title__icontains=search_string)
         | Q(description__icontains=search_string)
     )
-
-    return query_result
 
 
 # AJAX functions
 @ajax_login_required
 @ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
-def question_search_beta(request):
+def assignment_search_beta(request):
     FILTERS = [
         "category__title",
         "discipline.title",
         "difficulty.label",
         "peer_impact.label",
     ]
+
+    if search_string := request.GET.get("search_string", default=""):
+        start = time.perf_counter()
+
+        terms = search_string.split()
+        query = [t for t in terms if t.split("::")[0].lower() not in FILTERS]
+
+        # Search
+        s = as_ES(" ".join(query))
+
+        # Serialize
+        results = [hit.to_dict() for hit in s[:50]]
+
+        meta = {
+            "hit_count": s.count() if results else 0,
+        }
+
+        search_logger.info(
+            f"Assignment search: {time.perf_counter() - start:.2e}s - {search_string}"
+        )
+
+        return JsonResponse({"results": results, "meta": meta}, safe=False)
+
+    return JsonResponse({})
+
+
+@ajax_login_required
+@ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
+def collection_search_beta(request):
+    FILTERS = [
+        "category__title",
+        "discipline.title",
+        "difficulty.label",
+        "peer_impact.label",
+    ]
+
+    if search_string := request.GET.get("search_string", default=""):
+        start = time.perf_counter()
+
+        terms = search_string.split()
+        query = [t for t in terms if t.split("::")[0].lower() not in FILTERS]
+
+        # Search
+        s = cs_ES(" ".join(query))
+
+        # Serialize
+        results = [hit.to_dict() for hit in s[:50]]
+
+        meta = {
+            "hit_count": s.count() if results else 0,
+        }
+
+        search_logger.info(
+            f"Collection search: {time.perf_counter() - start:.2e}s - {search_string}"
+        )
+
+        return JsonResponse({"results": results, "meta": meta}, safe=False)
+
+    return JsonResponse({})
+
+
+@ajax_login_required
+@ajax_user_passes_test(lambda u: hasattr(u, "teacher"))
+def question_search_beta(request, page=0):
+    FILTERS = [
+        "category__title",
+        "discipline.title",
+        "difficulty.label",
+        "peer_impact.label",
+    ]
+    PAGINATION_LIMIT = 10
 
     search_string = request.GET.get("search_string", default="")
 
@@ -2199,7 +2277,13 @@ def question_search_beta(request):
         # Search
         s = qs_ES(" ".join(query), filters, flagged)
         # Serialize
-        results = [hit.to_dict() for hit in s[:50]]
+        if page < 0:
+            page = 0
+        if page > s.count() // PAGINATION_LIMIT:
+            page = s.count() // PAGINATION_LIMIT
+        start_index = page * PAGINATION_LIMIT
+        end_index = (page + 1) * PAGINATION_LIMIT
+        results = [hit.to_dict() for hit in s[start_index:end_index]]
         # Add metadata
         if results:
             _c = []
@@ -2227,6 +2311,9 @@ def question_search_beta(request):
                     for i in impacts
                     if _i[0] == i
                 ],
+                "hit_count": s.count(),
+                "page": page,
+                "page_size": PAGINATION_LIMIT,
             }
         else:
             meta = {
@@ -2234,10 +2321,13 @@ def question_search_beta(request):
                 "difficulties": [],
                 "disciplines": [],
                 "impacts": [],
+                "hit_count": 0,
+                "page": 0,
+                "page_size": PAGINATION_LIMIT,
             }
 
         search_logger.info(
-            f"{time.perf_counter() - start:.2e}s - {search_string}"
+            f"Question search: {time.perf_counter() - start:.2e}s - {search_string}"
         )
 
         return JsonResponse({"results": results, "meta": meta}, safe=False)
@@ -2246,7 +2336,6 @@ def question_search_beta(request):
 
 
 def question_search(request):
-
     start = time.perf_counter()
 
     if not Teacher.objects.filter(user=request.user).exists():

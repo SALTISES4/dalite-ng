@@ -2,6 +2,7 @@ import factory
 import pytest
 
 from peerinst.models import (
+    Answer,
     AnswerChoice,
     Institution,
     Question,
@@ -63,3 +64,26 @@ def undistributed_assignment(assignment, group):
     return StudentGroupAssignment.objects.create(
         assignment=assignment, group=group
     )
+
+
+@pytest.fixture
+def realistic_assignment(assignment, realistic_questions):
+    q = realistic_questions[0]
+    assignment.questions.clear()
+    assignment.questions.add(q)
+    for i, choice in enumerate(q.answerchoice_set.all()):
+        Answer.objects.create(
+            question=q,
+            first_answer_choice=i + 1,
+            rationale="rationale",
+            second_answer_choice=i + 1,
+            user_token="student1",
+        )
+        Answer.objects.create(
+            question=q,
+            first_answer_choice=i + 1,
+            rationale="rationale",
+            second_answer_choice=i + 1,
+            expert=True,
+        )
+    return assignment

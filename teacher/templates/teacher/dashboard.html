@@ -1,0 +1,49 @@
+{% extends 'teacher/base.html' %}
+
+{% load static %}
+
+{% block apps %}
+  {{ block.super }}
+  <script
+    src="{% static 'components/js/build/dashboard.min.js' %}"
+    defer="true"
+  ></script>
+{% endblock %}
+
+{% block injected_apps %}
+  {{ block.super }}
+  <div id="dashboard-app"></div>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function () {
+      const dashboardApp = () => {
+        return dashboard.h(dashboard.App, {
+          gettext: gettext,
+          logo: "{% static 'components/img/logo.gif' %}",
+          nonce: "{{ request.csp_nonce }}",
+          urls: {
+            add_to_assignment: "{% url 'REST:assignment_question-list' %}",
+            collection: "{% url 'REST:collection-list' %}?field=author&field=description&field=discipline&field=featured&field=follower_count&field=pk&field=title&field=url&field=user",
+            collections: "{% url 'REST:recommended-collections-list' %}?field=author&field=description&field=discipline&field=featured&field=follower_count&field=pk&field=title&field=url&field=user",
+            collectionsLink: "{% url 'teacher:search' %}?type=Collection",
+            questions: "{% url 'REST:recommended-questions-list' %}?field=answer_count&field=category&field=difficulty&field=discipline&field=peer_impact&field=tags&field=text&field=title&field=user&field=answerchoice_set&field=image&field=image_alt_text&field=video_url&field=pk&field=is_owner&field=urls&field=type",
+            questionsLink: "{% url 'teacher:search' %}?type=Question",
+            studentgroupassignments: "{% url 'REST:recent-studentgroupassignment-list' %}",
+            studentgroupassignmentsLink: "{% url 'teacher:library' request.user.teacher.pk %}?view=2",
+            teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=bookmarked_collections&field=activeAssignmentCount&field=activeGroupCount&field=createdQuestionCount&field=favourite_questions&field=user",
+          },
+          user: {
+            username: {% if request.user.saltisemember %}"{{ request.user.saltisemember.name }}"{% else %}"{{ request.user.username }}"{% endif %},
+          }
+        });
+      };
+      dashboard.render(
+        dashboardApp(),
+        document.getElementById("dashboard-app")
+      );
+    });
+  </script>
+{% endblock %}

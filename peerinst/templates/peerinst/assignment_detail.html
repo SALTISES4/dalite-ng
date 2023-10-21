@@ -80,7 +80,7 @@
       const assignmentUpdateApp = () => {
         return preact.h(
           assignment.AssignmentUpdateApp, {
-            assignmentURL: "{% url 'REST:assignment-detail' object.pk %}?format=json",
+            assignmentURL: "{% url 'REST:teacher-assignment-detail' object.pk %}?format=json",
             assignmentQuestionURL: "{% url 'REST:assignment_question-list' %}",
             teacherURL: "{% url 'REST:teacher' teacher.pk %}?field=favourite_questions",
             gettext: gettext,

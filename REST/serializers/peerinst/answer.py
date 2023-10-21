@@ -33,12 +33,6 @@ class AnswerSerializer(DynamicFieldsModelSerializer):
         read_only=True,
     )
 
-    def get_vote_count(self, obj):
-        return Answer.objects.filter(chosen_rationale_id=obj.id).count()
-
-    def get_shown_count(self, obj):
-        return ShownRationale.objects.filter(shown_answer=obj).count()
-
     def get_answer_choice(self, obj):
         if obj.question.type == "RO":
             return None
@@ -60,10 +54,16 @@ class AnswerSerializer(DynamicFieldsModelSerializer):
     def get_second_answer_choice_label(self, obj):
         return obj.question.get_choice_label(obj.second_answer_choice)
 
+    def get_shown_count(self, obj):
+        return ShownRationale.objects.filter(shown_answer=obj).count()
+
     def get_timestamp(self, obj):
         return (
             obj.datetime_second if obj.datetime_second else obj.datetime_first
         )
+
+    def get_vote_count(self, obj):
+        return Answer.objects.filter(chosen_rationale_id=obj.id).count()
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)

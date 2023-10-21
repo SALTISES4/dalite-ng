@@ -13,6 +13,7 @@ class InOwnerList(permissions.BasePermission):
 
 class InAssignmentOwnerList(permissions.BasePermission):
     """
+    FIXME: Unused???
     Object-level permission to only allow owners of an object to access/edit.
     """
 

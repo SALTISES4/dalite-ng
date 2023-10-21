@@ -1,46 +1,64 @@
+import logging
+from string import capwords
+
 import bleach
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Max
-from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
+from PIL import Image
 from rest_framework import serializers
-from rest_framework.exceptions import bad_request
 
+from peerinst.documents import CategoryDocument
 from peerinst.models import (
+    Answer,
+    AnswerChoice,
     Assignment,
     AssignmentQuestions,
     Category,
+    Collection,
     Discipline,
     Question,
+    StudentGroup,
+    StudentGroupAssignment,
 )
-from peerinst.templatetags.bleach_html import ALLOWED_TAGS
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS, STRICT_TAGS
 
 from .dynamic_serializer import DynamicFieldsModelSerializer
+from .student_group import StudentGroupSerializer
+
+logger = logging.getLogger("REST")
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ["title"]
-
+class CategorySerializer(DocumentSerializer):
     def to_representation(self, instance):
-        """Bleach"""
+        """Bleach on the way out"""
         ret = super().to_representation(instance)
-        ret["title"] = bleach.clean(ret["title"], tags=[], strip=True).strip()
+        ret["title"] = capwords(
+            bleach.clean(ret["title"], tags=[], strip=True).strip()
+        )
         return ret
+
+    class Meta:
+        document = CategoryDocument
+        fields = ["title"]
 
 
 class DisciplineSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        """Bleach on the way out"""
+        ret = super().to_representation(instance)
+        ret["title"] = capwords(
+            bleach.clean(ret["title"], tags=[], strip=True).strip()
+        )
+        return ret
+
     class Meta:
         model = Discipline
         fields = ["title", "pk"]
-
-    def to_representation(self, instance):
-        """Bleach"""
-        ret = super().to_representation(instance)
-        ret["title"] = bleach.clean(ret["title"], tags=[], strip=True).strip()
-        return ret
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -49,16 +67,135 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["username"]
 
 
+class SampleAnswerSerializer(serializers.ModelSerializer):
+    pk = serializers.IntegerField(read_only=False, required=False)
+
+    def validate_rationale(self, value):
+        """
+        Check rationale <= 4000 characters
+        """
+        if len(value) > 4000:
+            raise serializers.ValidationError(_("Rationale text too long"))
+        return value
+
+    def to_representation(self, instance):
+        """Bleach on the way out"""
+        ret = super().to_representation(instance)
+        if "rationale" in ret and ret["rationale"]:
+            ret["rationale"] = bleach.clean(
+                ret["rationale"], tags=STRICT_TAGS, strip=True
+            ).strip()
+        return ret
+
+    class Meta:
+        model = Answer
+        fields = [
+            "expert",
+            "pk",
+            "rationale",
+        ]
+        read_only_fields = ["pk"]
+
+
+class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
+    pk = serializers.IntegerField(required=False)
+    expert_answers = SampleAnswerSerializer(many=True, required=False)
+    sample_answers = SampleAnswerSerializer(many=True)
+
+    def validate(self, data):
+        """
+        Check correct answer choices have an expert rationale
+        """
+        if data["correct"]:
+            if (
+                "expert_answers" not in data
+                or len(data["expert_answers"]) == 0
+            ):
+                raise serializers.ValidationError(
+                    _(
+                        "An expert rationale is required for each correct answer choice"
+                    )
+                )
+        """
+        Check each answer choice has at least one sample rationale
+        """
+        if len(data["sample_answers"]) == 0:
+            raise serializers.ValidationError(
+                _("An sample rationale is required for each answer choice")
+            )
+        return data
+
+    def to_representation(self, instance):
+        """Bleach on the way out"""
+        ret = super().to_representation(instance)
+        if "text" in ret and ret["text"]:
+            ret["text"] = bleach.clean(
+                ret["text"], tags=ALLOWED_TAGS, strip=True
+            ).strip()
+        return ret
+
+    class Meta:
+        model = AnswerChoice
+        fields = [
+            "correct",
+            "expert_answers",
+            "pk",
+            "question",
+            "sample_answers",
+            "text",
+        ]
+
+
+class NullableM2MFormDataSerializer(serializers.SlugRelatedField):
+    def to_internal_value(self, data):
+        if data == "[]":
+            return None
+        return super().to_internal_value(data)
+
+
 class QuestionSerializer(DynamicFieldsModelSerializer):
     answer_count = serializers.ReadOnlyField()
-    answerchoice_set = serializers.SerializerMethodField()
+    answerchoice_set = AnswerChoiceSerializer(
+        fields=[
+            "correct",
+            "expert_answers",
+            "pk",
+            "sample_answers",
+            "text",
+        ],
+        many=True,
+    )
     assignment_count = serializers.ReadOnlyField()
     category = CategorySerializer(many=True, read_only=True)
+    category_pk = NullableM2MFormDataSerializer(
+        queryset=Category.objects.all(),
+        slug_field="title",
+        many=True,
+        source="category",
+        allow_null=True,
+        required=False,
+    )
     collaborators = UserSerializer(many=True, read_only=True)
+    collaborators_pk = NullableM2MFormDataSerializer(
+        queryset=User.objects.filter(teacher__isnull=False),
+        slug_field="username",
+        many=True,
+        source="collaborators",
+        allow_null=True,
+        required=False,
+    )
     difficulty = serializers.SerializerMethodField()
     discipline = DisciplineSerializer(read_only=True)
+    discipline_pk = serializers.PrimaryKeyRelatedField(
+        queryset=Discipline.objects.all(),
+        many=False,
+        source="discipline",
+        allow_null=True,
+        required=False,
+    )
     flag_reasons = serializers.ReadOnlyField()
-    frequency = serializers.SerializerMethodField()
+    frequency = serializers.ReadOnlyField(source="get_frequency")
+    image = serializers.ImageField(required=False)
     is_editable = serializers.SerializerMethodField()
     is_not_flagged = serializers.ReadOnlyField()
     is_not_missing_answer_choices = serializers.ReadOnlyField()
@@ -66,31 +203,17 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     is_not_missing_sample_answers = serializers.ReadOnlyField()
     is_owner = serializers.SerializerMethodField()
     is_valid = serializers.ReadOnlyField()
-    matrix = serializers.SerializerMethodField()
-    most_convincing_rationales = serializers.SerializerMethodField()
+    matrix = serializers.ReadOnlyField(source="get_matrix")
+    most_convincing_rationales = serializers.ReadOnlyField(
+        source="get_most_convincing_rationales"
+    )
     peer_impact = serializers.SerializerMethodField()
     urls = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
 
-    def get_answerchoice_set(self, obj):
-        return [
-            {
-                "correct": obj.is_correct(i),
-                "text": bleach.clean(
-                    ac[1],
-                    tags=ALLOWED_TAGS,
-                    strip=True,
-                ).strip(),
-            }
-            for i, ac in enumerate(obj.get_choices(), 1)
-        ]
-
     def get_difficulty(self, obj):
         d = obj.get_difficulty()
-        return {"score": d[0], "label": d[1]}
-
-    def get_frequency(self, obj):
-        return obj.get_frequency()
+        return {"score": d[0], "label": d[1], "value": d[2]}
 
     def get_is_editable(self, obj):
         if "request" in self.context:
@@ -108,15 +231,9 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             )
         return False
 
-    def get_matrix(self, obj):
-        return obj.get_matrix()
-
-    def get_most_convincing_rationales(self, obj):
-        return obj.get_most_convincing_rationales()
-
     def get_peer_impact(self, obj):
         pi = obj.get_peer_impact()
-        return {"score": pi[0], "label": pi[1]}
+        return {"score": pi[0], "label": pi[1], "value": pi[2]}
 
     def get_urls(self, obj):
         return {
@@ -130,9 +247,259 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "add_sample_answers": reverse(
                 "sample-answer-form", args=(obj.pk,)
             ),
+            "addable_assignments": reverse(
+                "REST:teacher-assignment-for-question", args=(obj.pk,)
+            ),
             "copy_question": reverse("question-clone", args=(obj.pk,)),
             "fix": reverse("question-fix", args=(obj.pk,)),
+            "matrix": reverse("REST:question-matrix", args=(obj.pk,)),
+            "rationales": reverse("REST:question-rationales", args=(obj.pk,)),
+            "update": reverse("teacher:question-update", args=(obj.pk,)),
         }
+
+    def validate_answerchoice_set(self, value):
+        """
+        Check at least two answer choices
+        """
+        if len(value) < 2:
+            raise serializers.ValidationError(
+                _("At least two answer choices are required")
+            )
+
+        """
+        Check at least one answer choice is marked correct
+        """
+        if sum(x["correct"] for x in value) == 0:
+            raise serializers.ValidationError(
+                _("At least one answer choice must be correct")
+            )
+        return value
+
+    def validate_image(self, value):
+        ALLOWED_IMAGE_FORMATS = ["PNG", "GIF", "JPEG"]
+        ALLOWED_IMAGE_SIZE = 1e6
+        with Image.open(value, formats=ALLOWED_IMAGE_FORMATS) as image:
+            image.load()
+
+            if image.format not in ALLOWED_IMAGE_FORMATS:
+                raise serializers.ValidationError(
+                    "Invalid image file format.  Allowed formats are "
+                    + ", ".join(ALLOWED_IMAGE_FORMATS)
+                    + "."
+                )
+
+            if value.size > ALLOWED_IMAGE_SIZE:
+                raise serializers.ValidationError(
+                    f"Invalid image file size.  Max size is {ALLOWED_IMAGE_SIZE/1e6} MB"
+                )
+
+        return value
+
+    def validate_text(self, value):
+        """
+        Check stripped text length <= 8000
+        """
+        text = bleach.clean(value, tags=[], strip=True).strip()
+        if len(text) > 8000:
+            raise serializers.ValidationError(_("Text too long"))
+        return value
+
+    def create(self, validated_data):
+        answerchoice_data = validated_data.pop("answerchoice_set")
+
+        """Create question and attach user"""
+        question = super().create(validated_data)
+        question.user = self.context["request"].user
+        question.save()
+
+        """Create answer choices, sample answers and expert rationales"""
+        for i, data in enumerate(answerchoice_data, 1):
+            sample_answers = data.pop("sample_answers")
+
+            if "expert_answers" in data:
+                expert_answers = data.pop("expert_answers")
+            else:
+                expert_answers = []
+
+            AnswerChoice.objects.create(question=question, **data)
+            for sample_answer in sample_answers:
+                Answer.objects.create(
+                    expert=False,
+                    first_answer_choice=i,
+                    question=question,
+                    rationale=sample_answer["rationale"],
+                )
+            for expert_answer in expert_answers:
+                Answer.objects.create(
+                    expert=True,
+                    first_answer_choice=i,
+                    question=question,
+                    rationale=expert_answer["rationale"],
+                )
+
+        return question
+
+    def update(self, question, validated_data):
+        """
+        If answerchoice_set is present:
+        - If _pk is provided, instance will be updated
+        - If _pk is missing, instance will be created
+        - If existing answerchoice is missing, it will be deleted with related models
+        - Same logic for sample and expert answers
+        """
+        answerchoice_data = None
+        if "answerchoice_set" in validated_data:
+            answerchoice_data = validated_data.pop("answerchoice_set")
+
+        # Update question
+        for field in validated_data.keys():
+            if (
+                type(validated_data[field]) is list
+                or type(validated_data[field]) is tuple
+            ):
+                _field = getattr(question, field)
+                _field.set(validated_data[field])
+            else:
+                setattr(question, field, validated_data[field])
+
+        question.save()
+
+        if answerchoice_data:
+            existing_answerchoices = set(
+                question.answerchoice_set.values_list("pk", flat=True)
+            )
+            # Update/create answer choices
+            for i, data in enumerate(answerchoice_data, 1):
+                sample_answers = data.pop("sample_answers")
+
+                if "expert_answers" in data:
+                    expert_answers = data.pop("expert_answers")
+                else:
+                    expert_answers = []
+
+                if "pk" in data:
+                    # Update answer choice and related models
+                    ac = question.answerchoice_set.get(pk=data["pk"])
+                    ac.correct = data["correct"]
+                    ac.text = data["text"]
+                    ac.save()
+
+                    # Sample answers
+                    existing = set(
+                        ac.sample_answers.values_list("pk", flat=True)
+                    )
+                    to_update = []
+                    to_create = []
+                    for sample_answer in sample_answers:
+                        if "pk" not in sample_answer:
+                            to_create.append(sample_answer)
+                            break
+                        if sample_answer["pk"] in existing:
+                            to_update.append(sample_answer)
+
+                    to_delete = existing - {s["pk"] for s in to_update}
+
+                    for sample_answer in to_update:
+                        s = Answer.objects.get(pk=sample_answer["pk"])
+                        s.rationale = sample_answer["rationale"]
+                        s.save()
+
+                    for sample_answer in to_create:
+                        Answer.objects.create(
+                            expert=False,
+                            first_answer_choice=i,
+                            question=question,
+                            rationale=sample_answer["rationale"],
+                        )
+
+                    for pk in to_delete:
+                        s = Answer.objects.get(pk=pk)
+                        s.delete()
+
+                    # Expert answers
+                    existing = set(
+                        ac.expert_answers.values_list("pk", flat=True)
+                    )
+                    to_update = []
+                    to_create = []
+                    for expert_answer in expert_answers:
+                        if "pk" not in expert_answer:
+                            to_create.append(expert_answer)
+                            break
+                        if expert_answer["pk"] in existing:
+                            to_update.append(expert_answer)
+
+                    to_delete = existing - {e["pk"] for e in to_update}
+
+                    for expert_answer in to_update:
+                        e = Answer.objects.get(pk=expert_answer["pk"])
+                        e.rationale = expert_answer["rationale"]
+                        e.save()
+
+                    for expert_answer in to_create:
+                        Answer.objects.create(
+                            expert=True,
+                            first_answer_choice=i,
+                            question=question,
+                            rationale=expert_answer["rationale"],
+                        )
+
+                    if len(to_create) > 0 or len(existing) > len(to_delete):
+                        for pk in to_delete:
+                            e = Answer.objects.get(pk=pk)
+                            e.delete()
+
+                else:
+                    # Create answer choice and related models
+                    AnswerChoice.objects.create(question=question, **data)
+                    for sample_answer in sample_answers:
+                        Answer.objects.create(
+                            expert=False,
+                            first_answer_choice=i,
+                            question=question,
+                            rationale=sample_answer["rationale"],
+                        )
+                    for expert_answer in expert_answers:
+                        Answer.objects.create(
+                            expert=True,
+                            first_answer_choice=i,
+                            question=question,
+                            rationale=expert_answer["rationale"],
+                        )
+
+            # Delete answer choices
+            for pk in existing_answerchoices - {
+                ac["pk"]
+                if "pk" in ac and ac["pk"] in existing_answerchoices
+                else None
+                for ac in answerchoice_data
+            }:
+                ac = question.answerchoice_set.get(pk=pk)
+                for sample_answer in ac.sample_answers.all():
+                    sample_answer.delete()
+                for expert_answer in ac.expert_answers.all():
+                    expert_answer.delete()
+                ac.delete()
+
+        return question
+
+    def to_representation(self, instance):
+        """Bleach on the way out"""
+        ret = super().to_representation(instance)
+        if "title" in ret:
+            ret["title"] = bleach.clean(
+                ret["title"], tags=ALLOWED_TAGS, strip=True
+            ).strip()
+        if "text" in ret:
+            ret["text"] = bleach.clean(
+                ret["text"], tags=ALLOWED_TAGS, strip=True
+            ).strip()
+
+        """Add answer_choice labels"""
+        if "answerchoice_set" in ret and ret["answerchoice_set"]:
+            for i, ac in enumerate(ret["answerchoice_set"], 1):
+                ac.update(label=instance.get_choice_label(i))
+        return ret
 
     class Meta:
         model = Question
@@ -142,9 +509,12 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "answer_style",
             "assignment_count",
             "category",
+            "category_pk",
             "collaborators",
+            "collaborators_pk",
             "difficulty",
             "discipline",
+            "discipline_pk",
             "flag_reasons",
             "frequency",
             "image",
@@ -159,6 +529,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "matrix",
             "most_convincing_rationales",
             "peer_impact",
+            "rationale_selection_algorithm",
             "pk",
             "text",
             "title",
@@ -167,19 +538,6 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "user",
             "video_url",
         ]
-
-    def to_representation(self, instance):
-        """Bleach HTML-supported fields"""
-        ret = super().to_representation(instance)
-        if "title" in ret:
-            ret["title"] = bleach.clean(
-                ret["title"], tags=ALLOWED_TAGS, strip=True
-            ).strip()
-        if "text" in ret:
-            ret["text"] = bleach.clean(
-                ret["text"], tags=ALLOWED_TAGS, strip=True
-            ).strip()
-        return ret
 
 
 class RankSerializer(serializers.ModelSerializer):
@@ -190,63 +548,79 @@ class RankSerializer(serializers.ModelSerializer):
             "answerchoice_set",
             "category",
             "collaborators",
+            "difficulty",  # Added for new assignment interface
             "discipline",
             "frequency",
             "image",
             "image_alt_text",
+            "is_owner",  # Added for new assignment interface
+            "is_valid",  # Added for new assignment interface
             "matrix",
+            "peer_impact",  # Added for new assignment interface
             "pk",
             "text",
             "title",
+            "type",
+            "urls",  # Added for new assignment interface
             "user",
         ),
     )
+    question_pk = serializers.PrimaryKeyRelatedField(
+        queryset=Question.objects.all(),
+        source="question",
+        required=True,
+    )
+
+    def get_unique_together_validators(self):
+        """
+        Have to override the unique_together constraint in order
+        to support update as nested field in AssignmentSerializer
+        """
+        return []
 
     def create(self, validated_data):
-        """Custom create method to add questions to an assignment based on pk
+        """
+        Custom create method to add questions to an assignment based on pk
         Required POST data:
             - assignment (validated normally)
-            - question_pk (validated here)
+            - question_pk (validated normally)
         """
-
         assignment = validated_data["assignment"]
+        question = validated_data["question"]
         if (
             assignment.editable
             and self.context["request"].user in assignment.owner.all()
         ):
-            if "question_pk" in self.context["request"].data:
-                question_pk = self.context["request"].data["question_pk"]
-                if assignment.questions.all():
-                    added_question = AssignmentQuestions.objects.create(
-                        assignment=assignment,
-                        question=get_object_or_404(Question, pk=question_pk),
-                        rank=assignment.questions.aggregate(
-                            Max("assignmentquestions__rank")
-                        )["assignmentquestions__rank__max"]
-                        + 1,
-                    )
-                else:
-                    added_question = AssignmentQuestions.objects.create(
-                        assignment=assignment,
-                        question=get_object_or_404(Question, pk=question_pk),
-                        rank=1,
-                    )
-                if added_question:
-                    return added_question
-                else:
-                    raise bad_request
+            if assignment.questions.all():
+                added_question = AssignmentQuestions.objects.create(
+                    assignment=assignment,
+                    question=question,
+                    rank=assignment.questions.aggregate(
+                        Max("assignmentquestions__rank")
+                    )["assignmentquestions__rank__max"]
+                    + 1,
+                )
             else:
-                raise bad_request
+                added_question = AssignmentQuestions.objects.create(
+                    assignment=assignment,
+                    question=question,
+                    rank=1,
+                )
+            return added_question
         raise PermissionDenied
 
     class Meta:
         model = AssignmentQuestions
-        fields = ["assignment", "question", "rank", "pk"]
+        fields = ["assignment", "question", "question_pk", "rank", "pk"]
 
 
 class AssignmentSerializer(DynamicFieldsModelSerializer):
+    answer_count = serializers.ReadOnlyField()
     editable = serializers.ReadOnlyField()
     is_valid = serializers.ReadOnlyField()
+    is_owner = serializers.SerializerMethodField()
+    owner = UserSerializer(many=True, read_only=True)
+    question_count = serializers.SerializerMethodField()
     question_pks = serializers.SerializerMethodField()
     questions = RankSerializer(
         source="assignmentquestions_set",
@@ -266,6 +640,14 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
     )
     urls = serializers.SerializerMethodField()
 
+    def get_is_owner(self, obj):
+        if "request" in self.context:
+            return self.context["request"].user in obj.owner.all()
+        return None
+
+    def get_question_count(self, obj):
+        return obj.questions.count()
+
     def get_question_pks(self, obj):
         return list(obj.questions.values_list("pk", flat=True))
 
@@ -280,7 +662,14 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
                 args=(obj.pk,),
             ),
             "preview": obj.get_absolute_url(),
-            "update": reverse("assignment-update", args=(obj.pk,)),
+            "update": reverse(
+                "teacher:assignment-update",
+                args=(obj.pk,),
+            ),
+            "view": reverse(
+                "teacher:assignment-detail",
+                args=(obj.pk,),
+            ),
         }
 
     def validate_questions(self, data):
@@ -303,20 +692,43 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        Only used to reorder questions.
+        Only used to reorder questions and change meta data.
         Adding/deleting questions is handled by serializer for through table.
         """
-        if instance.editable:
-            for i, aq in enumerate(instance.assignmentquestions_set.all()):
-                aq.rank = validated_data["assignmentquestions_set"][i]["rank"]
-                aq.save()
+        if "assignmentquestions_set" in validated_data:
+            if instance.editable:
+                for i, aq in enumerate(instance.assignmentquestions_set.all()):
+                    aq.rank = validated_data["assignmentquestions_set"][i][
+                        "rank"
+                    ]
+                    aq.save()
 
-            return instance
-        raise PermissionDenied
+        for field in ["conclusion_page", "description", "intro_page", "title"]:
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+
+        instance.save()
+
+        return instance
 
     def to_representation(self, instance):
-        """Bleach fields"""
+        """Bleach on the way out"""
         ret = super().to_representation(instance)
+        for field in ["conclusion_page", "description", "intro_page"]:
+            if field in ret and ret[field]:
+                ret[field] = bleach.clean(
+                    ret[field], tags=ALLOWED_TAGS, strip=True
+                ).strip()
+        for field in ["title"]:
+            if field in ret and ret[field]:
+                ret[field] = bleach.clean(
+                    ret[field], tags=[], strip=True
+                ).strip()
+        return ret
+
+    def to_internal_value(self, data):
+        """Bleach on the way in"""
+        ret = super().to_internal_value(data)
         for field in ["conclusion_page", "description", "intro_page"]:
             if field in ret and ret[field]:
                 ret[field] = bleach.clean(
@@ -332,15 +744,212 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Assignment
         fields = [
+            "answer_count",  #
             "conclusion_page",
             "description",
             "editable",
             "intro_page",
+            "is_owner",
             "is_valid",
+            "owner",  #
             "pk",
+            "question_count",  #
             "question_pks",
             "questions",
             "questions_basic",
             "title",
             "urls",
+        ]
+
+
+class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
+    active = serializers.SerializerMethodField()
+    answerCount = serializers.SerializerMethodField()
+    assignment = AssignmentSerializer(fields=["pk", "urls"], read_only=True)
+    assignment_pk = serializers.PrimaryKeyRelatedField(
+        queryset=Assignment.objects.all(),
+        source="assignment",
+        required=True,
+    )
+    author = serializers.SerializerMethodField()
+    difficulty = serializers.SerializerMethodField()
+    distributionState = serializers.SerializerMethodField()
+    group = StudentGroupSerializer(read_only=True)
+    group_pk = serializers.PrimaryKeyRelatedField(
+        queryset=StudentGroup.objects.all(),
+        source="group",
+        required=True,
+    )
+    issueCount = serializers.SerializerMethodField()
+    order = serializers.CharField(
+        max_length=1000
+    )  # Arbitrary upper limit as safeguard
+    progress = serializers.SerializerMethodField()
+    questionCount = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
+
+    def get_active(self, obj):
+        return obj.is_distributed and not obj.expired
+
+    def get_answerCount(self, obj):
+        return (
+            Answer.objects.filter(
+                user_token__in=[
+                    student.student.username
+                    for student in obj.group.students.all()
+                ]
+            )
+            .filter(assignment=obj.assignment)
+            .count()
+        )
+
+    def get_assignment_pk(self, obj):
+        return obj.assignment.pk
+
+    def get_author(self, obj):
+        if obj.assignment.owner.exists():
+            return obj.assignment.owner.first().username
+        return None
+
+    def get_difficulty(self, obj):
+        return "ToDo"  # calculate difficulty from questions
+
+    def get_distributionState(self, obj):
+        return "Distributed"
+        # FIXME: choices from components/static/_localComponents/enum.ts
+
+    def get_issueCount(self, obj):
+        return 1.0  # FIXME: Do we need this?
+
+    def get_progress(self, obj):
+        return f"{100 * obj.percent_completion:.0f}"
+
+    def get_questionCount(self, obj):
+        return obj.assignment.questions.count()
+
+    def get_title(self, obj):
+        return obj.assignment.title.strip()
+
+    def get_url(self, obj):
+        return obj.get_absolute_url()
+
+    def validate_assignment_pk(self, assignment):
+        if not assignment.is_valid:
+            logger.error(
+                f"Assignment {assignment} is not valid and cannot be distributed."
+            )
+            raise serializers.ValidationError("Assignment is not valid.")
+        return assignment
+
+    def validate_due_date(self, due_date):
+        """
+        Check due_date is in the future
+        """
+        if due_date < timezone.now():
+            logger.error(f"Invalid due_date: {due_date}")
+            raise serializers.ValidationError(
+                "Invalid due date (in the past)."
+            )
+        return due_date
+
+    def validate_group_pk(self, student_group):
+        """
+        Check that teacher owns group and that group is "assignable"
+        (see Teacher model)
+        """
+        teacher = self.context["request"].user.teacher
+
+        if (
+            teacher
+            and teacher in student_group.teacher.all()
+            and student_group in teacher.assignable_groups.all()
+        ):
+            return student_group
+
+        logger.error(f"Invalid student group: {student_group}")
+        raise serializers.ValidationError("Invalid student group.")
+
+    def validate_order(self, data):
+        logger.info(f"Order: {data}")
+        # TODO: Reimplement custom validation in model through validators and update
+        # raise serializers.ValidationError("Invalid question order.")
+        return data
+
+    def validate(self, data):
+        """
+        Impose unique_together on assignment and group
+        """
+        assignment = data["assignment"]
+        group = data["group"]
+        if StudentGroupAssignment.objects.filter(
+            assignment=assignment, group=group
+        ).exists():
+            logger.error(
+                f"Assignment {assignment} already distributed to {group}."
+            )
+            raise serializers.ValidationError(
+                f"Assignment already distributed to {group}."
+            )
+        return data
+
+    def create(self, validated_data):
+        sga = super().create(validated_data)
+        sga.distribute()
+        return sga
+
+    class Meta:
+        model = StudentGroupAssignment
+        fields = [
+            "active",
+            "answerCount",
+            "assignment",
+            "assignment_pk",
+            "author",
+            "difficulty",
+            "distributionState",
+            "due_date",
+            "group",
+            "group_pk",
+            "issueCount",
+            "order",
+            "pk",
+            "progress",
+            "questionCount",
+            "show_correct_answers",
+            "title",
+            "url",
+        ]
+
+
+class CollectionSerializer(DynamicFieldsModelSerializer):
+    answerCount = serializers.SerializerMethodField()
+    description = serializers.ReadOnlyField()
+    discipline = DisciplineSerializer(read_only=True)
+    follower_count = serializers.SerializerMethodField()
+    title = serializers.ReadOnlyField()
+    url = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True, source="owner.user")
+
+    def get_answerCount(self, obj):
+        return obj.answer_count
+
+    def get_follower_count(self, obj):
+        return obj.followers.count()
+
+    def get_url(self, obj):
+        return obj.get_absolute_url()
+
+    class Meta:
+        model = Collection
+        fields = [
+            "answerCount",
+            "description",
+            "discipline",
+            "featured",
+            "follower_count",
+            "pk",
+            "title",
+            "url",
+            "user",
         ]

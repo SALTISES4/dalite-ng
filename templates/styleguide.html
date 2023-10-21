@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% load i18n static %}
+
+{% block apps %}
+  {{ block.super }}
+  <script
+    src="{% static 'components/js/build/styleguide.min.js' %}"
+    defer="true"
+  ></script>
+{% endblock %}
+
+
+{% block injected_apps %}
+  {{ block.super }}
+  <div id="styleguide-app"></div>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function () {
+      const styleguideApp = () => {
+        return styleguide.h(styleguide.styleguide, {
+          nonce:"{{ request.csp_nonce }}",
+        });
+      };
+      styleguide.render(
+        styleguideApp(),
+        document.getElementById("styleguide-app")
+      );
+    });
+  </script>
+{% endblock %}

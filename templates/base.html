@@ -1,0 +1,123 @@
+{% load compress cookie_consent_tags csp i18n piwik static tz %}
+
+{% get_current_language as LANGUAGE_CODE %}
+
+{% timezone "Canada/Eastern" %}
+  <!DOCTYPE html>
+  <html lang="{{ LANGUAGE_CODE }}">
+    <head>
+      <!-- Meta -->
+      <title>{% block title %}myDALITE{% endblock %}</title>
+      <meta charset="utf-8"/>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="{% trans 'myDALITE is a free open-source web-based platform that promotes conceptual learning.' %}">
+      <meta name="theme-color" content="#004266">
+
+      <!-- Favicons -->
+      <link href="{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" rel="icon">
+      <link href="{% static 'peerinst/img/SALTISE-logo-icon.gif' %}" rel="apple-touch-icon">
+
+      <!-- Javascript translations -->
+      <script src="{% url 'javascript-catalog' %}"></script>
+
+      <!-- Fonts and styles -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      />
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Cardo:400i&display=swap"
+        type="text/css"
+      />
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Montserrat:400&display=swap"
+        type="text/css"
+      />
+
+      <!-- Inline styles -->
+      {% block stylesheets %}
+        <style nonce="{{ request.csp_nonce }}">
+          html {
+            background-color: #EDF5FC;
+          }
+          body {
+            margin: 0px 0px 50px 0px;
+          }
+          #main {
+            margin-left: 200px;
+          }
+        </style>
+      {% endblock %}
+
+      <!-- Cookie consent -->
+      {% compress css file cookie_law %}
+        <link href="{% static 'peerinst/css/cookie_law.min.css' %}" rel="stylesheet">
+      {% endcompress %}
+
+      <!-- Apps -->
+      <script
+        src="{% static 'components/js/build/navigation.min.js' %}"
+        defer="true"
+      ></script>
+      {% block apps %}{% endblock %}
+    </head>
+    <body>
+      {% block body %}{% endblock %}
+
+      <div id="main">
+        {% block injected_apps %}{% endblock %}
+      </div>
+
+      <!-- Cookie consent -->
+      <script src="{% static 'cookie_consent/cookiebar.js' %}"></script>
+
+      {% if request|cookie_consent_enabled %}
+        {% not_accepted_or_declined_cookie_groups request as cookie_groups %}
+
+        {% if cookie_groups %}
+          {% url "cookie_consent_cookie_group_list" as url_cookies %}
+          {% cookie_consent_accept_url cookie_groups as url_accept %}
+          {% cookie_consent_decline_url cookie_groups as url_decline %}
+          <script nonce="{{ request.csp_nonce }}">
+            var cookie_groups = [];
+            {% for cookie_group in cookie_groups %}
+              cookie_groups.push("{{ cookie_group.varname }}");
+            {% endfor %}
+
+            window.addEventListener("load", () => {
+              showCookieBar({
+                content: "{% filter escapejs %}{% with cookie_groups=cookie_groups|join:', ' %}<div id='CookielawBanner' class='cookie-bar'><p>This site uses {{ cookie_groups|lower }} cookies for better performance and user experience. Do you agree to use cookies?</p><div class='button-container'><a id='accept-cookies' class='mdc-button mdc-button--raised cc-cookie-accept' href='{{ url_accept }}'>{% trans 'Accept' %}</a> <a href='{{ url_decline }}' class='mdc-button mdc-button--raised cc-cookie-decline'>{% trans 'Decline' %}</a> <a class='mdc-button mdc-button--raised' href='{{ url_cookies }}?next={{ request.path }}'>Policy</a></div></div>{% endwith %}{% endfilter %}",
+                cookie_groups: cookie_groups,
+                cookie_decline: "{% get_decline_cookie_groups_cookie_string request cookie_groups %}",
+                beforeDeclined: function() {
+                  document.cookie = "{% get_decline_cookie_groups_cookie_string request cookie_groups %}";
+                }
+              });
+            });
+          </script>
+        {% endif %}
+      {% endif %}
+
+      <!-- Matomo analytics -->
+      {% if not debug  %}
+        {% if request|cookie_group_declined:"optional" %}
+          <script nonce="{{ request.csp_nonce }}">
+            var _paq = [];
+            _paq.push(['disableCookies']);
+          </script>
+        {% endif %}
+        {% script type="text/javascript" %}
+          {% piwik %}
+        {% endscript %}
+      {% endif %}
+
+      {% block scripts %}{% endblock %}
+    </body>
+  </html>
+{% endtimezone %}

@@ -6,3 +6,5 @@ django-storages
 gunicorn
 sentry-sdk >= 1.14.0
 watchtower
+
+mysqlclient

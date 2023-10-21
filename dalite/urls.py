@@ -92,6 +92,7 @@ urlpatterns += i18n_patterns(
     path("saltise/", include("saltise.urls", namespace="saltise")),
     path("blink/", include("blink.urls", namespace="blink")),
     path("course-flow/", include("course_flow.urls", namespace="course_flow")),
+    path("teacher/", include("teacher.urls", namespace="teacher")),
     path(
         "reputation/",
         decorator_include(
@@ -155,6 +156,7 @@ urlpatterns += i18n_patterns(
         name="admin_index_wrapper",
     ),
     path("admin/", admin.site.urls),
+    path("styleguide/", views.StyleGuideView.as_view(), name="styleguide"),
     path("tinymce/", include("tinymce.urls")),
 )
 

@@ -22,7 +22,7 @@
           <div class="quicklinks-wrap">
             <h3>{% trans 'Quick links' %}</h3>
             <div class="quicklinks">
-              <a href="{% url 'teacher-dashboard' %}" class="quicklinks__block">
+              <a href="{% url 'teacher:dashboard' request.user.teacher.pk %}" class="quicklinks__block">
                 <span>
                   <svg class="inline-svg">
                     <use href="#template" />
@@ -38,7 +38,7 @@
                 </span>
                 <h4>{% trans 'My account' %}</h4>
               </a>
-              <a href="{% url 'browse-database' %}" class="quicklinks__block">
+              <a href="{% url 'teacher:search' %}" class="quicklinks__block">
                 <span>
                   <svg class="inline-svg">
                     <use href="#search" />

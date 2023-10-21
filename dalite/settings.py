@@ -39,11 +39,14 @@ INSTALLED_APPS = (
     "saltise",
     "channels",
     "REST",
+    "teacher",
     "django_elasticsearch_dsl",
+    "django_elasticsearch_dsl_drf",
     "lti_provider",
     "tinymce",
     "csp",
     "cookie_consent",
+    "components",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -204,7 +207,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-
 # Channels
 ASGI_APPLICATION = "dalite.routing.application"
 CHANNEL_LAYERS = {
@@ -223,7 +225,7 @@ CHANNEL_LAYERS = {
 
 
 # Axes
-AXES_ONLY_USER_FAILURES = True
+AXES_LOCKOUT_PARAMETERS = ["ip_address", "username"]
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = datetime.timedelta(minutes=5)
 AXES_LOCKOUT_TEMPLATE = "registration/lockout.html"
@@ -361,12 +363,13 @@ CSP_OBJECT_SRC = [
     "*.courseflow.ca",
     "phet.colorado.edu",
     "*.youtube.com",
+    "*.youtube-nocookie.com",
     "*.vimeo.com",
     "docs.google.com",
     "openstax.org",
     "www.geogebra.org",
 ]
-
+CSP_FRAME_SRC = CSP_OBJECT_SRC
 CSP_FRAME_ANCESTORS = [
     "'self'",
     "moodle.dawsoncollege.qc.ca",
@@ -407,6 +410,12 @@ LOGGING = {
         },
     },
     "handlers": {
+        "console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
         "file_debug_log": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
@@ -581,6 +590,11 @@ LOGGING = {
         "performance": {
             "handlers": ["performance_console_log"],
             "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "REST": {
+            "handlers": ["console_log"],
+            "level": "DEBUG",
             "propagate": True,
         },
         "validation": {

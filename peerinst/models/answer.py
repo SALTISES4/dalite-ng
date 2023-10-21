@@ -5,7 +5,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from peerinst.templatetags.bleach_html import ALLOWED_TAGS
+from peerinst.templatetags.bleach_html import ALLOWED_TAGS, STRICT_TAGS
 from quality.models import Quality
 
 from .assignment import Assignment
@@ -14,7 +14,6 @@ from .question import GradingScheme, Question
 
 class AnswerMayShowManager(models.Manager):
     def get_queryset(self):
-
         return (
             super()
             .get_queryset()
@@ -28,6 +27,35 @@ class AnswerChoice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     text = models.CharField(_("Text"), max_length=500)
     correct = models.BooleanField(_("Correct?"))
+
+    @property
+    def rank(self):
+        return (
+            list(
+                self.question.answerchoice_set.values_list("pk", flat=True)
+            ).index(self.pk)
+            + 1
+        )
+
+    @property
+    def expert_answers(self):
+        """Return expert answer for this answer choice"""
+        return Answer.objects.filter(
+            first_answer_choice=self.rank,
+            question=self.question,
+            user_token__exact="",
+            expert=True,
+        ).all()
+
+    @property
+    def sample_answers(self):
+        """Return list of sample answers for this answer choice"""
+        return Answer.objects.filter(
+            first_answer_choice=self.rank,
+            question=self.question,
+            user_token__exact="",
+            expert=False,
+        ).all()
 
     def save(self, *args, **kwargs):
         """Bleach"""
@@ -124,6 +152,12 @@ class Answer(models.Model):
         )
 
     def save(self, *args, **kwargs):
+        """Bleach"""
+        self.rationale = bleach.clean(
+            self.rationale,
+            tags=STRICT_TAGS,
+            strip=True,
+        ).strip()
         super().save(*args, **kwargs)
 
     def show_chosen_rationale(self):
@@ -315,7 +349,7 @@ class RationaleOnlyQuestion(Question):
         return
 
     def get_start_form_class(self):
-        from ..forms import RationaleOnlyForm
+        from peerinst.forms import RationaleOnlyForm
 
         return RationaleOnlyForm
 

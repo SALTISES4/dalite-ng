@@ -490,6 +490,9 @@ admin.site.register(models.MessageType)
 
 
 class SaltiseMemberAdmin(admin.ModelAdmin):
+    list_display = ("name", "user", "picture")
+    search_fields = ["name", "user__username"]
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "user":
             teachers = Teacher.objects.all().values_list("user", flat=True)

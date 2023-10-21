@@ -11,16 +11,16 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from peerinst.tasks import distribute_assignment_to_students_async
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
-from quality.models import Quality
-from reputation.models import Reputation
-
-from ..tasks import distribute_assignment_to_students_async
-from ..util import (
+from peerinst.util import (
     get_average_time_spent_on_all_question_start,
     student_list_from_student_groups,
 )
-from ..utils import format_time
+from peerinst.utils import format_time
+from quality.models import Quality
+from reputation.models import Reputation
+
 from .group import StudentGroup
 from .question import Question
 
@@ -136,6 +136,10 @@ class Assignment(models.Model):
         verbose_name_plural = _("assignments")
 
     @property
+    def answer_count(self):
+        return sum(q.answer_count for q in self.questions.all())
+
+    @property
     def editable(self):
         return (
             not self.answer_set.filter(expert=False)
@@ -148,9 +152,10 @@ class Assignment(models.Model):
 
     @property
     def is_valid(self):
-        return not any(
+        return self.questions.count() > 0 and not any(
             [
                 Question.is_missing_answer_choices(self.questions.all()),
+                Question.is_missing_expert_rationale(self.questions.all()),
                 Question.is_missing_sample_answers(self.questions.all()),
                 Question.is_flagged(self.questions.all()),
             ]
@@ -163,9 +168,7 @@ class AssignmentQuestions(models.Model):
     rank = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return "{}-{}-{}".format(
-            self.assignment.pk, self.question.pk, self.rank
-        )
+        return f"{self.assignment.pk}-{self.question.pk}-{self.rank}"
 
     class Meta:
         db_table = "peerinst_assignment_questions"
@@ -193,6 +196,9 @@ class StudentGroupAssignment(models.Model):
     quality = models.ForeignKey(
         Quality, blank=True, null=True, on_delete=models.SET_NULL
     )
+
+    def get_absolute_url(self):
+        return reverse("group-assignment", args=(self.hash,))
 
     @staticmethod
     def get(hash_):
@@ -498,6 +504,23 @@ class StudentGroupAssignment(models.Model):
             }
             for i, question in enumerate(self.questions)
         ]
+
+    @property
+    def percent_completion(self):
+        from peerinst.models import Answer
+
+        # Return value between 0 and 1
+        return (
+            Answer.objects.filter(assignment=self.assignment)
+            .filter(
+                user_token__in=self.group.students.values_list(
+                    "student__username", flat=True
+                )
+            )
+            .count()
+            / (self.studentassignment_set.count() or 1)
+            / (len(self.questions) or 1)
+        )
 
     @property
     def hash(self):

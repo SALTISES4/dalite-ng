@@ -15,19 +15,24 @@
       <meta name="description" content="{% trans 'myDALITE is a free open-source web-based platform that promotes conceptual learning.' %}">
       <meta name="theme-color" content="#004266">
 
-      <!-- Dependencies -->
+      <!-- Globals -->
+      <!-- * jQuery -->
       <script
-        src="https://code.jquery.com/jquery-3.0.0.js"
-        integrity="sha384-4s7h2GHjGL3pidmgZNMUflDgyCMrPn1cnW/2NsD1U7SCZcCU5lBzlNhd6QENeuSK"
+        src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha384-S58meLBGKxIiQmJ/pJ8ilvFUcGcqgla+mWH9EEKGm6i6rKxSTA2kpXJQJ8n7XK4w"
         crossorigin="anonymous">
       </script>
-      <!-- jQuery migration patches (use non-minified for debugging purposes)-->
+      <!-- * jQuery migration patches (use non-minified for debugging purposes) -->
       <script
-        src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"
-        integrity="sha384-Pm1fyRwPgIbpBpjdSYtcKzBv+Z/nHekZIGmhoVSBTSJ+cynSJChqUaVhkQZvb7FV"
+        src="https://code.jquery.com/jquery-migrate-3.4.0.min.js"
+        integrity="sha384-MWooe10lo6cvKQSudVN1BEepxRAEoDDyZmEGwi6v1bh86cKSdudatSa5O7OEMa5V"
         crossorigin="anonymous">
       </script>
-
+      <!-- * https://jquery.com/upgrade-guide/3.5/-->
+      <script nonce="{{ request.csp_nonce }}">
+        jQuery.migrateEnablePatches("self-closed-tags");
+      </script>
+      <!-- * webcomponents -->
       <script
         src="https://unpkg.com/browse/@webcomponents/webcomponentsjs@2.6.0/webcomponents-loader.js"
         integrity="sha384-d79el5czCrB9MIVLbOTAsdBPXLKL2FCaAZE2BSHZSSf2zZoB5BWZzpaccglhCblp"
@@ -52,23 +57,23 @@
       <!-- Javascript translations -->
       <script src="{% url 'javascript-catalog' %}"></script>
 
-      <!-- External resources -->
-      <!-- * Icons -->
-      <!-- ** Preloads -->
+      <!-- Icons -->
+      <!-- * Preloads -->
       <link
         rel="preload"
         href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round&display=swap"
         as="style"
       />
-      <!-- ** Loads -->
+      <!-- * Loads -->
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round&display=swap"
         type="text/css"
       />
       <link href="https://unpkg.com/ionicons@4.2.4/dist/css/ionicons.min.css" rel="stylesheet">
-      <!-- * Fonts -->
-      <!-- ** Preloads -->
+
+      <!-- Fonts -->
+      <!-- * Preloads -->
       <link
         rel="preload"
         href="https://fonts.googleapis.com/css?family=Cardo:400,400i&display=swap"
@@ -79,7 +84,7 @@
         href="https://fonts.googleapis.com/css?family=Montserrat:300,700&display=swap"
         as="style"
       />
-      <!-- ** Loads -->
+      <!-- * Loads -->
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Cardo:400,400i&display=swap"
@@ -176,7 +181,8 @@
 
       {% include 'icons.svg' %}
 
-      <script nonce="{{ request.csp_nonce }}" type="text/javascript" src="{% static 'cookie_consent/cookiebar.js' %}"></script>
+      <!-- Cookie consent -->
+      <script src="{% static 'cookie_consent/cookiebar.js' %}"></script>
 
       {% if request|cookie_consent_enabled %}
         {% not_accepted_or_declined_cookie_groups request as cookie_groups %}
@@ -185,7 +191,7 @@
           {% url "cookie_consent_cookie_group_list" as url_cookies %}
           {% cookie_consent_accept_url cookie_groups as url_accept %}
           {% cookie_consent_decline_url cookie_groups as url_decline %}
-          <script nonce="{{ request.csp_nonce }}" type="text/javascript">
+          <script nonce="{{ request.csp_nonce }}">
             var cookie_groups = [];
             {% for cookie_group in cookie_groups %}
               cookie_groups.push("{{ cookie_group.varname }}");

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% load i18n static %}
+
+{% block injected_apps %}
+  {{ block.super }}
+  <div id="navigation-app"></div>
+{% endblock %}
+
+{% block body %}
+  {{ block.super }}
+  {% csrf_token %}
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function () {
+      const sidebarGroups = [
+        [
+          {title: "{% trans 'Dashboard' %}", icon: "dashboard", url: "{% url 'teacher:dashboard' request.user.teacher.pk %}"},
+          {title: "{% trans 'Search' %}", icon: "search", url: "{% url 'teacher:search' %}"},
+          {title: "{% trans 'My Library' %}", icon: "collections_bookmark", url: "{% url 'teacher:library' request.user.teacher.pk %}"},
+          {title: "{% trans 'Reports' %}", icon: "assessment", url: "{% url 'report_selector' %}"},
+        ],
+        [
+          {% for group in request.user.teacher.current_groups.all %}
+            {title: "{{ group.title }}", url: "{{ group.get_absolute_url }}"},
+          {% endfor %}
+          {title: "{% trans 'Manage groups' %}", url: "{% url 'teacher-groups' request.user.teacher.pk %}", aside: true},
+        ],
+        [
+          {
+            title: "{% trans 'Help & support' %}",
+            icon: "help",
+            url: "https://www.saltise.ca/professional-development/tools/mydalite/",
+            target: "_blank",
+          },
+        ],
+      ];
+      const currentUrl = new URL(window.location.href);
+      sidebarGroups.forEach(arr => {
+        arr.forEach(link => {
+          const linkUrl = new URL(link.url, currentUrl.origin);
+          link.selected = currentUrl.pathname == linkUrl.pathname;
+        }
+        )
+      });
+
+      const navigationApp = () => {
+        return navigation.h(navigation.App, {
+          sidebarGroups,
+          logo: "{% static 'components/img/logo.png' %}",
+          menuAddItems: [
+            [
+              {
+                title: "{% trans 'Question' %}",
+                icon: "question_answer",
+                url: "{% url 'teacher:question-create' %}",
+              },
+              {
+                title: "{% trans 'Assignment' %}",
+                icon: "assignment",
+                url: "{% url 'teacher:assignment-create' %}",
+              },
+              {
+                title: "{% trans 'Collection' %}",
+                icon: "playlist_add",
+                url: "{% url 'collection-create' %}"
+              },
+              {
+                title: "{% trans 'Group' %}",
+                icon: "groups",
+                url: "{% url 'teacher-groups' request.user.teacher.pk %}"
+              },
+              {
+                disabled: true,
+                title: "{% trans 'Invite' %}",
+                icon: "person_add",
+                url: "#"
+              },
+            ],
+          ],
+          menuProfile: [
+            [
+              {
+                title: "{% trans 'Profile' %}",
+                icon: "account_box",
+                url: "{% url 'teacher-update' request.user.teacher.pk %}",
+              },
+              {
+                title: "{% trans 'Password' %}",
+                icon: "lock",
+                url: "{% url 'password_change' %}"
+              },
+              {
+                title: "{% trans 'Email & notifications' %}",
+                icon: "notifications",
+                url: "{% url 'tos:email_modify' 'teacher' %}"
+              },
+              {
+                title: "{% trans 'Terms of service' %}",
+                icon: "gavel",
+                url: "{% url 'tos:tos_modify' 'teacher' %}?next={{ request.path }}"
+              },
+            ],
+            [
+              {
+                title: "{% trans 'Go to CourseFlow' %}",
+                icon: "account_tree",
+                url:  "{% url 'course_flow:home' %}"
+              },
+              {
+                title: "{% trans 'Sign out' %}",
+                icon: "logout",
+                url: "{% url 'logout' %}"
+              },
+            ],
+          ],
+          nonce: "{{ request.csp_nonce }}",
+          user: {
+            username: "{{ request.user.username }}",
+            avatar: "{{ avatar }}",
+          }
+        });
+      };
+      navigation.render(
+        navigationApp(),
+        document.getElementById("navigation-app")
+      );
+    });
+  </script>
+{% endblock %}

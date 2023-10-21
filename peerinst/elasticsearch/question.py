@@ -1,6 +1,7 @@
 import logging
 import pprint
 import time
+from functools import reduce
 
 from elasticsearch_dsl import Q
 
@@ -11,7 +12,6 @@ pp = pprint.PrettyPrinter()
 
 
 def question_search(search_string, filters=None, flagged=None):
-
     if filters is None:
         filters = []
     if flagged is None:
@@ -77,24 +77,44 @@ def question_search(search_string, filters=None, flagged=None):
         .exclude("terms", pk=flagged)
     )
 
+    def regroup(acc, cur):
+        acc[cur[0]].append(cur[1])
+        return acc
+
     if filters:
-        for f in filters:
+        # Regroup by key
+        _filters = list(
+            reduce(
+                regroup,
+                filters,
+                {d: [] for d in {x[0] for x in filters}},
+            ).items()
+        )
+
+        for f in _filters:
             if "__" in f[0]:
                 # Nested
-                s = s.filter(
-                    Q(
-                        "nested",
-                        path="category",
-                        query=Q("match", **{f[0]: f[1]}),
+                for v in f[1]:
+                    s = s.filter(
+                        Q(
+                            "nested",
+                            path="category",
+                            query=Q("match", **{f[0]: v}),
+                        )
                     )
-                )
             else:
-                s = s.filter("term", **{f[0]: f[1]})
+                for i, v in enumerate(f[1]):
+                    if i == 0:
+                        Q_or_condition = Q("term", **{f[0]: v})
+                    else:
+                        Q_or_condition |= Q("term", **{f[0]: v})
+
+                s = s.query("bool", filter=[Q_or_condition])
 
     end = time.perf_counter()
 
     logger.info(
-        f"ElasticSearch time to query '{search_string}' with filters '{filters}': {end - start:E}s"  # noqa E501
+        f"Question ElasticSearch time to query '{search_string}' with filters '{filters}': {end - start:E}s"  # noqa E501
     )
     logger.info(f"Hit count: {s.count()}")
 

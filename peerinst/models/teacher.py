@@ -102,6 +102,13 @@ class Teacher(models.Model):
     def __str__(self):
         return self.user.username
 
+    @property
+    def assignable_groups(self):
+        return self.current_groups.filter(
+            Q(mode_created=StudentGroup.STANDALONE)
+            | Q(mode_created=StudentGroup.LTI_STANDALONE)
+        )
+
     class Meta:
         verbose_name = _("teacher")
         verbose_name_plural = _("teachers")

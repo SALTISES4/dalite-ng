@@ -1,0 +1,56 @@
+{% extends 'teacher/base.html' %}
+
+{% load static %}
+
+{% block apps %}
+  {{ block.super }}
+  <script
+    src="{% static 'components/js/build/search.min.js' %}"
+    defer="true"
+  ></script>
+{% endblock %}
+
+{% block injected_apps %}
+  {{ block.super }}
+  <div id="search-app"></div>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function () {
+      const searchApp = () => {
+        return search.h(search.App, {
+          difficulties: {{ difficulties|safe }},
+          disciplines: {{ disciplines|safe }},
+          gettext: gettext,
+          impacts: {{ impacts|safe }},
+          logo: "{% static 'components/img/logo.gif' %}",
+          nonce: "{{ request.csp_nonce }}",
+          type: "{{ type }}",
+          urls: {
+            add_to_assignment: "{% url 'REST:assignment_question-list' %}",
+            assignments: "{% url 'assignment-search' %}",
+            backgroundImage: "{% static 'components/img/vector-search.svg' %}",
+            collection: "{% url 'REST:collection-list' %}?field=author&field=description&field=discipline&field=featured&field=follower_count&field=pk&field=title&field=url&field=user",
+            collections: "{% url 'collection-search-beta' %}",
+            questions: "{% url 'question-search' %}",
+            recommendations: {
+              assignments: "{% url 'REST:recommended-assignments-list' %}?field=owner&field=title&field=answer_count&field=pk&field=question_count&field=is_owner&field=urls",
+              collections: "{% url 'REST:recommended-collections-list' %}?field=author&field=description&field=discipline&field=featured&field=follower_count&field=pk&field=title&field=url&field=user",
+              questions: "{% url 'REST:recommended-questions-list' %}?field=answer_count&field=answerchoice_set&field=category&field=difficulty&field=discipline&field=image&field=image_alt_text&field=peer_impact&field=pk&field=text&field=title&field=user&field=video_url&field=is_owner&field=urls&field=type",
+            },
+            teacher: "{% url 'REST:teacher' request.user.teacher.pk %}?field=bookmarked_collections&field=favourite_questions&field=assignment_pks&field=user",
+          },
+          user: {
+            username: {% if request.user.saltisemember %}"{{ request.user.saltisemember.name }}"{% else %}"{{ request.user.username }}"{% endif %},
+          }
+        });
+      };
+      search.render(
+        searchApp(),
+        document.getElementById("search-app")
+      );
+    });
+  </script>
+{% endblock %}

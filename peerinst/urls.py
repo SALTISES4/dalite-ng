@@ -140,7 +140,17 @@ def old_patterns():
             name="assignment-edit",
         ),
         path(
+            "assignment-search/",
+            views.assignment_search_beta,
+            name="assignment-search",
+        ),
+        path(
             "question-search/",
+            views.question_search_beta,
+            name="question-search",
+        ),
+        path(
+            "question-search/<int:page>",
             views.question_search_beta,
             name="question-search",
         ),
@@ -148,6 +158,11 @@ def old_patterns():
             "question-search-legacy/",
             views.question_search,
             name="question-search-legacy",
+        ),
+        path(
+            "collection-search/",
+            views.collection_search_beta,
+            name="collection-search-beta",
         ),
         path(
             "collection-search/",
@@ -182,7 +197,7 @@ def old_patterns():
             name="teacher",
         ),
         path(
-            "teacher/<int:pk>/",
+            "teacher-profile/<int:pk>/",
             views.TeacherUpdate.as_view(),
             name="teacher-update",
         ),

@@ -6,7 +6,7 @@
 <aside class="mdc-drawer mdc-drawer--temporary mdc-typography">
   <nav class="mdc-drawer__drawer">
     <nav id="icon-with-text-demo" class="mdc-drawer__content mdc-list">
-      <a class="mdc-list-item" href="{% url 'teacher-dashboard' %}">
+      <a class="mdc-list-item" href="{% url 'teacher:dashboard' user.teacher.pk%}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
           aria-hidden="true">
           home

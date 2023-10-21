@@ -24,6 +24,78 @@ peerinst_api.register(
     views.QuestionViewSet,
     basename="question",
 )
+peerinst_api.register(
+    r"recommended-assignments",
+    views.TeacherAssignmentRecommendationViewSet,
+    basename="recommended-assignments",
+)
+peerinst_api.register(
+    r"recommended-collections",
+    views.TeacherCollectionRecommendationViewSet,
+    basename="recommended-collections",
+)
+peerinst_api.register(
+    r"recommended-questions",
+    views.TeacherQuestionRecommendationViewSet,
+    basename="recommended-questions",
+)
+peerinst_api.register(
+    r"studentgroupassignments/recent",
+    views.RecentStudentGroupAssignmentViewSet,
+    basename="recent-studentgroupassignment",
+)
+peerinst_api.register(
+    r"studentgroupassignments",
+    views.StudentGroupAssignmentViewSet,
+    basename="studentgroupassignment",
+),
+peerinst_api.register(
+    r"collections",
+    views.CollectionViewSet,
+    basename="collection",
+),
+"""
+TEACHER PATTERNS
+"""
+peerinst_api.register(
+    r"teacher/assignments",
+    views.TeacherAssignmentViewSet,
+    basename="teacher-assignment",
+),
+peerinst_api.register(
+    r"teacher/questions",
+    views.TeacherQuestionCreateUpdateViewSet,
+    basename="teacher-question-create-update",
+),
+peerinst_api.register(
+    r"teacher/library/assignments",
+    views.TeacherLibraryAssignmentViewSet,
+    basename="teacher-library-assignment",
+)
+peerinst_api.register(
+    r"teacher/library/collections",
+    views.TeacherLibraryCollectionViewSet,
+    basename="teacher-library-collection",
+)
+peerinst_api.register(
+    r"teacher/library/questions",
+    views.TeacherLibraryQuestionViewSet,
+    basename="teacher-library-question",
+)
+"""
+SEARCH PATTERNS
+Elasticsearch-backed read-only endpoints
+"""
+peerinst_api.register(
+    r"search/categories",
+    views.SearchCategoryViewSet,
+    basename="search-category",
+)
+peerinst_api.register(
+    r"search/teachers",
+    views.SearchTeacherViewSet,
+    basename="search-teacher",
+)
 
 
 urlpatterns = [

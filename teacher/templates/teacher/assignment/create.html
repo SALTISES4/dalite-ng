@@ -1,0 +1,51 @@
+{% extends 'teacher/base.html' %}
+
+{% load static %}
+
+{% block apps %}
+  {{ block.super }}
+  <script
+    src="{% static 'components/js/build/createAssignment.min.js' %}"
+    defer="true"
+  ></script>
+
+  <style nonce="{{ request.csp_nonce }}">
+    {% include 'teacher/html_editor_styles.html' %}
+  </style>
+{% endblock %}
+
+{% block injected_apps %}
+  {{ block.super }}
+  <div id="assignment-create-app"></div>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function () {
+      const assignmentCreateApp = () => {
+        return createAssignment.h(createAssignment.App, {
+          gettext: gettext,
+          nonce: "{{ request.csp_nonce }}",
+          EditorIcons: {
+            boldIcon: "{% static 'components/img/editor/bold.svg' %}",
+            italicIcon: "{% static 'components/img/editor/italic.svg' %}",
+            underIcon: "{% static 'components/img/editor/under.svg' %}",
+            undoIcon: "{% static 'components/img/editor/undo.svg' %}",
+            redoIcon: "{% static 'components/img/editor/redo.svg' %}",
+            subIcon: "{% static 'components/img/editor/sub.svg' %}",
+            superIcon: "{% static 'components/img/editor/super.svg' %}",
+            linkIcon: "{% static 'components/img/editor/link.svg' %}",
+          },
+          urls: {
+            create: "{% url 'REST:teacher-assignment-list' %}",
+          }
+        });
+      };
+      createAssignment.render(
+        assignmentCreateApp(),
+        document.getElementById("assignment-create-app")
+      );
+    });
+  </script>
+{% endblock %}

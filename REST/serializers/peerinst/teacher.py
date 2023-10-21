@@ -1,6 +1,15 @@
+from django.utils import timezone
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from rest_framework import serializers
 
-from peerinst.models import Assignment, Question, Teacher
+from peerinst.documents import TeacherDocument
+from peerinst.models import (
+    Assignment,
+    Collection,
+    Question,
+    StudentGroupAssignment,
+    Teacher,
+)
 
 from .assignment import (
     AssignmentSerializer,
@@ -8,11 +17,33 @@ from .assignment import (
     UserSerializer,
 )
 from .dynamic_serializer import DynamicFieldsModelSerializer
+from .student_group import StudentGroupSerializer
+
+
+class TeacherSearchSerializer(DocumentSerializer):
+    username = serializers.SerializerMethodField()
+
+    def get_username(self, obj):
+        try:
+            return obj.user.username
+        except AttributeError:
+            return obj.to_dict()["username"]
+
+    class Meta:
+        document = TeacherDocument
+        fields = ["username"]
 
 
 class TeacherSerializer(DynamicFieldsModelSerializer):
+    activeAssignmentCount = serializers.SerializerMethodField()
+    activeGroupCount = serializers.SerializerMethodField()
     archived_questions = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Question.objects.all()
+    )
+    assignable_groups = StudentGroupSerializer(
+        fields=["name", "pk", "semester", "title", "year"],
+        many=True,
+        read_only=True,
     )
     assignments = AssignmentSerializer(
         fields=[
@@ -30,6 +61,18 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
     # For updating
     assignment_pks = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Assignment.objects.all(), source="assignments"
+    )
+    # Allows updating
+    bookmarked_collections = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Collection.objects.all(),
+        source="followers",
+    )
+    createdQuestionCount = serializers.SerializerMethodField()
+    current_groups = StudentGroupSerializer(
+        fields=["name", "pk", "semester", "title", "year"],
+        many=True,
+        read_only=True,
     )
     deleted_questions = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Question.objects.all()
@@ -73,6 +116,23 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
     )
     user = UserSerializer(read_only=True)
 
+    def get_activeAssignmentCount(self, obj):
+        now = timezone.now()
+        return (
+            StudentGroupAssignment.objects.filter(
+                group__in=obj.current_groups.all()
+            )
+            .filter(distribution_date__lt=now)
+            .filter(due_date__gt=now)
+            .count()
+        )
+
+    def get_activeGroupCount(self, obj):
+        return obj.current_groups.count()
+
+    def get_createdQuestionCount(self, obj):
+        return Question.objects.filter(user=obj.user).count()
+
     def validate(self, data):
         # Limit deleted questions to questions where user is owner
         questions = self.context["request"].user.question_set.all()
@@ -103,9 +163,15 @@ class TeacherSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Teacher
         fields = [
+            "activeAssignmentCount",
+            "activeGroupCount",
             "archived_questions",
+            "assignable_groups",
             "assignment_pks",
             "assignments",
+            "bookmarked_collections",
+            "createdQuestionCount",
+            "current_groups",
             "deleted_questions",
             "favourite_questions",
             "owned_assignments",

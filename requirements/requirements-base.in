@@ -3,11 +3,13 @@
 
 alt-profanity-check
 asgiref
+attrs >= 21.3.0 # [3]
 better-profanity == 0.6.1 # [1]
 bleach
 celery[redis]
+certifi >= 2023.07.22
 # contextualSpellCheck # [2]
-django < 3.3, >=3.2.19
+django < 3.3, >=3.2.22
 django-analytical
 django-axes
 django-celery-beat
@@ -22,11 +24,11 @@ django-minify-html
 django-permissions-policy
 django-tinymce
 djangorestframework
+elasticsearch<7.14.0
 future>0.18.2
 langdetect
-mysqlclient
 pandas
-pillow
+pillow>=10.0.1
 pip-lock
 pyjwt
 pymemcache
@@ -36,10 +38,13 @@ requests >= 2.31.0
 scipy >= 1.10.0rc1
 sqlparse >= 0.4.4
 twisted == 22.4  # [3]
+urllib3 >= 1.26.17 # [4]
 
-SALTISE_course_flow == 0.8.9
+SALTISE_course_flow == 0.8.11
 SALTISE_user_feedback
+SALTISE_components == 0.2.13
 
 # 1. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
 # 2. Removed until used – See: peerinst/grammar.py
 # 3. Temporary pin - see https://github.com/twisted/twisted/issues/11839, requires ignore of vulnerability ID 51619
+# 4. Temporary pin - https://data.safetycli.com/vulnerabilities/CVE-2023-43804/61601/

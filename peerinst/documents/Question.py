@@ -1,11 +1,6 @@
-"""
-ElasticSearch endpoint
-
-Object serialization must match with REST API for component compatability.
-"""
-
 import bleach
 from django.contrib.auth.models import User
+from django.urls import reverse
 from django_elasticsearch_dsl import Document
 from django_elasticsearch_dsl.fields import (
     BooleanField,
@@ -17,7 +12,6 @@ from django_elasticsearch_dsl.fields import (
     TextField,
 )
 from django_elasticsearch_dsl.registries import registry
-from elasticsearch_dsl import analyzer, token_filter, tokenizer
 
 from peerinst.models import (
     AnswerChoice,
@@ -28,25 +22,7 @@ from peerinst.models import (
 )
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 
-html_strip = analyzer(
-    "html_strip",
-    tokenizer="whitespace",
-    filter=["lowercase", "stop", "snowball"],
-    char_filter=["html_strip"],
-)
-
-full_term = analyzer("full_term", tokenizer="keyword", filter=["lowercase"])
-
-autocomplete = analyzer(
-    "autocomplete",
-    tokenizer=tokenizer("autocomplete", "edge_ngram", min_gram=3, max_gram=50),
-    filter=["lowercase"],
-)
-
-trigram_filter = token_filter("ngram", "ngram", min_gram=3, max_gram=3)
-trigram = analyzer(
-    "trigram", tokenizer="whitespace", filter=["lowercase", trigram_filter]
-)
+from .analyzers import autocomplete, full_term, html_strip, trigram
 
 
 @registry.register_document
@@ -71,7 +47,7 @@ class QuestionDocument(Document):
     category = NestedField(
         properties={
             "title": TextField(
-                analyzer=full_term,
+                analyzer=trigram,
             )
         }
     )  # don't break on spaces?
@@ -119,6 +95,11 @@ class QuestionDocument(Document):
     pk = KeywordField()
     text = TextField(analyzer=html_strip)
     title = TextField(analyzer=html_strip)
+    urls = ObjectField(
+        properties={
+            "addable_assignments": TextField(index=False),
+        }
+    )
     user = ObjectField(
         properties={
             "username": TextField(analyzer=autocomplete),
@@ -140,6 +121,7 @@ class QuestionDocument(Document):
             return [
                 {
                     "correct": instance.is_correct(i),
+                    "label": ac[0],
                     "text": bleach.clean(
                         ac[1],
                         tags=ALLOWED_TAGS,
@@ -231,6 +213,17 @@ class QuestionDocument(Document):
             strip=True,
         ).strip()
 
+    def prepare_urls(self, instance):
+        return {
+            "addable_assignments": reverse(
+                "REST:teacher-assignment-for-question", args=(instance.pk,)
+            ),
+            "matrix": reverse("REST:question-matrix", args=(instance.pk,)),
+            "rationales": reverse(
+                "REST:question-rationales", args=(instance.pk,)
+            ),
+        }
+
     def prepare_user(self, instance):
         username = ""
         saltise = False
@@ -264,7 +257,11 @@ class QuestionDocument(Document):
 
     class Index:
         name = "questions"
-        settings = {"number_of_shards": 1, "number_of_replicas": 0}
+        settings = {
+            "number_of_shards": 1,
+            "number_of_replicas": 1,
+            "max_ngram_diff": 3,
+        }
 
     class Django:
         model = Question

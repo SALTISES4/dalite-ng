@@ -17,11 +17,11 @@ from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.utils.html import escape, strip_tags
 from django.utils.translation import gettext_lazy as _
 
+from peerinst import rationale_choice
 from peerinst.grammar import basic_syntax
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
 from reputation.models import Reputation
 
-from .. import rationale_choice
 from .search import MetaSearch
 
 
@@ -629,7 +629,7 @@ class Question(models.Model):
         )
 
     def get_start_form_class(self):
-        from ..forms import FirstAnswerForm
+        from peerinst.forms import FirstAnswerForm
 
         return FirstAnswerForm
 
@@ -801,8 +801,8 @@ class Question(models.Model):
         MIN_ANSWERS = 30
         UPPER_BOUND = 0.25
         LOWER_BOUND = 0.05
-        N = self.get_student_answers().count()
 
+        N = self.get_student_answers().count()
         if N > MIN_ANSWERS:
             peer_impact = (
                 self.get_answers_by_type(answer_type="RW").count()
@@ -834,7 +834,6 @@ class Question(models.Model):
             student_answers = self.get_student_answers()
             N = len(student_answers)
             if N > 0:
-
                 easy = self.get_answers_by_type(answer_type="RR").count()
 
                 hard = self.get_answers_by_type(answer_type="WW").count()
@@ -935,7 +934,7 @@ class Question(models.Model):
             df_chosen_ids["chosen_rationale__id"]
             .value_counts()
             .to_frame()
-            .rename(columns={"chosen_rationale__id": "times_chosen"})
+            .rename(columns={"count": "times_chosen"})
         )
 
         df_shown_ids = pd.DataFrame(
@@ -946,22 +945,20 @@ class Question(models.Model):
 
         # ShownRationale data only collected since Jan 2019
         if df_shown_ids.shape[0] > 0:
-
             df_shown = (
-                df_shown_ids["shown_answer__id"].value_counts().to_frame()
+                df_shown_ids["shown_answer__id"]
+                .value_counts()
+                .to_frame()
+                .rename(columns={"count": "times_shown"})
             )
 
-            df_votes = (
-                pd.merge(
-                    df_chosen,
-                    df_shown,
-                    left_index=True,
-                    right_index=True,
-                    how="right",
-                )
-                .rename(columns={"shown_answer__id": "times_shown"})
-                .sort_values("times_shown", ascending=False)
-            )
+            df_votes = pd.merge(
+                df_chosen,
+                df_shown,
+                left_index=True,
+                right_index=True,
+                how="right",
+            ).sort_values("times_shown", ascending=False)
         else:
             df_votes = df_chosen
             df_votes.loc[:, "times_shown"] = pd.Series(0)
@@ -1017,7 +1014,6 @@ class Question(models.Model):
         )
 
         if answer_qs.count() > 0:
-
             df_votes = self.get_vote_data()
 
             df_answers = pd.DataFrame(
@@ -1075,7 +1071,6 @@ class Question(models.Model):
 
 
 class QuestionFlagReason(models.Model):
-
     CHOICES = (
         (
             "Clarification needed",

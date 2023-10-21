@@ -1,8 +1,13 @@
+from datetime import timedelta
+
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from rest_framework import generics, serializers, viewsets
+from rest_framework import generics, serializers, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -13,6 +18,7 @@ from peerinst.models import (
     AnswerAnnotation,
     Assignment,
     AssignmentQuestions,
+    Collection,
     Discipline,
     Question,
     StudentGroup,
@@ -22,7 +28,6 @@ from peerinst.models import (
 from peerinst.util import question_search_function
 from REST.pagination import SearchPagination
 from REST.permissions import (
-    InAssignmentOwnerList,
     InOwnerList,
     InTeacherList,
     IsAdminUserOrReadOnly,
@@ -32,21 +37,34 @@ from REST.permissions import (
 from REST.serializers import (
     AnswerSerializer,
     AssignmentSerializer,
+    CollectionSerializer,
     DisciplineSerializer,
     FeedbackReadSerialzer,
     FeedbackWriteSerialzer,
     QuestionSerializer,
     RankSerializer,
     StudentGroupAssignmentAnswerSerializer,
+    StudentGroupAssignmentSerializer,
     StudentGroupSerializer,
     TeacherSerializer,
 )
 
 
-class AssignmentViewSet(viewsets.ModelViewSet):
+class AssignmentViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    A simple ViewSet for creating and viewing assignments, and editing question
-    order.
+    Readonly endpoint for assignment objects.
+    """
+
+    permission_classes = [IsAuthenticated, IsTeacher]
+    queryset = Assignment.objects.all()
+    renderer_classes = [JSONRenderer]
+    serializer_class = AssignmentSerializer
+
+
+class TeacherAssignmentViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for creating and viewing one's own
+    assignments and editing question order.
     """
 
     http_method_names = ["get", "patch", "post"]
@@ -56,6 +74,102 @@ class AssignmentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Assignment.objects.filter(owner=self.request.user)
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="addable-for-question/(?P<question_pk>[0-9]+)",
+    )
+    def for_question(self, request, question_pk=None):
+        # Return objects to which given question can be added for this teacher
+        question = get_object_or_404(Question, pk=question_pk)
+        queryset = self.get_queryset().exclude(questions=question)
+        pks = [a.pk for a in queryset if a.editable]
+        serializer = self.get_serializer(
+            queryset.filter(pk__in=pks), many=True, fields=["pk", "title"]
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class RecentStudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Readonly access to a teacher's active and recently due studentgroupassignments.
+    """
+
+    permission_classes = [IsAuthenticated, IsTeacher, InTeacherList]
+    renderer_classes = [JSONRenderer]
+    serializer_class = StudentGroupAssignmentSerializer
+
+    def get_queryset(self):
+        now = timezone.now()
+        return (
+            StudentGroupAssignment.objects.filter(
+                group__teacher=self.request.user.teacher
+            )
+            .filter(distribution_date__lt=now)
+            .filter(due_date__gt=now - timedelta(days=7))
+            .order_by("-distribution_date")
+        )
+
+
+class StudentGroupAssignmentViewSet(viewsets.ModelViewSet):
+    """
+    CRU access to a teacher's studentgroupassignments
+    On create, need to check that teacher owns group
+    """
+
+    http_method_names = [
+        "get",
+        "post",
+        "put",
+        "patch",
+        "head",
+        "options",
+        "trace",
+    ]
+    permission_classes = [IsAuthenticated, IsTeacher]
+    renderer_classes = [JSONRenderer]
+    serializer_class = StudentGroupAssignmentSerializer
+
+    def get_queryset(self):
+        """
+        Use queryset to limit access to StudentGroupAssignments associated
+        with a teacher's StudentGroups (as opposed to using permission_classes)
+        """
+        return StudentGroupAssignment.objects.filter(
+            group__teacher=self.request.user.teacher
+        )
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path=r"assignment/(?P<assignment_pk>[ a-zA-Z0-9_-]+)",
+    )
+    def for_assignment(self, request, assignment_pk=None):
+        # Return objects associated with a specific assignment for teacher
+        queryset = self.get_queryset().filter(assignment__pk=assignment_pk)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class MinimumResultsPagination(PageNumberPagination):
+    page_size = 4
+
+
+class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A simple ReadOnlyModelViewSet to return non-private collections.
+    """
+
+    pagination_class = MinimumResultsPagination
+    permission_classes = [IsAuthenticated, IsTeacher]
+    renderer_classes = [JSONRenderer]
+    serializer_class = CollectionSerializer
+
+    def get_queryset(self):
+        return Collection.objects.filter(private=False).order_by(
+            "featured", "-created_on"
+        )
 
 
 class DisciplineViewSet(viewsets.ModelViewSet):
@@ -94,6 +208,26 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(
+        detail=True,
+        methods=["get"],
+    )
+    def rationales(self, request, pk):
+        return Response(
+            self.get_object().get_most_convincing_rationales(),
+            status=status.HTTP_200_OK,
+        )
+
+    @action(
+        detail=True,
+        methods=["get"],
+    )
+    def matrix(self, request, pk):
+        return Response(
+            self.get_object().get_matrix(),
+            status=status.HTTP_200_OK,
+        )
+
 
 class QuestionListViewSet(viewsets.ModelViewSet):
     """
@@ -102,7 +236,7 @@ class QuestionListViewSet(viewsets.ModelViewSet):
 
     http_method_names = ["delete", "get", "post"]
     serializer_class = RankSerializer
-    permission_classes = [IsAuthenticated, IsNotStudent, InAssignmentOwnerList]
+    permission_classes = [IsAuthenticated, IsTeacher]
 
     def get_queryset(self):
         return AssignmentQuestions.objects.filter(
@@ -120,6 +254,7 @@ class QuestionSearchList(generics.ListAPIView):
     """A simple ListView to return search results in JSON format"""
 
     pagination_class = SearchPagination
+    permission_classes = [IsAuthenticated, IsNotStudent]
     renderer_classes = [JSONRenderer]
 
     def get_queryset(self):
@@ -223,6 +358,7 @@ class TeacherView(generics.RetrieveUpdateAPIView):
     RU operations for teacher
     - list assignments and questions
     - list/update favourites, questions, deleted, archived
+    - list readonly stats
     """
 
     http_method_names = ["get", "put"]
@@ -335,7 +471,6 @@ class TeacherFeedbackThroughAnswerDetail(TeacherFeedbackDetail):
 
 
 class TeacherSearch(ReadOnlyModelViewSet):
-
     permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
     serializer_class = TeacherSerializer
