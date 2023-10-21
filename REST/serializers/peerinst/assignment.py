@@ -365,6 +365,10 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         question.save()
 
         if answerchoice_data:
+            existing_answerchoices = set(
+                question.answerchoice_set.values_list("pk", flat=True)
+            )
+            # Update/create answer choices
             for i, data in enumerate(answerchoice_data, 1):
                 sample_answers = data.pop("sample_answers")
 
@@ -375,7 +379,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
                 if "pk" in data:
                     # Update answer choice and related models
-                    ac = AnswerChoice.objects.get(pk=data["pk"])
+                    ac = question.answerchoice_set.get(pk=data["pk"])
                     ac.correct = data["correct"]
                     ac.text = data["text"]
                     ac.save()
@@ -462,6 +466,20 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                             question=question,
                             rationale=expert_answer["rationale"],
                         )
+
+            # Delete answer choices
+            for pk in existing_answerchoices - {
+                ac["pk"]
+                if "pk" in ac and ac["pk"] in existing_answerchoices
+                else None
+                for ac in answerchoice_data
+            }:
+                ac = question.answerchoice_set.get(pk=pk)
+                for sample_answer in ac.sample_answers.all():
+                    sample_answer.delete()
+                for expert_answer in ac.expert_answers.all():
+                    expert_answer.delete()
+                ac.delete()
 
         return question
 
