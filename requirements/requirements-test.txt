@@ -287,9 +287,9 @@ ddt==1.2.2 \
     --hash=sha256:9f79cf234064cf9b43492b72da35c473de3f03163d37bd13cec5bd8d200dda6b \
     --hash=sha256:d94107babb0f01c8d69fd2651342c2f7ccaf1a5c3199b4cccba308aa2252453e
     # via -r requirements/requirements-test.in
-django==3.2.20 \
-    --hash=sha256:a477ab326ae7d8807dc25c186b951ab8c7648a3a23f9497763c37307a2b5ef87 \
-    --hash=sha256:dec2a116787b8e14962014bf78e120bba454135108e1af9e9b91ade7b2964c40
+django==3.2.22 \
+    --hash=sha256:83b6d66b06e484807d778263fdc7f9186d4dc1862fcfa6507830446ac6b060ba \
+    --hash=sha256:c5e7b668025a6e06cad9ba6d4de1fd1a21212acebb51ea34abb400c6e4d33430
     # via
     #   -r requirements/requirements-base.txt
     #   channels
@@ -930,8 +930,8 @@ rjsmin==1.2.0 \
     # via
     #   -r requirements/requirements-base.txt
     #   django-compressor
-saltise-course-flow==0.8.9 \
-    --hash=sha256:34804b8bfecdfb0a7c0e5e1026db67b8c5fb88e465749ac5cca46606f5ff62ec
+saltise-course-flow==0.8.11 \
+    --hash=sha256:4bf7b69513726c936d34c46fd39c496bb6ea7bbb7297dfe90a4b08fdb2c0b115
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==1.1.2 \
     --hash=sha256:c57647cb83ab8bcee43f2ddc5db586f5fc20db3fb9f7a6a09b9be01de2005303
