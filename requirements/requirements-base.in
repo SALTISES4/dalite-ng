@@ -26,7 +26,7 @@ future>0.18.2
 langdetect
 mysqlclient
 pandas
-pillow
+pillow >= 10.1.0
 pip-lock
 pyjwt
 pymemcache
@@ -36,6 +36,7 @@ requests >= 2.31.0
 scipy >= 1.10.0rc1
 sqlparse >= 0.4.4
 twisted == 22.4  # [3]
+urllib3 >= 1.26.18
 
 SALTISE_course_flow == 0.8.11
 SALTISE_user_feedback
