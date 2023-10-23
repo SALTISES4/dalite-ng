@@ -202,7 +202,9 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     )
     flag_reasons = serializers.ReadOnlyField()
     frequency = serializers.ReadOnlyField(source="get_frequency")
-    image = serializers.ImageField(required=False)
+    image = serializers.ImageField(
+        allow_empty_file=True, allow_null=True, required=False
+    )
     is_editable = serializers.SerializerMethodField()
     is_not_flagged = serializers.ReadOnlyField()
     is_not_missing_answer_choices = serializers.ReadOnlyField()
@@ -285,20 +287,22 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     def validate_image(self, value):
         ALLOWED_IMAGE_FORMATS = ["PNG", "GIF", "JPEG"]
         ALLOWED_IMAGE_SIZE = 1e6
-        with Image.open(value, formats=ALLOWED_IMAGE_FORMATS) as image:
-            image.load()
 
-            if image.format not in ALLOWED_IMAGE_FORMATS:
-                raise serializers.ValidationError(
-                    "Invalid image file format.  Allowed formats are "
-                    + ", ".join(ALLOWED_IMAGE_FORMATS)
-                    + "."
-                )
+        if value:
+            with Image.open(value, formats=ALLOWED_IMAGE_FORMATS) as image:
+                image.load()
 
-            if value.size > ALLOWED_IMAGE_SIZE:
-                raise serializers.ValidationError(
-                    f"Invalid image file size.  Max size is {ALLOWED_IMAGE_SIZE/1e6} MB"
-                )
+                if image.format not in ALLOWED_IMAGE_FORMATS:
+                    raise serializers.ValidationError(
+                        "Invalid image file format.  Allowed formats are "
+                        + ", ".join(ALLOWED_IMAGE_FORMATS)
+                        + "."
+                    )
+
+                if value.size > ALLOWED_IMAGE_SIZE:
+                    raise serializers.ValidationError(
+                        f"Invalid image file size.  Max: {ALLOWED_IMAGE_SIZE/1e6} MB"
+                    )
 
         return value
 
@@ -349,8 +353,8 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     def update(self, question, validated_data):
         """
         If answerchoice_set is present:
-        - If _pk is provided, instance will be updated
-        - If _pk is missing, instance will be created
+        - If pk is provided, instance will be updated
+        - If pk is missing, instance will be created
         - If existing answerchoice is missing, it will be deleted with related models
         - Same logic for sample and expert answers
         """

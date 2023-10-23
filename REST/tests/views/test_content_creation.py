@@ -415,7 +415,9 @@ def test_teacherquestioncreateupdateviewset_create_with_collaborators(
 
 
 @pytest.mark.django_db
-def test_teacherquestioncreateupdateviewset_create_image_png(client, teacher):
+def test_teacherquestioncreateupdateviewset_create_and_remove_image_png(
+    client, teacher
+):
     assert login_teacher(client, teacher)
 
     url = reverse("REST:teacher-question-create-update-list")
@@ -444,7 +446,27 @@ def test_teacherquestioncreateupdateviewset_create_image_png(client, teacher):
         },
     )
 
+    print(response.content)
+
     assert response.status_code == status.HTTP_201_CREATED
+
+    url = reverse(
+        "REST:teacher-question-create-update-detail",
+        args=(response.data["pk"],),
+    )
+    _client = APIClient()
+    assert login_teacher(_client, teacher)
+    response = _client.patch(
+        url,
+        data={
+            "image": SimpleUploadedFile("empty", ""),
+        },
+        format="multipart",
+    )
+
+    print(response.content)
+
+    assert response.status_code == status.HTTP_200_OK
 
 
 @pytest.mark.django_db
