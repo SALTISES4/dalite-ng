@@ -153,6 +153,13 @@ class NullableM2MFormDataSerializer(serializers.SlugRelatedField):
         return super().to_internal_value(data)
 
 
+class NullablePrimaryKeyFormDataSerializer(serializers.PrimaryKeyRelatedField):
+    def to_internal_value(self, data):
+        if data == "null":
+            return None
+        return super().to_internal_value(data)
+
+
 class QuestionSerializer(DynamicFieldsModelSerializer):
     answer_count = serializers.ReadOnlyField()
     answerchoice_set = AnswerChoiceSerializer(
@@ -186,7 +193,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     )
     difficulty = serializers.SerializerMethodField()
     discipline = DisciplineSerializer(read_only=True)
-    discipline_pk = serializers.PrimaryKeyRelatedField(
+    discipline_pk = NullablePrimaryKeyFormDataSerializer(
         queryset=Discipline.objects.all(),
         many=False,
         source="discipline",
@@ -393,8 +400,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                     for sample_answer in sample_answers:
                         if "pk" not in sample_answer:
                             to_create.append(sample_answer)
-                            break
-                        if sample_answer["pk"] in existing:
+                        elif sample_answer["pk"] in existing:
                             to_update.append(sample_answer)
 
                     to_delete = existing - {s["pk"] for s in to_update}
@@ -425,8 +431,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                     for expert_answer in expert_answers:
                         if "pk" not in expert_answer:
                             to_create.append(expert_answer)
-                            break
-                        if expert_answer["pk"] in existing:
+                        elif expert_answer["pk"] in existing:
                             to_update.append(expert_answer)
 
                     to_delete = existing - {e["pk"] for e in to_update}
