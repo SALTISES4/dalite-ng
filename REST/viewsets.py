@@ -1,5 +1,6 @@
 from rest_framework.mixins import (
     CreateModelMixin,
+    DestroyModelMixin,
     RetrieveModelMixin,
     UpdateModelMixin,
 )
@@ -10,16 +11,16 @@ from rest_framework.viewsets import GenericViewSet
 from REST.permissions import IsTeacher
 
 
-class TeacherCreateUpdateViewSet(
+class TeacherCRUDViewSet(
     CreateModelMixin,
     RetrieveModelMixin,
     UpdateModelMixin,
+    DestroyModelMixin,
     GenericViewSet,
 ):
     """
     - No list √
     - No PUT √
-    - No DELETE √
     - Login required √
     - Teacher required √
 
@@ -28,4 +29,4 @@ class TeacherCreateUpdateViewSet(
 
     permission_classes = [IsAuthenticated, IsTeacher]
     renderer_classes = [JSONRenderer]
-    http_method_names = ["get", "post", "patch"]
+    http_method_names = ["get", "post", "patch", "delete"]

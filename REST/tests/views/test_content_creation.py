@@ -1013,3 +1013,67 @@ def test_teacherquestioncreateupdateviewset_create_answer_rationale_too_long(
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert Question.objects.count() == count
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_delete_owned_editable_question(
+    client, teacher, question
+):
+    assert login_teacher(client, teacher)
+    assert question.user == teacher.user
+    assert question.answer_set.count() == 0
+
+    url = reverse(
+        "REST:teacher-question-create-update-detail",
+        args=(question.pk,),
+    )
+    count = Question.objects.count()
+    response = client.delete(url)
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+    assert not Question.objects.filter(pk=question.pk).exists()
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_delete_unowned_editable_question(
+    client, teachers, question
+):
+    assert login_teacher(client, teachers[1])
+    assert question.user != teachers[1].user
+    assert question.answer_set.count() == 0
+
+    url = reverse(
+        "REST:teacher-question-create-update-detail",
+        args=(question.pk,),
+    )
+    response = client.delete(url)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert Question.objects.filter(pk=question.pk).exists()
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_delete_owned_uneditable_question(
+    client, teacher, realistic_questions
+):
+    assert login_teacher(client, teacher)
+
+    question = realistic_questions[0]
+    question.user = teacher.user
+    question.save()
+    assert question.answerchoice_set.count() > 0
+    Answer.objects.create(
+        question=question,
+        rationale="rationale",
+        user_token="test_student",
+        first_answer_choice=1,
+    )
+
+    url = reverse(
+        "REST:teacher-question-create-update-detail",
+        args=(question.pk,),
+    )
+    response = client.delete(url)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert Question.objects.filter(pk=question.pk).exists()

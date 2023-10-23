@@ -2,16 +2,16 @@ from django.db.models import Exists, OuterRef, Q
 
 from peerinst.models import Answer, Question
 from REST.serializers import QuestionSerializer
-from REST.viewsets import TeacherCreateUpdateViewSet
+from REST.viewsets import TeacherCRUDViewSet
 
 
-class TeacherQuestionCreateUpdateViewSet(TeacherCreateUpdateViewSet):
+class TeacherQuestionCRUDViewSet(TeacherCRUDViewSet):
     """
-    Question create, retrieve and update for teacher
+    Question create, retrieve, update and delete for teacher
 
     - Attaches user on create via serializer √
     - Teacher can only access their own content √
-    - Validates editability before retrieve or update √
+    - Validates editability before retrieve, update, or delete √
     """
 
     serializer_class = QuestionSerializer

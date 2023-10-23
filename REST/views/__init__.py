@@ -20,17 +20,15 @@ __all__ = [
     "TeacherLibraryAssignmentViewSet",
     "TeacherLibraryCollectionViewSet",
     "TeacherLibraryQuestionViewSet",
+    "TeacherQuestionCRUDViewSet",
     "TeacherQuestionRecommendationViewSet",
-    "TeacherQuestionCreateUpdateViewSet",
     "TeacherView",
     "TeacherFeedbackList",
     "TeacherFeedbackDetail",
     "TeacherFeedbackThroughAnswerDetail",
     "TeacherSearch",
 ]
-from .content_creation.peerinst import (  # noqa
-    TeacherQuestionCreateUpdateViewSet,
-)
+from .content_creation.peerinst import TeacherQuestionCRUDViewSet  # noqa
 from .library import (  # noqa
     TeacherLibraryAssignmentViewSet,
     TeacherLibraryCollectionViewSet,

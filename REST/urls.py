@@ -64,7 +64,7 @@ peerinst_api.register(
 ),
 peerinst_api.register(
     r"teacher/questions",
-    views.TeacherQuestionCreateUpdateViewSet,
+    views.TeacherQuestionCRUDViewSet,
     basename="teacher-question-create-update",
 ),
 peerinst_api.register(

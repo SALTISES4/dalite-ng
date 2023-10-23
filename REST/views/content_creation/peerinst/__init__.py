@@ -1,5 +1,5 @@
 __all__ = [
-    "TeacherQuestionCreateUpdateViewSet",
+    "TeacherQuestionCRUDViewSet",
 ]
 
-from .question import TeacherQuestionCreateUpdateViewSet
+from .question import TeacherQuestionCRUDViewSet
