@@ -1,4 +1,5 @@
 from django.db.models import Exists, OuterRef, Q
+from rest_framework import serializers
 
 from peerinst.models import Answer, Question
 from REST.serializers import QuestionSerializer
@@ -35,3 +36,6 @@ class TeacherQuestionCRUDViewSet(TeacherCRUDViewSet):
         queryset = queryset.filter(~Exists(answers)).distinct()
 
         return queryset
+
+    def destroy(self, request, *args, **kwargs):
+        raise serializers.ValidationError("Cannot delete")

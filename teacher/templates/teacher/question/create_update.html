@@ -42,6 +42,7 @@
             create: "{% url 'REST:teacher-question-create-update-list' %}",
             categories: "{% url 'REST:search-category-list' %}",
             disciplines: "{% url 'REST:discipline-list' %}",
+            library: "{% url 'teacher:library' request.user.teacher.pk %}",
             teachers: "{% url 'REST:search-teacher-list' %}"
           }
         });
