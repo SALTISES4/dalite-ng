@@ -14,16 +14,20 @@
             <svg class="underline" width=150 height=4></svg>
           </h1>
 
-          {% if not user.student and assignment %}
+          {% if not user.student %}
             <div class="admin-link">
-              {% if access_teacher %}
+              {% if access_teacher and assignment %}
                 <a href="{% url 'question-list' assignment_id=assignment.pk %}">{% trans 'Back to assignment' %}</a>
                 {% if question.user == user or user in question.collaborators.all %}
                   <span class="admin-link--padded">|</span><a href="{% url 'question-update' question.id %}">{% trans 'Edit question' %}</a>
                 {% endif %}
               {% endif %}
               {% if first_choice_label and second_choice_label or first_choice_label and question.type == 'RO' %}
-                <span class="admin-link--padded">|</span><a href="{% url 'reset-question' assignment_id=assignment.pk question_id=question.id %}">{% trans 'Reset answers' %}</a>
+                {% if assignment %}
+                  <span class="admin-link--padded">|</span><a href="{% url 'reset-question' assignment_id=assignment.pk question_id=question.id %}">{% trans 'Reset answers' %}</a>
+                {% else %}
+                  <a href="{% url 'question-reset' question_id=question.id %}">{% trans 'Reset answers' %}</a>
+                {% endif %}
               {% endif %}
             </div>
           {% endif %}
@@ -36,7 +40,7 @@
             {% if messages %}
               <ul class="messages">
                 {% for message in messages %}
-                  <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                  <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
                 {% endfor %}
               </ul>
             {% endif %}

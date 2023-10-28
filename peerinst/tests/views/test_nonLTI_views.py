@@ -84,7 +84,6 @@ class SignUpTest(TestCase):
 
     @pytest.mark.skip
     def test_email_error(self):
-
         with self.settings(EMAIL_BACKEND="", DEBUG=True):
             response = self.client.post(
                 reverse("sign_up"),
@@ -739,7 +738,6 @@ class TeacherTest(TestCase):
         self.assertTemplateUsed(response, "peerinst/assignment_detail.html")
 
     def test_assignment_update_post(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,
@@ -846,7 +844,7 @@ class TeacherTest(TestCase):
             format="json",
             follow=True,
         )
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         # As non-logged in user, post valid form to add question -> Login reqd
         self.client.logout()
@@ -929,7 +927,6 @@ class TeacherTest(TestCase):
         self.assertTemplateUsed(response, "tos/tos_required.html")
 
     def test_collection_private(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,
@@ -967,7 +964,6 @@ class TeacherTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_collection_public_not_owner(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,
@@ -1006,7 +1002,6 @@ class TeacherTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_collection_public_owner(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,
@@ -1063,7 +1058,6 @@ class TeacherTest(TestCase):
         self.assertContains(response, "Your Collections")
 
     def test_collection_public_owner_follower(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,
@@ -1098,7 +1092,6 @@ class TeacherTest(TestCase):
         self.assertContains(response, q.title)
 
     def test_collection_public_owner_follower_featured(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,
@@ -1134,7 +1127,6 @@ class TeacherTest(TestCase):
         self.assertContains(response, q.title)
 
     def test_collection_private_owner_follower_featured(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,
@@ -1170,7 +1162,6 @@ class TeacherTest(TestCase):
         self.assertContains(response, q.title)
 
     def test_collection_private_owner_follower(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,
@@ -1206,7 +1197,6 @@ class TeacherTest(TestCase):
         self.assertContains(response, q.title)
 
     def test_collection_private_owner(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,
@@ -1240,7 +1230,6 @@ class TeacherTest(TestCase):
         self.assertContains(response, q.title)
 
     def test_collection_private(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,
@@ -1274,7 +1263,6 @@ class TeacherTest(TestCase):
         self.assertNotContains(response, q.title)
 
     def test_collection_private_featured(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,
@@ -1308,7 +1296,6 @@ class TeacherTest(TestCase):
         self.assertNotContains(response, q.title)
 
     def test_collection_private_featured_follower(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,
@@ -1344,7 +1331,6 @@ class TeacherTest(TestCase):
         self.assertNotContains(response, q.title)
 
     def test_collection_public_follower(self):
-
         logged_in = self.client.login(
             username=self.validated_teacher.username,
             password=self.validated_teacher.text_pwd,

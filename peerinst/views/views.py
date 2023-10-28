@@ -999,8 +999,10 @@ class QuestionFormView(QuestionMixin, FormView):
 
         # Add common fields to event data
         data.update(
-            assignment_id=self.assignment.pk,
-            assignment_title=self.assignment.title,
+            assignment_id=self.assignment.pk if self.assignment else None,
+            assignment_title=self.assignment.title
+            if self.assignment
+            else None,
             question_id=self.question.pk,
             question_text=self.question.text,
         )
@@ -1095,7 +1097,11 @@ class QuestionReviewBaseView(QuestionFormView):
         # Make the choice of rationales deterministic, so rationales won't
         # change when reloading the page after clearing the session.
         rng = random.Random(
-            (self.user_token, self.assignment.pk, self.question.pk)
+            (
+                self.user_token,
+                self.assignment.pk if self.assignment else None,
+                self.question.pk,
+            )
         )
         try:
             self.rationale_choices = self.choose_rationales(
@@ -1578,7 +1584,7 @@ def redirect_to_login_or_show_cookie_help(request):
     return redirect_to_login(request.get_full_path())
 
 
-def question(request, assignment_id, question_id):
+def question(request, question_id, assignment_id=None):
     """
     Load common question data and dispatch to the right question stage. This
     dispatcher loads the session state and relevant database objects. Based on
@@ -1588,14 +1594,16 @@ def question(request, assignment_id, question_id):
         return redirect_to_login_or_show_cookie_help(request)
 
     # Collect common objects required for the view
-    assignment = get_object_or_404(models.Assignment, pk=assignment_id)
+    assignment = get_object_or_none(models.Assignment, pk=assignment_id)
     question = get_object_or_404(models.Question, pk=question_id)
 
     # Reload question through proxy based on type, if needed
     if question.type == "RO":
         question = get_object_or_404(RationaleOnlyQuestion, pk=question_id)
 
-    custom_key = f"{str(assignment.pk)}:{str(question.pk)}"
+    custom_key = (
+        f"{str(assignment.pk) if assignment else 'test'}:{str(question.pk)}"
+    )
     stage_data = SessionStageData(request.session, custom_key)
     user_token = request.user.username
     view_data = {
@@ -1652,10 +1660,10 @@ def question(request, assignment_id, question_id):
 
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
-def reset_question(request, assignment_id, question_id):
+def reset_question(request, question_id, assignment_id=None):
     """Clear all answers from user (for testing)"""
 
-    assignment = get_object_or_404(models.Assignment, pk=assignment_id)
+    assignment = get_object_or_none(models.Assignment, pk=assignment_id)
     question = get_object_or_404(models.Question, pk=question_id)
     user_token = request.user.username
     answer = get_object_or_none(
@@ -1664,13 +1672,23 @@ def reset_question(request, assignment_id, question_id):
         question=question,
         user_token=user_token,
     )
-    answer.delete()
+    if answer:
+        answer.delete()
 
+    if assignment:
+        return HttpResponseRedirect(
+            reverse(
+                "question",
+                kwargs={
+                    "assignment_id": assignment.pk,
+                    "question_id": question.pk,
+                },
+            )
+        )
     return HttpResponseRedirect(
         reverse(
-            "question",
+            "question-test",
             kwargs={
-                "assignment_id": assignment.pk,
                 "question_id": question.pk,
             },
         )

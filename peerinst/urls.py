@@ -40,6 +40,16 @@ def old_patterns():
             name="question-clone",
         ),
         path(
+            "question/test/<int:question_id>",
+            views.question,
+            name="question-test",
+        ),
+        path(
+            "reset/<int:question_id>",
+            views.reset_question,
+            name="question-reset",
+        ),
+        path(
             "assignment/fix/<pk>",
             views.AssignmentFixView.as_view(),
             name="assignment-fix",
