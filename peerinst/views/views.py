@@ -278,7 +278,6 @@ def welcome(request):
         if teacher_group:
             if teacher_group not in teacher.user.groups.all():
                 teacher.user.groups.add(teacher_group)
-        #  return HttpResponseRedirect(reverse("browse-database"))
         return HttpResponseRedirect(reverse("saltise:lobby"))
 
     elif Student.objects.filter(student=request.user).exists():
@@ -297,17 +296,6 @@ def access_denied(request):
 def access_denied_and_logout(request):
     logout(request)
     raise PermissionDenied
-
-
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
-@user_passes_test(lambda u: hasattr(u, "teacher"))  # Teacher is required
-def browse_database(request):
-    return TemplateResponse(
-        request,
-        "peerinst/browse_database.html",
-        context={"static_url": settings.STATIC_URL},
-    )
 
 
 class AssignmentListView(LoginRequiredMixin, NoStudentsMixin, ListView):

@@ -86,7 +86,6 @@ const scriptBuilds = [
       "group",
       "student",
       "search",
-      "search_beta",
       "index",
       "preview",
       "question",
