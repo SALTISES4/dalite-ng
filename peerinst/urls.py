@@ -30,11 +30,6 @@ def dummy_paths():
 def old_patterns():
     return [
         path(
-            "assignment-list/",
-            views.AssignmentListView.as_view(),
-            name="assignment-list",
-        ),
-        path(
             "question/create",
             views.QuestionCreateView.as_view(),
             name="question-create",

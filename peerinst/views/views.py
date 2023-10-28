@@ -298,12 +298,6 @@ def access_denied_and_logout(request):
     raise PermissionDenied
 
 
-class AssignmentListView(LoginRequiredMixin, NoStudentsMixin, ListView):
-    """List of assignments used for debugging purposes."""
-
-    model = models.Assignment
-
-
 class AssignmentCreateView(LoginRequiredMixin, NoStudentsMixin, CreateView):
     """View to create an assignment"""
 
