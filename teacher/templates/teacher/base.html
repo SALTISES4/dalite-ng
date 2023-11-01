@@ -1,6 +1,17 @@
 {% extends 'base.html' %}
 
-{% load i18n static %}
+{% load compress i18n static %}
+
+{% block apps %}
+  {{ block.super }}
+
+  {% compress js file navigation %}
+    <script
+      src="{% static 'components/js/build/navigation.min.js' %}"
+      defer="true"
+    ></script>
+  {% endcompress %}
+{% endblock %}
 
 {% block injected_apps %}
   {{ block.super }}

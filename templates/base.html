@@ -21,7 +21,7 @@
       <!-- Javascript translations -->
       <script src="{% url 'javascript-catalog' %}"></script>
 
-      <!-- Fonts and styles -->
+      <!-- Fonts -->
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -45,6 +45,7 @@
         <style nonce="{{ request.csp_nonce }}">
           html {
             background-color: #EDF5FC;
+            font-family: sans-serif;
           }
           body {
             margin: 0px 0px 50px 0px;
@@ -60,18 +61,20 @@
         <link href="{% static 'peerinst/css/cookie_law.min.css' %}" rel="stylesheet">
       {% endcompress %}
 
-      <!-- Apps -->
-      <script
-        src="{% static 'components/js/build/navigation.min.js' %}"
-        defer="true"
-      ></script>
+      <!-- Material web -->
+      {% compress css file material-web %}
+        <link href="{% static 'peerinst/css/material-web.min.css' %}" rel="stylesheet">
+      {% endcompress %}
+      {% compress js file material-web %}
+        <script type="module" src="{% static 'peerinst/js/material-web.min.js' %}"></script>
+      {% endcompress %}
+
       {% block apps %}{% endblock %}
     </head>
     <body>
-      {% block body %}{% endblock %}
-
       <div id="main">
         {% block injected_apps %}{% endblock %}
+        {% block body %}{% endblock %}
       </div>
 
       <!-- Cookie consent -->

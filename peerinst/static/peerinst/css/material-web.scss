@@ -1,0 +1,57 @@
+@import 'theme';
+
+:root {
+    --md-ref-typeface-brand: $font;
+    --md-ref-typeface-plain: $font;
+
+    --md-sys-color-outline-variant: #{$secondary};
+    --md-sys-color-primary: #{$primary};
+    --md-sys-color-on-primary: #{$paper};
+
+    --md-sys-typescale-label-large-size: 16px;
+
+    --md-filled-button-container-shape: 4px;
+  }
+
+  .m3-question-card {
+    background-color: $paper;
+    border-radius: 10px;
+    margin-bottom: 40px;
+    padding: 20px;
+
+    & md-divider {
+        margin: 0px -20px;
+        width: calc(100% + 40px);
+    }
+
+    & h3:first-of-type {
+        font-weight: 600;
+        margin: 0px 0px 20px 0px;
+    }
+
+    & .rationale-field {
+        margin: 30px 0px;
+
+        & span.field-label {
+            margin-left: 10px;
+        }
+    }
+
+    & md-filled-button[type="submit"] {
+        left: 100%;
+        position: relative;
+        transform: translateX(-100%);
+    }
+  }
+
+  .m3-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.33rem;
+  }
+
+  .m3-radio-label {
+    align-items: center;
+    display: flex;
+    gap: 0.67rem;
+  }

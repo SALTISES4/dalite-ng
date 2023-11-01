@@ -105,9 +105,7 @@ class FirstAnswerForm(forms.Form):
 
     def __init__(self, answer_choices, *args, **kwargs):
         choice_texts = [
-            mark_safe(
-                f"<div class='flex-label'><div><strong>{pair[0]}.</strong></div><div>{pair[1]}</div></div>"  # noqa E501
-            )
+            mark_safe(f"<strong>{pair[0]}.</strong> {pair[1]}")  # noqa E501
             for pair in answer_choices
         ]
         self.base_fields["first_answer_choice"].choices = enumerate(
@@ -117,7 +115,6 @@ class FirstAnswerForm(forms.Form):
 
 
 class RationaleOnlyForm(forms.Form):
-
     error_css_class = "validation-error"
 
     rationale = RichTextRationaleField()
@@ -389,7 +386,6 @@ class CategorySelectForm(forms.Form):
 
 
 class ReportSelectForm(forms.Form):
-
     student_groups = forms.ModelMultipleChoiceField(
         label=_("Choose which groups to include in report:"),
         widget=forms.CheckboxSelectMultiple,
