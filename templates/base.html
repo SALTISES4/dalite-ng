@@ -45,7 +45,8 @@
         <style nonce="{{ request.csp_nonce }}">
           html {
             background-color: #EDF5FC;
-            font-family: sans-serif;
+            font-family: 'Open Sans', sans-serif;
+            visibility: hidden;
           }
           body {
             margin: 0px 0px 50px 0px;
@@ -121,6 +122,10 @@
       {% endif %}
 
       {% block scripts %}{% endblock %}
+
+      <script nonce="{{ request.csp_nonce }}">
+        window.addEventListener("load", () => {document.querySelector("html").style.visibility = "visible";});
+      </script>
     </body>
   </html>
 {% endtimezone %}
