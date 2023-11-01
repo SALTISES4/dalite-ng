@@ -95,11 +95,10 @@
                 {% endfor %}
               </div>
 
-              {% if form.errors.rationale %}
-                {{ form.errors.rationale }}
-              {% endif %}
-
               <div class="rationale-field">
+                {% if form.errors.rationale %}
+                  {{ form.errors.rationale }}
+                {% endif %}
                 <span class="field-label">{% trans 'Your rationale *' %}</span>
                 {{ form.rationale }}
               </div>
