@@ -3,10 +3,12 @@ export function initForm() {
     document.querySelectorAll(".rationale-text-container md-radio"),
   ).reduce((acc, curr) => {
     acc.push(
-      ...Array.from(curr.shadowRoot?.querySelectorAll("input[type=radio]")),
+      ...(Array.from(
+        (curr.shadowRoot as ShadowRoot).querySelectorAll("input[type=radio]"),
+      ) as HTMLInputElement[]),
     );
     return acc;
-  }, []);
+  }, [] as Element[]);
 
   const secondAnswerChoices = document.querySelectorAll(
     "input[type=radio][name=second_answer_choice]",
@@ -16,11 +18,10 @@ export function initForm() {
   secondAnswerChoices.forEach((el) => {
     el.addEventListener("change", function () {
       const parent = el.closest(".rationale");
-      console.info(parent);
       allRationaleInputs.forEach((el) => {
-        console.info(el.getRootNode().host.closest(".rationale"));
-        if (el.getRootNode().host.closest(".rationale") != parent) {
-          el.getRootNode().host.checked = false;
+        const host = (el.getRootNode() as ShadowRoot).host;
+        if (host.closest(".rationale") != parent) {
+          (host as HTMLInputElement).checked = false;
         }
       });
     });
@@ -30,9 +31,8 @@ export function initForm() {
   allRationaleInputs.forEach((el) => {
     el.addEventListener("click", () => {
       // Search ancestors for closest .rationale and then select correct child
-      const choiceElement = el
-        .getRootNode()
-        .host.closest(".rationale")
+      const choiceElement = (el.getRootNode() as ShadowRoot).host
+        .closest(".rationale")
         ?.querySelector(
           "input[type=radio][name=second_answer_choice]",
         ) as HTMLElement;
