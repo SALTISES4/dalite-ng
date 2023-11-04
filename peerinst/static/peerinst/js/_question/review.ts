@@ -34,12 +34,12 @@ function view() {
 }
 
 function submitButtonView() {
-  if (model.submitAllowed) {
-    // $FlowFixMe
-    document.getElementById("answer-form").disabled = false;
+  // Toggle disabled
+  const form = document.getElementById("answer-form") as HTMLFormElement;
+  if (form && model.submitAllowed) {
+    form.disabled = false;
   } else {
-    // $FlowFixMe
-    document.getElementById("answer-form").disabled = true;
+    form.disabled = true;
   }
 }
 
@@ -85,7 +85,7 @@ function showMeMore() {
 function listeners() {
   [].forEach.call(
     document.querySelectorAll("#submit-answer-form input[type=radio]"),
-    (el) => el.addEventListener("click", allowSubmit),
+    (el) => (el as HTMLInputElement).addEventListener("change", allowSubmit),
   );
 }
 
