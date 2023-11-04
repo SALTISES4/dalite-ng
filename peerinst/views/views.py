@@ -1142,7 +1142,7 @@ class QuestionReviewBaseView(QuestionFormView):
             self.mark_rationales_safe(escape_html=True)
             return
         fake_attributions = {}
-        for _choice, _label, rationales in self.rationale_choices:
+        for _choice, _label, rationales, _text in self.rationale_choices:
             attributed_rationales = []
             for id, text in rationales:
                 if id is None:
