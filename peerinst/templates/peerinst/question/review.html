@@ -4,7 +4,7 @@
 
 {% block answers %}
   {{ block.super }}
-  <p class="mdc-typography--body1">
+  <p>
     {% if sequential_review %}
       {% blocktrans %}
         Consider the problem again, and select the most convincing rationale.
@@ -21,27 +21,28 @@
 
 {% block inner_form %}
   {{ form.non_field_errors }}
-  <div class="rationales mdc-typography--body1">
-    {% for second_answer_choice, rationale_choice, show_more_counters, label, rationale_ids in form.rationale_groups %}
+  <div class="rationales">
+    {% for second_answer_choice, rationale_choice, show_more_counters, label, rationale_ids, text in form.rationale_groups %}
       <div class="rationale" id="rationales-{{ forloop.counter0 }}">
-        <div class="rationale-choice">{{ second_answer_choice }}.</div>
-        <div class="rationale-text-container">{{ rationale_choice.errors }}
-          <ul>
+        <div class="rationale-choice"><strong>{{ second_answer_choice }}.</strong> {{ text }}</div>
+        <div class="rationale-text-container">
+          {{ rationale_choice.errors }}
+
+          <div class="m3-radio-group" role="radiogroup" aria-label="{% trans 'Second answer choice rationales' %}">
             {% for r in rationale_choice %}
-              <li {% if forloop.counter > 2 %}class="hidden-{{ forloop.parentloop.counter }}" hidden{% endif %}>
-                <div class="mdc-form-field">
-                  <div class="mdc-radio" data-mdc-auto-init="MDCRadio">
-                    {{ r.tag|add_class:"mdc-radio__native-control" }}
-                    <div class="mdc-radio__background">
-                      <div class="mdc-radio__outer-circle"></div>
-                      <div class="mdc-radio__inner-circle"></div>
-                    </div>
-                  </div>
-                  {% with label=r.choice_label.strip|bleach_html|safe|capfirst %}
-                    <label class="mdc-typography--body1" for="{{ choice.id_for_label }}">{{ label }}</label>
-                  {% endwith %}
+              <div {% if forloop.counter > 2 %}class="hidden-{{ forloop.parentloop.counter }}" hidden{% endif %}>
+                <div class="m3-radio-label">
+                  <md-radio
+                    aria-label="{{ r.choice_label.strip|bleach_html|safe }}"
+                    id="{{ r.data.attrs.id }}"
+                    name="{{ r.data.name }}"
+                    required="{{ r.data.attrs.required }}"
+                    value="{{ r.data.value }}">
+                  </md-radio>
+                  <label for="{{ r.id_for_label }}">{{ r.choice_label.strip|bleach_html|safe }}</label>
                 </div>
-              </li>
+              </div>
+
               {% if forloop.counter > 2 and forloop.last %}
                 <input type="{{ show_more_counters.type }}"
                   name="{{ show_more_counters.name }}"
@@ -58,9 +59,13 @@
                 </div>
               {% endif %}
             {% endfor %}
-          </ul>
+          </div>
+
         </div>
+        <md-divider inset></md-divider>
+
       </div>
+
     {% endfor %}
   </div>
 {% endblock %}
@@ -70,12 +75,10 @@
 
 {% block scripts %}
   {{ block.super }}
-  {% compress js file question__review %}
-    <script src="{% static 'peerinst/js/question_review.js' %}"></script>
-  {% endcompress %}
   <script nonce="{{ request.csp_nonce }}">
     window.addEventListener("load", function() {
       question.initReview();
+      question.initForm();
     });
   </script>
 {% endblock %}

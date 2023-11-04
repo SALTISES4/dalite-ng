@@ -4,7 +4,22 @@
 
 {% block answers %}
   {% if question.type == "PI" %}
-    <ul id="answer-choices">
+    <div class="m3-radio-group" role="radiogroup" aria-label="{% trans 'First answer choice' %}">
+      {% for label, choice in answer_choices %}
+        <div class="m3-radio-label">
+          <md-radio
+            aria-label="{{ label }}"
+            {% if label == first_choice_label %}checked{% endif %}
+            disabled
+            id="{{ label }}"
+            name="first-answer-choice">
+          </md-radio>
+          <label for="{{ label }}"><strong>{{ label }}</strong>. {{ choice.strip|bleach_html|safe }}</label>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% comment %} <ul id="answer-choices">
       {% for label, choice in answer_choices %}
         <li class="dense-list {% if label == first_choice_label %}first-choice{% endif %}{% if label == second_choice_label %} second-choice{% endif %}">
           <div class='flex-label'>
@@ -23,32 +38,34 @@
                 {% endfor %}
               {% endif %}
             {% endif %}
-            <div>{{ label }}.</div><div>{{ choice.strip|bleach_html|safe }}</div>
+            <div>
+              <strong>{{ label }}.</strong> {{ choice.strip|bleach_html|safe }}
+            </div>
           </div>
         </li>
       {% endfor %}
-    </ul>
-    <div id="your-answer">
-      <p class="mdc-typography--body1">
+    </ul> {% endcomment %}
+
+    <div>
+      <p>
         {% blocktrans %}
           You answered <strong>{{ first_choice_label }}</strong> and gave this rationale:
         {% endblocktrans %}
       </p>
-      <blockquote id="your-rationale">{{ rationale.strip|bleach_html|safe }}</blockquote>
+      <blockquote>{{ rationale.strip|bleach_html|safe }}</blockquote>
     </div>
   {% endif %}
 
   {% if question.type == "RO" %}
-    <div id="your-answer">
-      <p class="mdc-typography--body1">
+    <div>
+      <p>
         {% blocktrans %}
           Your rationale:
         {% endblocktrans %}
       </p>
-      <blockquote id="your-rationale">{{ rationale.strip|bleach_html|safe }}</blockquote>
+      <blockquote>{{ rationale.strip|bleach_html|safe }}</blockquote>
     </div>
   {% endif %}
-
 {% endblock %}
 
 {% block scripts %}{{ block.super }}{% endblock %}

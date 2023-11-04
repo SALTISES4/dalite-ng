@@ -200,6 +200,7 @@ def _base_selection_algorithm(
     for choice in answer_choices_list:
         if choice:
             label = question.get_choice_label(choice)
+            text = question.get_choices()[choice - 1][1]
             # Get all rationales for the current choice.
             """
             only shows expert rationale if there aren't enough non-expert rationales
@@ -218,7 +219,7 @@ def _base_selection_algorithm(
                 rationales = [(r.id, r.rationale) for r in rationales]
             else:
                 rationales = []
-            chosen_choices.append((choice, label, rationales))
+            chosen_choices.append((choice, label, rationales, text))
     # Include the rationale the student entered in the choices.
 
     chosen_choices[0][2].append(

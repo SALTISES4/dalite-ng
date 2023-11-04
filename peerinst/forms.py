@@ -146,7 +146,10 @@ class ReviewAnswerForm(forms.Form):
         show_more_counters = []
         show_more_labels = []
         rationale_id_list = []
-        for i, (choice, label, rationales) in enumerate(rationale_choices):
+        texts = []
+        for i, (choice, label, rationales, text) in enumerate(
+            rationale_choices
+        ):
             rationales = [
                 (id_ if id_ is not None else "None", rationale)
                 for id_, rationale in rationales
@@ -172,6 +175,7 @@ class ReviewAnswerForm(forms.Form):
             answer_choices.append((choice, label))
             rationale_choice_fields.append(self[field_name])
             rationale_id_list.append(rationale_ids)
+            texts.append(text)
         self.fields["second_answer_choice"].choices = answer_choices
         self.rationale_groups = list(
             zip(
@@ -180,6 +184,7 @@ class ReviewAnswerForm(forms.Form):
                 show_more_counters,
                 show_more_labels,
                 rationale_id_list,
+                texts,
             )
         )
 
@@ -193,6 +198,7 @@ class ReviewAnswerForm(forms.Form):
                 _show_more_counter,
                 label,
                 rationale_ids,
+                _text,
             ) in self.rationale_groups:
                 shown_rationales.extend(
                     rationale_ids[i]

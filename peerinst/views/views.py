@@ -1117,7 +1117,7 @@ class QuestionReviewBaseView(QuestionFormView):
 
     def mark_rationales_safe(self, escape_html):
         processor = escape if escape_html else mark_safe
-        for _choice, _label, rationales in self.rationale_choices:
+        for _choice, _label, rationales, _text in self.rationale_choices:
             rationales[:] = [
                 (
                     id,
@@ -1283,7 +1283,7 @@ class QuestionReviewView(QuestionReviewBaseView):
             },
             "rationales": [
                 {"id": id, "text": rationale}
-                for choice, label, rationales in self.rationale_choices
+                for choice, label, rationales, texts in self.rationale_choices
                 for id, rationale in rationales
                 if id is not None
             ],
@@ -1391,7 +1391,7 @@ class QuestionReviewView(QuestionReviewBaseView):
         """
         rationale_ids = [
             rationale[0]
-            for _, _, rationales in self.rationale_choices
+            for _, _, rationales, _ in self.rationale_choices
             for rationale in rationales
         ]
         shown_answers = (

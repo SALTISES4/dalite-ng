@@ -11,9 +11,9 @@
     --md-sys-typescale-label-large-size: 16px;
 
     --md-filled-button-container-shape: 4px;
-  }
+}
 
-  .m3-question-card {
+.m3-question-card {
     background-color: $paper;
     border-radius: 10px;
     margin-bottom: 40px;
@@ -25,12 +25,12 @@
     }
 
     & ul.errorlist, ul.messages {
-      background-color: $error-light;
-      border-radius: 4px;
-      color: $error;
-      list-style-type: none;
-      margin: 1rem 0rem;
-      padding: 0px 16px;
+        background-color: $error-light;
+        border-radius: 4px;
+        color: $error;
+        list-style-type: none;
+        margin: 1rem 0rem;
+        padding: 0px 16px;
 
       & li {
         padding: 8px 0px;
@@ -50,6 +50,23 @@
         margin: 0px 0px 20px 0px;
     }
 
+    .m3-radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 1.33rem;
+    }
+
+    .m3-radio-label {
+        align-items: center;
+        display: flex;
+        gap: 0.67rem;
+
+        & md-radio {
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+    }
+
     & .rationale-field {
         margin: 30px 0px;
 
@@ -63,16 +80,23 @@
         position: relative;
         transform: translateX(-100%);
     }
-  }
 
-  .m3-radio-group {
-    display: flex;
-    flex-direction: column;
-    gap: 1.33rem;
-  }
+    & blockquote {
+        background-color: $secondary;
+        border-radius: 10px;
+        margin: 20px 0px;
+        padding: 4px 20px;
+    }
 
-  .m3-radio-label {
-    align-items: center;
-    display: flex;
-    gap: 0.67rem;
-  }
+    .rationales {
+        & .rationale-choice input {
+            display: none;
+        }
+
+        & md-divider {
+            margin: 0px;
+            padding: 20px 0px;
+            width: unset;
+        }
+    }
+}

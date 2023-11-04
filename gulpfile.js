@@ -89,7 +89,7 @@ const scriptBuilds = [
       // "search",
       // "index",
       // "preview",
-      // "question",
+      "question",
       // "teacher",
       // "custom_elements",
       // "teacher",
@@ -233,7 +233,7 @@ function buildScript(app, module) {
         exclude: "node_modules/**",
         extensions: [".js", ".jsx", ".ts", ".tsx"],
       }),
-      strip({ include: ["**/*.(js|jsx|ts|tsx)"] }),
+      // strip({ include: ["**/*.(js|jsx|ts|tsx)"] }),
     ],
   };
   const outputOptions = {
