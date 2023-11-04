@@ -59,7 +59,9 @@
             {% endfor %}
           </div>
         </div>
-        <md-divider inset></md-divider>
+        {% if not forloop.last %}
+          <md-divider></md-divider>
+        {% endif %}
       </div>
     {% endfor %}
   </div>

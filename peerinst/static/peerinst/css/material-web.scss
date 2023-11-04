@@ -88,14 +88,19 @@
         padding: 4px 20px;
     }
 
-    .rationales {
-        & .rationale-choice input {
-            display: none;
+    & .rationales {
+        margin-bottom: 30px;
+
+        & .rationale-choice {
+          padding-bottom: 20px;
+        }
+
+        & input {
+          display: none;
         }
 
         & md-divider {
-            margin: 0px;
-            padding: 20px 0px;
+            margin: 20px 0px;
             width: unset;
         }
     }
