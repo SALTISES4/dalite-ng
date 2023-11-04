@@ -24,10 +24,9 @@
   <div class="rationales">
     {% for second_answer_choice, rationale_choice, show_more_counters, label, rationale_ids, text in form.rationale_groups %}
       <div class="rationale" id="rationales-{{ forloop.counter0 }}">
-        <div class="rationale-choice"><strong>{{ second_answer_choice }}.</strong> {{ text }}</div>
+        <div class="rationale-choice"><strong>{{ second_answer_choice }}. {{ text.strip|bleach_html|safe }}</strong></div>
         <div class="rationale-text-container">
           {{ rationale_choice.errors }}
-
           <div class="m3-radio-group" role="radiogroup" aria-label="{% trans 'Second answer choice rationales' %}">
             {% for r in rationale_choice %}
               <div {% if forloop.counter > 2 %}class="hidden-{{ forloop.parentloop.counter }}" hidden{% endif %}>
@@ -36,7 +35,6 @@
                     aria-label="{{ r.choice_label.strip|bleach_html|safe }}"
                     id="{{ r.data.attrs.id }}"
                     name="{{ r.data.name }}"
-                    required="{{ r.data.attrs.required }}"
                     value="{{ r.data.value }}">
                   </md-radio>
                   <label for="{{ r.id_for_label }}">{{ r.choice_label.strip|bleach_html|safe }}</label>
@@ -60,12 +58,9 @@
               {% endif %}
             {% endfor %}
           </div>
-
         </div>
         <md-divider inset></md-divider>
-
       </div>
-
     {% endfor %}
   </div>
 {% endblock %}

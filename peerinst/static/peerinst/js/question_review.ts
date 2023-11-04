@@ -20,9 +20,7 @@ export function initForm() {
       allRationaleInputs.forEach((el) => {
         console.info(el.getRootNode().host.closest(".rationale"));
         if (el.getRootNode().host.closest(".rationale") != parent) {
-          // M3 doesn't update css when element unchecked via js
-          el.parentNode.classList.remove("checked");
-          (el as HTMLInputElement).checked = false;
+          el.getRootNode().host.checked = false;
         }
       });
     });
@@ -31,9 +29,6 @@ export function initForm() {
   // Select the right parent option
   allRationaleInputs.forEach((el) => {
     el.addEventListener("click", () => {
-      // M3 doesn't seem to update css if unchecked via the above
-      el.parentNode.classList.add("checked");
-
       // Search ancestors for closest .rationale and then select correct child
       const choiceElement = el
         .getRootNode()
