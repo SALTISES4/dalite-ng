@@ -1,14 +1,13 @@
 @import 'theme';
 
 :root {
-    --md-assist-chip-container-height: 20px;
-    --md-assist-chip-container-shape: 10px;
-    --md-assist-chip-icon-size: 14px;
-    --md-assist-chip-label-text-font: #{$font};
-    --md-assist-chip-label-text-size: 12px;
-    --md-assist-chip-outline-width: 0px;
-
     --md-filled-button-container-shape: 4px;
+
+    --md-icon-button-hover-icon-color: #{$primary};
+    --md-icon-button-hover-state-layer-color: #{$primary};
+    --md-icon-button-hover-state-layer-opacity: 0.04;
+    --md-icon-button-icon-color: #{$primary};
+
 
     --md-ref-typeface-brand: #{$font};
     --md-ref-typeface-plain: #{$font};
@@ -18,7 +17,27 @@
     --md-sys-color-on-primary: #{$paper};
 }
 
+.m3-appbar {
+    --md-icon-button-icon-size: 20px;
+    background-color: $paper;
+    height: 48px;
+    padding: 4px 0px;
+    width: 100%;
+
+    & .icon-button-tray {
+        display: flex;
+        gap: 35px;
+    }
+}
+
 .m3-question-card {
+    --md-assist-chip-container-height: 20px;
+    --md-assist-chip-container-shape: 10px;
+    --md-assist-chip-icon-size: 14px;
+    --md-assist-chip-label-text-font: #{$font};
+    --md-assist-chip-label-text-size: 12px;
+    --md-assist-chip-outline-width: 0px;
+
     background-color: $paper;
     border-radius: 10px;
     margin-bottom: 40px;

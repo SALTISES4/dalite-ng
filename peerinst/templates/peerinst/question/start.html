@@ -2,6 +2,47 @@
 
 {% load add_class bleach_html compress i18n static %}
 
+{% block appbar %}
+  {% if user.teacher %}
+    {% if first_choice_label and second_choice_label or first_choice_label and question.type == 'RO' %}
+      <div class="m3-appbar">
+        <div class="mui-container">
+          <div class="icon-button-tray">
+            <md-icon-button
+              aria-label="{% trans 'Reset answers' %}"
+              href="{% if assignment %}{% url 'reset-question' assignment_id=assignment.pk question_id=question.id %}{% else %}{% url 'question-reset' question_id=question.id %}{% endif %}"
+              title="{% trans 'Reset answers' %}"
+              type="button"
+            >
+              <md-icon>restart_alt</md-icon>
+            </md-icon-button>
+            {% if access_teacher and assignment %}
+              <md-icon-button
+                aria-label="{% trans 'Return to assignment' %}"
+                href="{% url 'question-list' assignment_id=assignment.pk %}"
+                title="{% trans 'Return to assignment' %}"
+                type="button"
+              >
+                <md-icon>assignment</md-icon>
+              </md-icon-button>
+            {% endif %}
+            {% if question.user == user or user in question.collaborators.all %}
+              <md-icon-button
+                aria-label="{% trans 'Update question' %}"
+                href="{% url 'teacher:question-update' pk=question.id %}"
+                title="{% trans 'Update question' %}"
+                type="button"
+              >
+                <md-icon>edit</md-icon>
+              </md-icon-button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+{% endblock %}
+
 {% block body %}
   <div class="mui-container">
     {% block pretext %}{% endblock %}
@@ -10,24 +51,6 @@
       <h1>{{ assignment.title }}</h1>
     {% else %}
       <h1>{% trans 'Question preview' %}</h1>
-    {% endif %}
-
-    {% if not user.student %}
-      <div class="admin-link">
-        {% if access_teacher and assignment %}
-          <a href="{% url 'question-list' assignment_id=assignment.pk %}">{% trans 'Back to assignment' %}</a>
-          {% if question.user == user or user in question.collaborators.all %}
-            <span class="admin-link--padded">|</span><a href="{% url 'question-update' question.id %}">{% trans 'Edit question' %}</a>
-          {% endif %}
-        {% endif %}
-        {% if first_choice_label and second_choice_label or first_choice_label and question.type == 'RO' %}
-          {% if assignment %}
-            <span class="admin-link--padded">|</span><a href="{% url 'reset-question' assignment_id=assignment.pk question_id=question.id %}">{% trans 'Reset answers' %}</a>
-          {% else %}
-            <a href="{% url 'question-reset' question_id=question.id %}">{% trans 'Reset answers' %}</a>
-          {% endif %}
-        {% endif %}
-      </div>
     {% endif %}
 
     {% block extra_title %}{% endblock %}
@@ -175,6 +198,7 @@
     });
 
     window.addEventListener("load", function() {
+      // Fire alert prior to submit
       const finishButton = document.getElementById("finish-button");
       if (finishButton) {
         finishButton.addEventListener("click", function(evt) {
