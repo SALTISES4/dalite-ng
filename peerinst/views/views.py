@@ -1209,7 +1209,7 @@ class QuestionSequentialReviewView(QuestionReviewBaseView):
                     for id, rationale in rationales
                     if id is not None
                 ]
-                for choice, label, rationales in self.rationale_choices
+                for choice, label, rationales, text in self.rationale_choices
             )
         )
         self.current_rationale = rationale_sequence[0]

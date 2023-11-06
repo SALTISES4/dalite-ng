@@ -31,21 +31,19 @@
       {% endif %}
     </p>
 
-    <p>
-      {% trans 'Expert rationales' %}:
-      {% for expert in experts %}
-        {% for option in question.answerchoice_set.all %}
-          {% if option.correct and expert.first_answer_choice == forloop.counter %}
-            <blockquote>
-              {{ expert.rationale.strip|bleach_html|safe }}
-            </blockquote>
-          {% endif %}
+    {% if experts %}
+      <p>
+        {% trans 'Expert rationales' %}:
+        {% for expert in experts %}
+          {% for option in question.answerchoice_set.all %}
+            {% if option.correct and expert.first_answer_choice == forloop.counter %}
+              <blockquote>
+                {{ expert.rationale.strip|bleach_html|safe }}
+              </blockquote>
+            {% endif %}
+          {% endfor %}
         {% endfor %}
-      {% empty %}
-        <blockquote>
-          {% trans 'Sorry, but there are currently no rationales in the database that have been marked as expert for the correct answer choice(s).'%}
-        </blockquote>
-      {% endfor %}
-    </p>
+      </p>
+    {% endif %}
   {% endif %}
 {% endblock %}

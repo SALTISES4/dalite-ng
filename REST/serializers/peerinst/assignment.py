@@ -259,10 +259,15 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "addable_assignments": reverse(
                 "REST:teacher-assignment-for-question", args=(obj.pk,)
             ),
-            "copy_question": reverse("question-clone", args=(obj.pk,)),
-            "fix": reverse("question-fix", args=(obj.pk,)),
+            "copy_question": reverse(
+                "question-clone", args=(obj.pk,)
+            ),  # TODO: Revise logic on copy
+            "fix": reverse(
+                "question-fix", args=(obj.pk,)
+            ),  # TODO: Is this still needed?
             "matrix": reverse("REST:question-matrix", args=(obj.pk,)),
             "rationales": reverse("REST:question-rationales", args=(obj.pk,)),
+            "test": reverse("question-test", args=(obj.pk,)),
             "update": reverse("teacher:question-update", args=(obj.pk,)),
         }
 
