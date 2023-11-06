@@ -1611,7 +1611,7 @@ def question(request, question_id, assignment_id=None):
         "assignment": assignment,
         "question": question,
         "user_token": user_token,
-        "answer_choices": question.get_choices(),
+        "answer_choices": question.get_choices_with_correct(),
         "custom_key": custom_key,
         "stage_data": stage_data,
         "answer": models.Answer.objects.filter(

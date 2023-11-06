@@ -1,16 +1,21 @@
 @import 'theme';
 
 :root {
-    --md-ref-typeface-brand: $font;
-    --md-ref-typeface-plain: $font;
+    --md-assist-chip-container-height: 20px;
+    --md-assist-chip-container-shape: 10px;
+    --md-assist-chip-icon-size: 14px;
+    --md-assist-chip-label-text-font: #{$font};
+    --md-assist-chip-label-text-size: 12px;
+    --md-assist-chip-outline-width: 0px;
+
+    --md-filled-button-container-shape: 4px;
+
+    --md-ref-typeface-brand: #{$font};
+    --md-ref-typeface-plain: #{$font};
 
     --md-sys-color-outline-variant: #{$secondary};
     --md-sys-color-primary: #{$primary};
     --md-sys-color-on-primary: #{$paper};
-
-    --md-sys-typescale-label-large-size: 16px;
-
-    --md-filled-button-container-shape: 4px;
 }
 
 .m3-question-card {
@@ -89,7 +94,17 @@
         background-color: $secondary;
         border-radius: 10px;
         margin: 20px 0px;
-        padding: 4px 20px;
+        padding: 20px 20px;
+
+        & :first-child {
+            margin-top: 0px;
+            padding-top: 0px;
+        }
+
+        & :last-child {
+            margin-bottom: 0px;
+            padding-bottom: 0px;
+        }
     }
 
     & .rationales {
@@ -114,5 +129,27 @@
             margin: 20px 0px;
             width: unset;
         }
+    }
+
+    md-icon[filled] {
+        font-variation-settings: 'FILL' 1;
+    }
+
+    md-icon[correct] {
+        color: $success;
+    }
+
+    md-icon[incorrect] {
+        color: $error;
+    }
+
+    md-assist-chip[correct] {
+        --md-assist-chip-label-text-color: #{$success};
+        background-color: $success-light;
+    }
+
+    md-assist-chip[incorrect] {
+        --md-assist-chip-label-text-color: #{$error};
+        background-color: $error-light;
     }
 }

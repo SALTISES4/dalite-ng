@@ -1,11 +1,12 @@
 {% extends 'peerinst/question/review_base.html' %}
+
 {% load bleach_html i18n %}
 
 {% block answers %}
   {{ block.super }}
 
   {% if question.type == "PI" %}
-    <p class="mdc-typography--body1">
+    <p>
       {% if first_choice_label == second_choice_label %}
         {% if chosen_rationale == None %}
           {% blocktrans %}
@@ -15,42 +16,29 @@
           {% blocktrans %}
             You stuck with your answer choice and selected this rationale:
           {% endblocktrans %}
-          <blockquote id="chosen-rationale">{{ chosen_rationale.rationale.strip|bleach_html|safe }}</blockquote>
+          <blockquote>
+            {{ chosen_rationale.rationale.strip|bleach_html|safe }}
+          </blockquote>
         {% endif %}
       {% else %}
         {% blocktrans %}
           You then changed your answer to <strong>{{ second_choice_label }}</strong>
           and selected this rationale:
         {% endblocktrans %}
-        <blockquote id="chosen-rationale">{{ chosen_rationale.rationale.strip|bleach_html|safe }}</blockquote>
+        <blockquote>
+          {{ chosen_rationale.rationale.strip|bleach_html|safe }}
+        </blockquote>
       {% endif %}
     </p>
 
-    {% if not group_assignment or group_assignment.show_correct_answers %}
-      <p class='mdc-typography--body1'>
-        {% trans 'Correct answer(s)' %}:
-        {% for label, choice in answer_choices %}
-          {% for c in question.answerchoice_set.all %}
-            {% if forloop.counter == forloop.parentloop.counter %}
-              {% if c.correct %}
-                <blockquote>
-                  <div class='flex-label no-padding'>
-                    <div><strong>{{ label }}.</strong></div><div>{{ choice.strip|bleach_html|safe }}</div>
-                  </div>
-                </blockquote>
-              {% endif %}
-            {% endif %}
-          {% endfor %}
-        {% endfor %}
-      </p>
-    {% endif %}
-
-    <p class='mdc-typography--body1'>
-      {% trans 'Expert rationale(s)' %}:
+    <p>
+      {% trans 'Expert rationales' %}:
       {% for expert in experts %}
         {% for option in question.answerchoice_set.all %}
           {% if option.correct and expert.first_answer_choice == forloop.counter %}
-            <blockquote>{{ expert.rationale.strip|bleach_html|safe }}</blockquote>
+            <blockquote>
+              {{ expert.rationale.strip|bleach_html|safe }}
+            </blockquote>
           {% endif %}
         {% endfor %}
       {% empty %}
@@ -59,7 +47,5 @@
         </blockquote>
       {% endfor %}
     </p>
-
   {% endif %}
-
 {% endblock %}

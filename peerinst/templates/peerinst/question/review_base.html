@@ -5,46 +5,44 @@
 {% block answers %}
   {% if question.type == "PI" %}
     <div class="m3-radio-group" role="radiogroup" aria-label="{% trans 'First answer choice' %}">
-      {% for label, choice in answer_choices %}
+      {% for label, choice, correct in answer_choices %}
         <div class="m3-radio-label">
           <md-radio
             aria-label="{{ label }}"
-            {% if label == first_choice_label %}checked{% endif %}
+            {% if label == first_choice_label or label == second_choice_label %}checked{% endif %}
             disabled
             id="{{ label }}"
-            name="first-answer-choice">
+            name="answer-choice-{{ forloop.counter }}">
           </md-radio>
-          <label for="{{ label }}"><strong>{{ label }}</strong>. {{ choice.strip|bleach_html|safe }}</label>
+          <label for="{{ label }}">
+            <strong>{{ label }}</strong>. {{ choice.strip|bleach_html|safe }}
+            {% if second_choice_label %}
+              {% if label == first_choice_label or label == second_choice_label %}
+                {% if not group_assignment or group_assignment.show_correct_answers %}
+                  {% if correct %}
+                    <md-assist-chip correct label="{% if label == first_choice_label %}{% trans 'First choice' %}{% else %}{% trans 'Second choice' %}{% endif %}">
+                      <md-icon correct filled slot="icon">check_circle</md-icon>
+                    </md-assist-chip>
+                  {% else %}
+                    <md-assist-chip incorrect label="{% if label == first_choice_label %}{% trans 'First choice' %}{% else %}{% trans 'Second choice' %}{% endif %}">
+                      <md-icon incorrect filled slot="icon">cancel</md-icon>
+                    </md-assist-chip>
+                  {% endif %}
+                {% endif %}
+              {% else %}
+                {% if not group_assignment or group_assignment.show_correct_answers and correct %}
+                  {% if correct %}
+                    <md-assist-chip correct label="{% trans 'Correct' %}">
+                      <md-icon correct filled slot="icon">check_circle</md-icon>
+                    </md-assist-chip>
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+            {% endif %}
+          </label>
         </div>
       {% endfor %}
     </div>
-
-    {% comment %} <ul id="answer-choices">
-      {% for label, choice in answer_choices %}
-        <li class="dense-list {% if label == first_choice_label %}first-choice{% endif %}{% if label == second_choice_label %} second-choice{% endif %}">
-          <div class='flex-label'>
-            {% if first_choice_label and second_choice_label %}
-              {% if label == second_choice_label %}
-                {% for c in question.answerchoice_set.all %}
-                  {% if forloop.counter == forloop.parentloop.counter %}
-                    {% if not group_assignment or group_assignment.show_correct_answers %}
-                      {% if c.correct %}
-                        <i id="check" class="material-icons check-12 grade-icon">check</i>
-                      {% else %}
-                        <i id="check" class="material-icons check-12 grade-icon">close</i>
-                      {% endif %}
-                    {% endif %}
-                  {% endif %}
-                {% endfor %}
-              {% endif %}
-            {% endif %}
-            <div>
-              <strong>{{ label }}.</strong> {{ choice.strip|bleach_html|safe }}
-            </div>
-          </div>
-        </li>
-      {% endfor %}
-    </ul> {% endcomment %}
 
     <div>
       <p>
@@ -52,7 +50,9 @@
           You answered <strong>{{ first_choice_label }}</strong> and gave this rationale:
         {% endblocktrans %}
       </p>
-      <blockquote>{{ rationale.strip|bleach_html|safe }}</blockquote>
+      <blockquote>
+        {{ rationale.strip|bleach_html|safe }}
+      </blockquote>
     </div>
   {% endif %}
 
@@ -63,7 +63,9 @@
           Your rationale:
         {% endblocktrans %}
       </p>
-      <blockquote>{{ rationale.strip|bleach_html|safe }}</blockquote>
+      <blockquote>
+        {{ rationale.strip|bleach_html|safe }}
+      </blockquote>
     </div>
   {% endif %}
 {% endblock %}

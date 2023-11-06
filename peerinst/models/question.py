@@ -714,6 +714,15 @@ class Question(models.Model):
             )
         ]
 
+    def get_choices_with_correct(self):
+        """Return a list of pairs (answer label, answer choice text, correct)."""
+        return [
+            (label, choice.text, choice.correct)
+            for label, choice in zip(
+                self.get_choice_label_iter(), self.answerchoice_set.all()
+            )
+        ]
+
     def is_correct(self, index):
         return self.answerchoice_set.all()[index - 1].correct
 
