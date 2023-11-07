@@ -81,48 +81,6 @@
 
       <div id="questions-app"></div>
 
-      <!-- <div class="foldable">
-        <h2 id="blink-section" class="foldable--title mdc-typography--display1 mdc-theme--secondary">
-          {% trans 'Blink scripts' %}
-        </h2>
-        <div class="foldable--body">
-          <div class="admin-link">
-            <a href="{% url 'blink:blinkAssignment-create' %}">{% trans 'Add script' %}</a>
-          </div>
-          <p class="m-bot-10">{% trans 'Student link' %}: <span class="bold">{{ request.get_host}}{% url 'blink:blink-get-current' object.user.username %}</span></p>
-
-          {% if not object.blinkassignment_set.all %}
-            <p class='mdc-typography--body1'>{% blocktrans %}A blink script is a series of blink questions strung together into one activity.  You do not have any blink scripts.{% endblocktrans %}</p>
-          {% endif %}
-
-          <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive" >
-            {% for a in object.blinkassignment_set.all %}
-              <li role="separator" class="mdc-list-divider"></li>
-              <li class="mdc-list-item blink {% if a.blinkassignmentquestion_set.all|length > 0 %}pointer{% endif %}" id="edit-blink-{{a.pk}}">
-                <span class="mdc-list-item__graphic mdc-theme--primary">
-                  <i class="mdc-theme--primary material-icons md-36">play_circle_filled</i>
-                </span>
-                <span class="mdc-list-item__text mdc-theme--secondary bold">
-                  {{a.title|safe|striptags}}
-                  <span class="mdc-list-item__secondary-text">
-                    {{a.blinkassignmentquestion_set.count}} {% trans 'question(s)' %}
-                  </span>
-                </span>
-                <span class="mdc-list-item__meta">
-                  <a href="{% url 'blink:blinkAssignment-delete' a.key %}">
-                    <i class="material-icons md-24 mdc-ripple-surface icon-list">delete</i>
-                  </a>
-                  <a href="{% url 'blink:blinkAssignment-update' a.pk %}">
-                    <i class="material-icons md-24 mdc-ripple-surface icon-list">mode_edit</i>
-                  </a>
-                </span>
-              </li>
-            {% endfor %}
-            <li role="separator" class="mdc-list-divider"></li>
-          </ul>
-        </div>
-      </div> -->
-
       <div class="foldable">
         <h2 id="collection-section" class="foldable--title mdc-typography--display1 mdc-theme--secondary">
           {% trans 'Collections' %}
@@ -366,12 +324,6 @@
           window.location.href='{% url 'group-details' g.hash %}';
         });
       {% endfor %}
-
-      // {% for a in object.blinkassignment_set.all %}
-      //   document.getElementById("edit-blink-{{a.pk}}").addEventListener("click", function() {
-      //     window.location.href="{% url 'blink:blink-waiting' username=object.user.username assignment=a.key %}";
-      //   });
-      // {% endfor %}
 
       document.getElementById("edit-user-btn").addEventListener("click", function() {
         edit_user();
