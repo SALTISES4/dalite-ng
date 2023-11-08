@@ -139,7 +139,7 @@ daphne==4.0.0
     #   channels
 ddt==1.6.0
     # via -r requirements/requirements-test.in
-django==3.2.22
+django==3.2.23
     # via
     #   -r requirements/requirements-base.txt
     #   channels
