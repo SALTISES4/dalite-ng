@@ -8,7 +8,6 @@ RUN mkdir static
 COPY requirements ./requirements
 RUN python3 -m pip install --upgrade pip
 RUN pip3 install --no-deps -r ./requirements/requirements-dev.txt
-COPY ./analytics analytics
 COPY ./blink blink
 COPY ./dalite dalite
 COPY ./locale locale

@@ -30,7 +30,6 @@ INSTALLED_APPS = (
     "user_feedback",
     "course_flow.apps.CourseFlowConfig",
     "rest_framework",
-    "analytics",
     "reputation",
     "quality",
     "tos",
@@ -490,18 +489,6 @@ LOGGING = {
             "formatter": "complete",
             "stream": "ext://sys.stdout",
         },
-        "analytics_file_log": {
-            "level": "DEBUG" if DEBUG else "INFO",
-            "class": "logging.FileHandler",
-            "formatter": "complete",
-            "filename": os.path.join(BASE_DIR, "log", "analytics.log"),
-        },
-        "analytics_console_log": {
-            "level": "DEBUG" if DEBUG else "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "complete",
-            "stream": "ext://sys.stdout",
-        },
         "search_file_log": {
             "level": "INFO",
             "class": "logging.FileHandler",
@@ -579,11 +566,6 @@ LOGGING = {
         },
         "reputation": {
             "handlers": ["reputation_file_log", "reputation_console_log"],
-            "level": "DEBUG" if DEBUG else "INFO",
-            "propagate": True,
-        },
-        "analytics": {
-            "handlers": ["analytics_file_log", "analytics_console_log"],
             "level": "DEBUG" if DEBUG else "INFO",
             "propagate": True,
         },

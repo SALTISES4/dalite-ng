@@ -69,10 +69,6 @@ const styleBuilds = [
   //   app: "quality",
   //   modules: ["edit"],
   // },
-  // {
-  //   app: "analytics",
-  //   modules: [],
-  // },
 ];
 
 const scriptBuilds = [
@@ -104,10 +100,6 @@ const scriptBuilds = [
   // {
   //   app: "quality",
   //   modules: ["edit"],
-  // },
-  // {
-  //   app: "analytics",
-  //   modules: ["teachers"],
   // },
 ];
 
