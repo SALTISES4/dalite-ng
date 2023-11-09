@@ -76,6 +76,15 @@ class TeacherAssignmentViewSet(viewsets.ModelViewSet):
         return Assignment.objects.filter(owner=self.request.user)
 
     @action(
+        detail=True,
+        methods=["post"],
+        url_path="copy",
+    )
+    def copy(self, request, pk):
+        # TODO: Copy with new id and redirect to update
+        return
+
+    @action(
         detail=False,
         methods=["get"],
         url_path="addable-for-question/(?P<question_pk>[0-9]+)",
