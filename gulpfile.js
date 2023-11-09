@@ -70,10 +70,6 @@ const styleBuilds = [
   //   modules: ["edit"],
   // },
   // {
-  //   app: "reputation",
-  //   modules: ["header/teacher", "header/student"],
-  // },
-  // {
   //   app: "analytics",
   //   modules: [],
   // },
@@ -108,10 +104,6 @@ const scriptBuilds = [
   // {
   //   app: "quality",
   //   modules: ["edit"],
-  // },
-  // {
-  //   app: "reputation",
-  //   modules: ["header/teacher", "header/student"],
   // },
   // {
   //   app: "analytics",

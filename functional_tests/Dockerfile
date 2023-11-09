@@ -14,7 +14,6 @@ COPY ./dalite dalite
 COPY ./locale locale
 COPY ./peerinst peerinst
 COPY ./quality quality
-COPY ./reputation reputation
 COPY ./REST REST
 COPY ./saltise ./saltise
 COPY ./templates templates

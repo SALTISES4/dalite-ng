@@ -15,7 +15,6 @@ COPY dalite ./dalite
 COPY locale ./locale
 COPY peerinst ./peerinst
 COPY quality ./quality
-COPY reputation ./reputation
 COPY requirements ./requirements
 COPY REST ./REST
 COPY saltise ./saltise
@@ -42,7 +41,6 @@ COPY --from=static /code/dalite ./dalite
 COPY --from=static /code/locale ./locale
 COPY --from=static /code/peerinst ./peerinst
 COPY --from=static /code/quality ./quality
-COPY --from=static /code/reputation ./reputation
 COPY --from=static /code/REST ./REST
 COPY --from=static /code/saltise ./saltise
 COPY --from=static /code/templates ./templates
