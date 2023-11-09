@@ -102,6 +102,12 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
     expert_answers = SampleAnswerSerializer(many=True, required=False)
     sample_answers = SampleAnswerSerializer(many=True)
 
+    def validate_sample_answers(self, data):
+        # TODO: Apply quality check here
+        raise serializers.ValidationError(
+            _("Sample answer failed quality check")
+        )
+
     def validate(self, data):
         """
         Check correct answer choices have an expert rationale

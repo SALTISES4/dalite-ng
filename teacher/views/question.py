@@ -26,6 +26,7 @@ class QuestionUpdateView(TeacherRequiredMixin, DetailView):
             Answer.objects.filter(question=OuterRef("pk"))
             .exclude(expert=True)
             .exclude(user_token__exact="")
+            .exclude(user_token__exact=OuterRef("user__username"))
         )
         queryset = queryset.filter(~Exists(answers)).distinct()
 

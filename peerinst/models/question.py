@@ -584,6 +584,7 @@ class Question(models.Model):
         return (
             self.answer_set.filter(expert=False)
             .exclude(user_token__exact="")
+            .exclude(user_token__exact=self.user.username)
             .count()
             == 0
         )
