@@ -581,13 +581,12 @@ class Question(models.Model):
 
     @property
     def is_editable(self):
-        return (
-            self.answer_set.filter(expert=False)
-            .exclude(user_token__exact="")
-            .exclude(user_token__exact=self.user.username)
-            .count()
-            == 0
+        queryset = self.answer_set.exclude(expert=True).exclude(
+            user_token__exact=""
         )
+        if self.user:
+            queryset = queryset.exclude(user_token__exact=self.user.username)
+        return queryset.count() == 0
 
     @property
     def is_not_flagged(self):
