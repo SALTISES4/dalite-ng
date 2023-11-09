@@ -247,25 +247,6 @@ class SequentialReviewForm(forms.Form):
         return cleaned_data
 
 
-class AssignmentCreateForm(forms.ModelForm):
-    """Simple form to create a new Assignment"""
-
-    class Meta:
-        model = Assignment
-        fields = [
-            "identifier",
-            "title",
-            "description",
-            "intro_page",
-            "conclusion_page",
-        ]
-        widgets = {
-            "description": TinyMCE(),
-            "intro_page": TinyMCE(),
-            "conclusion_page": TinyMCE(),
-        }
-
-
 class AssignmentMultiselectForm(forms.Form):
     def __init__(self, user=None, question=None, *args, **kwargs):
         super().__init__(*args, **kwargs)

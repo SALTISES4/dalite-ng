@@ -298,83 +298,50 @@ def access_denied_and_logout(request):
     raise PermissionDenied
 
 
-class AssignmentCreateView(LoginRequiredMixin, NoStudentsMixin, CreateView):
-    """View to create an assignment"""
+# class AssignmentCopyView(AssignmentCreateView):
+#     """View to create an assignment from existing."""
 
-    model = models.Assignment
-    form_class = forms.AssignmentCreateForm
+#     def get_initial(self, *args, **kwargs):
+#         super().get_initial(*args, **kwargs)
+#         assignment = get_object_or_404(
+#             models.Assignment, pk=self.kwargs["assignment_id"]
+#         )
+#         initial = {
+#             "title": _("Copy of ") + assignment.title,
+#             "description": assignment.description,
+#             "intro_page": assignment.intro_page,
+#             "conclusion_page": assignment.conclusion_page,
+#         }
+#         return initial
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        teacher = get_object_or_404(models.Teacher, user=self.request.user)
-        context["teacher"] = teacher
-        context["help_text"] = _(
-            "The assignment title may be displayed and \
-        should be informative. The assignment identifier is used as the \
-        keyword to access the assignment through a url.  It must be unique \
-        but does not need to be informative."
-        )
-        return context
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context["help_text"] = _(
+#             "Assignments cannot be modified once they \
+#         contain student answers.  After providing a unique identifier below \
+#         and submitting the form, a copy of this assignment will be made that \
+#         can be edited."
+#         )
+#         return context
 
-    def form_valid(self, form):
-        self.object = form.save()
-        teacher = get_object_or_404(models.Teacher, user=self.request.user)
-        form.instance.owner.add(teacher.user)
-        form.instance.save()
-        teacher.assignments.add(self.object)
-        teacher.save()
-        return super().form_valid(form)
+#     def get_object(self, queryset=None):
+#         # Remove link on object to pk to dump object permissions
+#         return None
 
-    def get_success_url(self):
-        return reverse(
-            "assignment-update", kwargs={"assignment_id": self.object.pk}
-        )
+#     # Custom save is needed to attach questions and user
+#     def form_valid(self, form):
+#         self.object = form.save()
+#         assignment = get_object_or_404(
+#             models.Assignment, pk=self.kwargs["assignment_id"]
+#         )
+#         for aq in assignment.assignmentquestions_set.all():
+#             form.instance.questions.add(
+#                 aq.question, through_defaults={"rank": aq.rank}
+#             )
+#         form.instance.parent = assignment
+#         form.instance.save()
 
-
-class AssignmentCopyView(AssignmentCreateView):
-    """View to create an assignment from existing."""
-
-    def get_initial(self, *args, **kwargs):
-        super().get_initial(*args, **kwargs)
-        assignment = get_object_or_404(
-            models.Assignment, pk=self.kwargs["assignment_id"]
-        )
-        initial = {
-            "title": _("Copy of ") + assignment.title,
-            "description": assignment.description,
-            "intro_page": assignment.intro_page,
-            "conclusion_page": assignment.conclusion_page,
-        }
-        return initial
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["help_text"] = _(
-            "Assignments cannot be modified once they \
-        contain student answers.  After providing a unique identifier below \
-        and submitting the form, a copy of this assignment will be made that \
-        can be edited."
-        )
-        return context
-
-    def get_object(self, queryset=None):
-        # Remove link on object to pk to dump object permissions
-        return None
-
-    # Custom save is needed to attach questions and user
-    def form_valid(self, form):
-        self.object = form.save()
-        assignment = get_object_or_404(
-            models.Assignment, pk=self.kwargs["assignment_id"]
-        )
-        for aq in assignment.assignmentquestions_set.all():
-            form.instance.questions.add(
-                aq.question, through_defaults={"rank": aq.rank}
-            )
-        form.instance.parent = assignment
-        form.instance.save()
-
-        return super().form_valid(form)
+#         return super().form_valid(form)
 
 
 class AssignmentUpdateView(LoginRequiredMixin, NoStudentsMixin, DetailView):

@@ -120,16 +120,6 @@ def old_patterns():
             name="sample-answer-form-done",
         ),
         path(
-            "assignment/create",
-            views.AssignmentCreateView.as_view(),
-            name="assignment-create",
-        ),
-        path(
-            "assignment/copy/<assignment_id>",
-            views.AssignmentCopyView.as_view(),
-            name="assignment-copy",
-        ),
-        path(
             "assignment/edit",
             views.update_assignment_question_list,
             name="assignment-edit-ajax",
