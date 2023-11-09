@@ -20,7 +20,6 @@ from django.utils.translation import gettext_lazy as _
 from peerinst import rationale_choice
 from peerinst.grammar import basic_syntax
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
-from reputation.models import Reputation
 
 from .search import MetaSearch
 
@@ -349,9 +348,6 @@ class Question(models.Model):
             "0.5 points if they subsequently stick with or change to the "
             "correct answer."
         ),
-    )
-    reputation = models.OneToOneField(
-        Reputation, blank=True, null=True, on_delete=models.SET_NULL
     )
     meta_search = GenericRelation(MetaSearch, related_query_name="questions")
 

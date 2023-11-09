@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from quality.models import Quality
-from reputation.models import Reputation
 
 from .answer import Answer
 from .assignment import Assignment
@@ -36,9 +35,6 @@ class Teacher(models.Model):
     )
     quality = models.ForeignKey(
         Quality, blank=True, null=True, on_delete=models.SET_NULL
-    )
-    reputation = models.OneToOneField(
-        Reputation, blank=True, null=True, on_delete=models.SET_NULL
     )
     last_dashboard_access = models.DateTimeField(
         blank=True,

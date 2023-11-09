@@ -19,7 +19,6 @@ from peerinst.util import (
 )
 from peerinst.utils import format_time
 from quality.models import Quality
-from reputation.models import Reputation
 
 from .group import StudentGroup
 from .question import Question
@@ -84,9 +83,6 @@ class Assignment(models.Model):
     owner = models.ManyToManyField(User, blank=True)
     parent = models.ForeignKey(
         "Assignment", blank=True, null=True, on_delete=models.SET_NULL
-    )
-    reputation = models.OneToOneField(
-        Reputation, blank=True, null=True, on_delete=models.SET_NULL
     )
     created_on = models.DateTimeField(auto_now_add=True, null=True)
     last_modified = models.DateTimeField(auto_now=True, null=True)

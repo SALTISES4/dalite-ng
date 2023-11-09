@@ -11,8 +11,6 @@ from django.template import loader
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from reputation.models import Reputation
-
 from ..students import create_student_token, get_student_username_and_password
 from ..tasks import send_mail_async
 from .answer import Answer, ShownRationale
@@ -32,9 +30,6 @@ class Student(models.Model):
     )
     send_reminder_email_every_day = models.BooleanField(default=False)
     send_reminder_email_day_before = models.BooleanField(default=True)
-    reputation = models.OneToOneField(
-        Reputation, blank=True, null=True, on_delete=models.SET_NULL
-    )
 
     def __str__(self):
         return self.student.email
@@ -72,7 +67,6 @@ class Student(models.Model):
             )
             created = False
         except Student.DoesNotExist:
-
             try:
                 user = User.objects.create_user(
                     username=username, email=email, password=password
@@ -118,7 +112,6 @@ class Student(models.Model):
         err = None
 
         if not self.student.email.endswith("localhost"):
-
             username = self.student.username
             user_email = self.student.email
 
@@ -129,7 +122,6 @@ class Student(models.Model):
                 logger.error(err)
 
             else:
-
                 token = create_student_token(username, user_email)
 
                 if request:
@@ -301,33 +293,6 @@ class Student(models.Model):
 
         return err
 
-    def evaluate_reputation(self, criterion=None):
-        """
-        Calculates the reputation for the student on all criteria or on a
-        specific criterion, creating the Reputation for them if it doesn't
-        already exist.
-
-        Parameters
-        ----------
-        criterion : Optional[str] (default : none)
-            Criterion on which to evaluate
-
-        Returns
-        -------
-        float
-            Evaluated reputation
-
-        Raises
-        ------
-        ValueError
-            If the given criterion isn't part of the list for this reputation
-            type
-        """
-        if self.reputation is None:
-            self.reputation = Reputation.create("student")
-            self.save()
-        return self.reputation.evaluate(criterion)[0]
-
     @property
     def current_groups(self):
         return [
@@ -375,14 +340,6 @@ class Student(models.Model):
             .exclude(pk__in=self.answers)
             .filter(chosen_rationale_id__in=chosen_by_student)
         )
-
-    @property
-    def convincing_rationale_reputation(self):
-        if self.reputation is None:
-            self.reputation = Reputation.create("student")
-            self.save()
-
-        return self.reputation.evaluate("convincing_rationales")[0]
 
 
 class StudentGroupMembership(models.Model):
@@ -436,7 +393,6 @@ class StudentAssignment(models.Model):
         err = None
 
         if self.group_assignment.group.mode_created == StudentGroup.STANDALONE:
-
             username = self.student.student.username
             user_email = self.student.student.email
             group_membership = StudentGroupMembership.objects.get(
@@ -452,7 +408,6 @@ class StudentAssignment(models.Model):
                 group_membership.send_emails
                 and group_membership.current_member
             ):
-
                 token = create_student_token(username, user_email)
 
                 if request:
@@ -803,7 +758,6 @@ class StudentNotification(models.Model):
             )
 
         else:
-
             if assignment is None and "assignment" in type_:
                 msg = f"An assignment is needed for type {type_}."
                 logger.error(msg)

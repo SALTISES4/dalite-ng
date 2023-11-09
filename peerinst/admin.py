@@ -296,7 +296,6 @@ class AnswerAdmin(admin.ModelAdmin):
 class TeacherAdmin(admin.ModelAdmin):
     readonly_fields = [
         "user",
-        "reputation",
         "quality",
     ]
     filter_horizontal = [
@@ -327,7 +326,6 @@ class StudentAdmin(admin.ModelAdmin):
     list_display = [student_username, student_email]
     search_fields = ["student__email", "student__username"]
     readonly_fields = ["student"]
-    exclude = ["reputation"]
 
 
 @admin.register(StudentGroup)
@@ -420,7 +418,6 @@ class StudentGroupMembershipAdmin(admin.ModelAdmin):
 # https://djangosnippets.org/snippets/2484/
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
-
     date_hierarchy = "action_time"
 
     readonly_fields = [f.name for f in LogEntry._meta.get_fields()]
