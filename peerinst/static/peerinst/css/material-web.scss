@@ -2,6 +2,10 @@
 
 :root {
     --md-filled-button-container-shape: 4px;
+    --md-filled-button-label-text-size: 16px;
+    --md-outlined-button-container-shape: 4px;
+    --md-outlined-button-label-text-size: 16px;
+    --md-outlined-button-label-text-color: #{$text};
 
     --md-icon-button-hover-icon-color: #{$primary};
     --md-icon-button-hover-state-layer-color: #{$primary};
@@ -11,9 +15,20 @@
     --md-ref-typeface-brand: #{$font};
     --md-ref-typeface-plain: #{$font};
 
-    --md-sys-color-outline-variant: #{$secondary};
+    --md-sys-color-outline: #{$text};
     --md-sys-color-primary: #{$primary};
     --md-sys-color-on-primary: #{$paper};
+    --md-sys-typescale-label-large-weight: 400;
+}
+
+md-outlined-button:hover {
+    --md-sys-color-outline: #{$primary};
+}
+
+.m3-button-container {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
 }
 
 .m3-appbar {
