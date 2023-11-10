@@ -2,15 +2,6 @@
 
 {% load compress i18n static %}
 
-{% block stylesheets %}
-  {{ block.super }}
-  {% if user.student %}
-    {% compress css %}
-      <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
-    {% endcompress %}
-  {% endif %}
-{% endblock %}
-
 {% block body %}
   <div class="mui-container">
     <h1>{% trans 'Terms of Service' %}</h1>
