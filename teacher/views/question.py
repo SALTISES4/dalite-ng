@@ -1,16 +1,21 @@
 from django.db.models import Exists, OuterRef, Q
 from django.views.generic import DetailView, TemplateView
 
+from peerinst.mixins import TOSAcceptanceRequiredMixin
 from peerinst.models import Answer, Question
 from teacher.mixins import TeacherRequiredMixin
 
 
-class QuestionCreateView(TeacherRequiredMixin, TemplateView):
+class QuestionCreateView(
+    TeacherRequiredMixin, TOSAcceptanceRequiredMixin, TemplateView
+):
     http_method_names = ["get"]
     template_name = "teacher/question/create_update.html"
 
 
-class QuestionUpdateView(TeacherRequiredMixin, DetailView):
+class QuestionUpdateView(
+    TeacherRequiredMixin, TOSAcceptanceRequiredMixin, DetailView
+):
     http_method_names = ["get"]
     template_name = "teacher/question/create_update.html"
 
