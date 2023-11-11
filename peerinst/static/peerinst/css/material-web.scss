@@ -12,8 +12,15 @@
     --md-icon-button-hover-state-layer-opacity: 0.04;
     --md-icon-button-icon-color: #{$primary};
 
+    --md-outlined-text-field-input-text-size: 14px;
+
     --md-ref-typeface-brand: #{$font};
     --md-ref-typeface-plain: #{$font};
+
+    --md-switch-selected-handle-height: 20px;
+    --md-switch-selected-handle-width: 20px;
+    --md-switch-track-height: 24px;
+    --md-switch-track-width: 48px;
 
     --md-sys-color-outline: #{$text};
     --md-sys-color-primary: #{$primary};
@@ -25,10 +32,8 @@ md-outlined-button:hover {
     --md-sys-color-outline: #{$primary};
 }
 
-.m3-button-container {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+md-outlined-text-field {
+    width: 100%;
 }
 
 .m3-appbar {
@@ -41,6 +46,30 @@ md-outlined-button:hover {
     & .icon-button-tray {
         display: flex;
         gap: 35px;
+    }
+}
+
+.m3-button-container {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.m3-switch-field {
+    column-gap: 30px;
+    display: flex;
+
+
+    & div {
+        font-size: 14px;
+
+        & label {
+            font-weight: 600;
+        }
+        & p {
+            font-size: inherit;
+            margin-top: 0.3rem;
+        }
     }
 }
 

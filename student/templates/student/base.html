@@ -45,7 +45,7 @@
               {
                 title: "{% trans 'Email & notifications' %}",
                 icon: "notifications",
-                url: "{% url 'tos:email_modify' 'student' %}"
+                url: "{% url 'tos:email_modify' 'student' %}?next={{ request.path }}"
               },
               {
                 title: "{% trans 'Terms of Service' %}",

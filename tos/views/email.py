@@ -8,8 +8,8 @@ from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
-from ..forms import EmailChangeForm
-from ..models import EmailConsent, EmailType, Role
+from tos.forms import EmailChangeForm
+from tos.models import EmailConsent, EmailType, Role
 
 
 @login_required
@@ -21,7 +21,7 @@ def email_consent_modify(req, role):
 
     email_types = _get_email_types(username, role_.role)
 
-    form = EmailChangeForm()
+    form = EmailChangeForm(initial={"email": req.user.email})
 
     context = {
         "next": req.GET.get("next", "/welcome/"),
@@ -67,6 +67,7 @@ def change_user_email(req, role):
         return username
 
     form = EmailChangeForm(req.POST)
+
     if form.is_valid():
         req.user.email = form.cleaned_data["email"]
         req.user.save()
@@ -76,6 +77,7 @@ def change_user_email(req, role):
     email_types = _get_email_types(username, role_.role)
 
     context = {
+        "next": req.GET.get("next", "/welcome/"),
         "form": form,
         "username": username,
         "role": role,
