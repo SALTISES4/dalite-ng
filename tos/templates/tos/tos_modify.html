@@ -1,4 +1,4 @@
-{% extends 'peerinst/base.html' %}
+{% extends user.teacher|yesno:'teacher/base.html,student/base.html' %}
 
 {% load i18n %}
 

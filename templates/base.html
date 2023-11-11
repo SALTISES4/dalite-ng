@@ -63,6 +63,14 @@
         <link href="{% static 'peerinst/css/cookie_law.min.css' %}" rel="stylesheet">
       {% endcompress %}
 
+      <!-- Navigation app -->
+      {% compress js file navigation %}
+        <script
+          src="{% static 'components/js/build/navigation.min.js' %}"
+          defer="true"
+        ></script>
+      {% endcompress %}
+
       <!-- Material web -->
       {% compress css file material-web %}
         <link href="{% static 'peerinst/css/material-web.min.css' %}" rel="stylesheet">
@@ -75,7 +83,9 @@
     </head>
     <body>
       <div id="main">
-        {% block injected_apps %}{% endblock %}
+        {% block injected_apps %}
+          <div id="navigation-app"></div>
+        {% endblock %}
         {% block appbar %}{% endblock %}
         {% block body %}{% endblock %}
       </div>
