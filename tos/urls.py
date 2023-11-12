@@ -51,18 +51,13 @@ urlpatterns = [
         name="tos_consent",
     ),
     path(
-        "email/<role>/modify",
+        "notifications/<role>/modify",
         views.email.email_consent_modify,
         name="email_modify",
     ),
     path(
-        "email/<role>/update",
+        "notifications/<role>/update",
         views.email.email_consent_update,
         name="email_update",
-    ),
-    path(
-        "email/<role>/change",
-        views.email.change_user_email,
-        name="email_change",
     ),
 ]

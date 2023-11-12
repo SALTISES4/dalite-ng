@@ -4,36 +4,10 @@
 
 {% block body %}
   <div class="mui-container">
-    <h1>{% trans 'Account settings' %}</h1>
+    <h1>{% trans 'Notification settings' %}</h1>
 
     <div class="m3-question-card">
-      <h3>{% trans 'Email address' %}</h3>
-
-      <md-divider></md-divider>
-
-      <p></p>
-
-      <form action="{% url 'tos:email_change' role %}?next={{ next }}" class="mui-typography-body2" method="post">
-        {% csrf_token %}
-        {{ form.email.errors }}
-        <md-outlined-text-field
-          label="{{ form.email.label }}"
-          name="email"
-          supporting-text="{{ form.email.help_text }}"
-          required
-          type="email"
-          value="{{ form.email.value }}">
-        </md-outlined-text-field>
-        <div>
-          <md-filled-button type="submit">
-            {% trans 'Save' %}
-          </md-filled-button>
-        </div>
-      </form>
-    </div>
-
-    <div class="m3-question-card">
-      <h3>{% trans 'Notifications' %}</h3>
+      <h3>{% trans 'Email' %}</h3>
 
       <md-divider></md-divider>
 
@@ -57,13 +31,13 @@
             </div>
           </div>
         {% endfor %}
-
-        <div>
-          <md-filled-button type="submit">
-            {% trans 'Save' %}
-          </md-filled-button>
-        </div>
       </form>
+    </div>
+
+    <div class="m3-button-container">
+      <md-filled-button form="email-settings-form" type="submit">
+        {% trans 'Save' %}
+      </md-filled-button>
     </div>
   </div>
 {% endblock %}
