@@ -131,7 +131,7 @@ class EmailType(models.Model):
     type = models.CharField(max_length=32)
     title = models.TextField()
     description = models.TextField()
-    show_order = models.PositiveIntegerField(blank=True)
+    show_order = models.PositiveIntegerField(blank=True, null=True)
 
     def __str__(self):
         return f"email type {self.type} for {self.role}"
@@ -210,6 +210,6 @@ def _create_email_type_all(role):
         role=role,
         type="all",
         title="All email",
-        description="Turn off all non-administrative email from Dalite.",
+        description="Receive all emails from myDALITE",
         show_order=len(EmailType.objects.filter(role=role)),
     )

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% load i18n static %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function () {
+      const sidebarGroups = [
+        [
+          {title: "{% trans 'Home' %}", icon: "home", url: ""},
+          {title: "{% trans 'Assignments' %}", icon: "assignment", url: ""},
+          {title: "{% trans 'Groups' %}", icon: "group", url: ""},
+        ],
+        [
+          {
+            title: "{% trans 'Help & support' %}",
+            icon: "help",
+            url: "https://www.saltise.ca/professional-development/tools/mydalite/",
+            target: "_blank",
+          },
+        ],
+      ];
+      const currentUrl = new URL(window.location.href);
+      sidebarGroups.forEach(arr => {
+        arr.forEach(link => {
+          const linkUrl = new URL(link.url, currentUrl.origin);
+          link.selected = currentUrl.pathname == linkUrl.pathname;
+        }
+        )
+      });
+
+      const navigationApp = () => {
+        return navigation.h(navigation.App, {
+          sidebarGroups,
+          logo: "{% static 'components/img/logo.png' %}",
+          menuAddItems: [],
+          menuProfile: [
+            [
+              {
+                title: "{% trans 'Profile' %}",
+                icon: "account_box",
+                url: "",
+              },
+              {
+                title: "{% trans 'Notification settings' %}",
+                icon: "notifications",
+                url: "{% url 'tos:email_modify' 'student' %}?next={{ request.path }}"
+              },
+              {
+                title: "{% trans 'Terms of Service' %}",
+                icon: "gavel",
+                url: "{% url 'tos:tos_modify' 'student' %}?next={{ request.path }}"
+              },
+            ],
+            [
+              {
+                title: "{% trans 'Sign out' %}",
+                icon: "logout",
+                url: "{% url 'logout' %}"
+              },
+            ],
+          ],
+          nonce: "{{ request.csp_nonce }}",
+          user: {
+            username: "{{ request.user.username }}",
+            avatar: "{{ avatar }}",
+          }
+        });
+      };
+      navigation.render(
+        navigationApp(),
+        document.getElementById("navigation-app")
+      );
+    });
+  </script>
+{% endblock %}

@@ -1,46 +1,25 @@
-{% extends 'peerinst/base.html' %}
+{% extends user.teacher|yesno:'teacher/base.html,student/base.html' %}
 
-{% load compress i18n static %}
-
-{% block stylesheets %}
-  {{ block.super }}
-  {% compress css %}
-    <link rel="stylesheet" href="{% static 'tos/css/styles.min.css' %}">
-  {% endcompress %}
-  {% if user.student %}
-    {% compress css %}
-      <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
-    {% endcompress %}
-  {% endif %}
-  <style nonce="{{ request.csp_nonce }}">
-    .footnote {
-      margin-top:15px;
-      line-height: 1.1;
-      font-style: italic;
-      font-size: 10px;
-    }
-  </style>
-{% endblock %}
+{% load i18n %}
 
 {% block body %}
-  <main>
-    <section class='mdc-typography'>
-      <h1 class="mdc-typography--display3">{% trans 'Terms of Service' %}
-        <svg class="underline" width=150 height=4></svg>
-      </h1>
+  <div class="mui-container">
+    <h1>{% trans 'Terms of Service' %}</h1>
 
-      <h2 class='mdc-typography--display1'>{% trans 'Welcome!' %}</h2>
+    <div class="m3-question-card">
+      <h3>{% trans 'Welcome!' %}</h3>
+
+      <md-divider></md-divider>
 
       {% if role == "student" %}
-        <p class='mdc-typography--body1'>
+        <p class="mui-typography-body2">
           {% blocktrans %}
             Please carefully read our Terms of Service (ToS) and Privacy Policy in the box below, and either accept or decline at the bottom of the page.
-
             The ToS that follows is an agreement (the "Agreement") between you and the SALTISE research network. By using myDALITE.org, you accept and agree to be legally bound by this Agreement, whether or not you are a registered user. The Privacy Policy describes how your personal data is collected and processed when you use the site.
           {% endblocktrans %}
         </p>
       {% elif role == "teacher" %}
-        <p class='mdc-typography--body1'>
+        <p class="mui-typography-body2">
           {% blocktrans %}
             Please carefully read our Terms of Service (ToS) and Privacy Policy in the box below, and either accept or decline at the bottom of the page.
 
@@ -48,56 +27,37 @@
           {% endblocktrans %}
         </p>
       {% endif %}
-      <div class='mdc-typography--caption footnote'>
-        {% blocktrans %} 1. The SALTISE research network reserves the right to modify these ToS at any time without advance notice. Any changes to these ToS will be effective immediately upon posting on this page, with an updated effective date.
-        {% endblocktrans %}
-      </div>
-      <div class='mdc-typography--caption footnote'>
+      <p class="mui-typography-body2">
         {% blocktrans %}
-          2. Any version of these ToS in a language other than English is provided for convenience and you understand and agree that the English language version will control if there is any conflict.
+          The SALTISE research network reserves the right to modify these ToS at any time without advance notice. Any changes to these ToS will be effective immediately upon posting on this page, with an updated effective date.
         {% endblocktrans %}
+      </p>
+      <p class="mui-typography-body2">
+        {% blocktrans %}
+          Any version of these ToS in a language other than English is provided for convenience and you understand and agree that the English language version will control if there is any conflict.
+        {% endblocktrans %}
+      </p>
+
+      <div class="mui-typography-body2">
+        {{ tos_text|safe }}
+        <div>Version: {{ version }} {% if current %}({% trans 'current' %}){% endif %}</div>
       </div>
+    </div>
 
-      <form id="tos-container" action="{% url 'tos:tos_update' role version %}" method="post">
-        {% csrf_token %}
+    <form action="{% url 'tos:tos_update' role version %}" method="post">
+      {% csrf_token %}
 
-        <div id="tos-text">{{ tos_text|safe }}</div>
+      <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
 
-        {% if current %}
-          <div class='mdc-typography--caption' id="tos-version">Version: {{ version }} ({% trans 'current' %})</div>
-        {% else %}
-          <div class='mdc-typography--caption' id="tos-version">Version: {{ version }}</div>
-        {% endif %}
+      <div class="m3-button-container">
+        <md-outlined-button name="accepted" value="false" type="submit">
+          {% trans 'Refuse terms' %}
+        </md-outlined-button>
 
-        <button type="submit" name="accepted" value="true" id="tos-accept" class="mdc-button mdc-button--raised">
-          <i class="material-icons mdc-button__icon" aria-hidden="true">done</i>
-          {% trans 'Share' %}
-        </button>
-
-        <button type="submit" name="accepted" value="false" id="tos-refuse" class="mdc-button mdc-button--raised">
-          <i class="material-icons mdc-button__icon" aria-hidden="true">clear</i>
-          {% trans 'Refuse' %}
-        </button>
-
-        <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
-
-      </form>
-    </section>
-  </main>
-{% endblock %}
-
-{% block scripts %}
-  {% if user.student %}
-    {% compress js %}
-      <script src="{% static 'peerinst/js/student.min.js' %}"></script>
-    {% endcompress %}
-
-    <script nonce="{{ request.csp_nonce }}">
-      window.addEventListener("load", function() {
-        student.initStudentHeader(
-          "{% url 'student-get-notifications' %}"
-        )
-      });
-    </script>
-  {% endif %}
+        <md-filled-button name="accepted" value="true" type="submit">
+          {% trans 'Accept terms' %}
+        </md-filled-button>
+      </div>
+    </form>
+  </div>
 {% endblock %}

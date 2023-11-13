@@ -1,27 +1,6 @@
 {% extends 'base.html' %}
 
-{% load compress i18n static %}
-
-{% block apps %}
-  {{ block.super }}
-
-  {% compress js file navigation %}
-    <script
-      src="{% static 'components/js/build/navigation.min.js' %}"
-      defer="true"
-    ></script>
-  {% endcompress %}
-{% endblock %}
-
-{% block injected_apps %}
-  {{ block.super }}
-  <div id="navigation-app"></div>
-{% endblock %}
-
-{% block body %}
-  {{ block.super }}
-  {% csrf_token %}
-{% endblock %}
+{% load i18n static %}
 
 {% block scripts %}
   {{ block.super }}
@@ -105,12 +84,12 @@
                 url: "{% url 'password_change' %}"
               },
               {
-                title: "{% trans 'Email & notifications' %}",
+                title: "{% trans 'Notification settings' %}",
                 icon: "notifications",
-                url: "{% url 'tos:email_modify' 'teacher' %}"
+                url: "{% url 'tos:email_modify' 'teacher' %}?next={{ request.path }}"
               },
               {
-                title: "{% trans 'Terms of service' %}",
+                title: "{% trans 'Terms of Service' %}",
                 icon: "gavel",
                 url: "{% url 'tos:tos_modify' 'teacher' %}?next={{ request.path }}"
               },
