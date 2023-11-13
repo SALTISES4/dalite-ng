@@ -96,7 +96,7 @@ def _get_email_types(username, role):
             "title": email_type.title,
             "description": email_type.description,
             "accepted": EmailConsent.get(
-                username, role, email_type.type, default=True, ignore_all=True
+                username, role, email_type.type, default=False, ignore_all=True
             ),
         }
         for email_type in EmailType.objects.filter(role=role).order_by(

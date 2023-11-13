@@ -2,6 +2,15 @@
 
 {% load compress static i18n %}
 
+{% block apps %}
+  {% compress js file email_notifications %}
+    <script
+      src="{% static 'tos/js/email.min.js' %}"
+      defer="true"
+    ></script>
+  {% endcompress %}
+{% endblock %}
+
 {% block body %}
   <div class="mui-container">
     <h1>{% trans 'Notification settings' %}</h1>
@@ -19,12 +28,11 @@
 
       <form id="email-settings-form" action="{% url 'tos:email_update' role %}?next={{next}}" method="post">
         {% csrf_token %}
-
         {% for email_type in email_types %}
           <div class="m3-switch-field">
-            <md-switch id="{{ email_type.type }}" name="{{ email_type.type }}-consent" {% if email_type.accepted %}selected{% endif %}></md-switch>
+            <md-switch id="notification-{{ email_type.type }}" name="{{ email_type.type }}-consent" {% if email_type.accepted %}selected{% endif %}></md-switch>
             <div>
-              <label for="{{ email_type.type }}">{{ email_type.title }}</label>
+              <label for="notification-{{ email_type.type }}">{{ email_type.title }}</label>
               <p>
                 {{ email_type.description }}
               </p>
