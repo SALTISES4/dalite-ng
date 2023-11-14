@@ -56,6 +56,7 @@
           urls: {
             add_to_assignment: "{% url 'REST:assignment_question-list' %}",
             assignment: {% if meta_editable_by_user or questions_editable_by_user %}"{% url 'REST:teacher-assignment-detail' object.identifier %}?field=questions&field=is_valid&field=intro_page&field=conclusion_page&field=description&field=title&field=pk"{% else %}"{% url 'REST:assignment-detail' object.identifier %}?field=questions&field=is_valid&field=intro_page&field=conclusion_page&field=description&field=title&field=pk"{% endif %},
+            check_id: "{% url 'REST:assignment-check-id' %}",
             distribute: "{% url 'REST:studentgroupassignment-list' %}",
             search: "{% url 'teacher:search' %}",
             studentgroupassignments: "{% url 'REST:studentgroupassignment-for-assignment' object.pk %}?field=group&field=due_date&field=progress&field=title",
