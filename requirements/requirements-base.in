@@ -7,7 +7,7 @@ better-profanity == 0.6.1 # [1]
 bleach
 celery[redis]
 # contextualSpellCheck # [2]
-django < 3.3, >=3.2.21
+django < 3.3, >=3.2.23
 django-analytical
 django-axes
 django-celery-beat
@@ -38,7 +38,7 @@ sqlparse >= 0.4.4
 twisted == 22.4  # [3]
 urllib3 >= 1.26.18
 
-SALTISE_course_flow == 0.8.11
+SALTISE_course_flow == 0.8.13
 SALTISE_user_feedback
 
 # 1. Temporary pin – See: https://github.com/snguyenthanh/better_profanity/issues/19
