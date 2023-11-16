@@ -90,7 +90,7 @@ class TeacherAssignmentViewSet(viewsets.ModelViewSet):
                     "title": assignment_to_copy.title,
                     "description": assignment_to_copy.description,
                     "intro_page": assignment_to_copy.intro_page,
-                    "conclustion_page": assignment_to_copy.conclusion_page,
+                    "conclusion_page": assignment_to_copy.conclusion_page,
                     "parent": assignment_to_copy,
                 },
                 context={"request": request},
