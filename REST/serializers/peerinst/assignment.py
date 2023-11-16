@@ -707,6 +707,8 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         """Attach user and add to teacher assignments"""
         # TODO: Add check here that user is teacher?
         assignment = super().create(validated_data)
+
+        # TODO: Check that context has request, otherwise raise error or skip
         assignment.owner.add(self.context["request"].user)
         self.context["request"].user.teacher.assignments.add(assignment)
         return assignment

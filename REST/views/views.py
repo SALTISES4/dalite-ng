@@ -81,8 +81,31 @@ class TeacherAssignmentViewSet(viewsets.ModelViewSet):
         url_path="copy",
     )
     def copy(self, request, pk):
-        # TODO: Copy with new id and redirect to update
-        return
+        assignment_to_copy = get_object_or_404(Assignment, pk=pk)
+        identifier = request.data.get("identifier")
+        if identifier:
+            serializer = AssignmentSerializer(
+                data={
+                    "pk": identifier,
+                    "title": assignment_to_copy.title,
+                    "description": assignment_to_copy.description,
+                    "intro_page": assignment_to_copy.intro_page,
+                    "conclustion_page": assignment_to_copy.conclusion_page,
+                    "parent": assignment_to_copy,
+                },
+                context={"request": request},
+            )
+            if serializer.is_valid(raise_exception=True):
+                new_assignment = serializer.save()
+                # Add questions
+                new_assignment.questions.set(
+                    assignment_to_copy.questions.all()
+                )
+                return Response(
+                    serializer.data, status=status.HTTP_201_CREATED
+                )
+        else:
+            raise serializers.ValidationError(_("Identifier missing"))
 
     @action(
         detail=False,

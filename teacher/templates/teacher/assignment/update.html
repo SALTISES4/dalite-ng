@@ -16,6 +16,7 @@
 
 {% block injected_apps %}
   {{ block.super }}
+  {% csrf_token %}
   <div id="assignment-update-app"></div>
 {% endblock %}
 
@@ -55,7 +56,7 @@
           questionsEditableByUser: {{ questions_editable_by_user|yesno:"true,false" }},
           urls: {
             add_to_assignment: "{% url 'REST:assignment_question-list' %}",
-            assignment: {% if meta_editable_by_user or questions_editable_by_user %}"{% url 'REST:teacher-assignment-detail' object.identifier %}?field=questions&field=is_valid&field=intro_page&field=conclusion_page&field=description&field=title&field=pk"{% else %}"{% url 'REST:assignment-detail' object.identifier %}?field=questions&field=is_valid&field=intro_page&field=conclusion_page&field=description&field=title&field=pk"{% endif %},
+            assignment: {% if meta_editable_by_user or questions_editable_by_user %}"{% url 'REST:teacher-assignment-detail' object.identifier %}?field=questions&field=is_valid&field=intro_page&field=conclusion_page&field=description&field=title&field=urls&field=pk"{% else %}"{% url 'REST:assignment-detail' object.identifier %}?field=questions&field=is_valid&field=intro_page&field=conclusion_page&field=description&field=title&field=urls&field=pk"{% endif %},
             check_id: "{% url 'REST:assignment-check-id' %}",
             distribute: "{% url 'REST:studentgroupassignment-list' %}",
             search: "{% url 'teacher:search' %}",
