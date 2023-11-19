@@ -140,6 +140,15 @@ class Assignment(models.Model):
         return sum(q.answer_count for q in self.questions.all())
 
     @property
+    def deletable(self):
+        """
+        Assignments can be deleted only when:
+        - There are no related student answers
+        - There are no related StudentGroupAssignment objects
+        """
+        return False
+
+    @property
     def editable(self):
         return (
             not self.answer_set.filter(expert=False)
@@ -178,7 +187,7 @@ class AssignmentQuestions(models.Model):
 
 class StudentGroupAssignment(models.Model):
     group = models.ForeignKey(StudentGroup, on_delete=models.CASCADE)
-    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Assignment, on_delete=models.PROTECT)
     distribution_date = models.DateTimeField(
         editable=False, null=True, blank=True
     )

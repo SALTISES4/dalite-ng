@@ -23,6 +23,17 @@ class TeacherAssignmentCRUDViewSet(TeacherCRUDViewSet):
     def get_queryset(self):
         return Assignment.objects.filter(owner=self.request.user)
 
+    def perform_destroy(self, instance):
+        """
+        Queryset returns objects that are editable but not deletable.
+        Explicitly check this object is deletable.
+        """
+        if not instance.deletable:
+            raise serializers.ValidationError(
+                _("Assignment cannot be deleted")
+            )
+        instance.delete()
+
     @action(
         detail=True,
         methods=["post"],
