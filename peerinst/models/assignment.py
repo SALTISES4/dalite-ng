@@ -163,8 +163,8 @@ class Assignment(models.Model):
 
 
 class AssignmentQuestions(models.Model):
-    assignment = models.ForeignKey(Assignment, models.DO_NOTHING)
-    question = models.ForeignKey(Question, models.DO_NOTHING)
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     rank = models.PositiveIntegerField(default=0)
 
     def __str__(self):

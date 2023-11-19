@@ -28,7 +28,6 @@ from peerinst.models import (
 from peerinst.util import question_search_function
 from REST.pagination import SearchPagination
 from REST.permissions import (
-    InOwnerList,
     InTeacherList,
     IsAdminUserOrReadOnly,
     IsNotStudent,
@@ -59,68 +58,6 @@ class AssignmentViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Assignment.objects.all()
     renderer_classes = [JSONRenderer]
     serializer_class = AssignmentSerializer
-
-
-class TeacherAssignmentViewSet(viewsets.ModelViewSet):
-    """
-    A simple ViewSet for creating and viewing one's own
-    assignments and editing question order.
-    """
-
-    http_method_names = ["get", "patch", "post"]
-    permission_classes = [IsAuthenticated, IsTeacher, InOwnerList]
-    renderer_classes = [JSONRenderer]
-    serializer_class = AssignmentSerializer
-
-    def get_queryset(self):
-        return Assignment.objects.filter(owner=self.request.user)
-
-    @action(
-        detail=True,
-        methods=["post"],
-        url_path="copy",
-    )
-    def copy(self, request, pk):
-        assignment_to_copy = get_object_or_404(Assignment, pk=pk)
-        identifier = request.data.get("identifier")
-        if identifier:
-            serializer = AssignmentSerializer(
-                data={
-                    "pk": identifier,
-                    "title": assignment_to_copy.title,
-                    "description": assignment_to_copy.description,
-                    "intro_page": assignment_to_copy.intro_page,
-                    "conclusion_page": assignment_to_copy.conclusion_page,
-                    "parent": assignment_to_copy,
-                },
-                context={"request": request},
-            )
-            if serializer.is_valid(raise_exception=True):
-                new_assignment = serializer.save()
-                # Add questions
-                new_assignment.questions.set(
-                    assignment_to_copy.questions.all()
-                )
-                return Response(
-                    serializer.data, status=status.HTTP_201_CREATED
-                )
-        else:
-            raise serializers.ValidationError(_("Identifier missing"))
-
-    @action(
-        detail=False,
-        methods=["get"],
-        url_path="addable-for-question/(?P<question_pk>[0-9]+)",
-    )
-    def for_question(self, request, question_pk=None):
-        # Return objects to which given question can be added for this teacher
-        question = get_object_or_404(Question, pk=question_pk)
-        queryset = self.get_queryset().exclude(questions=question)
-        pks = [a.pk for a in queryset if a.editable]
-        serializer = self.get_serializer(
-            queryset.filter(pk__in=pks), many=True, fields=["pk", "title"]
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class RecentStudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):

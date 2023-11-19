@@ -33,6 +33,9 @@ class TeacherQuestionCRUDViewSet(TeacherCRUDViewSet):
             .exclude(user_token__exact="")
             .exclude(user_token__exact=OuterRef("user__username"))
         )
+        """
+        TODO: And where no other teachers have assigned this question?
+        """
         queryset = queryset.filter(~Exists(answers)).distinct()
 
         return queryset
