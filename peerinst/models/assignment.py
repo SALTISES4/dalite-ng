@@ -145,12 +145,13 @@ class Assignment(models.Model):
         Assignments can be deleted only when:
         - They are editable
         - They have not been included in any collections
-        - They have not been bookmarked
+        - They have not been bookmarked by other users
         """
         return (
             self.is_editable
             and self.collection_set.count() == 0
-            and self.teacher_set.count() == 0
+            and self.teacher_set.exclude(user__in=self.owner.all()).count()
+            == 0
         )
 
     @property
