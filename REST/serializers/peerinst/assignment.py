@@ -608,7 +608,7 @@ class RankSerializer(serializers.ModelSerializer):
         assignment = validated_data["assignment"]
         question = validated_data["question"]
         if (
-            assignment.editable
+            assignment.is_editable
             and self.context["request"].user in assignment.owner.all()
         ):
             if assignment.questions.all():
@@ -636,7 +636,7 @@ class RankSerializer(serializers.ModelSerializer):
 
 class AssignmentSerializer(DynamicFieldsModelSerializer):
     answer_count = serializers.ReadOnlyField()
-    editable = serializers.ReadOnlyField()
+    is_editable = serializers.ReadOnlyField()
     is_valid = serializers.ReadOnlyField()
     is_owner = serializers.SerializerMethodField()
     owner = UserSerializer(many=True, read_only=True)
@@ -719,7 +719,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         Adding/deleting questions is handled by serializer for through table.
         """
         if "assignmentquestions_set" in validated_data:
-            if instance.editable:
+            if instance.is_editable:
                 for i, aq in enumerate(instance.assignmentquestions_set.all()):
                     aq.rank = validated_data["assignmentquestions_set"][i][
                         "rank"
@@ -770,8 +770,8 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
             "answer_count",  #
             "conclusion_page",
             "description",
-            "editable",
             "intro_page",
+            "is_editable",
             "is_owner",
             "is_valid",
             "owner",  #

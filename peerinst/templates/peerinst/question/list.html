@@ -16,7 +16,7 @@
       </h1>
 
       <div class="admin-link">
-        {% if user in assignment.owner.all and assignment.editable or user.is_staff %}
+        {% if user in assignment.owner.all and assignment.is_editable or user.is_staff %}
           <a href="{% url 'assignment-update' assignment_id=assignment.identifier%}">{% trans 'Edit question list' %}</a>
           <span class="admin-link--padded">|</span>{% endif %}<a href="{% url 'research-assignment-question-index-by-assignment' assignment_id=assignment.identifier%}">{% trans 'Score Rationales / Flag Questions / Update Expert Answers' %}</a>
       </div>

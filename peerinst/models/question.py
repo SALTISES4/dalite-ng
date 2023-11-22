@@ -13,7 +13,7 @@ from django.core import exceptions
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, F, OuterRef, Q, Subquery
+from django.db.models import Count, Exists, F, OuterRef, Q, Subquery
 from django.utils.html import escape, strip_tags
 from django.utils.translation import gettext_lazy as _
 
@@ -557,13 +557,47 @@ class Question(models.Model):
                 )
         return False
 
+    @classmethod
+    def editable_queryset(cls, queryset):
+        """
+        Accepts a Question queryset and filters to return editable only
+        - Returns empty Question queryset if passed bad input
+        """
+        if queryset and queryset.model is cls:
+            from peerinst.models import Answer
+
+            answers = (
+                Answer.objects.filter(question=OuterRef("pk"))
+                .exclude(expert=True)  # Remove expert answers
+                .exclude(user_token__exact="")  # Remove sample answers
+                .exclude(
+                    user_token__exact=OuterRef("user__username")
+                )  # Remove owner's answers
+            )
+            return queryset.filter(~Exists(answers)).distinct()
+        else:
+            return cls.objects.none()
+
+    @classmethod
+    def editable_queryset_for_user(cls, user):
+        """
+        A user can only retrieve or update questions where
+        they are either the owner or a collaborator
+        """
+        queryset = cls.objects.filter(Q(user=user) | Q(collaborators=user))
+        """
+        And where the question is editable
+        """
+        queryset = cls.editable_queryset(queryset)
+        return queryset
+
     @property
     def answer_count(self):
         return self.get_student_answers().count()
 
     @property
     def assignment_count(self):
-        return self.assignment_set.all().count()
+        return self.assignment_set.count()
 
     @property
     def collections(self):
@@ -571,6 +605,38 @@ class Question(models.Model):
             app_label="peerinst", model_name="collection"
         )
         return Collection.objects.filter(assignments__questions=self)
+
+    @property
+    def is_deletable(self):
+        """
+        Questions can be deleted only when:
+        - They are editable
+        - They have not been included in any assignments
+        - They have not been bookmarked
+        """
+        return (
+            self.is_editable
+            and self.assignment_count == 0
+            and self.teacher_set.count() == 0
+        )
+
+    @property
+    def delete_validation_error(self):
+        if not self.is_editable:
+            return _("Question cannot be deleted as student answers exist")
+        if self.assignment_count > 0:
+            return (
+                _(
+                    "Question cannot be deleted as it is part of the following \
+                    assignment(s): "
+                )
+                + ", ".join(a.identifier for a in self.assignment_set.all())
+            )
+        if self.teacher_set.count() > 0:
+            return _(
+                "Question cannot be deleted as has been included in the library \
+                of other teachers"
+            )
 
     @property
     def featured(self):
@@ -581,6 +647,10 @@ class Question(models.Model):
 
     @property
     def is_editable(self):
+        """
+        Questions can be edited only when:
+        - There are no related student answers
+        """
         queryset = self.answer_set.exclude(expert=True).exclude(
             user_token__exact=""
         )

@@ -12,7 +12,9 @@ from .teacher import Teacher
 
 class Collection(models.Model):
     assignments = models.ManyToManyField(Assignment, blank=True)
-    discipline = models.ForeignKey(Discipline, on_delete=models.CASCADE)
+    discipline = models.ForeignKey(
+        Discipline, null=True, blank=True, on_delete=models.SET_NULL
+    )
     owner = models.ForeignKey(
         Teacher, related_name="owner", on_delete=models.CASCADE
     )

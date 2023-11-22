@@ -25,13 +25,11 @@ class TeacherAssignmentCRUDViewSet(TeacherCRUDViewSet):
 
     def perform_destroy(self, instance):
         """
-        Queryset returns objects that are editable but not deletable.
-        Explicitly check this object is deletable.
+        Queryset returns objects that are editable but not necessarily deletable
+        - Explicitly check this object is deletable
         """
-        if not instance.deletable:
-            raise serializers.ValidationError(
-                _("Assignment cannot be deleted")
-            )
+        if not instance.is_deletable:
+            raise serializers.ValidationError(instance.delete_validation_error)
         instance.delete()
 
     @action(
@@ -75,7 +73,7 @@ class TeacherAssignmentCRUDViewSet(TeacherCRUDViewSet):
         # Return assignments to which given question can be added for this teacher
         question = get_object_or_404(Question, pk=question_pk)
         queryset = self.get_queryset().exclude(questions=question)
-        pks = [a.pk for a in queryset if a.editable]
+        pks = [a.pk for a in queryset if a.is_editable]
         serializer = self.get_serializer(
             queryset.filter(pk__in=pks), many=True, fields=["pk", "title"]
         )

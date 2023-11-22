@@ -361,7 +361,7 @@ class AssignmentUpdateView(LoginRequiredMixin, NoStudentsMixin, DetailView):
             or self.request.user.is_staff
         ):
             # Check for student answers
-            if not self.get_object().editable:
+            if not self.get_object().is_editable:
                 raise PermissionDenied
             else:
                 return super().dispatch(*args, **kwargs)
@@ -396,7 +396,7 @@ class AssignmentEditView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
             or self.request.user.is_staff
         ):
             # Check for student answers
-            if not self.get_object().editable:
+            if not self.get_object().is_editable:
                 raise PermissionDenied
             else:
                 return super().dispatch(*args, **kwargs)
@@ -727,7 +727,7 @@ def sample_answer_form_done(request, question_id):
                 for a in assignments:
                     if teacher.user in a.owner.all():
                         # Check for student answers
-                        if a.editable and question not in a.questions.all():
+                        if a.is_editable and question not in a.questions.all():
                             a.questions.add(question)
                     else:
                         raise PermissionDenied

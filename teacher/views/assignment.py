@@ -20,9 +20,9 @@ class AssignmentCreateView(
 class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
     """
     Update view should account for three levels of editability:
-    - None at all: non-owners or owners refusing TOS >>> redirect to view only
-    - Meta fields only: owners where assignment.editable is false
-    - All fields: owners where assignment.editable is true
+    - None at all: non-owners or owners refusing TOS > silently redirect to detail view
+    - Meta fields only: owners where assignment.is_editable is false
+    - All fields: owners where assignment.is_editable is true
     """
 
     http_method_names = ["get"]
@@ -62,7 +62,7 @@ class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
             LTI_launch_url=str("https://" + self.request.get_host() + "/lti/"),
             meta_editable_by_user=True,
             owner=[u.username for u in assignment.owner.all()],
-            questions_editable_by_user=assignment.editable,
+            questions_editable_by_user=assignment.is_editable,
         )
         return context
 

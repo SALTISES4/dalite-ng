@@ -140,16 +140,31 @@ class Assignment(models.Model):
         return sum(q.answer_count for q in self.questions.all())
 
     @property
-    def deletable(self):
+    def is_deletable(self):
         """
         Assignments can be deleted only when:
-        - There are no related student answers
-        - There are no related StudentGroupAssignment objects
+        - They are editable
+        - They have not been included in any collections
+        - They have not been bookmarked
         """
-        return False
+        return (
+            self.is_editable
+            and self.collection_set.count() == 0
+            and self.teacher_set.count() == 0
+        )
 
     @property
-    def editable(self):
+    def delete_validation_error(self):
+        return _("Assignment cannot be deleted")
+
+    @property
+    def is_editable(self):
+        """
+        Assignments can be edited only when:
+        - There are no related student answers
+        - There are no related StudentGroupAssignment objects
+        - TODO: What about LTI assignments?
+        """
         return (
             not self.answer_set.filter(expert=False)
             .exclude(user_token__exact="")

@@ -213,7 +213,7 @@ class QuestionListViewSet(viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
-        if self.get_object().assignment.editable:
+        if self.get_object().assignment.is_editable:
             return super().destroy(request, *args, **kwargs)
 
         raise PermissionDenied

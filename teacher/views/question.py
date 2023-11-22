@@ -1,8 +1,7 @@
-from django.db.models import Exists, OuterRef, Q
 from django.views.generic import DetailView, TemplateView
 
 from peerinst.mixins import TOSAcceptanceRequiredMixin
-from peerinst.models import Answer, Question
+from peerinst.models import Question
 from teacher.mixins import TeacherRequiredMixin
 
 
@@ -20,19 +19,5 @@ class QuestionUpdateView(
     template_name = "teacher/question/create_update.html"
 
     def get_queryset(self):
-        """
-        Same queryset as REST endpoint
-        """
-        queryset = Question.objects.filter(
-            Q(user=self.request.user) | Q(collaborators=self.request.user)
-        )
-
-        answers = (
-            Answer.objects.filter(question=OuterRef("pk"))
-            .exclude(expert=True)
-            .exclude(user_token__exact="")
-            .exclude(user_token__exact=OuterRef("user__username"))
-        )
-        queryset = queryset.filter(~Exists(answers)).distinct()
-
-        return queryset
+        """Same as REST endpoint"""
+        return Question.editable_queryset_for_user(self.request.user)

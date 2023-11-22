@@ -53,8 +53,8 @@ repos:
       - id: isort
         args: ["--profile", "black"]
 
-  - repo: https://github.com/ambv/black
-    rev: 22.12.0
+  - repo: https://github.com/psf/black
+    rev: 23.11.0
     hooks:
       - id: black
         exclude: "^.*/migrations/.*.py$"
