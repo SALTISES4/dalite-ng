@@ -6,8 +6,10 @@
 #
 --index-url https://pypi.python.org/simple
 
--e file:///Users/jonathonsumner/Development/Components
-    # via -r requirements/requirements-dev.in
+-e file:///Users/jsumner/Development/MYDALITE/Components
+    # via
+    #   -r requirements/requirements-dev.in
+    #   -r requirements/requirements-test.txt
 alt-profanity-check==1.3.0
     # via -r requirements/requirements-test.txt
 amqp==5.1.1
@@ -149,7 +151,7 @@ ddt==1.6.0
     # via -r requirements/requirements-test.txt
 distlib==0.3.7
     # via virtualenv
-django==3.2.20
+django==3.2.22
     # via
     #   -r requirements/requirements-test.txt
     #   channels
@@ -271,8 +273,11 @@ faker==12.0.1
     #   -r requirements/requirements-test.txt
     #   factory-boy
     #   mixer
-filelock==3.12.2
-    # via virtualenv
+filelock==3.13.1
+    # via
+    #   -r requirements/requirements-test.txt
+    #   tldextract
+    #   virtualenv
 flake8==5.0.4
     # via -r requirements/requirements-dev.in
 future==0.18.3
@@ -305,6 +310,7 @@ idna==3.4
     #   -r requirements/requirements-test.txt
     #   hyperlink
     #   requests
+    #   tldextract
     #   trio
     #   twisted
     #   urllib3
@@ -389,7 +395,7 @@ pandas==2.0.3
     #   saltise-course-flow
 pathspec==0.11.2
     # via black
-pillow==10.0.0
+pillow==10.0.1
     # via -r requirements/requirements-test.txt
 pip-lock==2.11.0
     # via -r requirements/requirements-test.txt
@@ -504,7 +510,13 @@ redis==5.0.0
 requests==2.31.0
     # via
     #   -r requirements/requirements-test.txt
+    #   requests-file
     #   safety
+    #   tldextract
+requests-file==1.5.1
+    # via
+    #   -r requirements/requirements-test.txt
+    #   tldextract
 rjsmin==1.2.1
     # via
     #   -r requirements/requirements-test.txt
@@ -515,7 +527,7 @@ ruamel-yaml-clib==0.2.7
     # via ruamel-yaml
 safety==2.3.4
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.8.9
+saltise-course-flow==0.8.11
     # via -r requirements/requirements-test.txt
 saltise-user-feedback==1.1.2
     # via -r requirements/requirements-test.txt
@@ -544,6 +556,7 @@ six==1.16.0
     #   langdetect
     #   pylti
     #   python-dateutil
+    #   requests-file
 sniffio==1.3.0
     # via
     #   -r requirements/requirements-test.txt
@@ -564,6 +577,8 @@ threadpoolctl==3.2.0
     # via
     #   -r requirements/requirements-test.txt
     #   scikit-learn
+tldextract==5.1.1
+    # via -r requirements/requirements-test.txt
 tomli==2.0.1
     # via
     #   -r requirements/requirements-test.txt
@@ -602,7 +617,7 @@ tzdata==2023.3
     #   celery
     #   django-celery-beat
     #   pandas
-urllib3[secure,socks]==1.26.16
+urllib3[secure,socks]==1.26.17
     # via
     #   -r requirements/requirements-test.txt
     #   elasticsearch

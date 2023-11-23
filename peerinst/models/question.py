@@ -20,6 +20,7 @@ from django.utils.translation import gettext_lazy as _
 from peerinst import rationale_choice
 from peerinst.grammar import basic_syntax
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
+from peerinst.validators import allowed_domain, allowed_scheme
 from reputation.models import Reputation
 
 from .search import MetaSearch
@@ -264,7 +265,6 @@ class Question(models.Model):
             "student may be using a screen reader."
         ),
     )
-    # Videos will be handled by off-site services.
     video_url = models.URLField(
         _("Question video URL"),
         blank=True,
@@ -275,6 +275,7 @@ class Question(models.Model):
             "from phet (i.e. https://phet.colorado.edu/sims/html/...) are "
             "currently supported."
         ),
+        validators=[allowed_domain, allowed_scheme],
     )
     ALPHA = 0
     NUMERIC = 1
@@ -386,6 +387,7 @@ class Question(models.Model):
         """
         Exclude questions which are part of any Teacher's deleted_questions,
         and have no answers
+        TODO: Do we still need this if we support question delete now?
         """
         Teacher = apps.get_model(app_label="peerinst", model_name="teacher")
 
@@ -563,20 +565,23 @@ class Question(models.Model):
         Accepts a Question queryset and filters to return editable only
         - Returns empty Question queryset if passed bad input
         """
-        if queryset and queryset.model is cls:
-            from peerinst.models import Answer
+        if isinstance(queryset, models.query.QuerySet):
+            if queryset and queryset.model is cls:
+                Answer = apps.get_model(
+                    app_label="peerinst", model_name="answer"
+                )
 
-            answers = (
-                Answer.objects.filter(question=OuterRef("pk"))
-                .exclude(expert=True)  # Remove expert answers
-                .exclude(user_token__exact="")  # Remove sample answers
-                .exclude(
-                    user_token__exact=OuterRef("user__username")
-                )  # Remove owner's answers
-            )
-            return queryset.filter(~Exists(answers)).distinct()
-        else:
-            return cls.objects.none()
+                answers = (
+                    Answer.objects.filter(question=OuterRef("pk"))
+                    .exclude(expert=True)  # Remove expert answers
+                    .exclude(user_token__exact="")  # Remove sample answers
+                    .exclude(
+                        user_token__exact=OuterRef("user__username")
+                    )  # Remove owner's answers
+                )
+                return queryset.filter(~Exists(answers)).distinct()
+
+        return cls.objects.none()
 
     @classmethod
     def editable_queryset_for_user(cls, user):
@@ -612,12 +617,15 @@ class Question(models.Model):
         Questions can be deleted only when:
         - They are editable
         - They have not been included in any assignments
-        - They have not been bookmarked
+        - They have not been added to another teacher's library
         """
         return (
             self.is_editable
             and self.assignment_count == 0
-            and self.teacher_set.count() == 0
+            and self.favourite_questions.exclude(user=self.user)
+            .exclude(user__in=self.collaborators)
+            .count()
+            == 0
         )
 
     @property
@@ -649,7 +657,7 @@ class Question(models.Model):
     def is_editable(self):
         """
         Questions can be edited only when:
-        - There are no related student answers
+        - There are no related student or other teacher answers
         """
         queryset = self.answer_set.exclude(expert=True).exclude(
             user_token__exact=""
@@ -725,6 +733,7 @@ class Question(models.Model):
         return
 
     def clean(self):
+        # TODO: Call from DRF
         errors = {}
         fields = ["image", "video_url"]
         filled_in_fields = sum(bool(getattr(self, f)) for f in fields)
@@ -805,6 +814,7 @@ class Question(models.Model):
         )
 
     def get_student_answers(self):
+        # TODO: Drop any answers that have teacher usernames?
         return (
             self.answer_set.filter(expert=False)
             .filter(second_answer_choice__gt=0)

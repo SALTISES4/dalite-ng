@@ -13,6 +13,7 @@ from PIL import Image
 from rest_framework import serializers
 
 from peerinst.documents import CategoryDocument
+from peerinst.forms import RichTextRationaleField
 from peerinst.models import (
     Answer,
     AnswerChoice,
@@ -72,10 +73,10 @@ class SampleAnswerSerializer(serializers.ModelSerializer):
 
     def validate_rationale(self, value):
         """
-        Check rationale <= 4000 characters
+        Run validators defined peerinst/forms.py for RichTextRationaleField
         """
-        if len(value) > 4000:
-            raise serializers.ValidationError(_("Rationale text too long"))
+        for validator in RichTextRationaleField.default_validators:
+            validator(value)
         return value
 
     def to_representation(self, instance):
@@ -101,12 +102,6 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
     pk = serializers.IntegerField(required=False)
     expert_answers = SampleAnswerSerializer(many=True, required=False)
     sample_answers = SampleAnswerSerializer(many=True)
-
-    def validate_sample_answers(self, data):
-        # TODO: Apply quality check here
-        raise serializers.ValidationError(
-            _("Sample answer failed quality check")
-        )
 
     def validate(self, data):
         """

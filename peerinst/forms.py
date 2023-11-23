@@ -26,6 +26,7 @@ from .models import (
 )
 from .validators import (
     EnglishFrenchValidator,
+    MaxCharactersValidator,
     MinWordsValidator,
     NoProfanityValidator,
 )
@@ -67,6 +68,10 @@ class RichTextRationaleField(forms.CharField):
         MinWordsValidator(
             4,
             _("Please provide a more detailed rationale for your choice."),
+        ),
+        MaxCharactersValidator(
+            4000,
+            _("Please provide a less detailed rationale for your choice."),
         ),
         NoProfanityValidator(
             0.7,
