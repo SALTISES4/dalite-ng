@@ -16,6 +16,8 @@ from django.utils.translation import ngettext_lazy
 from langdetect import DetectorFactory, LangDetectException, detect_langs
 from profanity_check import predict_prob
 
+from peerinst.templatetags.bleach_html import STRICT_TAGS
+
 from .profanity import profanity
 
 DetectorFactory.seed = 0
@@ -53,7 +55,11 @@ class MaxCharactersValidator(MaxLengthValidator):
     code = "max_chars"
 
     def clean(self, text):
-        cleaned_text = html_to_text(text)
+        cleaned_text = bleach.clean(
+            text,
+            tags=STRICT_TAGS,
+            strip=True,
+        ).strip()
         result = len(str(cleaned_text))
         validation_logger.info(f"Character count: {result} for '{text}'")
         return result
