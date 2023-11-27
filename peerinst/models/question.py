@@ -733,7 +733,6 @@ class Question(models.Model):
         return
 
     def clean(self):
-        # TODO: Call from DRF
         errors = {}
         fields = ["image", "video_url"]
         filled_in_fields = sum(bool(getattr(self, f)) for f in fields)

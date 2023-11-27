@@ -172,6 +172,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "text",
         ],
         many=True,
+        required=False,
     )
     assignment_count = serializers.ReadOnlyField()
     category = CategorySerializer(many=True, read_only=True)
@@ -249,14 +250,14 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         return {
             "add_answer_choices": reverse(
                 "answer-choice-form", args=(obj.pk,)
-            ),
+            ),  # TODO: Remove for RO type
             "add_expert_rationales": reverse(
                 "research-fix-expert-rationale", args=(obj.pk,)
-            ),
+            ),  # TODO: Remove for RO type
             "add_new_question": reverse("question-create"),
             "add_sample_answers": reverse(
                 "sample-answer-form", args=(obj.pk,)
-            ),
+            ),  # TODO: Remove for RO type
             "addable_assignments": reverse(
                 "REST:teacher-assignment-for-question", args=(obj.pk,)
             ),
@@ -266,29 +267,13 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "fix": reverse(
                 "question-fix", args=(obj.pk,)
             ),  # TODO: Is this still needed?
-            "matrix": reverse("REST:question-matrix", args=(obj.pk,)),
+            "matrix": reverse(
+                "REST:question-matrix", args=(obj.pk,)
+            ),  # TODO: Remove for RO type?
             "rationales": reverse("REST:question-rationales", args=(obj.pk,)),
             "test": reverse("question-test", args=(obj.pk,)),
             "update": reverse("teacher:question-update", args=(obj.pk,)),
         }
-
-    def validate_answerchoice_set(self, value):
-        """
-        Check at least two answer choices
-        """
-        if len(value) < 2:
-            raise serializers.ValidationError(
-                _("At least two answer choices are required")
-            )
-
-        """
-        Check at least one answer choice is marked correct
-        """
-        if sum(x["correct"] for x in value) == 0:
-            raise serializers.ValidationError(
-                _("At least one answer choice must be correct")
-            )
-        return value
 
     def validate_image(self, value):
         ALLOWED_IMAGE_FORMATS = ["PNG", "GIF", "JPEG"]
@@ -320,6 +305,54 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         if len(text) > 8000:
             raise serializers.ValidationError(_("Text too long"))
         return value
+
+    def validate(self, data):
+        """
+        - Validation logic is often included in Model.clean(), but DRF ignores it
+        - See discussion here https://github.com/encode/django-rest-framework/discussions/7850
+        - For now, we reproduce logic in serializer explicitly
+        - TODO: Consider how updates in Django admin should be handled since serializer validation won't be run
+        """
+        # Can't have image and video_url
+        if (
+            "image"
+            and "video_url" in data
+            and data["image"]
+            and data["video_url"]
+        ):
+            raise serializers.ValidationError(
+                _(
+                    "Only one of the image and video URL fields can be specified"
+                )
+            )
+        # Can't have image without image_alt_text
+        if "image" in data and data["image"]:
+            if "image_alt_text" not in data or not data["image_alt_text"]:
+                raise serializers.ValidationError(
+                    _(
+                        "An alternative text for accessibility if is required if providing an image"
+                    )
+                )
+        # Only validate answerchoice_set if question type is "PI" otherwise ensure empty
+        if data["type"] == "PI":
+            """
+            Check at least two answer choices
+            """
+            if len(data["answerchoice_set"]) < 2:
+                raise serializers.ValidationError(
+                    _("At least two answer choices are required")
+                )
+
+            """
+            Check at least one answer choice is marked correct
+            """
+            if sum(x["correct"] for x in data["answerchoice_set"]) == 0:
+                raise serializers.ValidationError(
+                    _("At least one answer choice must be correct")
+                )
+        else:
+            data["answerchoice_set"] = []
+        return data
 
     def create(self, validated_data):
         answerchoice_data = validated_data.pop("answerchoice_set")
