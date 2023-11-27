@@ -313,9 +313,19 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         - For now, we reproduce logic in serializer explicitly
         - TODO: Consider how updates in Django admin should be handled since serializer validation won't be run
         """
+        # Can't have image without image_alt_text; they must always be changed together
+        if "image" in data and data["image"]:
+            if "image_alt_text" not in data or not data["image_alt_text"]:
+                raise serializers.ValidationError(
+                    _(
+                        "An alternative text for accessibility if is required if providing an image"
+                    )
+                )
         # Can't have image and video_url
+        # - raise validation error if sent together
+        # - raise validation error if one sent with other existing on instance
         if (
-            "image"
+            "image" in data
             and "video_url" in data
             and data["image"]
             and data["video_url"]
@@ -325,33 +335,74 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                     "Only one of the image and video URL fields can be specified"
                 )
             )
-        # Can't have image without image_alt_text
-        if "image" in data and data["image"]:
-            if "image_alt_text" not in data or not data["image_alt_text"]:
+        if self.instance:
+            if (
+                self.instance.video_url and "image" in data and data["image"]
+            ) or (
+                self.instance.image
+                and "video_url" in data
+                and data["video_url"]
+            ):
                 raise serializers.ValidationError(
                     _(
-                        "An alternative text for accessibility if is required if providing an image"
+                        "Only one of the image and video URL fields can be specified"
                     )
                 )
-        # Only validate answerchoice_set if question type is "PI" otherwise ensure empty
-        if data["type"] == "PI":
-            """
-            Check at least two answer choices
-            """
-            if len(data["answerchoice_set"]) < 2:
-                raise serializers.ValidationError(
-                    _("At least two answer choices are required")
-                )
+        # Only validate answerchoice_set if question type is PI otherwise ensure empty
+        if not self.instance:
+            if ("type" not in data) or (
+                "type" in data and data["type"] == "PI"
+            ):
+                # Create logic - PI
+                """
+                Check at least two answer choices
+                """
+                if (
+                    "answerchoice_set" not in data
+                    or len(data["answerchoice_set"]) < 2
+                ):
+                    raise serializers.ValidationError(
+                        {
+                            "answerchoice_set": _(
+                                "At least two answer choices are required"
+                            )
+                        }
+                    )
 
-            """
-            Check at least one answer choice is marked correct
-            """
-            if sum(x["correct"] for x in data["answerchoice_set"]) == 0:
-                raise serializers.ValidationError(
-                    _("At least one answer choice must be correct")
-                )
+                """
+                Check at least one answer choice is marked correct
+                """
+                if sum(x["correct"] for x in data["answerchoice_set"]) == 0:
+                    raise serializers.ValidationError(
+                        {
+                            "answerchoice_set": _(
+                                "At least one answer choice must be correct"
+                            )
+                        }
+                    )
+            else:
+                # Create logic - RO
+                data["answerchoice_set"] = []
         else:
-            data["answerchoice_set"] = []
+            if ("type" in data and data["type"] == "PI") or (
+                "type" not in data and self.instance.type == "PI"
+            ):
+                # Update logic - PI
+                if self.instance.answerchoice_set.count() < 2 and (
+                    "answerchoice_set" not in data
+                    or len(data["answerchoice_set"]) < 2
+                ):
+                    raise serializers.ValidationError(
+                        {
+                            "answerchoice_set": _(
+                                "At least two answer choices are required"
+                            )
+                        }
+                    )
+            else:
+                # Update logic - RO
+                data["answerchoice_set"] = []
+
         return data
 
     def create(self, validated_data):

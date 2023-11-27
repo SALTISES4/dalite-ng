@@ -623,7 +623,7 @@ class Question(models.Model):
             self.is_editable
             and self.assignment_count == 0
             and self.favourite_questions.exclude(user=self.user)
-            .exclude(user__in=self.collaborators)
+            .exclude(user__in=self.collaborators.all())
             .count()
             == 0
         )

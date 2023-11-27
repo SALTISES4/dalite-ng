@@ -121,6 +121,8 @@ def test_teacherquestioncreateupdateviewset_create_attaches_user(
         content_type="application/json",
     )
 
+    print(response.content)
+
     assert response.status_code == status.HTTP_201_CREATED
     assert Question.objects.get(title=title).user == teacher.user
 
@@ -653,6 +655,8 @@ def test_teacherquestioncreateupdateviewset_update_remove_categories(
         },
         content_type="application/json",
     )
+
+    print(response.content)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data["category"] == []
