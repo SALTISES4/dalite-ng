@@ -42,7 +42,8 @@ def images(instance, filename):
     )
 
 
-class Category(models.Model):
+class Category(models.Model): 
+    #   require docstring
     title = models.CharField(
         _("Category"),
         unique=True,
@@ -52,7 +53,9 @@ class Category(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        """Bleach"""
+        """
+        Bleach
+        """
         self.title = bleach.clean(
             self.title,
             tags=[],
@@ -570,7 +573,6 @@ class Question(models.Model):
                 Answer = apps.get_model(
                     app_label="peerinst", model_name="answer"
                 )
-
                 answers = (
                     Answer.objects.filter(question=OuterRef("pk"))
                     .exclude(expert=True)  # Remove expert answers
