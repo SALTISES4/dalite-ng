@@ -818,7 +818,7 @@ class Question(models.Model):
         )
         if self.user:
             queryset = queryset.exclude(user_token__exact=self.user.username)
-        if self.collaborators:
+        if self.collaborators.exists():
             queryset = queryset.exclude(
                 user_token__in=self.collaborators.values_list(
                     "teacher__user__username", flat=True
