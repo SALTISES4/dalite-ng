@@ -121,8 +121,6 @@ def test_teacherquestioncreateupdateviewset_create_attaches_user(
         content_type="application/json",
     )
 
-    print(response.content)
-
     assert response.status_code == status.HTTP_201_CREATED
     assert Question.objects.get(title=title).user == teacher.user
 
@@ -331,6 +329,8 @@ def test_teacherquestioncreateupdateviewset_create_with_categories(
     )
     data = json.loads(response.content)
 
+    print(response.content)
+
     assert response.status_code == status.HTTP_201_CREATED
     assert category.title in [x["title"] for x in data["category"]]
 
@@ -438,13 +438,14 @@ def test_teacherquestioncreateupdateviewset_create_and_remove_image_png(
                     "rb",
                 ).read(),
             ),
+            "image_alt_text": fake.sentence(),
             "answerchoice_set[0]correct": True,
             "answerchoice_set[0]text": fake.sentence(),
-            "answerchoice_set[0]sample_answers[0]rationale": fake.sentence(),
-            "answerchoice_set[0]expert_answers[0]rationale": fake.sentence(),
+            "answerchoice_set[0]sample_answers[0]rationale": fake.paragraph(),
+            "answerchoice_set[0]expert_answers[0]rationale": fake.paragraph(),
             "answerchoice_set[1]correct": False,
             "answerchoice_set[1]text": fake.sentence(),
-            "answerchoice_set[1]sample_answers[0]rationale": fake.sentence(),
+            "answerchoice_set[1]sample_answers[0]rationale": fake.paragraph(),
         },
     )
 
@@ -463,6 +464,8 @@ def test_teacherquestioncreateupdateviewset_create_and_remove_image_png(
         },
         format="multipart",
     )
+
+    print(response.content)
 
     assert response.status_code == status.HTTP_200_OK
 
@@ -554,11 +557,11 @@ def test_teacherquestioncreateupdateviewset_create_image_svg(client, teacher):
             ),
             "answerchoice_set[0]correct": True,
             "answerchoice_set[0]text": fake.sentence(),
-            "answerchoice_set[0]sample_answers[0]rationale": fake.sentence(),
-            "answerchoice_set[0]expert_answers[0]rationale": fake.sentence(),
+            "answerchoice_set[0]sample_answers[0]rationale": fake.paragraph(),
+            "answerchoice_set[0]expert_answers[0]rationale": fake.paragraph(),
             "answerchoice_set[1]correct": False,
             "answerchoice_set[1]text": fake.sentence(),
-            "answerchoice_set[1]sample_answers[0]rationale": fake.sentence(),
+            "answerchoice_set[1]sample_answers[0]rationale": fake.paragraph(),
         },
     )
 
@@ -591,11 +594,11 @@ def test_teacherquestioncreateupdateviewset_create_image_large_file(
             ),
             "answerchoice_set[0]correct": True,
             "answerchoice_set[0]text": fake.sentence(),
-            "answerchoice_set[0]sample_answers[0]rationale": fake.sentence(),
-            "answerchoice_set[0]expert_answers[0]rationale": fake.sentence(),
+            "answerchoice_set[0]sample_answers[0]rationale": fake.paragraph(),
+            "answerchoice_set[0]expert_answers[0]rationale": fake.paragraph(),
             "answerchoice_set[1]correct": False,
             "answerchoice_set[1]text": fake.sentence(),
-            "answerchoice_set[1]sample_answers[0]rationale": fake.sentence(),
+            "answerchoice_set[1]sample_answers[0]rationale": fake.paragraph(),
         },
     )
 
@@ -623,6 +626,19 @@ def test_teacherquestioncreateupdateviewset_update_owned_editable_question(
         data={
             "text": text,
             "title": title,
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [{"rationale": fake.paragraph()}],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
         },
         content_type="application/json",
     )
@@ -652,11 +668,22 @@ def test_teacherquestioncreateupdateviewset_update_remove_categories(
         url,
         data={
             "category_pk": [],
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [{"rationale": fake.paragraph()}],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
         },
         content_type="application/json",
     )
-
-    print(response.content)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data["category"] == []
