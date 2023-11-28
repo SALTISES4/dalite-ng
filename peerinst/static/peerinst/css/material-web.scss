@@ -124,17 +124,28 @@ md-outlined-text-field {
     }
 
     .m3-radio-label {
-        align-items: center;
+        align-items: baseline;
         display: flex;
         gap: 0.67rem;
 
         & md-radio {
             flex-grow: 0;
             flex-shrink: 0;
+            position: relative;
+            top: 4px;
         }
 
         & label {
-          pointer-events: none;
+            display: contents;
+            pointer-events: none;
+
+            & p:first-of-type {
+                margin-top: 0px;
+            }
+
+            & p:last-of-type {
+                margin-bottom: 0px;
+            }
         }
     }
 
@@ -173,18 +184,51 @@ md-outlined-text-field {
         margin-bottom: 30px;
 
         & .expand-button {
-          color: $primary;
-          cursor: pointer;
-          display: flex;
-          gap: 0.4rem;
+            color: $primary;
+            cursor: pointer;
+            display: flex;
+            gap: 0.5rem;
+
+            & i {
+                margin-left: -2px;
+            }
         }
 
         & .rationale-choice {
-          padding-bottom: 20px;
+            align-items: baseline;
+            display: flex;
+            gap: 0.67rem;
+            margin-bottom: 1.33rem;
+
+            & p:first-of-type {
+                margin-top: 0px;
+            }
+
+            & p:last-of-type {
+                margin-bottom: 0px;
+            }
+        }
+
+        & .rationale-text-container {
+            align-items: baseline;
+            display: flex;
+            gap: 0.67rem;
+
+            & .visibility-hidden {
+                visibility: hidden;
+            }
+
+            & p:first-of-type {
+                margin-top: 0px;
+            }
+
+            & p:last-of-type {
+                margin-bottom: 0px;
+            }
         }
 
         & input {
-          display: none;
+            display: none;
         }
 
         & md-divider {

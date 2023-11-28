@@ -15,7 +15,7 @@
             name="answer-choice-{{ forloop.counter }}">
           </md-radio>
           <label for="{{ label }}">
-            <strong>{{ label }}</strong>. {{ choice.strip|bleach_html|safe }}
+            <strong>{{ label }}.</strong> {{ choice.strip|bleach_html|safe }}
             {% if second_choice_label %}
               {% if label == first_choice_label or label == second_choice_label %}
                 {% if not group_assignment or group_assignment.show_correct_answers %}
