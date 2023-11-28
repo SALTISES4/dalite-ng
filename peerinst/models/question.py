@@ -598,7 +598,7 @@ class Question(models.Model):
 
     @property
     def answer_count(self):
-        return self.get_student_answers().count()
+        return self.get_student_answers().distinct().count()
 
     @property
     def assignment_count(self):
@@ -657,14 +657,10 @@ class Question(models.Model):
     def is_editable(self):
         """
         Questions can be edited only when:
-        - There are no related student or other teacher answers
+        - There are no related student or non-owner teacher answers
         """
-        queryset = self.answer_set.exclude(expert=True).exclude(
-            user_token__exact=""
-        )
-        if self.user:
-            queryset = queryset.exclude(user_token__exact=self.user.username)
-        return queryset.count() == 0
+
+        return self.get_all_student_answers().count() == 0
 
     @property
     def is_not_flagged(self):
@@ -812,13 +808,36 @@ class Question(models.Model):
             itertools.compress(itertools.count(1), answerchoice_correct)
         )
 
-    def get_student_answers(self):
-        # TODO: Drop any answers that have teacher usernames?
-        return (
-            self.answer_set.filter(expert=False)
-            .filter(second_answer_choice__gt=0)
-            .exclude(user_token="")
+    def get_all_student_answers(self):
+        """
+        Collect all non-expert, non-sample, non-owner answers
+        - Include both complete answers and answers in progress
+        """
+        queryset = self.answer_set.exclude(expert=True).exclude(
+            user_token__exact=""
         )
+        if self.user:
+            queryset = queryset.exclude(user_token__exact=self.user.username)
+        if self.collaborators:
+            queryset = queryset.exclude(
+                user_token__in=self.collaborators.values_list(
+                    "teacher__user__username", flat=True
+                )
+            )
+
+        return queryset
+
+    def get_student_answers(self):
+        """
+        Collect all non-expert, non-sample, non-owner answers
+        - Exclude incomplete answers for PI questions
+        """
+        queryset = self.get_all_student_answers()
+
+        if self.type == "PI":
+            queryset.filter(second_answer_choice__gt=0)
+
+        return queryset
 
     def get_answers_by_type(self, answer_type):
         """
