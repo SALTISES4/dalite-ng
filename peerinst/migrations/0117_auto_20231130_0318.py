@@ -15,12 +15,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='category',
             name='title',
-            field=models.CharField(max_length=100, unique=True, validators=[peerinst.models.question.no_hyphens], verbose_name='Category'),
+            field=models.CharField(max_length=100, unique=True, validators=[peerinst.models.no_hyphens], verbose_name='Category'),
         ),
         migrations.AlterField(
             model_name='discipline',
             name='title',
-            field=models.CharField(max_length=100, unique=True, validators=[peerinst.models.question.no_hyphens], verbose_name='Discipline'),
+            field=models.CharField(max_length=100, unique=True, validators=[peerinst.models.no_hyphens], verbose_name='Discipline'),
         ),
         migrations.AlterField(
             model_name='question',
@@ -30,6 +30,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='subject',
             name='title',
-            field=models.CharField(max_length=100, unique=True, validators=[peerinst.models.question.no_hyphens], verbose_name='Subject'),
+            field=models.CharField(max_length=100, unique=True, validators=[peerinst.models.no_hyphens], verbose_name='Subject'),
         ),
     ]
