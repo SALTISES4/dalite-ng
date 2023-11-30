@@ -48,7 +48,6 @@ from lti_provider.lti import LTI
 from pylti.common import post_message
 from tinymce.widgets import TinyMCE
 
-from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
 from peerinst import admin, forms, models, rationale_choice
 from peerinst.admin_views import get_question_rationale_aggregates
@@ -1774,26 +1773,6 @@ class TeacherDetailView(TeacherBase, DetailView):
         )
         context["tos_timestamp"] = latest_teacher_consent.datetime
 
-        # Set all blink assignments, questions, and rounds for this teacher to
-        # inactive
-        for a in self.get_object().blinkassignment_set.all():
-            if a.active:
-                a.active = False
-                a.save()
-
-        for b in self.get_object().blinkquestion_set.all():
-            if b.active:
-                b.active = False
-                b.save()
-
-                open_rounds = BlinkRound.objects.filter(question=b).filter(
-                    deactivate_time__isnull=True
-                )
-
-                for open_round in open_rounds:
-                    open_round.deactivate_time = timezone.now()
-                    open_round.save()
-
         return context
 
 
@@ -2326,12 +2305,6 @@ def question_search(request):
 
         # Exclusions based on type of search
         q_qs = []
-        if type == "blink":
-            assignment = None
-            bq_qs = request.user.teacher.blinkquestion_set.all()
-            q_qs = [bq.question.id for bq in bq_qs]
-            form_field_name = "new_blink"
-
         if type == "assignment":
             assignment = Assignment.objects.get(
                 identifier=request.GET["assignment_identifier"]
@@ -2416,7 +2389,7 @@ def question_search(request):
         query_meta = {}
         for term in search_terms:
             query_term = question_search_function(
-                term, search_list, (type == "assignment" or type == "blink")
+                term, search_list, (type == "assignment")
             )
             query_term = query_term.exclude(id__in=q_qs).distinct()
 

@@ -90,7 +90,6 @@ urlpatterns += i18n_patterns(
         "feedback/", include("user_feedback.urls", namespace="user_feedback")
     ),
     path("saltise/", include("saltise.urls", namespace="saltise")),
-    path("blink/", include("blink.urls", namespace="blink")),
     path("course-flow/", include("course_flow.urls", namespace="course_flow")),
     path("teacher/", include("teacher.urls", namespace="teacher")),
     path("quality/", include("quality.urls", namespace="quality")),
