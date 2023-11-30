@@ -297,52 +297,6 @@ def access_denied_and_logout(request):
     raise PermissionDenied
 
 
-# class AssignmentCopyView(AssignmentCreateView):
-#     """View to create an assignment from existing."""
-
-#     def get_initial(self, *args, **kwargs):
-#         super().get_initial(*args, **kwargs)
-#         assignment = get_object_or_404(
-#             models.Assignment, pk=self.kwargs["assignment_id"]
-#         )
-#         initial = {
-#             "title": _("Copy of ") + assignment.title,
-#             "description": assignment.description,
-#             "intro_page": assignment.intro_page,
-#             "conclusion_page": assignment.conclusion_page,
-#         }
-#         return initial
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context["help_text"] = _(
-#             "Assignments cannot be modified once they \
-#         contain student answers.  After providing a unique identifier below \
-#         and submitting the form, a copy of this assignment will be made that \
-#         can be edited."
-#         )
-#         return context
-
-#     def get_object(self, queryset=None):
-#         # Remove link on object to pk to dump object permissions
-#         return None
-
-#     # Custom save is needed to attach questions and user
-#     def form_valid(self, form):
-#         self.object = form.save()
-#         assignment = get_object_or_404(
-#             models.Assignment, pk=self.kwargs["assignment_id"]
-#         )
-#         for aq in assignment.assignmentquestions_set.all():
-#             form.instance.questions.add(
-#                 aq.question, through_defaults={"rank": aq.rank}
-#             )
-#         form.instance.parent = assignment
-#         form.instance.save()
-
-#         return super().form_valid(form)
-
-
 class AssignmentUpdateView(LoginRequiredMixin, NoStudentsMixin, DetailView):
     """
     View for updating assignment question list.
@@ -782,7 +736,6 @@ def disciplines_select_form(request, pk=None):
     AJAX view simply renders the DisciplinesSelectForm. Preselects instance
     with teachers current set.
     """
-
     disciplines = request.user.teacher.disciplines.values_list("pk", flat=True)
 
     if pk:
@@ -874,7 +827,7 @@ class QuestionMixin:
         return context
 
     def send_grade(self):
-        if not self.request.session.get("access_type") == StudentGroup.LTI:
+        if self.request.session.get("access_type") != StudentGroup.LTI:
             # We are running outside of a basic LTI context, so we don't need to
             # send a grade.
             return
@@ -962,7 +915,6 @@ class QuestionFormView(QuestionMixin, FormView):
         """
         Log an event in a JSON format for each step in problem
         """
-
         # Add common fields to event data
         data.update(
             assignment_id=self.assignment.pk if self.assignment else None,
@@ -1022,7 +974,8 @@ class QuestionFormView(QuestionMixin, FormView):
 
 
 class QuestionStartView(QuestionFormView):
-    """Render a question with or without answer choices depending on type.
+    """
+    Render a question with or without answer choices depending on type.
 
     The user can choose one answer and enter a rationale.
     """
@@ -1628,7 +1581,6 @@ def question(request, question_id, assignment_id=None):
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
 def reset_question(request, question_id, assignment_id=None):
     """Clear all answers from user (for testing)"""
-
     assignment = get_object_or_none(models.Assignment, pk=assignment_id)
     question = get_object_or_404(models.Question, pk=question_id)
     user_token = request.user.username

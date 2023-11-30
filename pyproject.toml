@@ -43,5 +43,3 @@ extend-select = ["D213"]
 convention = "google"
 
 [tool.ruff.format]
-
-[tool.ruff.per-file-ignores]
