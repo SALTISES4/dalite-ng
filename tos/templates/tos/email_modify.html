@@ -1,148 +1,51 @@
-{% extends 'peerinst/base.html' %}
+{% extends user.teacher|yesno:'teacher/base.html,student/base.html' %}
 
-{% load add_class compress i18n static %}
+{% load compress static i18n %}
 
-{% block stylesheets %}
-  {{ block.super }}
-  {% compress css %}
-    <link rel="stylesheet" href="{% static 'tos/css/styles.min.css' %}">
+{% block apps %}
+  {% compress js file email_notifications %}
+    <script
+      src="{% static 'tos/js/email.min.js' %}"
+      defer="true"
+    ></script>
   {% endcompress %}
-  {% if user.student %}
-    {% compress css %}
-      <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
-    {% endcompress %}
-  {% endif %}
 {% endblock %}
 
 {% block body %}
-  <main>
-    <section>
-      <h1 class="mdc-typography--display3">{% trans 'Email Settings' %}
-        <svg class="underline" width=150 height=4></svg>
-      </h1>
+  <div class="mui-container">
+    <h1>{% trans 'Notification settings' %}</h1>
 
-      {% if user.teacher %}
-        <div class="admin-link">
-          <a href="{% url 'teacher' user.teacher.id %}">{% trans 'Back to My Account' %}</a>
-        </div>
-      {% endif %}
+    <div class="m3-question-card">
+      <h3>{% trans 'Email' %}</h3>
 
-      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Email address' %}</h2>
+      <md-divider></md-divider>
 
-      <div class='field-container'>
-        <div class='number-box'><span class='number'>?</span></div>
-        <div class='field'>
-          <p><small>
-            {% blocktrans %}
-              You can change the email address associated with your account below.  Your current email address is:
-            {% endblocktrans %}<span class="bold">{{ request.user.email }}</span>
-          </small></p>
-        </div>
-      </div>
-
-      <form action="{% url 'tos:email_change' role %}?next={{next}}" method="post">
-        {% csrf_token %}
-
-        {% for field in form %}
-          <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
-            {{ field|add_class:"mdc-text-field__input" }}
-            {{ field.label_tag|add_class:"mdc-floating-label"|cut:":" }}
-            <div class="mdc-notched-outline">
-              <svg>
-                <path class="mdc-notched-outline__path"/>
-              </svg>
-            </div>
-            <div class="mdc-notched-outline__idle"></div>
-          </div>
-          <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">
-            {{ field.help_text|safe }}
-          </p>
-          {{ field.errors }}
-        {% endfor %}
-
-        <input id="submit-email-change-btn" class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Save' %}" />
-      </form>
-
-      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Notifications' %}</h2>
-
-      <div class='field-container'>
-        <div class='number-box'><span class='number'>?</span></div>
-        <div class='field'>
-          <p><small>
-            {% blocktrans %}
-              Use the toggle buttons below to control which types of emails myDALITE is permitted to send you.  Certain emails will be sent regardless of the settings below (for example a password reset link).
-            {% endblocktrans %}
-          </small></p>
-        </div>
-      </div>
-      <br>
+      <p class="mui-typography-body2">
+        {% blocktrans %}
+          Use the toggle buttons below to control which types of emails myDALITE is permitted to send you.  Certain emails will be sent regardless of the settings below (for example a password reset link).
+        {% endblocktrans %}
+      </p>
 
       <form id="email-settings-form" action="{% url 'tos:email_update' role %}?next={{next}}" method="post">
         {% csrf_token %}
-
-        <ul class="mdc-list mdc-list--two-line mdc-list--non-interactive">
-          {% for email_type in email_types %}
-            <li role="separator" class="mdc-list-divider"></li>
-            <li class="mdc-list-item email-consent">
-              <span class="mdc-list-item__text mdc-theme--secondary bold">
-                {{ email_type.title }}
-                <span class="mdc-list-item__secondary-text">
-                  {{ email_type.description }}
-                </span>
-              </span>
-              <span class="mdc-list-item__meta">
-                <div
-                  id="{% if email_type.type == 'all' %}btn-toggle-all{% endif %}"
-                  class="btn-toggle {% if not email_type.type == 'all' and not all_accepted %}btn-toggle--disabled{% endif %}"
-                >
-                  {% if email_type.accepted %}
-                    <input type="checkbox" name="{{ email_type.type }}-consent" checked>
-                    <div class="btn-toggle--selected">{% trans 'Yes' %}</div>
-                    <div >{% trans 'No' %}</div>
-                  {% else %}
-                    <input type="checkbox" name="{{ email_type.type }}-consent">
-                    <div>{% trans 'Yes' %}</div>
-                    <div class="btn-toggle--selected">{% trans 'No' %}</div>
-                  {% endif %}
-                </div>
-              </span>
-            </li>
-          {% endfor %}
-          <li role="separator" class="mdc-list-divider"></li>
-        </ul>
-        <input id="submit-notification-change-btn" type="submit" class="mdc-button mdc-button--raised padded-top" disabled value="{% trans 'Save' %}">
+        {% for email_type in email_types %}
+          <div class="m3-switch-field">
+            <md-switch id="notification-{{ email_type.type }}" name="{{ email_type.type }}-consent" {% if email_type.accepted %}selected{% endif %}></md-switch>
+            <div>
+              <label for="notification-{{ email_type.type }}">{{ email_type.title }}</label>
+              <p>
+                {{ email_type.description }}
+              </p>
+            </div>
+          </div>
+        {% endfor %}
       </form>
+    </div>
 
-    </section>
-  </main>
-{% endblock %}
-
-{% block scripts %}
-  {% compress js %}
-    <script src="{% static 'tos/js/email.min.js' %}"></script>
-  {% endcompress %}
-
-  <script nonce="{{ request.csp_nonce }}">
-    window.addEventListener("load", function() {
-      $(".btn-toggle").each(function(i, el) {
-        el.addEventListener("click", function() {
-          document.getElementById("submit-notification-change-btn").disabled = false;
-        });
-      })
-    });
-  </script>
-
-  {% if user.student %}
-    {% compress js %}
-      <script src="{% static 'peerinst/js/student.min.js' %}"></script>
-    {% endcompress %}
-
-    <script nonce="{{ request.csp_nonce }}">
-      window.addEventListener("load", function() {
-        student.initStudentHeader(
-          "{% url 'student-get-notifications' %}"
-        )
-      });
-    </script>
-  {% endif %}
+    <div class="m3-button-container">
+      <md-filled-button form="email-settings-form" type="submit">
+        {% trans 'Save' %}
+      </md-filled-button>
+    </div>
+  </div>
 {% endblock %}

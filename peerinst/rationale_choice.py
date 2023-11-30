@@ -85,6 +85,13 @@ def _base_selection_algorithm(
                 for answers in batch(all_rationales.iterator(), batch_size)
             )
         )
+        """
+        Do not apply quality checks to sample answers at this point
+        - Quality can be checked upon creation
+        - Checking them here means that questions may appear valid, but students
+          could get the error message below if quality metrics change and no
+          answer satisfies the new criteria
+        """
         kept_answers = [
             answer.pk
             for answer, q in zip(all_rationales.iterator(), qualities)
@@ -92,6 +99,7 @@ def _base_selection_algorithm(
                 c["quality"]["quality"] >= c["quality"]["threshold"]
                 for c in q[1]
             )
+            or answer.user_token == ""
         ]
         all_rationales = all_rationales.filter(pk__in=kept_answers)
     except Quality.DoesNotExist:

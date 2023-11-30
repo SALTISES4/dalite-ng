@@ -16,7 +16,6 @@ from .decorators import teacher_required
 @require_http_methods(["POST"])
 @teacher_required
 def update_assignment_question_list(req, teacher):
-
     post_data = json.loads(req.body)
 
     try:
@@ -33,7 +32,7 @@ def update_assignment_question_list(req, teacher):
     # Check object permissions (to be refactored using mixin)
     if req.user in assignment.owner.all() or req.user.is_staff:
         # Check for student answers
-        if not assignment.editable:
+        if not assignment.is_editable:
             raise PermissionDenied
     else:
         raise PermissionDenied

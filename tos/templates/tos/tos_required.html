@@ -1,48 +1,29 @@
 {% extends 'peerinst/base.html' %}
 
-{% load compress i18n static %}
-
-{% block stylesheets %}
-  {{ block.super }}
-  {% if user.student %}
-    {% compress css %}
-      <link href="{% static 'peerinst/css/student.min.css' %}" rel="stylesheet">
-    {% endcompress %}
-  {% endif %}
-{% endblock %}
+{% load i18n %}
 
 {% block body %}
-  <main>
-    <section class='mdc-typography'>
-      <h1 class="mdc-typography--display3">{% trans 'Terms of Service' %}
-        <svg class="underline" width=150 height=4></svg>
-      </h1>
+  <div class="mui-container">
+    <h1>{% trans 'Terms of Service' %}</h1>
 
-      <h2 class='mdc-typography--display1'>{% trans 'Sharing required' %}</h2>
+    <div class="m3-question-card">
+      <h3>{% trans 'Sharing required' %}</h3>
 
-      <p>
+      <md-divider></md-divider>
+
+      <p class="mui-typography-body2">
         {% blocktrans %}
-          You must agree to share created content in the Terms of Service (accessible from your account) in order to access this page.
+          You must agree to share created content in the Terms of Service in order to access this page.
         {% endblocktrans %}
       </p>
-    </section>
-  </main>
-{% endblock %}
+    </div>
 
-{% block scripts %}
-  {{ block.super }}
-
-  {% if user.student %}
-    {% compress js %}
-      <script src="{% static 'peerinst/js/student.min.js' %}"></script>
-    {% endcompress %}
-
-    <script nonce="{{ request.csp_nonce }}">
-      window.addEventListener("load", function() {
-        student.initStudentHeader(
-          "{% url 'student-get-notifications' %}"
-        )
-      });
-    </script>
-  {% endif %}
+    {% if user.teacher %}
+      <div class="m3-button-container">
+        <md-filled-button href="{% url 'tos:tos_modify' 'teacher' %}?next={{ redirect_to }}">
+          {% trans 'Consent to Terms of Service' %}
+        </md-filled-button>
+      </div>
+    {% endif %}
+  </div>
 {% endblock %}

@@ -12,6 +12,7 @@
 
 {% block injected_apps %}
   {{ block.super }}
+  {% csrf_token %}
   <div id="search-app"></div>
 {% endblock %}
 

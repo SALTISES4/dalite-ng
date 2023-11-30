@@ -1,5 +1,5 @@
 export type Assignment = {
-  editable: boolean;
+  is_editable: boolean;
   pk: string;
   question_pks: number[]; // eslint-disable-line camelcase
   title: string;

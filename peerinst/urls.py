@@ -120,16 +120,6 @@ def old_patterns():
             name="sample-answer-form-done",
         ),
         path(
-            "assignment/create",
-            views.AssignmentCreateView.as_view(),
-            name="assignment-create",
-        ),
-        path(
-            "assignment/copy/<assignment_id>",
-            views.AssignmentCopyView.as_view(),
-            name="assignment-copy",
-        ),
-        path(
             "assignment/edit",
             views.update_assignment_question_list,
             name="assignment-edit-ajax",
@@ -322,11 +312,6 @@ def old_patterns():
 
 def group_patterns():
     return [
-        path(
-            "group/student-information/",
-            views.group.get_student_reputation,
-            name="group-details--student-information",
-        ),
         path(
             "group/<group_hash>/",
             views.group_details_page,

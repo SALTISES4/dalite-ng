@@ -13,67 +13,117 @@ from django.core import exceptions
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, F, OuterRef, Q, Subquery
+from django.db.models import Count, Exists, F, OuterRef, Q, Subquery
 from django.utils.html import escape, strip_tags
 from django.utils.translation import gettext_lazy as _
 
 from peerinst import rationale_choice
 from peerinst.grammar import basic_syntax
 from peerinst.templatetags.bleach_html import ALLOWED_TAGS
-from reputation.models import Reputation
+from peerinst.validators import allowed_domain, allowed_scheme
 
 from .search import MetaSearch
 
 
 def no_hyphens(value):
+    """
+    Raise a ValidationError if the given value contains hyphens.
+
+    Args:
+        value: The value to be checked for hyphens.
+
+    Raises:
+        ValidationError: If the value contains hyphens.
+    """
     if "-" in value:
         raise ValidationError(_("Hyphens may not be used in this field."))
 
 
 def images(instance, filename):
-    hash = hashlib.sha256(f"{datetime.now()}-{filename}".encode()).hexdigest()[
-        :8
-    ]
+    """
+    Generates a file path for storing an image based on datetime and filename.
+
+    Args:
+        instance: The instance associated with the image.
+        filename: The original filename of the image.
+
+    Returns:
+        The generated file path for storing the image.
+    """
+    _hash = hashlib.sha256(
+        f"{datetime.now()}-{filename}".encode()
+    ).hexdigest()[:8]
     return (
         f"images/{instance.user.username}/{datetime.now().month}/{hash}_{filename}"
         if instance.user
-        else f"images/unknown/{datetime.now().month}/{hash}_{filename}"
+        else f"images/unknown/{datetime.now().month}/{_hash}_{filename}"
     )
 
 
 class Category(models.Model):
+    """
+    Represents categories (or 'tags') by which questions may be indexed.
+
+    Fields:
+        title: The title of the category.  Must be unique.
+
+    Methods:
+        save: Saves the category after cleaning the title using bleach.
+
+    TODO: Is no_hyphens validator still needed?
+    """
+
     title = models.CharField(
         _("Category"),
         unique=True,
         max_length=100,
-        help_text=_("Enter the title of the question category."),
         validators=[no_hyphens],
     )
-
-    def save(self, *args, **kwargs):
-        """Bleach"""
-        self.title = bleach.clean(
-            self.title,
-            tags=[],
-            strip=True,
-        ).strip()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
 
     class Meta:
         ordering = ("title",)
         verbose_name = _("category")
         verbose_name_plural = _("categories")
 
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        """
+        Bleach title.
+
+        Remove:
+            - all html tags
+            - any leading and trailing whitespace.
+        """
+        self.title = bleach.clean(
+            self.title,
+            tags=[],
+            strip=True,
+        ).strip()
+
+        super().save(*args, **kwargs)
+
 
 class Subject(models.Model):
+    """
+    Represents subjects by which questions may be indexed.
+
+    Fields:
+        title: The title of the subject.  Must be unique.
+        discipline: Discipline
+        categories: List[Category]
+
+    Methods:
+        save: Saves the category after cleaning the title using bleach.
+
+    TODO: Is no_hyphens validator still needed?
+    """
+
     title = models.CharField(
         _("Subject"),
         unique=True,
         max_length=100,
-        help_text=_("Enter the title of the subject."),
         validators=[no_hyphens],
     )
     discipline = models.ForeignKey(
@@ -83,49 +133,73 @@ class Subject(models.Model):
         Category, related_name="subjects", blank=True
     )
 
-    def save(self, *args, **kwargs):
-        """Bleach"""
-        self.title = bleach.clean(
-            self.title,
-            tags=[],
-            strip=True,
-        ).strip()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
-
     class Meta:
         ordering = ("title",)
         verbose_name = _("subject")
         verbose_name_plural = _("subjects")
 
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        """
+        Bleach title.
+
+        Remove:
+            - all html tags
+            - any leading and trailing whitespace.
+        """
+        self.title = bleach.clean(
+            self.title,
+            tags=[],
+            strip=True,
+        ).strip()
+
+        super().save(*args, **kwargs)
+
 
 class Discipline(models.Model):
+    """
+    Represents disciplines by which questions may be indexed.
+
+    Fields:
+        title: The title of the discipline.  Must be unique.
+
+    Methods:
+        save: Saves the discipline after cleaning the title using bleach.
+
+    TODO: Is no_hyphens validator still needed?
+    """
+
     title = models.CharField(
         _("Discipline"),
         unique=True,
         max_length=100,
-        help_text=_("Enter the title of the discipline."),
         validators=[no_hyphens],
     )
 
+    class Meta:
+        ordering = ("title",)
+        verbose_name = _("discipline")
+        verbose_name_plural = _("disciplines")
+
+    def __str__(self):
+        return self.title
+
     def save(self, *args, **kwargs):
-        """Bleach"""
+        """
+        Bleach title.
+
+        Remove:
+            - all html tags
+            - any leading and trailing whitespace.
+        """
         self.title = bleach.clean(
             self.title,
             tags=[],
             strip=True,
         ).strip()
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        ordering = ("title",)
-        verbose_name = _("discipline")
-        verbose_name_plural = _("disciplines")
 
 
 class GradingScheme:
@@ -264,7 +338,6 @@ class Question(models.Model):
             "student may be using a screen reader."
         ),
     )
-    # Videos will be handled by off-site services.
     video_url = models.URLField(
         _("Question video URL"),
         blank=True,
@@ -275,6 +348,7 @@ class Question(models.Model):
             "from phet (i.e. https://phet.colorado.edu/sims/html/...) are "
             "currently supported."
         ),
+        validators=[allowed_domain, allowed_scheme],
     )
     ALPHA = 0
     NUMERIC = 1
@@ -350,9 +424,6 @@ class Question(models.Model):
             "correct answer."
         ),
     )
-    reputation = models.OneToOneField(
-        Reputation, blank=True, null=True, on_delete=models.SET_NULL
-    )
     meta_search = GenericRelation(MetaSearch, related_query_name="questions")
 
     def __str__(self):
@@ -384,8 +455,9 @@ class Question(models.Model):
     @classmethod
     def deleted_questions(cls):
         """
-        Exclude questions which are part of any Teacher's deleted_questions,
-        and have no answers
+        Exclude questions which are part of any Teacher's deleted_questions, and have no answers.
+
+        TODO: Do we still need this if we support question delete now?
         """
         Teacher = apps.get_model(app_label="peerinst", model_name="teacher")
 
@@ -557,13 +629,49 @@ class Question(models.Model):
                 )
         return False
 
+    @classmethod
+    def editable_queryset(cls, queryset):
+        """
+        Accepts a Question queryset and filters to return editable only
+        - Returns empty Question queryset if passed bad input
+        """
+        if isinstance(queryset, models.query.QuerySet):
+            if queryset and queryset.model is cls:
+                Answer = apps.get_model(
+                    app_label="peerinst", model_name="answer"
+                )
+                answers = (
+                    Answer.objects.filter(question=OuterRef("pk"))
+                    .exclude(expert=True)  # Remove expert answers
+                    .exclude(user_token__exact="")  # Remove sample answers
+                    .exclude(
+                        user_token__exact=OuterRef("user__username")
+                    )  # Remove owner's answers
+                )
+                return queryset.filter(~Exists(answers)).distinct()
+
+        return cls.objects.none()
+
+    @classmethod
+    def editable_queryset_for_user(cls, user):
+        """
+        A user can only retrieve or update questions where
+        they are either the owner or a collaborator
+        """
+        queryset = cls.objects.filter(Q(user=user) | Q(collaborators=user))
+        """
+        And where the question is editable
+        """
+        queryset = cls.editable_queryset(queryset)
+        return queryset
+
     @property
     def answer_count(self):
-        return self.get_student_answers().count()
+        return self.get_student_answers().distinct().count()
 
     @property
     def assignment_count(self):
-        return self.assignment_set.all().count()
+        return self.assignment_set.count()
 
     @property
     def collections(self):
@@ -571,6 +679,38 @@ class Question(models.Model):
             app_label="peerinst", model_name="collection"
         )
         return Collection.objects.filter(assignments__questions=self)
+
+    @property
+    def is_deletable(self):
+        """
+        Questions can be deleted only when:
+        - They are editable
+        - They have not been included in any assignments
+        - They have not been added to another teacher's library
+        """
+        return (
+            self.is_editable
+            and self.assignment_count == 0
+            and self.favourite_questions.exclude(user=self.user)
+            .exclude(user__in=self.collaborators.all())
+            .count()
+            == 0
+        )
+
+    @property
+    def delete_validation_error(self):
+        if not self.is_editable:
+            return _("Question cannot be deleted as student answers exist")
+        if self.assignment_count > 0:
+            return _(
+                "Question cannot be deleted as it is part of the following \
+                    assignment(s): "
+            ) + ", ".join(a.identifier for a in self.assignment_set.all())
+        if self.teacher_set.count() > 0:
+            return _(
+                "Question cannot be deleted as has been included in the library \
+                of other teachers"
+            )
 
     @property
     def featured(self):
@@ -581,12 +721,11 @@ class Question(models.Model):
 
     @property
     def is_editable(self):
-        return (
-            self.answer_set.filter(expert=False)
-            .exclude(user_token__exact="")
-            .count()
-            == 0
-        )
+        """
+        Questions can be edited only when:
+        - There are no related student or non-owner teacher answers
+        """
+        return self.get_all_student_answers().count() == 0
 
     @property
     def is_not_flagged(self):
@@ -734,12 +873,36 @@ class Question(models.Model):
             itertools.compress(itertools.count(1), answerchoice_correct)
         )
 
-    def get_student_answers(self):
-        return (
-            self.answer_set.filter(expert=False)
-            .filter(second_answer_choice__gt=0)
-            .exclude(user_token="")
+    def get_all_student_answers(self):
+        """
+        Collect all non-expert, non-sample, non-owner answers
+        - Include both complete answers and answers in progress
+        """
+        queryset = self.answer_set.exclude(expert=True).exclude(
+            user_token__exact=""
         )
+        if self.user:
+            queryset = queryset.exclude(user_token__exact=self.user.username)
+        if self.collaborators.exists():
+            queryset = queryset.exclude(
+                user_token__in=self.collaborators.values_list(
+                    "teacher__user__username", flat=True
+                )
+            )
+
+        return queryset
+
+    def get_student_answers(self):
+        """
+        Collect all non-expert, non-sample, non-owner answers
+        - Exclude incomplete answers for PI questions
+        """
+        queryset = self.get_all_student_answers()
+
+        if self.type == "PI":
+            queryset.filter(second_answer_choice__gt=0)
+
+        return queryset
 
     def get_answers_by_type(self, answer_type):
         """
@@ -752,6 +915,7 @@ class Question(models.Model):
                         - RW (right to wrong),
                         - WR,
                         - WR
+
         Returns:
         -------
             queryset of student answers
@@ -928,7 +1092,6 @@ class Question(models.Model):
             times_shown -> int
             times_chosen -> int
         """
-
         from peerinst.models import ShownRationale
 
         answer_qs = self.answer_set.all()
