@@ -1,11 +1,22 @@
 import logging
+import urllib
 from html import unescape
 
 import bleach
-from django.core.validators import BaseValidator, MinLengthValidator
+import tldextract
+from django.conf import settings
+from django.core.validators import (
+    BaseValidator,
+    MaxLengthValidator,
+    MinLengthValidator,
+    ValidationError,
+)
+from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
 from langdetect import DetectorFactory, LangDetectException, detect_langs
 from profanity_check import predict_prob
+
+from peerinst.templatetags.bleach_html import STRICT_TAGS
 
 from .profanity import profanity
 
@@ -32,6 +43,25 @@ class MinWordsValidator(MinLengthValidator):
         cleaned_text = html_to_text(text)
         result = len(str(cleaned_text).split())
         validation_logger.info(f"Word count: {result} for '{text}'")
+        return result
+
+
+class MaxCharactersValidator(MaxLengthValidator):
+    message = ngettext_lazy(
+        "Ensure this value has less than %(limit_value)d char (it has %(show_value)d).",
+        "Ensure this value has less than %(limit_value)d chars (it has %(show_value)d).",  # noqa
+        "limit_value",
+    )
+    code = "max_chars"
+
+    def clean(self, text):
+        cleaned_text = bleach.clean(
+            text,
+            tags=STRICT_TAGS,
+            strip=True,
+        ).strip()
+        result = len(str(cleaned_text))
+        validation_logger.info(f"Character count: {result} for '{text}'")
         return result
 
 
@@ -100,7 +130,6 @@ class EnglishFrenchValidator(BaseValidator):
     def clean(self, text):
         # Return a tuple with results English and French
         cleaned_text = html_to_text(text)
-        validation_logger.info(cleaned_text)
         try:
             detected_languages = detect_langs(cleaned_text)
         except LangDetectException:
@@ -110,3 +139,38 @@ class EnglishFrenchValidator(BaseValidator):
             result.lang: result.prob for result in detected_languages
         }
         return (dl_as_dict.get("en", 0), dl_as_dict.get("fr", 0), text)
+
+
+def allowed_scheme(value):
+    """
+    Only allow https
+    """
+    url = urllib.parse.urlparse(value)
+    if url.scheme != "https":
+        raise ValidationError(
+            _("Only urls starting with https:// are allowed")
+        )
+
+
+def _construct_url(value):
+    extracted_url = tldextract.extract(value)
+    domain = f"{extracted_url.domain}.{extracted_url.suffix}"
+    if extracted_url.subdomain and extracted_url.subdomain != "*":
+        return f"{extracted_url.subdomain}.{domain}"
+    return domain
+
+
+def allowed_domain(value):
+    """
+    Only allow domains in CSP_OBJECT_SRC
+    """
+    allowed_domains = [
+        _construct_url(entry) for entry in settings.CSP_OBJECT_SRC
+    ]
+    url = _construct_url(value)
+    if url not in allowed_domains:
+        raise ValidationError(
+            url
+            + _(" is not in the list of allowed domains: ")
+            + ", ".join(allowed_domains)
+        )

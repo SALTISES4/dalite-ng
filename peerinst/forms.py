@@ -26,6 +26,7 @@ from .models import (
 )
 from .validators import (
     EnglishFrenchValidator,
+    MaxCharactersValidator,
     MinWordsValidator,
     NoProfanityValidator,
 )
@@ -67,6 +68,10 @@ class RichTextRationaleField(forms.CharField):
         MinWordsValidator(
             4,
             _("Please provide a more detailed rationale for your choice."),
+        ),
+        MaxCharactersValidator(
+            4000,
+            _("Please provide a less detailed rationale for your choice."),
         ),
         NoProfanityValidator(
             0.7,
@@ -245,25 +250,6 @@ class SequentialReviewForm(forms.Form):
         else:
             raise forms.ValidationError(_("Please vote up or down."))
         return cleaned_data
-
-
-class AssignmentCreateForm(forms.ModelForm):
-    """Simple form to create a new Assignment"""
-
-    class Meta:
-        model = Assignment
-        fields = [
-            "identifier",
-            "title",
-            "description",
-            "intro_page",
-            "conclusion_page",
-        ]
-        widgets = {
-            "description": TinyMCE(),
-            "intro_page": TinyMCE(),
-            "conclusion_page": TinyMCE(),
-        }
 
 
 class AssignmentMultiselectForm(forms.Form):

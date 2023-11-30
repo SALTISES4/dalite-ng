@@ -13,6 +13,7 @@ from PIL import Image
 from rest_framework import serializers
 
 from peerinst.documents import CategoryDocument
+from peerinst.forms import RichTextRationaleField
 from peerinst.models import (
     Answer,
     AnswerChoice,
@@ -72,10 +73,10 @@ class SampleAnswerSerializer(serializers.ModelSerializer):
 
     def validate_rationale(self, value):
         """
-        Check rationale <= 4000 characters
+        Run validators defined peerinst/forms.py for RichTextRationaleField
         """
-        if len(value) > 4000:
-            raise serializers.ValidationError(_("Rationale text too long"))
+        for validator in RichTextRationaleField.default_validators:
+            validator(value)
         return value
 
     def to_representation(self, instance):
@@ -171,6 +172,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "text",
         ],
         many=True,
+        required=False,
     )
     assignment_count = serializers.ReadOnlyField()
     category = CategorySerializer(many=True, read_only=True)
@@ -248,14 +250,14 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         return {
             "add_answer_choices": reverse(
                 "answer-choice-form", args=(obj.pk,)
-            ),
+            ),  # TODO: Remove for RO type
             "add_expert_rationales": reverse(
                 "research-fix-expert-rationale", args=(obj.pk,)
-            ),
+            ),  # TODO: Remove for RO type
             "add_new_question": reverse("question-create"),
             "add_sample_answers": reverse(
                 "sample-answer-form", args=(obj.pk,)
-            ),
+            ),  # TODO: Remove for RO type
             "addable_assignments": reverse(
                 "REST:teacher-assignment-for-question", args=(obj.pk,)
             ),
@@ -265,29 +267,13 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "fix": reverse(
                 "question-fix", args=(obj.pk,)
             ),  # TODO: Is this still needed?
-            "matrix": reverse("REST:question-matrix", args=(obj.pk,)),
+            "matrix": reverse(
+                "REST:question-matrix", args=(obj.pk,)
+            ),  # TODO: Remove for RO type?
             "rationales": reverse("REST:question-rationales", args=(obj.pk,)),
             "test": reverse("question-test", args=(obj.pk,)),
             "update": reverse("teacher:question-update", args=(obj.pk,)),
         }
-
-    def validate_answerchoice_set(self, value):
-        """
-        Check at least two answer choices
-        """
-        if len(value) < 2:
-            raise serializers.ValidationError(
-                _("At least two answer choices are required")
-            )
-
-        """
-        Check at least one answer choice is marked correct
-        """
-        if sum(x["correct"] for x in value) == 0:
-            raise serializers.ValidationError(
-                _("At least one answer choice must be correct")
-            )
-        return value
 
     def validate_image(self, value):
         ALLOWED_IMAGE_FORMATS = ["PNG", "GIF", "JPEG"]
@@ -319,6 +305,105 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         if len(text) > 8000:
             raise serializers.ValidationError(_("Text too long"))
         return value
+
+    def validate(self, data):
+        """
+        - Validation logic is often included in Model.clean(), but DRF ignores it
+        - See discussion here https://github.com/encode/django-rest-framework/discussions/7850
+        - For now, we reproduce logic in serializer explicitly
+        - TODO: Consider how updates in Django admin should be handled since serializer validation won't be run
+        """
+        # Can't have image without image_alt_text; they must always be changed together
+        if "image" in data and data["image"]:
+            if "image_alt_text" not in data or not data["image_alt_text"]:
+                raise serializers.ValidationError(
+                    _(
+                        "An alternative text for accessibility if is required if providing an image"
+                    )
+                )
+        # Can't have image and video_url
+        # - raise validation error if sent together
+        # - raise validation error if one sent with other existing on instance
+        if (
+            "image" in data
+            and "video_url" in data
+            and data["image"]
+            and data["video_url"]
+        ):
+            raise serializers.ValidationError(
+                _(
+                    "Only one of the image and video URL fields can be specified"
+                )
+            )
+        if self.instance:
+            if (
+                self.instance.video_url and "image" in data and data["image"]
+            ) or (
+                self.instance.image
+                and "video_url" in data
+                and data["video_url"]
+            ):
+                raise serializers.ValidationError(
+                    _(
+                        "Only one of the image and video URL fields can be specified"
+                    )
+                )
+        # Only validate answerchoice_set if question type is PI otherwise ensure empty
+        if not self.instance:
+            if ("type" not in data) or (
+                "type" in data and data["type"] == "PI"
+            ):
+                # Create logic - PI
+                """
+                Check at least two answer choices
+                """
+                if (
+                    "answerchoice_set" not in data
+                    or len(data["answerchoice_set"]) < 2
+                ):
+                    raise serializers.ValidationError(
+                        {
+                            "answerchoice_set": _(
+                                "At least two answer choices are required"
+                            )
+                        }
+                    )
+
+                """
+                Check at least one answer choice is marked correct
+                """
+                if sum(x["correct"] for x in data["answerchoice_set"]) == 0:
+                    raise serializers.ValidationError(
+                        {
+                            "answerchoice_set": _(
+                                "At least one answer choice must be correct"
+                            )
+                        }
+                    )
+            else:
+                # Create logic - RO
+                data["answerchoice_set"] = []
+        else:
+            if ("type" in data and data["type"] == "PI") or (
+                "type" not in data and self.instance.type == "PI"
+            ):
+                # Update logic - PI
+                if self.instance.answerchoice_set.count() < 2 and (
+                    "answerchoice_set" not in data
+                    or len(data["answerchoice_set"]) < 2
+                ):
+                    raise serializers.ValidationError(
+                        {
+                            "answerchoice_set": _(
+                                "At least two answer choices are required"
+                            )
+                        }
+                    )
+            else:
+                # Update logic - RO
+                data["answerchoice_set"] = []
+
+        return data
 
     def create(self, validated_data):
         answerchoice_data = validated_data.pop("answerchoice_set")
@@ -602,7 +687,7 @@ class RankSerializer(serializers.ModelSerializer):
         assignment = validated_data["assignment"]
         question = validated_data["question"]
         if (
-            assignment.editable
+            assignment.is_editable
             and self.context["request"].user in assignment.owner.all()
         ):
             if assignment.questions.all():
@@ -630,7 +715,7 @@ class RankSerializer(serializers.ModelSerializer):
 
 class AssignmentSerializer(DynamicFieldsModelSerializer):
     answer_count = serializers.ReadOnlyField()
-    editable = serializers.ReadOnlyField()
+    is_editable = serializers.ReadOnlyField()
     is_valid = serializers.ReadOnlyField()
     is_owner = serializers.SerializerMethodField()
     owner = UserSerializer(many=True, read_only=True)
@@ -667,7 +752,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
 
     def get_urls(self, obj):
         return {
-            "copy": reverse("assignment-copy", args=(obj.pk,)),
+            "copy": reverse("REST:teacher-assignment-copy", args=(obj.pk,)),
             "distribute": reverse(
                 "student-group-assignment-create", args=(obj.pk,)
             ),
@@ -699,7 +784,10 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
 
     def create(self, validated_data):
         """Attach user and add to teacher assignments"""
+        # TODO: Add check here that user is teacher?
         assignment = super().create(validated_data)
+
+        # TODO: Check that context has request, otherwise raise error or skip
         assignment.owner.add(self.context["request"].user)
         self.context["request"].user.teacher.assignments.add(assignment)
         return assignment
@@ -710,7 +798,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         Adding/deleting questions is handled by serializer for through table.
         """
         if "assignmentquestions_set" in validated_data:
-            if instance.editable:
+            if instance.is_editable:
                 for i, aq in enumerate(instance.assignmentquestions_set.all()):
                     aq.rank = validated_data["assignmentquestions_set"][i][
                         "rank"
@@ -761,8 +849,8 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
             "answer_count",  #
             "conclusion_page",
             "description",
-            "editable",
             "intro_page",
+            "is_editable",
             "is_owner",
             "is_valid",
             "owner",  #

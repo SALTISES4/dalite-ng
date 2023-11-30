@@ -136,7 +136,32 @@ class Assignment(models.Model):
         return sum(q.answer_count for q in self.questions.all())
 
     @property
-    def editable(self):
+    def is_deletable(self):
+        """
+        Assignments can be deleted only when:
+        - They are editable
+        - They have not been included in any collections
+        - They have not been bookmarked by other users
+        """
+        return (
+            self.is_editable
+            and self.collection_set.count() == 0
+            and self.teacher_set.exclude(user__in=self.owner.all()).count()
+            == 0
+        )
+
+    @property
+    def delete_validation_error(self):
+        return _("Assignment cannot be deleted")
+
+    @property
+    def is_editable(self):
+        """
+        Assignments can be edited only when:
+        - There are no related student answers
+        - There are no related StudentGroupAssignment objects
+        - TODO: What about LTI assignments?
+        """
         return (
             not self.answer_set.filter(expert=False)
             .exclude(user_token__exact="")
@@ -159,8 +184,8 @@ class Assignment(models.Model):
 
 
 class AssignmentQuestions(models.Model):
-    assignment = models.ForeignKey(Assignment, models.DO_NOTHING)
-    question = models.ForeignKey(Question, models.DO_NOTHING)
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     rank = models.PositiveIntegerField(default=0)
 
     def __str__(self):
@@ -174,7 +199,7 @@ class AssignmentQuestions(models.Model):
 
 class StudentGroupAssignment(models.Model):
     group = models.ForeignKey(StudentGroup, on_delete=models.CASCADE)
-    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Assignment, on_delete=models.PROTECT)
     distribution_date = models.DateTimeField(
         editable=False, null=True, blank=True
     )

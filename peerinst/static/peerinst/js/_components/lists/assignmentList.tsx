@@ -35,7 +35,7 @@ import "@rmwc/menu/node_modules/@material/menu-surface/dist/mdc.menu-surface.css
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
 export type Assignment = {
-  editable: boolean;
+  is_editable: boolean;
   is_valid: boolean; // eslint-disable-line camelcase
   pk: string;
   questions_basic?: ListedQuestion[]; // eslint-disable-line camelcase
@@ -91,10 +91,10 @@ export function AssignmentList({
   const sort = (a: Assignment, b: Assignment): number => {
     // Triple sort on owned, then editable, then title
     if (+ownedPks.includes(b.pk) == +ownedPks.includes(a.pk)) {
-      if (a.editable == b.editable || !ownedPks.includes(b.pk)) {
+      if (a.is_editable == b.is_editable || !ownedPks.includes(b.pk)) {
         return a.title.localeCompare(b.title);
       }
-      return +b.editable - +a.editable;
+      return +b.is_editable - +a.is_editable;
     }
     return +ownedPks.includes(b.pk) - +ownedPks.includes(a.pk);
   };
@@ -237,7 +237,7 @@ class AssignmentListItem extends Component<
   };
 
   editIcon = (): JSX.Element | undefined => {
-    const edit = this.props.owned && this.props.assignment.editable;
+    const edit = this.props.owned && this.props.assignment.is_editable;
     if (!this.props.archived) {
       return (
         <IconButton

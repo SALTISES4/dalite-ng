@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     "channels",
     "REST",
     "teacher",
+    "student",
     "django_elasticsearch_dsl",
     "django_elasticsearch_dsl_drf",
     "lti_provider",

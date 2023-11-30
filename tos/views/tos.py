@@ -6,7 +6,7 @@ from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
-from ..models import Consent, Role, Tos
+from tos.models import Consent, Role, Tos
 
 
 @login_required
@@ -93,7 +93,6 @@ def tos_consent_update(req, role, version):
 
 
 def _consent_view(req, username, role, version):
-
     if not Role.objects.filter(role=role):
         return (
             TemplateResponse(
@@ -156,4 +155,8 @@ def _consent_view(req, username, role, version):
 
 @login_required
 def tos_required(req):
-    return TemplateResponse(req, "tos/tos_required.html", status=403)
+    context = {
+        "redirect_to": req.GET.get("next", "/welcome/"),
+    }
+
+    return TemplateResponse(req, "tos/tos_required.html", context, status=403)

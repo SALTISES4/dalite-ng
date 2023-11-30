@@ -1,6 +1,6 @@
 {% extends 'peerinst/question/base.html' %}
 
-{% load add_class bleach_html compress i18n static %}
+{% load bleach_html i18n %}
 
 {% block appbar %}
   {% if user.teacher %}
@@ -27,14 +27,16 @@
               </md-icon-button>
             {% endif %}
             {% if question.user == user or user in question.collaborators.all %}
-              <md-icon-button
-                aria-label="{% trans 'Update question' %}"
-                href="{% url 'teacher:question-update' pk=question.id %}"
-                title="{% trans 'Update question' %}"
-                type="button"
-              >
-                <md-icon>edit</md-icon>
-              </md-icon-button>
+              {% if question.is_editable %}
+                <md-icon-button
+                  aria-label="{% trans 'Update question' %}"
+                  href="{% url 'teacher:question-update' pk=question.id %}"
+                  title="{% trans 'Update question' %}"
+                  type="button"
+                >
+                  <md-icon>edit</md-icon>
+                </md-icon-button>
+              {% endif %}
             {% endif %}
           </div>
         </div>

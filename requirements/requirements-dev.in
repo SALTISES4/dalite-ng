@@ -1,14 +1,8 @@
 -r requirements-test.txt
 
-black
-django-sslserver
-flake8 == 5.0.4 # [1]
-isort
+mypy
 pre-commit
-safety >= 2.2.0
-
 PyMySQL
+ruff
 
 -e ../Components
-
-# 1. Pinned to pre-commit version

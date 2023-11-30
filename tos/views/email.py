@@ -8,8 +8,7 @@ from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
-from ..forms import EmailChangeForm
-from ..models import EmailConsent, EmailType, Role
+from tos.models import EmailConsent, EmailType, Role
 
 
 @login_required
@@ -21,11 +20,8 @@ def email_consent_modify(req, role):
 
     email_types = _get_email_types(username, role_.role)
 
-    form = EmailChangeForm()
-
     context = {
         "next": req.GET.get("next", "/welcome/"),
-        "form": form,
         "username": username,
         "role": role,
         "email_types": email_types,
@@ -57,34 +53,6 @@ def email_consent_update(req, role):
     redirect_to = req.GET.get("next", "/welcome/")
 
     return HttpResponseRedirect(redirect_to)
-
-
-@login_required
-@require_http_methods(["POST"])
-def change_user_email(req, role):
-    username, role_ = _get_username_and_role(req, role)
-    if isinstance(username, HttpResponse):
-        return username
-
-    form = EmailChangeForm(req.POST)
-    if form.is_valid():
-        req.user.email = form.cleaned_data["email"]
-        req.user.save()
-        redirect_to = req.GET.get("next", "/welcome/")
-        return HttpResponseRedirect(redirect_to)
-
-    email_types = _get_email_types(username, role_.role)
-
-    context = {
-        "form": form,
-        "username": username,
-        "role": role,
-        "email_types": email_types,
-        "all_accepted": "all" not in list(map(itemgetter("type"), email_types))
-        or next(e["accepted"] for e in email_types if e["type"] == "all"),
-    }
-
-    return render(req, "tos/email_modify.html", context)
 
 
 def _get_username_and_role(req, role):
@@ -128,7 +96,7 @@ def _get_email_types(username, role):
             "title": email_type.title,
             "description": email_type.description,
             "accepted": EmailConsent.get(
-                username, role, email_type.type, default=True, ignore_all=True
+                username, role, email_type.type, default=False, ignore_all=True
             ),
         }
         for email_type in EmailType.objects.filter(role=role).order_by(

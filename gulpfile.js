@@ -58,13 +58,9 @@ const styleBuilds = [
       // "landing_page",
       // "email",
       "material-web",
-      "tiny",
+      // "tiny",
     ],
   },
-  // {
-  //   app: "tos",
-  //   modules: ["styles"],
-  // },
   // {
   //   app: "quality",
   //   modules: ["edit"],
@@ -81,7 +77,7 @@ const scriptBuilds = [
       // "search",
       // "index",
       // "preview",
-      "question",
+      // "question",
       // "teacher",
       // "custom_elements",
       // "teacher",
@@ -93,10 +89,10 @@ const scriptBuilds = [
       "material-web",
     ],
   },
-  // {
-  //   app: "tos",
-  //   modules: ["email"],
-  // },
+  {
+    app: "tos",
+    modules: ["email"],
+  },
   // {
   //   app: "quality",
   //   modules: ["edit"],

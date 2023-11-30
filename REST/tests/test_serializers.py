@@ -130,7 +130,7 @@ def test_assignment_detail(client, assignments, questions, teacher):
     2. Must be owner to GET
     3. Must be owner to PATCH
     4. No one can DELETE
-    5. Cannot edit is assignment.editable is false
+    5. Cannot edit is assignment.is_editable is false
     """
 
     # Setup
@@ -200,9 +200,10 @@ def test_assignment_detail(client, assignments, questions, teacher):
     response = client.delete(url)
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
-    # 5. Cannot edit if assignment.editable is false
+    # 5. Cannot edit if assignment.is_editable is false
     with mock.patch(
-        "peerinst.models.Assignment.editable", new_callable=mock.PropertyMock
+        "peerinst.models.Assignment.is_editable",
+        new_callable=mock.PropertyMock,
     ) as mock_editable:
         mock_editable.return_value = False
         response = client.patch(
@@ -227,7 +228,7 @@ def test_assignmentquestions_detail(client, assignments, student, teachers):
     2. Students cannot GET
     3. Only return owned assignments
     4. Must be owner of related assignment to create or delete
-    5. Cannot create or delete if assignment.editable is false
+    5. Cannot create or delete if assignment.is_editable is false
     """
 
     # Setup
@@ -315,10 +316,11 @@ def test_assignmentquestions_detail(client, assignments, student, teachers):
     assignments[0].refresh_from_db()
     assert question_to_add not in assignments[0].questions.all()
 
-    # 5. Cannot create or delete if assignment.editable is false
+    # 5. Cannot create or delete if assignment.is_editable is false
     assert login_teacher(client, teachers[0])
     with mock.patch(
-        "peerinst.models.Assignment.editable", new_callable=mock.PropertyMock
+        "peerinst.models.Assignment.is_editable",
+        new_callable=mock.PropertyMock,
     ) as mock_editable:
         mock_editable.return_value = False
 
