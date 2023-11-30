@@ -27,57 +27,104 @@ from .search import MetaSearch
 
 
 def no_hyphens(value):
+    """
+    Raise a ValidationError if the given value contains hyphens.
+
+    Args:
+        value: The value to be checked for hyphens.
+
+    Raises:
+        ValidationError: If the value contains hyphens.
+    """
     if "-" in value:
         raise ValidationError(_("Hyphens may not be used in this field."))
 
 
 def images(instance, filename):
-    hash = hashlib.sha256(f"{datetime.now()}-{filename}".encode()).hexdigest()[
-        :8
-    ]
+    """
+    Generates a file path for storing an image based on datetime and filename.
+
+    Args:
+        instance: The instance associated with the image.
+        filename: The original filename of the image.
+
+    Returns:
+        The generated file path for storing the image.
+    """
+    _hash = hashlib.sha256(
+        f"{datetime.now()}-{filename}".encode()
+    ).hexdigest()[:8]
     return (
         f"images/{instance.user.username}/{datetime.now().month}/{hash}_{filename}"
         if instance.user
-        else f"images/unknown/{datetime.now().month}/{hash}_{filename}"
+        else f"images/unknown/{datetime.now().month}/{_hash}_{filename}"
     )
 
 
-class Category(models.Model): 
-    #   require docstring
+class Category(models.Model):
+    """
+    Represents categories (or 'tags') by which questions may be indexed.
+
+    Fields:
+        title: The title of the category.  Must be unique.
+
+    Methods:
+        save: Saves the category after cleaning the title using bleach.
+
+    TODO: Is no_hyphens validator still needed?
+    """
+
     title = models.CharField(
         _("Category"),
         unique=True,
         max_length=100,
-        help_text=_("Enter the title of the question category."),
         validators=[no_hyphens],
     )
-
-    def save(self, *args, **kwargs):
-        """
-        Bleach
-        """
-        self.title = bleach.clean(
-            self.title,
-            tags=[],
-            strip=True,
-        ).strip()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
 
     class Meta:
         ordering = ("title",)
         verbose_name = _("category")
         verbose_name_plural = _("categories")
 
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        """
+        Bleach title.
+
+        Remove:
+            - all html tags
+            - any leading and trailing whitespace.
+        """
+        self.title = bleach.clean(
+            self.title,
+            tags=[],
+            strip=True,
+        ).strip()
+
+        super().save(*args, **kwargs)
+
 
 class Subject(models.Model):
+    """
+    Represents subjects by which questions may be indexed.
+
+    Fields:
+        title: The title of the subject.  Must be unique.
+        discipline: Discipline
+        categories: List[Category]
+
+    Methods:
+        save: Saves the category after cleaning the title using bleach.
+
+    TODO: Is no_hyphens validator still needed?
+    """
+
     title = models.CharField(
         _("Subject"),
         unique=True,
         max_length=100,
-        help_text=_("Enter the title of the subject."),
         validators=[no_hyphens],
     )
     discipline = models.ForeignKey(
@@ -87,49 +134,73 @@ class Subject(models.Model):
         Category, related_name="subjects", blank=True
     )
 
-    def save(self, *args, **kwargs):
-        """Bleach"""
-        self.title = bleach.clean(
-            self.title,
-            tags=[],
-            strip=True,
-        ).strip()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
-
     class Meta:
         ordering = ("title",)
         verbose_name = _("subject")
         verbose_name_plural = _("subjects")
 
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        """
+        Bleach title.
+
+        Remove:
+            - all html tags
+            - any leading and trailing whitespace.
+        """
+        self.title = bleach.clean(
+            self.title,
+            tags=[],
+            strip=True,
+        ).strip()
+
+        super().save(*args, **kwargs)
+
 
 class Discipline(models.Model):
+    """
+    Represents disciplines by which questions may be indexed.
+
+    Fields:
+        title: The title of the discipline.  Must be unique.
+
+    Methods:
+        save: Saves the discipline after cleaning the title using bleach.
+
+    TODO: Is no_hyphens validator still needed?
+    """
+
     title = models.CharField(
         _("Discipline"),
         unique=True,
         max_length=100,
-        help_text=_("Enter the title of the discipline."),
         validators=[no_hyphens],
     )
 
+    class Meta:
+        ordering = ("title",)
+        verbose_name = _("discipline")
+        verbose_name_plural = _("disciplines")
+
+    def __str__(self):
+        return self.title
+
     def save(self, *args, **kwargs):
-        """Bleach"""
+        """
+        Bleach title.
+
+        Remove:
+            - all html tags
+            - any leading and trailing whitespace.
+        """
         self.title = bleach.clean(
             self.title,
             tags=[],
             strip=True,
         ).strip()
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        ordering = ("title",)
-        verbose_name = _("discipline")
-        verbose_name_plural = _("disciplines")
 
 
 class GradingScheme:
@@ -388,8 +459,8 @@ class Question(models.Model):
     @classmethod
     def deleted_questions(cls):
         """
-        Exclude questions which are part of any Teacher's deleted_questions,
-        and have no answers
+        Exclude questions which are part of any Teacher's deleted_questions, and have no answers.
+
         TODO: Do we still need this if we support question delete now?
         """
         Teacher = apps.get_model(app_label="peerinst", model_name="teacher")
@@ -635,13 +706,10 @@ class Question(models.Model):
         if not self.is_editable:
             return _("Question cannot be deleted as student answers exist")
         if self.assignment_count > 0:
-            return (
-                _(
-                    "Question cannot be deleted as it is part of the following \
+            return _(
+                "Question cannot be deleted as it is part of the following \
                     assignment(s): "
-                )
-                + ", ".join(a.identifier for a in self.assignment_set.all())
-            )
+            ) + ", ".join(a.identifier for a in self.assignment_set.all())
         if self.teacher_set.count() > 0:
             return _(
                 "Question cannot be deleted as has been included in the library \
@@ -661,7 +729,6 @@ class Question(models.Model):
         Questions can be edited only when:
         - There are no related student or non-owner teacher answers
         """
-
         return self.get_all_student_answers().count() == 0
 
     @property
@@ -852,6 +919,7 @@ class Question(models.Model):
                         - RW (right to wrong),
                         - WR,
                         - WR
+
         Returns:
         -------
             queryset of student answers
@@ -1028,7 +1096,6 @@ class Question(models.Model):
             times_shown -> int
             times_chosen -> int
         """
-
         from peerinst.models import ShownRationale
 
         answer_qs = self.answer_set.all()

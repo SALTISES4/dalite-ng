@@ -1,7 +1,3 @@
-import pytest
-from django.db import IntegrityError
-
-from peerinst.models import Question
 from peerinst.tests.fixtures import *  # noqa
 
 
@@ -17,6 +13,8 @@ def test_get_all_student_answers(answers, teachers):
         assert answer.user_token != owner.user.username
         assert answer.user_token != collaborator.user.username
     assert question.get_all_student_answers().count() == len(answer_set)
+    assert answer_set[0] in question.get_all_student_answers().all()
+    assert answer_set[1] in question.get_all_student_answers().all()
 
     # Attach owner to question
     question.user = owner.user
