@@ -9,13 +9,11 @@ COPY .eslintrc.json ./
 COPY tsconfig.json ./
 COPY package*.json ./
 RUN npm i
-COPY analytics ./analytics
 COPY blink ./blink
 COPY dalite ./dalite
 COPY locale ./locale
 COPY peerinst ./peerinst
 COPY quality ./quality
-COPY reputation ./reputation
 COPY requirements ./requirements
 COPY REST ./REST
 COPY saltise ./saltise
@@ -36,13 +34,11 @@ RUN python3 -m pip install --upgrade pip
 RUN pip3 install --no-deps -r ./requirements/requirements-prod-aws.txt
 # Temporary fix for upcoming lti_provider functional tests
 RUN pip3 install factory-boy
-COPY --from=static /code/analytics ./analytics
 COPY --from=static /code/blink ./blink
 COPY --from=static /code/dalite ./dalite
 COPY --from=static /code/locale ./locale
 COPY --from=static /code/peerinst ./peerinst
 COPY --from=static /code/quality ./quality
-COPY --from=static /code/reputation ./reputation
 COPY --from=static /code/REST ./REST
 COPY --from=static /code/saltise ./saltise
 COPY --from=static /code/templates ./templates

@@ -313,11 +313,6 @@ def old_patterns():
 def group_patterns():
     return [
         path(
-            "group/student-information/",
-            views.group.get_student_reputation,
-            name="group-details--student-information",
-        ),
-        path(
             "group/<group_hash>/",
             views.group_details_page,
             name="group-details",

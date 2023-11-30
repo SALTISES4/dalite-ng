@@ -1,6 +1,5 @@
 import json
 import logging
-import re
 
 from django import forms
 from django.contrib.auth.decorators import login_required
@@ -14,7 +13,6 @@ from django.views.decorators.http import require_POST, require_safe
 from django.views.generic.edit import UpdateView
 
 from dalite.views.errors import response_400, response_500
-from dalite.views.utils import get_json_params
 from peerinst.models import (
     Student,
     StudentAssignment,
@@ -22,7 +20,6 @@ from peerinst.models import (
     StudentGroupAssignment,
     Teacher,
 )
-from reputation.models import ReputationType
 
 from ..mixins import LoginRequiredMixin, NoStudentsMixin
 from .decorators import group_access_required
@@ -49,7 +46,6 @@ def validate_update_data(req):
 @require_safe
 @group_access_required
 def group_details_page(req, group_hash, teacher, group):
-
     assignments = StudentGroupAssignment.objects.filter(group=group)
 
     data = {
@@ -78,30 +74,11 @@ def group_details_page(req, group_hash, teacher, group):
         },
     }
 
-    student_reputation_criteria = [
-        dict(c)
-        for c in ReputationType.objects.get(type="student").criteria.all()
-    ]
     context = {
         "data": json.dumps(data),
         "group": group,
         "assignments": assignments,
         "teacher": teacher,
-        "student_reputation_criteria": [
-            {
-                "name": c["name"],
-                "icon": c["badge_icon"],
-                "colour": c["badge_colour"],
-                "description": gettext(
-                    re.sub(
-                        r"\bYou\b",
-                        "They",
-                        re.sub(r"\byou\b", "they", c["description"]),
-                    )
-                ),
-            }
-            for c in student_reputation_criteria
-        ],
         # "owned_courses": get_owned_courses(teacher.user),
         # "connected_course": StudentGroupCourse.objects.filter(
         #     student_group=group
@@ -188,7 +165,6 @@ def group_details_update(req, group_hash, teacher, group):
 @require_safe
 @group_access_required
 def group_assignment_page(req, assignment_hash, teacher, group, assignment):
-
     context = {
         "teacher_id": teacher.id,
         "group": group,
@@ -251,7 +227,6 @@ def group_assignment_remove(req, assignment_hash, teacher, group, assignment):
 @require_POST
 @group_access_required
 def group_assignment_update(req, assignment_hash, teacher, group, assignment):
-
     name, value = validate_update_data(req)
     if isinstance(name, HttpResponse):
         return name
@@ -268,7 +243,6 @@ def group_assignment_update(req, assignment_hash, teacher, group, assignment):
 @require_POST
 @group_access_required
 def send_student_assignment(req, assignment_hash, teacher, group, assignment):
-
     try:
         data = json.loads(req.body)
     except ValueError:
@@ -323,68 +297,6 @@ def distribute_assignment(req, assignment_hash, teacher, group, assignment):
         else None,
     }
     return JsonResponse(data)
-
-
-@login_required
-@require_POST
-def get_student_reputation(req):
-    """
-    Returns the student information along with the convincing rationales
-    criterion.
-
-    Parameters
-    ----------
-    req : HttpRequest
-        Request with:
-            parameters:
-                id: int
-                    Student pk
-
-    Returns
-    -------
-    Either
-        JSONResponse
-            Response with json data:
-                {
-                    email : str
-                        Student email
-                    last_login : str
-                        Date of last login in isoformat
-                    popularity : float
-                        Value of the convincing rationales criterion
-
-                }
-        HttpResponse
-            Error response
-    """
-    args = get_json_params(req, args=["id"])
-    if isinstance(args, HttpResponse):
-        return args
-    (id_,), _ = args
-
-    try:
-        student = Student.objects.get(pk=id_)
-    except Student.DoesNotExist:
-        return response_400(
-            req,
-            msg=_("The student couldn't be found."),
-            logger_msg=(f"The student with pk {id_} couldn't be found."),
-            log=logger.warning,
-        )
-    criteria = {
-        c.name: student.evaluate_reputation(c.name)
-        for c in ReputationType.objects.get(type="student").criteria.all()
-    }
-
-    return JsonResponse(
-        {
-            "email": student.student.email,
-            "last_login": student.student.last_login.isoformat()
-            if student.student.last_login is not None
-            else None,
-            "criteria": criteria,
-        }
-    )
 
 
 class StudentGroupUpdateView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
