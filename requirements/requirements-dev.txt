@@ -519,7 +519,7 @@ ruamel-yaml-clib==0.2.7
     # via ruamel-yaml
 safety==2.3.4
     # via -r requirements/requirements-dev.in
-saltise-course-flow==0.8.15
+saltise-course-flow==0.8.17
     # via -r requirements/requirements-test.txt
 saltise-user-feedback==1.1.2
     # via -r requirements/requirements-test.txt
