@@ -36,7 +36,7 @@ select = [
     # pydocstyle
     "D",
 ]
-ignore = ["D100", "D105", "D106", "D212"]
+ignore = ["D100", "D104", "D105", "D106", "D212"]
 extend-select = ["D213"]
 
 [tool.ruff.lint.pydocstyle]

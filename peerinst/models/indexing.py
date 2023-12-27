@@ -73,7 +73,7 @@ class Subject(models.Model):
         categories: List[Category]
 
     Methods:
-        save: Saves the category after cleaning the title using bleach.
+        save: Saves the subject after cleaning the title using bleach.
 
     TODO: Is no_hyphens validator still needed?
     """
