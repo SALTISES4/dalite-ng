@@ -7,7 +7,7 @@ from REST.viewsets import TeacherCRUDViewSet
 
 class TeacherQuestionCRUDViewSet(TeacherCRUDViewSet):
     """
-    Question create, retrieve, update and delete for teacher
+    Question create, retrieve, update and delete for teacher.
 
     - Attaches user on create via serializer √
     - Teacher can only access their own content √
@@ -17,12 +17,14 @@ class TeacherQuestionCRUDViewSet(TeacherCRUDViewSet):
     serializer_class = QuestionSerializer
 
     def get_queryset(self):
+        """Return editable objects for this user."""
         return Question.editable_queryset_for_user(self.request.user)
 
     def perform_destroy(self, instance):
         """
-        Queryset returns objects that are editable but not necessarily deletable
-        - Explicitly check if this object is deletable
+        Queryset returns objects that are editable but not necessarily deletable.
+
+        - Explicitly check if this object is deletable.
         """
         if not instance.is_deletable:
             raise serializers.ValidationError(instance.delete_validation_error)

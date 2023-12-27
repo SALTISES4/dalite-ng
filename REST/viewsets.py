@@ -4,7 +4,7 @@ from rest_framework.mixins import (
     RetrieveModelMixin,
     UpdateModelMixin,
 )
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import DjangoModelPermissions, IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.viewsets import GenericViewSet
 
@@ -19,6 +19,8 @@ class TeacherCRUDViewSet(
     GenericViewSet,
 ):
     """
+    Generic base viewset for teacher-related models.
+
     - No list √
     - No PUT √
     - Login required √
@@ -27,6 +29,6 @@ class TeacherCRUDViewSet(
     TODO: Consider if we need a TOS check
     """
 
-    permission_classes = [IsAuthenticated, IsTeacher]
+    permission_classes = [IsAuthenticated, IsTeacher, DjangoModelPermissions]
     renderer_classes = [JSONRenderer]
     http_method_names = ["get", "post", "patch", "delete"]

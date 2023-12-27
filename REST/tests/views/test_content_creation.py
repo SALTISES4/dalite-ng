@@ -1327,6 +1327,7 @@ def test_teacherquestioncreateupdateviewset_delete_owned_editable_question(
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
     assert not Question.objects.filter(pk=question.pk).exists()
+    assert Question.objects.count() == count - 1
 
 
 @pytest.mark.django_db
