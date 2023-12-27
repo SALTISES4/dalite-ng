@@ -2,7 +2,7 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 
-from peerinst.models.question import Category
+from peerinst.models import Category
 
 
 @pytest.mark.django_db

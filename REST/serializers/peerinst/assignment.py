@@ -298,9 +298,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         return value
 
     def validate_text(self, value):
-        """
-        Check stripped text length <= 8000
-        """
+        """Check stripped text length <= 8000."""
         text = bleach.clean(value, tags=[], strip=True).strip()
         if len(text) > 8000:
             raise serializers.ValidationError(_("Text too long"))
@@ -308,19 +306,24 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
     def validate(self, data):
         """
-        - Validation logic is often included in Model.clean(), but DRF ignores it
+        - Validation logic is often included in Model.clean(), but DRF ignores.
+
         - See discussion here https://github.com/encode/django-rest-framework/discussions/7850
         - For now, we reproduce logic in serializer explicitly
-        - TODO: Consider how updates in Django admin should be handled since serializer validation won't be run
+        - TODO: Consider how updates in Django admin should be handled since
+          serializer validation won't be run.
         """
-        # Can't have image without image_alt_text; they must always be changed together
-        if "image" in data and data["image"]:
-            if "image_alt_text" not in data or not data["image_alt_text"]:
-                raise serializers.ValidationError(
-                    _(
-                        "An alternative text for accessibility if is required if providing an image"
-                    )
+        # Can't have image without image_alt_text; they must always be changed together  # noqa E501
+        if (
+            "image" in data
+            and data["image"]
+            and ("image_alt_text" not in data or not data["image_alt_text"])
+        ):
+            raise serializers.ValidationError(
+                _(
+                    "An alternative text for accessibility if is required if providing an image"  # noqa E501
                 )
+            )
         # Can't have image and video_url
         # - raise validation error if sent together
         # - raise validation error if one sent with other existing on instance
@@ -332,58 +335,25 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         ):
             raise serializers.ValidationError(
                 _(
-                    "Only one of the image and video URL fields can be specified"
+                    "Only one of the image and video URL fields can be specified"  # noqa E501
                 )
             )
-        if self.instance:
-            if (
-                self.instance.video_url and "image" in data and data["image"]
-            ) or (
+        if self.instance and (
+            (self.instance.video_url and "image" in data and data["image"])
+            or (
                 self.instance.image
                 and "video_url" in data
                 and data["video_url"]
-            ):
-                raise serializers.ValidationError(
-                    _(
-                        "Only one of the image and video URL fields can be specified"
-                    )
+            )
+        ):
+            raise serializers.ValidationError(
+                _(
+                    "Only one of the image and video URL fields can be specified"  # noqa E501
                 )
-        # Only validate answerchoice_set if question type is PI otherwise ensure empty
-        if not self.instance:
-            if ("type" not in data) or (
-                "type" in data and data["type"] == "PI"
-            ):
-                # Create logic - PI
-                """
-                Check at least two answer choices
-                """
-                if (
-                    "answerchoice_set" not in data
-                    or len(data["answerchoice_set"]) < 2
-                ):
-                    raise serializers.ValidationError(
-                        {
-                            "answerchoice_set": _(
-                                "At least two answer choices are required"
-                            )
-                        }
-                    )
-
-                """
-                Check at least one answer choice is marked correct
-                """
-                if sum(x["correct"] for x in data["answerchoice_set"]) == 0:
-                    raise serializers.ValidationError(
-                        {
-                            "answerchoice_set": _(
-                                "At least one answer choice must be correct"
-                            )
-                        }
-                    )
-            else:
-                # Create logic - RO
-                data["answerchoice_set"] = []
-        else:
+            )
+        # Only validate answerchoice_set if question type is PI,
+        # otherwise ensure empty
+        if self.instance:
             if ("type" in data and data["type"] == "PI") or (
                 "type" not in data and self.instance.type == "PI"
             ):
@@ -403,6 +373,37 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                 # Update logic - RO
                 data["answerchoice_set"] = []
 
+        elif "type" not in data or data["type"] == "PI":
+            # Create logic - PI
+            """
+            Check at least two answer choices
+            """
+            if (
+                "answerchoice_set" not in data
+                or len(data["answerchoice_set"]) < 2
+            ):
+                raise serializers.ValidationError(
+                    {
+                        "answerchoice_set": _(
+                            "At least two answer choices are required"
+                        )
+                    }
+                )
+
+            """
+            Check at least one answer choice is marked correct
+            """
+            if sum(x["correct"] for x in data["answerchoice_set"]) == 0:
+                raise serializers.ValidationError(
+                    {
+                        "answerchoice_set": _(
+                            "At least one answer choice must be correct"
+                        )
+                    }
+                )
+        else:
+            # Create logic - RO
+            data["answerchoice_set"] = []
         return data
 
     def create(self, validated_data):
@@ -452,12 +453,16 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         if "answerchoice_set" in validated_data:
             answerchoice_data = validated_data.pop("answerchoice_set")
 
-        # Update question
-        for field in validated_data.keys():
-            if (
-                type(validated_data[field]) is list
-                or type(validated_data[field]) is tuple
-            ):
+        # Only owner can modify list of collaborators
+        if "collaborators_pk" in validated_data:
+            collaborators_pk = validated_data.pop("collaborators_pk")
+
+            if question.user == self.request.user:
+                question.collaborators.set(collaborators_pk)
+
+        # Update remaining question fields
+        for field in validated_data:
+            if isinstance(validated_data[field], (list, tuple)):
                 _field = getattr(question, field)
                 _field.set(validated_data[field])
             else:
@@ -473,10 +478,11 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             for i, data in enumerate(answerchoice_data, 1):
                 sample_answers = data.pop("sample_answers")
 
-                if "expert_answers" in data:
-                    expert_answers = data.pop("expert_answers")
-                else:
-                    expert_answers = []
+                expert_answers = (
+                    data.pop("expert_answers")
+                    if "expert_answers" in data
+                    else []
+                )
 
                 if "pk" in data:
                     # Update answer choice and related models
@@ -543,7 +549,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                             rationale=expert_answer["rationale"],
                         )
 
-                    if len(to_create) > 0 or len(existing) > len(to_delete):
+                    if to_create or len(existing) > len(to_delete):
                         for pk in to_delete:
                             e = Answer.objects.get(pk=pk)
                             e.delete()

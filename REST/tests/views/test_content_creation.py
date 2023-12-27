@@ -13,7 +13,7 @@ from functional_tests.fixtures import (  # noqa
     realistic_assignment,
     realistic_questions,
 )
-from peerinst.models import Answer, Category, Question
+from peerinst.models import Answer, Question
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.teacher import login_teacher
 
@@ -648,6 +648,83 @@ def test_teacherquestioncreateupdateviewset_update_owned_editable_question(
     assert question.text == text
     assert question.title == title
     assert Question.objects.count() == count
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_update_collaborators_owner(
+    client, teachers, question
+):
+    assert login_teacher(client, teachers[0])
+    assert question.user == teachers[0].user
+    assert question.answer_set.count() == 0
+
+    url = reverse(
+        "REST:teacher-question-create-update-detail",
+        args=(question.pk,),
+    )
+    response = client.patch(
+        url,
+        data={
+            "collaborators_pk": [teachers[1].user.username],
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [{"rationale": fake.paragraph()}],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
+        },
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    question.refresh_from_db()
+    assert teachers[1].user in question.collaborators.all()
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_update_collaborators_collaborator(
+    client, teachers, question
+):
+    assert login_teacher(client, teachers[1])
+    assert question.user == teachers[0].user
+    assert question.answer_set.count() == 0
+    question.collaborators.add(teachers[1].user)
+
+    url = reverse(
+        "REST:teacher-question-create-update-detail",
+        args=(question.pk,),
+    )
+    response = client.patch(
+        url,
+        data={
+            "collaborators_pk": [teachers[2].user.username],
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [{"rationale": fake.paragraph()}],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
+        },
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    question.refresh_from_db()
+    assert teachers[1].user not in question.collaborators.all()
 
 
 @pytest.mark.django_db

@@ -2,7 +2,7 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 
-from peerinst.models.question import Discipline
+from peerinst.models import Discipline
 
 
 @pytest.mark.django_db
