@@ -11,7 +11,7 @@ from tos.models import Consent
 
 
 class AssignmentCreateView(
-    TOSAcceptanceRequiredMixin, TeacherRequiredMixin, TemplateView
+    TeacherRequiredMixin, TOSAcceptanceRequiredMixin, TemplateView
 ):
     http_method_names = ["get"]
     template_name = "teacher/assignment/create.html"
@@ -35,7 +35,7 @@ class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
             # Try to get the object
             self.get_object()
             return super().get(request, *args, **kwargs)
-        except http.Http404 as e:
+        except http.Http404:
             # Object is not in queryset, swallow error and redirect to detail view
             return HttpResponseRedirect(
                 reverse(

@@ -3,9 +3,9 @@ from django.urls import reverse
 from faker import Faker
 from rest_framework import status
 
-from peerinst.models import Question
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.teacher import login_teacher
+from tos.models import Consent
 
 fake = Faker()
 
@@ -25,6 +25,30 @@ def test_teachercreateupdateviewset_teacher_required(client, user):
     url = reverse("REST:teacher-question-create-update-list")
     response = client.get(url)
 
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+def test_teachercreateupdateviewset_teacher_tos_required_POST_and_PATCH(
+    client, teacher, question
+):
+    assert login_teacher(client, teacher)
+
+    Consent.objects.get(
+        user__username=teacher.user.username,
+        tos__role="teacher",
+    ).delete()
+
+    url = reverse(
+        "REST:teacher-question-create-update-detail", args=(question.pk,)
+    )
+    response = client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+
+    response = client.patch(url, data={})
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    response = client.post(url, data={})
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 

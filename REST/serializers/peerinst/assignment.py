@@ -36,7 +36,7 @@ logger = logging.getLogger("REST")
 
 class CategorySerializer(DocumentSerializer):
     def to_representation(self, instance):
-        """Bleach on the way out"""
+        """Bleach and capitalize on the way out."""
         ret = super().to_representation(instance)
         ret["title"] = capwords(
             bleach.clean(ret["title"], tags=[], strip=True).strip()
@@ -50,7 +50,7 @@ class CategorySerializer(DocumentSerializer):
 
 class DisciplineSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
-        """Bleach on the way out"""
+        """Bleach on the way out."""
         ret = super().to_representation(instance)
         ret["title"] = capwords(
             bleach.clean(ret["title"], tags=[], strip=True).strip()
@@ -72,15 +72,13 @@ class SampleAnswerSerializer(serializers.ModelSerializer):
     pk = serializers.IntegerField(read_only=False, required=False)
 
     def validate_rationale(self, value):
-        """
-        Run validators defined peerinst/forms.py for RichTextRationaleField
-        """
+        """Run validators in peerinst/forms.py for RichTextRationaleField."""
         for validator in RichTextRationaleField.default_validators:
             validator(value)
         return value
 
     def to_representation(self, instance):
-        """Bleach on the way out"""
+        """Bleach on the way out."""
         ret = super().to_representation(instance)
         if "rationale" in ret and ret["rationale"]:
             ret["rationale"] = bleach.clean(
@@ -104,22 +102,17 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
     sample_answers = SampleAnswerSerializer(many=True)
 
     def validate(self, data):
-        """
-        Check correct answer choices have an expert rationale
-        """
-        if data["correct"]:
-            if (
-                "expert_answers" not in data
-                or len(data["expert_answers"]) == 0
-            ):
-                raise serializers.ValidationError(
-                    _(
-                        "An expert rationale is required for each correct answer choice"
-                    )
+        """Check correct answer choices have an expert rationale."""
+        if data["correct"] and (
+            "expert_answers" not in data or len(data["expert_answers"]) == 0
+        ):
+            raise serializers.ValidationError(
+                _(
+                    "An expert rationale is required for each correct answer choice"  # noqa E501
                 )
-        """
-        Check each answer choice has at least one sample rationale
-        """
+            )
+
+        """Check each answer choice has at least one sample rationale."""
         if len(data["sample_answers"]) == 0:
             raise serializers.ValidationError(
                 _("An sample rationale is required for each answer choice")
@@ -127,7 +120,7 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
         return data
 
     def to_representation(self, instance):
-        """Bleach on the way out"""
+        """Bleach on the way out."""
         ret = super().to_representation(instance)
         if "text" in ret and ret["text"]:
             ret["text"] = bleach.clean(
@@ -148,20 +141,38 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
 
 
 class NullableM2MFormDataSerializer(serializers.SlugRelatedField):
+    """
+    Serializer for handling nullable many-to-many fields in form data.
+
+    Args:
+        data: The input data to be converted to internal value.
+
+    Returns:
+        The internal value of the many-to-many field, or None if data is "[]".
+    """
+
     def to_internal_value(self, data):
-        if data == "[]":
-            return None
-        return super().to_internal_value(data)
+        return None if data == "[]" else super().to_internal_value(data)
 
 
 class NullablePrimaryKeyFormDataSerializer(serializers.PrimaryKeyRelatedField):
+    """
+    Serializer for handling nullable primary key related fields in form data.
+
+    Args:
+        data: The input data to be converted to internal value.
+
+    Returns:
+        The internal value of the primary key field, or None if data is "null".
+    """
+
     def to_internal_value(self, data):
-        if data == "null":
-            return None
-        return super().to_internal_value(data)
+        return None if data == "null" else super().to_internal_value(data)
 
 
 class QuestionSerializer(DynamicFieldsModelSerializer):
+    """Question model serializer with dynamic field filtering via querystring."""
+
     answer_count = serializers.ReadOnlyField()
     answerchoice_set = AnswerChoiceSerializer(
         fields=[
@@ -205,7 +216,9 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     flag_reasons = serializers.ReadOnlyField()
     frequency = serializers.ReadOnlyField(source="get_frequency")
     image = serializers.ImageField(
-        allow_empty_file=True, allow_null=True, required=False
+        allow_empty_file=True,
+        allow_null=True,
+        required=False,
     )
     is_editable = serializers.SerializerMethodField()
     is_not_flagged = serializers.ReadOnlyField()
@@ -277,9 +290,9 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
     def validate_image(self, value):
         ALLOWED_IMAGE_FORMATS = ["PNG", "GIF", "JPEG"]
-        ALLOWED_IMAGE_SIZE = 1e6
-
         if value:
+            ALLOWED_IMAGE_SIZE = 1e6
+
             with Image.open(value, formats=ALLOWED_IMAGE_FORMATS) as image:
                 image.load()
 
@@ -292,9 +305,8 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
                 if value.size > ALLOWED_IMAGE_SIZE:
                     raise serializers.ValidationError(
-                        f"Invalid image file size.  Max: {ALLOWED_IMAGE_SIZE/1e6} MB"
+                        f"Invalid image file size.  Max: {ALLOWED_IMAGE_SIZE/1e6} MB"  # noqa E501
                     )
-
         return value
 
     def validate_text(self, value):
@@ -418,11 +430,9 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         for i, data in enumerate(answerchoice_data, 1):
             sample_answers = data.pop("sample_answers")
 
-            if "expert_answers" in data:
-                expert_answers = data.pop("expert_answers")
-            else:
-                expert_answers = []
-
+            expert_answers = (
+                data.pop("expert_answers") if "expert_answers" in data else []
+            )
             AnswerChoice.objects.create(question=question, **data)
             for sample_answer in sample_answers:
                 Answer.objects.create(
@@ -589,7 +599,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         return question
 
     def to_representation(self, instance):
-        """Bleach on the way out"""
+        """Bleach on the way out."""
         ret = super().to_representation(instance)
         if "title" in ret:
             ret["title"] = bleach.clean(
@@ -820,7 +830,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         return instance
 
     def to_representation(self, instance):
-        """Bleach on the way out"""
+        """Bleach on the way out."""
         ret = super().to_representation(instance)
         for field in ["conclusion_page", "description", "intro_page"]:
             if field in ret and ret[field]:
@@ -835,7 +845,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         return ret
 
     def to_internal_value(self, data):
-        """Bleach on the way in"""
+        """Bleach on the way in."""
         ret = super().to_internal_value(data)
         for field in ["conclusion_page", "description", "intro_page"]:
             if field in ret and ret[field]:
@@ -943,6 +953,7 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
         return obj.get_absolute_url()
 
     def validate_assignment_pk(self, assignment):
+        """Check assignment is valid."""
         if not assignment.is_valid:
             logger.error(
                 f"Assignment {assignment} is not valid and cannot be distributed."
@@ -951,9 +962,7 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
         return assignment
 
     def validate_due_date(self, due_date):
-        """
-        Check due_date is in the future
-        """
+        """Check due_date is in the future."""
         if due_date < timezone.now():
             logger.error(f"Invalid due_date: {due_date}")
             raise serializers.ValidationError(
@@ -963,8 +972,9 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
 
     def validate_group_pk(self, student_group):
         """
-        Check that teacher owns group and that group is "assignable"
-        (see Teacher model)
+        Check that teacher owns group and that group is "assignable".
+
+        - See Teacher model
         """
         teacher = self.context["request"].user.teacher
 
@@ -985,9 +995,7 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
         return data
 
     def validate(self, data):
-        """
-        Impose unique_together on assignment and group
-        """
+        """Check unique_together constraint on assignment and group."""
         assignment = data["assignment"]
         group = data["group"]
         if StudentGroupAssignment.objects.filter(

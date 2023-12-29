@@ -11,7 +11,7 @@ from REST.viewsets import TeacherCRUDViewSet
 
 class TeacherAssignmentCRUDViewSet(TeacherCRUDViewSet):
     """
-    Assignment create, retrieve, update and delete for teacher
+    Assignment create, retrieve, update and delete for teacher.
 
     - Attaches user on create via serializer
     - Teacher can only access their own content
@@ -25,7 +25,8 @@ class TeacherAssignmentCRUDViewSet(TeacherCRUDViewSet):
 
     def perform_destroy(self, instance):
         """
-        Queryset returns objects that are editable but not necessarily deletable
+        Queryset returns objects that are editable but not necessarily deletable.
+
         - Explicitly check this object is deletable
         """
         if not instance.is_deletable:

@@ -138,6 +138,8 @@ class Assignment(models.Model):
     @property
     def is_deletable(self):
         """
+        Logic for assignment deletion.
+
         Assignments can be deleted only when:
         - They are editable
         - They have not been included in any collections
@@ -157,6 +159,8 @@ class Assignment(models.Model):
     @property
     def is_editable(self):
         """
+        Logic for assignment editing.
+
         Assignments can be edited only when:
         - There are no related student answers
         - There are no related StudentGroupAssignment objects
@@ -273,7 +277,7 @@ class StudentGroupAssignment(models.Model):
         due_date : str
             String in the format "%Y-%m-%dT%H:%M:%S(.%f)?"
 
-        Returns
+        Returns:
         -------
         err : Optional[str]
             Error message if there is any
@@ -294,9 +298,7 @@ class StudentGroupAssignment(models.Model):
             self.save()
             logger.info(
                 f"Student group assignment {self.pk}"
-                + " due date updated to {} from {}.".format(
-                    self.due_date, prev_due_date
-                )
+                + f" due date updated to {self.due_date} from {prev_due_date}."
             )
         return err
 
@@ -309,7 +311,7 @@ class StudentGroupAssignment(models.Model):
         order : str
             New order as a string of indices separated by commas
 
-        Returns
+        Returns:
         -------
         err : Optional[str]
             Error message if there is any
@@ -321,9 +323,7 @@ class StudentGroupAssignment(models.Model):
             self.save()
             logger.info(
                 f"Student group assignment {self.pk}"
-                + " order updated to {} from {}.".format(
-                    self.order, prev_order
-                )
+                + f" order updated to {self.order} from {prev_order}."
             )
         else:
             logger.error(err)
@@ -396,7 +396,7 @@ class StudentGroupAssignment(models.Model):
             Hostname of the server to be able to send emails (emails aren't
             sent if None)
 
-        Returns
+        Returns:
         -------
         err : Optional[str]
             Error message if there is any
@@ -435,7 +435,7 @@ class StudentGroupAssignment(models.Model):
         and the due date is sooner or equal to the number reminder days,
         the student notification is updated and an email if possibly sent.
 
-        Returns
+        Returns:
         -------
         err : Optional[str]
             Error message if there is any
@@ -479,7 +479,7 @@ class StudentGroupAssignment(models.Model):
     @property
     def student_progress(self):
         """
-        Returns
+        Returns:
         -------
         [
             {

@@ -44,10 +44,9 @@ def test_check_assignment_id_is_valid(client, assignment, student, teacher):
     assert not data["valid"]
 
     # Return {"valid": False} if id is not slug or greater than max_length
-    url = (
-        reverse("REST:assignment-check-id")
-        + f"?id={quote_plus('123$$%^*&(*#)')}"
-    )
+    url = reverse(
+        "REST:assignment-check-id"
+    ) + f"?id={quote_plus('123$$%^*&(*#)')}"
     response = client.get(url)
     data = json.loads(response.content)
 
@@ -63,6 +62,7 @@ def test_check_assignment_id_is_valid(client, assignment, student, teacher):
     assert not data["valid"]
 
 
+@pytest.mark.django_db
 def test_get_assignment_help_texts(client, assignment, student, teacher):
     url = reverse("REST:assignment-help-texts")
 
