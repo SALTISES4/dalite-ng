@@ -129,11 +129,6 @@ urlpatterns += i18n_patterns(
                         ]
                     ),
                 ),
-                path(
-                    "update/",
-                    peerinst_views.AssignmentUpdateView.as_view(),
-                    name="assignment-update",
-                ),
             ]
         ),
     ),

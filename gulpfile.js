@@ -84,7 +84,6 @@ const scriptBuilds = [
       // "collection",
       // "admin",
       // "ajax",
-      // "assignment",
       // "preact",
       "material-web",
     ],

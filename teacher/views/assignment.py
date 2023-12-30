@@ -13,13 +13,17 @@ from tos.models import Consent
 class AssignmentCreateView(
     TeacherRequiredMixin, TOSAcceptanceRequiredMixin, TemplateView
 ):
+    """View to serve assignment create template."""
+
     http_method_names = ["get"]
     template_name = "teacher/assignment/create.html"
 
 
 class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
     """
-    Update view should account for three levels of editability:
+    View to serve assignment update template.
+
+    Should for three levels of editability:
     - None at all: non-owners or owners refusing TOS > silently redirect to detail view
     - Meta fields only: owners where assignment.is_editable is false
     - All fields: owners where assignment.is_editable is true
@@ -36,7 +40,7 @@ class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
             self.get_object()
             return super().get(request, *args, **kwargs)
         except http.Http404:
-            # Object is not in queryset, swallow error and redirect to detail view
+            # Object not in queryset, swallow error and redirect to detail view
             return HttpResponseRedirect(
                 reverse(
                     "teacher:assignment-detail",
@@ -45,9 +49,7 @@ class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
             )
 
     def get_queryset(self):
-        """
-        Check TOS status, then limit access to a user's own assignments
-        """
+        """Check TOS status, then limit access to a user's own assignments."""
         if not Consent.get(self.request.user.username, "teacher"):
             return Assignment.objects.none()
         else:
@@ -59,7 +61,7 @@ class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
         context.update(
             LTI_key=str(settings.LTI_BASIC_CLIENT_KEY),
             LTI_secret=str(settings.LTI_BASIC_CLIENT_SECRET),
-            LTI_launch_url=str("https://" + self.request.get_host() + "/lti/"),
+            LTI_launch_url=str(f"https://{self.request.get_host()}/lti/"),
             meta_editable_by_user=True,
             owner=[u.username for u in assignment.owner.all()],
             questions_editable_by_user=assignment.is_editable,
