@@ -261,13 +261,10 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
     def get_urls(self, obj):
         urls = {
-            "add_new_question": reverse("question-create"),
             "addable_assignments": reverse(
                 "REST:teacher-assignment-for-question", args=(obj.pk,)
             ),
-            "copy_question": reverse(
-                "question-clone", args=(obj.pk,)
-            ),  # TODO: Revise logic on copy
+            "copy_question": "",  # TODO: Revise logic on copy
             "fix": reverse(
                 "question-fix", args=(obj.pk,)
             ),  # TODO: Is this still needed?
