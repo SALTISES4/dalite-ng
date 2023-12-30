@@ -30,16 +30,6 @@ def dummy_paths():
 def old_patterns():
     return [
         path(
-            "question/create",
-            views.QuestionCreateView.as_view(),
-            name="question-create",
-        ),
-        path(
-            "question/clone/<int:pk>",
-            views.QuestionCloneView.as_view(),
-            name="question-clone",
-        ),
-        path(
             "question/test/<int:question_id>",
             views.question,
             name="question-test",
@@ -63,46 +53,6 @@ def old_patterns():
             "question/update/<int:pk>",
             views.QuestionUpdateView.as_view(),
             name="question-update",
-        ),
-        path(
-            "discipline/create",
-            views.DisciplineCreateView.as_view(),
-            name="discipline-create",
-        ),
-        path(
-            "discipline/form/<int:pk>",
-            views.discipline_select_form,
-            name="discipline-form",
-        ),
-        path(
-            "discipline/form",
-            views.discipline_select_form,
-            name="discipline-form",
-        ),
-        path(
-            "disciplines/form/<int:pk>",
-            views.disciplines_select_form,
-            name="disciplines-form",
-        ),
-        path(
-            "disciplines/form",
-            views.disciplines_select_form,
-            name="disciplines-form",
-        ),
-        path(
-            "category/create",
-            views.CategoryCreateView.as_view(),
-            name="category-create",
-        ),
-        path(
-            "category/form/<int:pk>",
-            views.category_select_form,
-            name="category-form",
-        ),
-        path(
-            "category/form",
-            views.category_select_form,
-            name="category-form",
         ),
         path(
             "answer-choice/form/<int:question_id>",

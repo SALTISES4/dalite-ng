@@ -42,7 +42,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_safe
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView, View
-from django.views.generic.edit import CreateView, FormView, UpdateView
+from django.views.generic.edit import FormView, UpdateView
 from django.views.generic.list import ListView
 from lti_provider.lti import LTI
 from pylti.common import post_message
@@ -315,100 +315,48 @@ class QuestionListView(LoginRequiredMixin, NoStudentsMixin, ListView):
         return context
 
 
-# Views related to Question
-class QuestionCreateView(
-    LoginRequiredMixin,
-    NoStudentsMixin,
-    ObjectPermissionMixin,
-    TOSAcceptanceRequiredMixin,
-    CreateView,
-):
-    """View to create a new question outside of admin."""
+# class QuestionCloneView(QuestionCreateView):
+#     """View to create a question from existing."""
 
-    object_permission_required = "peerinst.add_question"
-    model = models.Question
-    fields = [
-        "title",
-        "text",
-        "type",
-        "image",
-        "image_alt_text",
-        "video_url",
-        "answer_style",
-        "category",
-        "discipline",
-        "collaborators",
-        "fake_attributions",
-        "sequential_review",
-        "rationale_selection_algorithm",
-        "grading_scheme",
-    ]
+#     template_name = "peerinst/question/form.html"
 
-    template_name = "peerinst/question/form.html"
+#     def get_initial(self, *args, **kwargs):
+#         super().get_initial(*args, **kwargs)
+#         question = get_object_or_404(models.Question, pk=self.kwargs["pk"])
+#         return {
+#             "text": question.text,
+#             "type": question.type,
+#             "image": question.image,
+#             "image_alt_text": question.image_alt_text,
+#             "video_url": question.video_url,
+#             "answer_style": question.answer_style,
+#             "category": question.category.all(),
+#             "discipline": question.discipline,
+#             "fake_attributions": question.fake_attributions,
+#             "sequential_review": question.sequential_review,
+#             "rationale_selection_algorithm": question.rationale_selection_algorithm,
+#             "grading_scheme": question.grading_scheme,
+#         }
 
-    # Custom save is needed to attach user to question
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
+#     def get_object(self, queryset=None):
+#         # Remove link on object to pk to dump object permissions
+#         return None
 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.fields["text"].widget = TinyMCE()
-        return form
+#     # Custom save is needed to attach parent question to clone
+#     def form_valid(self, form):
+#         form.instance.parent = get_object_or_404(
+#             models.Question, pk=self.kwargs["pk"]
+#         )
+#         if form.instance.type == "RO":
+#             form.instance.second_answer_needed = False
+#         return super().form_valid(form)
 
-    def get_success_url(self):
-        if self.object.type == "RO":
-            return reverse(
-                "sample-answer-form", kwargs={"question_id": self.object.pk}
-            )
-        else:
-            return reverse(
-                "answer-choice-form", kwargs={"question_id": self.object.pk}
-            )
-
-
-class QuestionCloneView(QuestionCreateView):
-    """View to create a question from existing."""
-
-    template_name = "peerinst/question/form.html"
-
-    def get_initial(self, *args, **kwargs):
-        super().get_initial(*args, **kwargs)
-        question = get_object_or_404(models.Question, pk=self.kwargs["pk"])
-        return {
-            "text": question.text,
-            "type": question.type,
-            "image": question.image,
-            "image_alt_text": question.image_alt_text,
-            "video_url": question.video_url,
-            "answer_style": question.answer_style,
-            "category": question.category.all(),
-            "discipline": question.discipline,
-            "fake_attributions": question.fake_attributions,
-            "sequential_review": question.sequential_review,
-            "rationale_selection_algorithm": question.rationale_selection_algorithm,
-            "grading_scheme": question.grading_scheme,
-        }
-
-    def get_object(self, queryset=None):
-        # Remove link on object to pk to dump object permissions
-        return None
-
-    # Custom save is needed to attach parent question to clone
-    def form_valid(self, form):
-        form.instance.parent = get_object_or_404(
-            models.Question, pk=self.kwargs["pk"]
-        )
-        if form.instance.type == "RO":
-            form.instance.second_answer_needed = False
-        return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            parent=get_object_or_404(models.Question, pk=self.kwargs["pk"])
-        )
-        return context
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context.update(
+#             parent=get_object_or_404(models.Question, pk=self.kwargs["pk"])
+#         )
+#         return context
 
 
 class AssignmentFixView(
@@ -614,96 +562,6 @@ def sample_answer_form_done(request, question_id):
             return response_400(request)
     else:
         return response_400(request)
-
-
-class DisciplineCreateView(
-    LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, CreateView
-):
-    """View to create a new discipline outside of admin."""
-
-    model = Discipline
-    fields = ["title"]
-
-    def get_success_url(self):
-        if self.request.GET.get("multiselect", False):
-            return reverse("disciplines-form", kwargs={"pk": self.object.pk})
-        else:
-            return reverse("discipline-form", kwargs={"pk": self.object.pk})
-
-
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
-@user_passes_test(teacher_tos_accepted_check, login_url="/tos/required/")
-def discipline_select_form(request, pk=None):
-    """
-    An AJAX view that simply renders the DisciplineSelectForm. Preselects
-    instance with pk, if given.
-    """
-    if pk:
-        form = forms.DisciplineSelectForm(
-            initial={"discipline": Discipline.objects.get(pk=pk)}
-        )
-    else:
-        form = forms.DisciplineSelectForm()
-
-    return TemplateResponse(
-        request, "peerinst/discipline_select_form.html", context={"form": form}
-    )
-
-
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
-def disciplines_select_form(request, pk=None):
-    """
-    AJAX view simply renders the DisciplinesSelectForm. Preselects instance
-    with teachers current set.
-    """
-    disciplines = request.user.teacher.disciplines.values_list("pk", flat=True)
-
-    if pk:
-        disciplines = Discipline.objects.filter(
-            Q(pk=pk) | Q(pk__in=disciplines)
-        )
-
-    form = forms.DisciplinesSelectForm(initial={"disciplines": disciplines})
-
-    return TemplateResponse(
-        request,
-        "peerinst/disciplines_select_form.html",
-        context={"form": form},
-    )
-
-
-class CategoryCreateView(
-    LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, CreateView
-):
-    """View to create a new category outside of admin."""
-
-    model = Category
-    fields = ["title"]
-
-    def get_success_url(self):
-        return reverse("category-form", kwargs={"pk": self.object.pk})
-
-
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
-@user_passes_test(teacher_tos_accepted_check, login_url="/tos/required/")
-def category_select_form(request, pk=None):
-    """
-    AJAX view simply renders the CategorySelectForm. Preselects instance with
-    pk, if given.
-    """
-    if pk:
-        form = forms.CategorySelectForm(
-            initial={"category": [Category.objects.get(pk=pk)]}
-        )
-    else:
-        form = forms.CategorySelectForm()
-
-    return TemplateResponse(
-        request, "peerinst/category_select_form.html", context={"form": form}
-    )
 
 
 class QuestionMixin:
