@@ -15,7 +15,7 @@ from peerinst.models import Category, Discipline, Subject
         ("sUbJect", "sUbJect"),
     ],
 )
-def test_subject_save_no_error_cases(title, expected_title):
+def test_subject_save_no_errors(title, expected_title):
     # Arrange
     discipline = Discipline.objects.create(title="Test Discipline")
     category = Category.objects.create(title="Test Category")

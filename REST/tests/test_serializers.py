@@ -9,7 +9,9 @@ from functional_tests.fixtures import (  # noqa
 )
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.teacher import login_teacher
-from REST.serializers import AssignmentSerializer
+from REST.serializers import (
+    AssignmentSerializer,
+)
 
 
 @pytest.mark.django_db

@@ -837,11 +837,7 @@ class Question(models.Model):
         return (peer_impact, *peer_impact_label)
 
     def get_matrix(self):
-        matrix = {}
-        matrix["easy"] = 0
-        matrix["hard"] = 0
-        matrix["tricky"] = 0
-        matrix["peer"] = 0
+        matrix = {"easy": 0, "hard": 0, "tricky": 0, "peer": 0}
 
         answer_choices = self.answerchoice_set.all()
         correct_choices = self.get_correct_choices()
@@ -856,16 +852,6 @@ class Question(models.Model):
                 hard = self.get_answers_by_type(answer_type="WW").count()
 
                 tricky = self.get_answers_by_type(answer_type="RW").count()
-
-                # peer = (
-                #     student_answers.exclude(
-                #         first_answer_choice__in=correct_choices
-                #     )
-                #     .filter(second_answer_choice__in=correct_choices)
-                #     .count()
-                # )
-
-                # assert easy + hard + tricky + peer == N
 
                 peer = N - easy - tricky - hard
 

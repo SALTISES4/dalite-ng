@@ -1,1 +1,3 @@
-from .fixtures import group
+__all__ = ["group", "groups"]
+
+from .fixtures import group, groups  # noqa

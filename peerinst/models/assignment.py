@@ -244,11 +244,9 @@ class StudentGroupAssignment(models.Model):
     def __str__(self):
         return f"{self.assignment} for {self.group}"
 
-    def _verify_order(self, order):
-        n = len(self.assignment.questions.all())
-
+    @staticmethod
+    def verify_order(order, n):
         err = None
-
         try:
             order_ = list(map(int, order.split(",")))
         except ValueError:
@@ -267,6 +265,11 @@ class StudentGroupAssignment(models.Model):
             err = "There are duplicate values in `order`."
 
         return err
+
+    def _verify_order(self, order):
+        return StudentGroupAssignment.verify_order(
+            order, len(self.assignment.questions.all())
+        )
 
     def _modify_due_date(self, due_date):
         """

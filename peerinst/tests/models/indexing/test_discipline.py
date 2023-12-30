@@ -15,7 +15,7 @@ from peerinst.models import Discipline
         ("dIscIpline", "dIscIpline"),
     ],
 )
-def test_discipline_save_no_error_cases(title, expected_title):
+def test_discipline_save_no_errors(title, expected_title):
     # Act
     discipline = Discipline.objects.create(title=title)
 

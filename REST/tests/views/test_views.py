@@ -8,16 +8,13 @@ from django.utils import timezone
 from faker import Faker
 from rest_framework import status
 
-from functional_tests.fixtures import (  # noqa
-    realistic_assignment,
-    realistic_questions,
-)
+from functional_tests.fixtures import *  # noqa
 from peerinst.models import (
     Assignment,
     StudentGroup,
     StudentGroupAssignment,
 )
-from peerinst.tests.fixtures import *  # noqa  # noqa
+from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.student import login_student
 from peerinst.tests.fixtures.teacher import login_teacher
 
@@ -661,7 +658,6 @@ def test_studentgroupassignment_uniquetogether_assignment_and_group(
         data,
         content_type="application/json",
     )
-    print(response.content)
     assert response.status_code == status.HTTP_201_CREATED
 
     response = client.post(
@@ -673,15 +669,170 @@ def test_studentgroupassignment_uniquetogether_assignment_and_group(
 
 
 @pytest.mark.django_db
-def test_feedback_duplication(client, teacher, answers):
-    assert login_teacher(client, teacher)
+def test_studentgroupassignment_uniquetogether_change_assignment_and_group(
+    client, realistic_assignment, groups, teacher
+):
+    """
+    Requirements:
+    1. Must return error if assignment and group aren't unique together
+    """
+    assert realistic_assignment.is_valid
 
-    url = reverse("REST:teacher-feedback-list")
-    response = client.post(url, {"score": 1, "answer": answers[0].pk})
+    login_teacher(client, teacher)
+    groups[0].teacher.add(teacher)
+    teacher.current_groups.add(groups[0])
+    groups[1].teacher.add(teacher)
+    teacher.current_groups.add(groups[1])
+    sga1 = StudentGroupAssignment.objects.create(
+        assignment=realistic_assignment,
+        due_date=timezone.now() + datetime.timedelta(days=1),
+        group=groups[0],
+        show_correct_answers=True,
+    )
+    StudentGroupAssignment.objects.create(
+        assignment=realistic_assignment,
+        due_date=timezone.now() + datetime.timedelta(days=1),
+        group=groups[1],
+        show_correct_answers=True,
+    )
+    url = reverse("REST:studentgroupassignment-detail", args=(sga1.pk,))
+    data = {
+        "group_pk": groups[1].pk,
+    }
+    response = client.patch(
+        url,
+        data,
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "order, error_message",
+    [
+        (
+            "3,4",
+            "Given `order` has at least one value bigger than the number of questions.",  # noqa E501
+        ),
+        (
+            "-3,4",
+            "Given `order` has negative values.",
+        ),
+        (
+            "123123",
+            "Given `order` has at least one value bigger than the number of questions.",  # noqa E501
+        ),
+    ],
+)
+def test_studentgroupassignment_list_order_validation_errors(
+    client,
+    realistic_assignment,
+    group,
+    teacher,
+    order,
+    error_message,
+):
+    """Test StudentGroupAssignmentViewSet list endpoint order validation."""
+    # Arrange
+    login_teacher(client, teacher)
+    group.teacher.add(teacher)
+    teacher.current_groups.add(group)
+    url = reverse("REST:studentgroupassignment-list")
+    data = {
+        "assignment_pk": realistic_assignment.pk,
+        "due_date": timezone.now() + datetime.timedelta(days=1),
+        "group_pk": group.pk,
+        "order": order,
+        "show_correct_answers": True,
+    }
+
+    # Act
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+
+    # Assert
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert error_message in response.data["non_field_errors"]
+
+
+@pytest.mark.django_db
+def test_studentgroupassignment_list_order_validation_no_errors(
+    client, realistic_assignment, group, teacher
+):
+    """Test StudentGroupAssignmentViewSet list endpoint order validation."""
+    # Arrange
+    login_teacher(client, teacher)
+    group.teacher.add(teacher)
+    teacher.current_groups.add(group)
+    url = reverse("REST:studentgroupassignment-list")
+    data = {
+        "assignment_pk": realistic_assignment.pk,
+        "due_date": timezone.now() + datetime.timedelta(days=1),
+        "group_pk": group.pk,
+        "order": "0,1",
+        "show_correct_answers": True,
+    }
+
+    # Act
+    response = client.post(
+        url,
+        data,
+        content_type="application/json",
+    )
+
+    # Assert
     assert response.status_code == status.HTTP_201_CREATED
 
-    response = client.post(url, {"score": 1, "answer": answers[0].pk})
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "order, error_message",
+    [
+        (
+            "3,4",
+            "Given `order` has at least one value bigger than the number of questions.",  # noqa E501
+        ),
+        (
+            "-3,4",
+            "Given `order` has negative values.",
+        ),
+        (
+            "123123",
+            "Given `order` has at least one value bigger than the number of questions.",  # noqa E501
+        ),
+    ],
+)
+def test_studentgroupassignment_detail_order_validation_errors(
+    client, realistic_assignment, group, teacher, order, error_message
+):
+    """Test StudentGroupAssignmentViewSet detail endpoint order validation."""
+    # Arrange
+    login_teacher(client, teacher)
+    group.teacher.add(teacher)
+    teacher.current_groups.add(group)
+    sga = StudentGroupAssignment.objects.create(
+        assignment=realistic_assignment,
+        due_date=timezone.now() + datetime.timedelta(days=1),
+        group=group,
+        show_correct_answers=True,
+    )
+    url = reverse("REST:studentgroupassignment-detail", args=(sga.pk,))
+    data = {"order": order}
+
+    # Act
+    response = client.patch(
+        url,
+        data,
+        content_type="application/json",
+    )
+
+    # Assert
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert error_message in response.data["non_field_errors"]
 
 
 @pytest.mark.django_db
@@ -725,3 +876,15 @@ def test_studentgroupassignmentviewset_queryset(
                 pk=obj["pk"]
             ).group.teacher.all()
         )
+
+
+@pytest.mark.django_db
+def test_feedback_duplication(client, teacher, answers):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-feedback-list")
+    response = client.post(url, {"score": 1, "answer": answers[0].pk})
+    assert response.status_code == status.HTTP_201_CREATED
+
+    response = client.post(url, {"score": 1, "answer": answers[0].pk})
+    assert response.status_code == status.HTTP_400_BAD_REQUEST

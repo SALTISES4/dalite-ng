@@ -15,7 +15,7 @@ from peerinst.models import Category
         ("cAtEgOrY", "cAtEgOrY"),
     ],
 )
-def test_category_save_no_error_cases(title, expected_title):
+def test_category_save_no_errors(title, expected_title):
     # Act
     category = Category.objects.create(title=title)
 

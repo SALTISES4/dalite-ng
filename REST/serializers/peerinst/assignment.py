@@ -260,17 +260,8 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         return {"score": pi[0], "label": pi[1], "value": pi[2]}
 
     def get_urls(self, obj):
-        return {
-            "add_answer_choices": reverse(
-                "answer-choice-form", args=(obj.pk,)
-            ),  # TODO: Remove for RO type
-            "add_expert_rationales": reverse(
-                "research-fix-expert-rationale", args=(obj.pk,)
-            ),  # TODO: Remove for RO type
+        urls = {
             "add_new_question": reverse("question-create"),
-            "add_sample_answers": reverse(
-                "sample-answer-form", args=(obj.pk,)
-            ),  # TODO: Remove for RO type
             "addable_assignments": reverse(
                 "REST:teacher-assignment-for-question", args=(obj.pk,)
             ),
@@ -280,13 +271,25 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "fix": reverse(
                 "question-fix", args=(obj.pk,)
             ),  # TODO: Is this still needed?
-            "matrix": reverse(
-                "REST:question-matrix", args=(obj.pk,)
-            ),  # TODO: Remove for RO type?
             "rationales": reverse("REST:question-rationales", args=(obj.pk,)),
             "test": reverse("question-test", args=(obj.pk,)),
             "update": reverse("teacher:question-update", args=(obj.pk,)),
         }
+        if obj.type == "PI":
+            urls.update(
+                add_answer_choices=reverse(
+                    "answer-choice-form", args=(obj.pk,)
+                ),
+                add_expert_rationales=reverse(
+                    "research-fix-expert-rationale", args=(obj.pk,)
+                ),
+                add_sample_answers=reverse(
+                    "sample-answer-form", args=(obj.pk,)
+                ),
+                matrix=reverse("REST:question-matrix", args=(obj.pk,)),
+            )
+
+        return urls
 
     def validate_image(self, value):
         ALLOWED_IMAGE_FORMATS = ["PNG", "GIF", "JPEG"]
@@ -900,7 +903,7 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
     )
     issueCount = serializers.SerializerMethodField()
     order = serializers.CharField(
-        max_length=1000
+        max_length=1000, required=False
     )  # Arbitrary upper limit as safeguard
     progress = serializers.SerializerMethodField()
     questionCount = serializers.SerializerMethodField()
@@ -976,6 +979,14 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
 
         - See Teacher model
         """
+        if "request" not in self.context:
+            logger.error(
+                f"Cannot validate student group outside of a request: {student_group}"  # noqa
+            )
+            raise serializers.ValidationError(
+                "Cannot validate student group outside of a request."
+            )
+
         teacher = self.context["request"].user.teacher
 
         if (
@@ -988,25 +999,39 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
         logger.error(f"Invalid student group: {student_group}")
         raise serializers.ValidationError("Invalid student group.")
 
-    def validate_order(self, data):
-        logger.info(f"Order: {data}")
-        # TODO: Reimplement custom validation in model through validators and update
-        # raise serializers.ValidationError("Invalid question order.")
-        return data
-
     def validate(self, data):
         """Check unique_together constraint on assignment and group."""
-        assignment = data["assignment"]
-        group = data["group"]
-        if StudentGroupAssignment.objects.filter(
+        assignment = (
+            data["assignment"]
+            if "assignment" in data
+            else self.instance.assignment
+        )
+        group = data["group"] if "group" in data else self.instance.group
+        queryset = StudentGroupAssignment.objects.filter(
             assignment=assignment, group=group
-        ).exists():
+        )
+        if self.instance:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.exists():
             logger.error(
                 f"Assignment {assignment} already distributed to {group}."
             )
             raise serializers.ValidationError(
                 f"Assignment already distributed to {group}."
             )
+
+        """Check order."""
+        if "order" in data:
+            if self.instance:
+                if err := self.instance._verify_order(data["order"]):
+                    logger.error(err)
+                    raise serializers.ValidationError(err)
+            elif err := StudentGroupAssignment.verify_order(
+                data["order"], data["assignment"].questions.count()
+            ):
+                raise serializers.ValidationError(err)
+
         return data
 
     def create(self, validated_data):
