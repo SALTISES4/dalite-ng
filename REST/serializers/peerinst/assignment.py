@@ -264,7 +264,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "addable_assignments": reverse(
                 "REST:teacher-assignment-for-question", args=(obj.pk,)
             ),
-            "copy_question": "",  # TODO: Revise logic on copy
+            "copy": reverse("teacher:question-copy", args=(obj.pk,)),
             "fix": reverse(
                 "question-fix", args=(obj.pk,)
             ),  # TODO: Is this still needed?
@@ -424,7 +424,6 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         """Create question and attach user"""
         question = super().create(validated_data)
         question.user = self.context["request"].user
-        question.save()
 
         """Create answer choices, sample answers and expert rationales"""
         for i, data in enumerate(answerchoice_data, 1):
@@ -433,6 +432,11 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             expert_answers = (
                 data.pop("expert_answers") if "expert_answers" in data else []
             )
+
+            # By definition, pk cannot be passed on create
+            if "pk" in data:
+                data.pop("pk")
+
             AnswerChoice.objects.create(question=question, **data)
             for sample_answer in sample_answers:
                 Answer.objects.create(
@@ -448,6 +452,8 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                     question=question,
                     rationale=expert_answer["rationale"],
                 )
+
+        question.save()
 
         return question
 
@@ -645,6 +651,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "most_convincing_rationales",
             "peer_impact",
             "rationale_selection_algorithm",
+            "parent",
             "pk",
             "text",
             "title",

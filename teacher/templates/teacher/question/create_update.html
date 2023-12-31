@@ -38,12 +38,14 @@
             superIcon: "{% static 'components/img/editor/super.svg' %}",
             linkIcon: "{% static 'components/img/editor/link.svg' %}",
           },
+          copy: {% if copy %}true{% else %}false{% endif %},
           {% if object %}pk: {{ object.pk }},{% endif %}
           urls: {
             create: "{% url 'REST:teacher-question-create-update-list' %}",
             categories: "{% url 'REST:search-category-list' %}",
             disciplines: "{% url 'REST:discipline-list' %}",
             library: "{% url 'teacher:library' request.user.teacher.pk %}",
+            questions: "{% url 'REST:question-list' %}",
             teachers: "{% url 'REST:search-teacher-list' %}"
           }
         });

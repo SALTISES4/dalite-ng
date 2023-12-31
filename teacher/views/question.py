@@ -12,6 +12,21 @@ class QuestionCreateView(
     template_name = "teacher/question/create_update.html"
 
 
+class QuestionCopyView(
+    TeacherRequiredMixin, TOSAcceptanceRequiredMixin, DetailView
+):
+    http_method_names = ["get"]
+    template_name = "teacher/question/create_update.html"
+    queryset = Question.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context.update(
+            copy=True,
+        )
+        return context
+
+
 class QuestionUpdateView(
     TeacherRequiredMixin, TOSAcceptanceRequiredMixin, DetailView
 ):

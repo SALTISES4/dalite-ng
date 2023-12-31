@@ -29,6 +29,11 @@ question_patterns = [
         name="question-create",
     ),
     path(
+        "copy/<int:pk>/",
+        views.QuestionCopyView.as_view(),
+        name="question-copy",
+    ),
+    path(
         "update/<int:pk>/",
         views.QuestionUpdateView.as_view(),
         name="question-update",
