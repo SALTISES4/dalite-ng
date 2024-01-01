@@ -18,6 +18,8 @@ class TeacherAssignmentCRUDViewSet(TeacherCRUDViewSet):
     - Validates editability before update or delete
     """
 
+    lookup_field = "identifier"
+    lookup_value_converter = "string"
     serializer_class = AssignmentSerializer
 
     def get_queryset(self):
@@ -25,7 +27,7 @@ class TeacherAssignmentCRUDViewSet(TeacherCRUDViewSet):
 
     def perform_destroy(self, instance):
         """
-        Queryset returns objects that are editable but not necessarily deletable.
+        Queryset returns objs that are editable but not necessarily deletable.
 
         - Explicitly check this object is deletable
         """
@@ -40,8 +42,7 @@ class TeacherAssignmentCRUDViewSet(TeacherCRUDViewSet):
     )
     def copy(self, request, pk):
         assignment_to_copy = get_object_or_404(Assignment, pk=pk)
-        identifier = request.data.get("identifier")
-        if identifier:
+        if identifier := request.data.get("identifier"):
             serializer = AssignmentSerializer(
                 data={
                     "pk": identifier,
@@ -71,7 +72,7 @@ class TeacherAssignmentCRUDViewSet(TeacherCRUDViewSet):
         url_path="addable-for-question/(?P<question_pk>[0-9]+)",
     )
     def for_question(self, request, question_pk=None):
-        # Return assignments to which given question can be added for this teacher
+        # Return assignments to which given question can be added for teacher
         question = get_object_or_404(Question, pk=question_pk)
         queryset = self.get_queryset().exclude(questions=question)
         pks = [a.pk for a in queryset if a.is_editable]
