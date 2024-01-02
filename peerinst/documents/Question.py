@@ -1,7 +1,6 @@
 from string import capwords
 
 import bleach
-from django.contrib.auth.models import User
 from django.urls import reverse
 from django_elasticsearch_dsl import Document
 from django_elasticsearch_dsl.fields import (
@@ -258,7 +257,7 @@ class QuestionDocument(Document):
         return super().get_queryset().select_related("discipline", "user")
 
     def get_instances_from_related(self, related_instance):
-        for model in [Category, Discipline, User]:
+        for model in [Category, Discipline]:
             if isinstance(related_instance, model):
                 return related_instance.question_set.all()
         for model in [AnswerChoice, QuestionFlag]:

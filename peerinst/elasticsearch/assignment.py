@@ -13,17 +13,25 @@ pp = pprint.PrettyPrinter()
 def assignment_search(search_string, filters=None):
     start = time.perf_counter()
 
-    q = Q(
-        "multi_match",
-        query=search_string,
-        fields=[
-            "title^2",
-            "description",
-        ],
-    ) | Q(
-        "nested",
-        path="owner",
-        query=Q("match", owner__username=search_string),
+    q = (
+        Q(
+            "multi_match",
+            query=search_string,
+            fields=[
+                "title^2",
+                "description",
+            ],
+        )
+        | Q(
+            "nested",
+            path="owner",
+            query=Q("match", owner__username=search_string),
+        )
+        | Q(
+            "nested",
+            path="questions",
+            query=Q("match", questions__title=search_string),
+        )
     )
 
     s = (

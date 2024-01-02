@@ -24,6 +24,9 @@ class AssignmentDocument(Document):
         properties={"username": TextField(analyzer=autocomplete)}
     )
     pk = KeywordField(index=False)
+    questions = NestedField(
+        properties={"title": TextField(analyzer=autocomplete)}
+    )
     question_count = IntegerField(index=False)
     title = TextField(analyzer=html_strip)
     urls = ObjectField(
