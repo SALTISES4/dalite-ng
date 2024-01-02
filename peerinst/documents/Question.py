@@ -230,6 +230,7 @@ class QuestionDocument(Document):
             "rationales": reverse(
                 "REST:question-rationales", args=(instance.pk,)
             ),
+            "test": reverse("question-test", args=(instance.pk,)),
             "update": reverse("teacher:question-update", args=(instance.pk,)),
         }
 
@@ -282,5 +283,4 @@ class QuestionDocument(Document):
             Category,
             Discipline,
             QuestionFlag,
-            User,
         ]

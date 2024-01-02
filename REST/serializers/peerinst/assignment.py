@@ -231,6 +231,12 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     most_convincing_rationales = serializers.ReadOnlyField(
         source="get_most_convincing_rationales"
     )
+    parent = NullablePrimaryKeyFormDataSerializer(
+        queryset=Question.objects.all(),
+        many=False,
+        allow_null=True,
+        required=False,
+    )
     peer_impact = serializers.SerializerMethodField()
     urls = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
@@ -483,6 +489,10 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                 _field.set(validated_data[field])
             else:
                 setattr(question, field, validated_data[field])
+
+        # Cannot change parent
+        if "parent" in validated_data:
+            validated_data.pop("parent")
 
         question.save()
 

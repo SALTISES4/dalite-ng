@@ -126,9 +126,7 @@ class MinimumResultsPagination(PageNumberPagination):
 
 
 class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    A simple ReadOnlyModelViewSet to return non-private collections.
-    """
+    """A simple ReadOnlyModelViewSet to return non-private collections."""
 
     pagination_class = MinimumResultsPagination
     permission_classes = [IsAuthenticated, IsTeacher]
@@ -142,9 +140,7 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class DisciplineViewSet(viewsets.ModelViewSet):
-    """
-    A simple ViewSet to serve list of current disciplines.
-    """
+    """A simple ViewSet to serve list of current disciplines."""
 
     permission_classes = [IsAuthenticated, IsNotStudent, IsAdminUserOrReadOnly]
     queryset = Discipline.objects.all()
@@ -303,7 +299,6 @@ class StudentReviewList(generics.ListAPIView):
         """
         return answers submitted by authenticated student
         """
-
         student = self.request.user
         return Answer.objects.filter(user_token=student.username)
 

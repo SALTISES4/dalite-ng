@@ -378,7 +378,7 @@ CSP_FRAME_ANCESTORS = [
 ELASTICSEARCH_DSL = {
     "default": {"hosts": "localhost:9200"},
 }
-ELASTICSEARCH_DSL_AUTOSYNC = False
+ELASTICSEARCH_DSL_AUTOSYNC = True
 
 # Functional tests that scrape web console logs currently require chromedriver
 TESTING_BROWSER = "chrome"
