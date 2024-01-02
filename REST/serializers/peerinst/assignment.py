@@ -50,7 +50,7 @@ class CategorySerializer(DocumentSerializer):
 
 class DisciplineSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
-        """Bleach on the way out."""
+        """Bleach and capitalize on the way out."""
         ret = super().to_representation(instance)
         ret["title"] = capwords(
             bleach.clean(ret["title"], tags=[], strip=True).strip()
