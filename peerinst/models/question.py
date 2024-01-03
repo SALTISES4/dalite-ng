@@ -208,7 +208,6 @@ class Question(models.Model):
     )
     category = models.ManyToManyField(
         Category,
-        _("Categories"),
         help_text=_(
             "Type to search and select at least one category for this "
             "question. You can select multiple categories."

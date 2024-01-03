@@ -427,9 +427,10 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     def create(self, validated_data):
         answerchoice_data = validated_data.pop("answerchoice_set")
 
-        """Create question and attach user"""
+        """Attach user"""
         question = super().create(validated_data)
-        question.user = self.context["request"].user
+        if "request" in self.context:
+            question.user = self.context["request"].user
 
         """Create answer choices, sample answers and expert rationales"""
         for i, data in enumerate(answerchoice_data, 1):
@@ -459,6 +460,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                     rationale=expert_answer["rationale"],
                 )
 
+        """Create question"""
         question.save()
 
         return question
@@ -482,6 +484,10 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             if question.user == self.request.user:
                 question.collaborators.set(collaborators_pk)
 
+        # Cannot change parent
+        if "parent" in validated_data:
+            validated_data.pop("parent")
+
         # Update remaining question fields
         for field in validated_data:
             if isinstance(validated_data[field], (list, tuple)):
@@ -490,10 +496,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             else:
                 setattr(question, field, validated_data[field])
 
-        # Cannot change parent
-        if "parent" in validated_data:
-            validated_data.pop("parent")
-
+        """Update question"""
         question.save()
 
         if answerchoice_data:
@@ -830,13 +833,13 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         Only used to reorder questions and change meta data.
         Adding/deleting questions is handled by serializer for through table.
         """
-        if "assignmentquestions_set" in validated_data:
-            if instance.is_editable:
-                for i, aq in enumerate(instance.assignmentquestions_set.all()):
-                    aq.rank = validated_data["assignmentquestions_set"][i][
-                        "rank"
-                    ]
-                    aq.save()
+        if (
+            "assignmentquestions_set" in validated_data
+            and instance.is_editable
+        ):
+            for i, aq in enumerate(instance.assignmentquestions_set.all()):
+                aq.rank = validated_data["assignmentquestions_set"][i]["rank"]
+                aq.save()
 
         for field in ["conclusion_page", "description", "intro_page", "title"]:
             if field in validated_data:

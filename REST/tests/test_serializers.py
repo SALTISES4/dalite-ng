@@ -9,9 +9,7 @@ from functional_tests.fixtures import (  # noqa
 )
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.teacher import login_teacher
-from REST.serializers import (
-    AssignmentSerializer,
-)
+from REST.serializers import AssignmentSerializer, QuestionSerializer
 
 
 @pytest.mark.django_db
@@ -118,3 +116,154 @@ def test_assignmentserializer_to_representation(realistic_assignment):
     assert assignment.data["conclusion_page"] == "<p>OK</p>"
     assert assignment.data["description"] == "<p>OK</p>"
     assert assignment.data["intro_page"] == "<p>OK</p>"
+
+
+@pytest.mark.django_db
+def test_questionserializer_create_set_pk():
+    """
+    Test QuestionSerializer create method.
+
+    Requirement:
+    1. pk cannot be set
+    """
+    question_serializer = QuestionSerializer(
+        data={
+            "title": "Question title",
+            "text": "Question text",
+            "type": "RO",
+            "pk": 4,
+        }
+    )
+    assert question_serializer.is_valid()
+    assert "pk" not in question_serializer.validated_data
+    question = question_serializer.save()
+    assert question.pk != 4
+
+
+@pytest.mark.django_db
+def test_questionserializer_create_set_parent(realistic_questions):
+    """
+    Test QuestionSerializer create method.
+
+    Requirement:
+    1. `parent` should be set if valid pk passed
+    2. If invalid pk passed, raise error
+    3. If nothing passed, set None
+    """
+    question_serializer = QuestionSerializer(
+        data={
+            "title": "Question title",
+            "text": "Question text",
+            "type": "RO",
+            "parent": realistic_questions[0].pk,
+        }
+    )
+    assert question_serializer.is_valid()
+    question = question_serializer.save()
+    assert question.parent.pk == realistic_questions[0].pk
+
+    question_serializer = QuestionSerializer(
+        data={
+            "title": "Another question title",
+            "text": "Question text",
+            "type": "RO",
+            "parent": 1000000000000,
+        }
+    )
+    question_serializer.is_valid()
+    assert question_serializer.errors["parent"][0].code == "does_not_exist"
+
+    question_serializer = QuestionSerializer(
+        data={
+            "title": "Another question title",
+            "text": "Question text",
+            "type": "RO",
+        }
+    )
+    question_serializer.is_valid()
+    question = question_serializer.save()
+    assert question.parent is None
+
+
+@pytest.mark.django_db
+def test_questionserializer_create_RO():
+    """
+    Test QuestionSerializer create method.
+
+    Requirement:
+    1. RO must have second_answer_needed as False
+    """
+    question_serializer = QuestionSerializer(
+        data={
+            "title": "Question title",
+            "text": "Question text",
+            "second_answer_needed": True,
+            "type": "RO",
+        }
+    )
+    assert question_serializer.is_valid()
+    question = question_serializer.save()
+    assert not question.second_answer_needed
+
+
+@pytest.mark.django_db
+def test_questionserializer_update_no_pk():
+    """
+    Test QuestionSerializer update method.
+
+    Requirement:
+    1. pk cannot be changed
+    """
+    question_serializer = QuestionSerializer(
+        data={
+            "title": "Question title",
+            "text": "Question text",
+            "type": "RO",
+        }
+    )
+    assert question_serializer.is_valid()
+    question = question_serializer.save()
+
+    update_serializer = QuestionSerializer(
+        instance=question,
+        partial=True,
+        data={"title": "New question title", "pk": 4},
+    )
+    assert update_serializer.is_valid()
+    assert "pk" not in update_serializer.validated_data
+    update_serializer.save()
+    question.refresh_from_db()
+    assert question.title == "New question title"
+    assert question.pk != 4
+
+
+@pytest.mark.django_db
+def test_questionserializer_update_parent(realistic_questions):
+    """
+    Test QuestionSerializer update method.
+
+    Requirement:
+    1. parent cannot be changed
+    """
+    question_serializer = QuestionSerializer(
+        data={
+            "title": "Question title",
+            "text": "Question text",
+            "type": "RO",
+            "parent": realistic_questions[0].pk,
+        }
+    )
+    assert question_serializer.is_valid()
+    question = question_serializer.save()
+
+    update_serializer = QuestionSerializer(
+        instance=question,
+        partial=True,
+        data={
+            "parent": realistic_questions[1].pk,
+        },
+    )
+    assert update_serializer.is_valid()
+    update_serializer.save()
+    question.refresh_from_db()
+    assert question.parent.pk == realistic_questions[0].pk

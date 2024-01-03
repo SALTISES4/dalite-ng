@@ -315,50 +315,6 @@ class QuestionListView(LoginRequiredMixin, NoStudentsMixin, ListView):
         return context
 
 
-# class QuestionCloneView(QuestionCreateView):
-#     """View to create a question from existing."""
-
-#     template_name = "peerinst/question/form.html"
-
-#     def get_initial(self, *args, **kwargs):
-#         super().get_initial(*args, **kwargs)
-#         question = get_object_or_404(models.Question, pk=self.kwargs["pk"])
-#         return {
-#             "text": question.text,
-#             "type": question.type,
-#             "image": question.image,
-#             "image_alt_text": question.image_alt_text,
-#             "video_url": question.video_url,
-#             "answer_style": question.answer_style,
-#             "category": question.category.all(),
-#             "discipline": question.discipline,
-#             "fake_attributions": question.fake_attributions,
-#             "sequential_review": question.sequential_review,
-#             "rationale_selection_algorithm": question.rationale_selection_algorithm,
-#             "grading_scheme": question.grading_scheme,
-#         }
-
-#     def get_object(self, queryset=None):
-#         # Remove link on object to pk to dump object permissions
-#         return None
-
-#     # Custom save is needed to attach parent question to clone
-#     def form_valid(self, form):
-#         form.instance.parent = get_object_or_404(
-#             models.Question, pk=self.kwargs["pk"]
-#         )
-#         if form.instance.type == "RO":
-#             form.instance.second_answer_needed = False
-#         return super().form_valid(form)
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context.update(
-#             parent=get_object_or_404(models.Question, pk=self.kwargs["pk"])
-#         )
-#         return context
-
-
 class AssignmentFixView(
     LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, DetailView
 ):
