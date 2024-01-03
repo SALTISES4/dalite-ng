@@ -19,7 +19,7 @@ class TeacherAssignmentCRUDViewSet(TeacherCRUDViewSet):
     """
 
     lookup_field = "identifier"
-    lookup_value_regex = "[-a-zA-Z0-9_\.\s]+"
+    lookup_value_regex = "[-a-zA-Z0-9_\.\s\:\;]+"
     serializer_class = AssignmentSerializer
 
     def get_queryset(self):
