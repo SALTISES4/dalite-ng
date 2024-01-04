@@ -76,7 +76,7 @@
               {
                 title: "{% trans 'Profile' %}",
                 icon: "account_box",
-                url: "{% url 'teacher-update' request.user.teacher.pk %}",
+                url: "{% url 'teacher-update' request.user.teacher.pk %}?next={{ request.path }}",
               },
               {
                 title: "{% trans 'Password' %}",

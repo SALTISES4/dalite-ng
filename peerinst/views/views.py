@@ -70,6 +70,7 @@ from peerinst.models import (
     Category,
     Collection,
     Discipline,
+    Institution,
     NewUserRequest,
     Question,
     RationaleOnlyQuestion,
@@ -1465,11 +1466,40 @@ class TeacherDetailView(TeacherBase, DetailView):
 
 
 class TeacherUpdate(TeacherBase, UpdateView):
-    """View for user to update teacher properties"""
+    """
+    View for user to update teacher properties.
+
+    Passes as context typical Django ModelForm as well as raw
+    data needed to construct custom form (e.g. via MUI)
+    """
 
     model = Teacher
     fields = ["institutions", "disciplines"]
     template_name = "peerinst/teacher/form.html"
+
+    def get_success_url(self):
+        return self.request.GET.get(
+            "next",
+            reverse("teacher:dashboard", args=(self.request.user.teacher.pk,)),
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            disciplineOptions=list(Discipline.objects.values("pk", "title")),
+            disciplines=list(
+                self.request.user.teacher.disciplines.values_list(
+                    "pk", flat=True
+                )
+            ),
+            institutionOptions=list(Institution.objects.values("pk", "name")),
+            institutions=list(
+                self.request.user.teacher.institutions.values_list(
+                    "pk", flat=True
+                )
+            ),
+        )
+        return context
 
 
 class TeacherAssignments(TeacherBase, ListView):

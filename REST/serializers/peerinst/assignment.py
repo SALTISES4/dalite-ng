@@ -466,13 +466,6 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         return question
 
     def update(self, question, validated_data):
-        """
-        If answerchoice_set is present:
-        - If pk is provided, instance will be updated
-        - If pk is missing, instance will be created
-        - If existing answerchoice is missing, it will be deleted with related models
-        - Same logic for sample and expert answers
-        """
         answerchoice_data = None
         if "answerchoice_set" in validated_data:
             answerchoice_data = validated_data.pop("answerchoice_set")
@@ -500,6 +493,13 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         question.save()
 
         if answerchoice_data:
+            """
+            If answerchoice_set is present:
+            - If pk is provided, instance will be updated
+            - If pk is missing, instance will be created
+            - If existing answerchoice is missing, it will be deleted with related models
+            - Same logic for sample and expert answers
+            """
             existing_answerchoices = set(
                 question.answerchoice_set.values_list("pk", flat=True)
             )
@@ -708,6 +708,8 @@ class RankSerializer(serializers.ModelSerializer):
 
     def get_unique_together_validators(self):
         """
+        Override default.
+
         Have to override the unique_together constraint in order
         to support update as nested field in AssignmentSerializer
         """
@@ -726,8 +728,8 @@ class RankSerializer(serializers.ModelSerializer):
             assignment.is_editable
             and self.context["request"].user in assignment.owner.all()
         ):
-            if assignment.questions.all():
-                added_question = AssignmentQuestions.objects.create(
+            return (
+                AssignmentQuestions.objects.create(
                     assignment=assignment,
                     question=question,
                     rank=assignment.questions.aggregate(
@@ -735,13 +737,13 @@ class RankSerializer(serializers.ModelSerializer):
                     )["assignmentquestions__rank__max"]
                     + 1,
                 )
-            else:
-                added_question = AssignmentQuestions.objects.create(
+                if assignment.questions.all()
+                else AssignmentQuestions.objects.create(
                     assignment=assignment,
                     question=question,
                     rank=1,
                 )
-            return added_question
+            )
         raise PermissionDenied
 
     class Meta:

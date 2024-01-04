@@ -145,7 +145,7 @@ def test_questionserializer_create_set_parent(realistic_questions):
     """
     Test QuestionSerializer create method.
 
-    Requirement:
+    Requirements:
     1. `parent` should be set if valid pk passed
     2. If invalid pk passed, raise error
     3. If nothing passed, set None
@@ -207,7 +207,7 @@ def test_questionserializer_create_RO():
 
 
 @pytest.mark.django_db
-def test_questionserializer_update_no_pk():
+def test_questionserializer_update_set_pk():
     """
     Test QuestionSerializer update method.
 
@@ -238,12 +238,12 @@ def test_questionserializer_update_no_pk():
 
 
 @pytest.mark.django_db
-def test_questionserializer_update_parent(realistic_questions):
+def test_questionserializer_update_set_parent(realistic_questions):
     """
     Test QuestionSerializer update method.
 
     Requirement:
-    1. parent cannot be changed
+    1. `parent` cannot be changed
     """
     question_serializer = QuestionSerializer(
         data={

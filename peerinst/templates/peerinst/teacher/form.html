@@ -1,61 +1,42 @@
 {% extends 'peerinst/teacher/base.html' %}
 
-{% load i18n add_class compress %}
+{% load compress static %}
 
-{% block stylesheets %}
-  {{ block.super }}
-  <style nonce="{{ request.csp_nonce }}">
-    label {
-      padding-right: 10px;
-    }
-  </style>
+{% block apps %}
+  {% compress js file profile_settings %}
+    <script
+      src="{% static 'components/js/build/updateProfile.min.js' %}"
+      defer="true"
+    ></script>
+  {% endcompress %}
 {% endblock %}
 
-{% block body %}
-  <main>
-    <section>
-      <h1 class="mdc-typography--display3">{% trans 'Identity' %}
-        <svg class="underline" width=150 height=4></svg>
-      </h1>
+{% block injected_apps %}
+  {{ block.super }}
+  <form method="post">
+    {% csrf_token %}
+    <div id="profile-settings-app"></div>
+  </form>
+{% endblock %}
 
-      <div class="admin-link">
-        <a href="{% url 'teacher' user.teacher.id %}">{% trans 'Back to My Account' %}</a>
-      </div>
-
-      <h2 class="mdc-typography--display1 mdc-theme--secondary">{% trans 'Discipline and institution' %}</h2>
-
-      <div class='field-container'>
-        <div class='number-box'><span class='number'>?</span></div>
-        <div class='field'>
-          <p class="mdc-theme--secondary"><small>
-            {% blocktrans %}
-              Select content disciplines and the institutions where you teach.  You can select multiple choices using the shift button.
-            {% endblocktrans %}
-          </small></p>
-        </div>
-      </div>
-      <br>
-
-      {{ form.non_field_errors }}
-
-      <form action="{% url 'teacher-update' object.id %}" method="post">
-        {% csrf_token %}
-
-        <div class='mdc-form-field'>
-          <label for='id_institutions'>{{ form.institutions.label }}:</label>
-          {{ form.institutions|add_class:'multiple-select mdc-theme--background' }}
-        </div>
-        {{ form.institutions.errors }}
-
-        <div class='padded-top'>
-          <div id='discipline_form'>
-            {% include 'peerinst/disciplines_select_form.html' %}
-          </div>
-        </div>
-
-        <input id="update-identity" class="mdc-button mdc-button--raised padded-top" type="submit" value="{% trans 'Update' %}"/>
-      </form>
-
-    </section>
-  </main>
+{% block scripts %}
+  {{ block.super }}
+  <script nonce="{{ request.csp_nonce }}">
+    window.addEventListener("load", function () {
+      const profileApp = () => {
+        return updateProfile.h(updateProfile.App, {
+          gettext: gettext,
+          nonce: "{{ request.csp_nonce }}",
+          disciplineOptions: {{ disciplineOptions|safe }},
+          disciplines: {{ disciplines|safe }},
+          institutionOptions: {{ institutionOptions|safe }},
+          institutions: {{ institutions|safe }},
+        })
+      };
+      updateProfile.render(
+        profileApp(),
+        document.getElementById("profile-settings-app")
+      );
+    });
+  </script>
 {% endblock %}
