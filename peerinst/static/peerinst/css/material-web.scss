@@ -91,6 +91,14 @@ md-outlined-text-field {
         width: calc(100% + 40px);
     }
 
+    & md-outlined-text-field {
+        margin-bottom: 10px;
+    }
+
+    & >*:last-child {
+        margin-bottom: 0px;
+    }
+
     & ul.errorlist, ul.messages {
         background-color: $error-light;
         border-radius: 4px;
