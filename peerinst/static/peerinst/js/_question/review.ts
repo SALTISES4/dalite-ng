@@ -34,19 +34,19 @@ function view() {
 }
 
 function submitButtonView() {
-  if (model.submitAllowed) {
-    // $FlowFixMe
-    document.getElementById("answer-form").disabled = false;
+  // Toggle disabled
+  const form = document.getElementById("answer-form") as HTMLFormElement;
+  if (form && model.submitAllowed) {
+    form.disabled = false;
   } else {
-    // $FlowFixMe
-    document.getElementById("answer-form").disabled = true;
+    form.disabled = true;
   }
 }
 
 function showMeMore() {
   [].forEach.call(
     document.querySelectorAll(".expand-button"),
-    function (el, i) {
+    function (el: HTMLElement, i: number) {
       el.addEventListener("click", function () {
         const els = document.getElementsByClassName(
           `hidden-${el.getAttribute("data-rationale-iterator")}`,
@@ -57,8 +57,8 @@ function showMeMore() {
         let shownCounter = 0;
 
         for (let i = 0; i < els.length; i++) {
-          if (els[i].hidden == true && shownCounter < 2) {
-            els[i].hidden = false;
+          if ((els[i] as HTMLElement).hidden == true && shownCounter < 2) {
+            (els[i] as HTMLElement).hidden = false;
             shownCounter++;
 
             if (i == els.length - 1) {
@@ -66,11 +66,20 @@ function showMeMore() {
               break;
             }
 
-            showCounter.setAttribute(
-              "value",
-              +showCounter.getAttribute("value") + 1,
-            );
+            if (showCounter) {
+              showCounter.setAttribute(
+                "value",
+                `${+(showCounter.getAttribute("value") || 0) + 1}`,
+              );
+            }
           }
+        }
+
+        if (
+          el.parentNode?.querySelectorAll("[class^=hidden][hidden]").length ==
+          0
+        ) {
+          (el as HTMLElement).style.display = "none";
         }
       });
     },
@@ -85,7 +94,7 @@ function showMeMore() {
 function listeners() {
   [].forEach.call(
     document.querySelectorAll("#submit-answer-form input[type=radio]"),
-    (el) => el.addEventListener("click", allowSubmit),
+    (el) => (el as HTMLInputElement).addEventListener("change", allowSubmit),
   );
 }
 

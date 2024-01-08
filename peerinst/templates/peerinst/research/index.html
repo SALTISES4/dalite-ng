@@ -9,7 +9,7 @@
       <h4 id="title" class="mdc-typography--title bold">{% trans 'Disciplines' %}</h4>
 
       <div class="admin-link">
-        <a href="{% url 'browse-database' %}">{% trans 'Back to Browse' %}</a>
+        <a href="{% url 'teacher:search' %}">{% trans 'Back to Browse' %}</a>
       </div>
       <ul>
         {% for d in disciplines %}

@@ -9,8 +9,8 @@ from REST.permissions import InTeacherList, IsNotStudent
 
 
 @pytest.mark.django_db
-def test_is_not_student_permission(client, rf, student, teacher):
-
+def test_isnotstudent_permission(client, rf, student, teacher):
+    """Test IsNotStudent permission."""
     rf.user = student.student
 
     assert not IsNotStudent().has_permission(rf, None)
@@ -21,10 +21,10 @@ def test_is_not_student_permission(client, rf, student, teacher):
 
 
 @pytest.mark.django_db
-def test_is_not_student_permission_in_view(
+def test_isnotstudent_permission_in_view(
     client, student, student_group_assignment
 ):
-
+    """Test IsNotStudent permission applied to REST endpoint."""
     assert login_student(client, student)
 
     url = reverse(
@@ -34,17 +34,16 @@ def test_is_not_student_permission_in_view(
             student_group_assignment.assignment.questions.first().pk,
         ],
     )
-
     response = client.get(url)
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 @pytest.mark.django_db
-def test_in_teacher_list_permission(
+def test_inteacherlist_permission(
     client, rf, student_group_assignment, teacher
 ):
-
+    """Test InTeacherList permission."""
     rf.user = teacher.user
 
     assert not InTeacherList().has_object_permission(
@@ -56,11 +55,9 @@ def test_in_teacher_list_permission(
     assert InTeacherList().has_object_permission(
         rf, None, student_group_assignment
     )
-
     assert InTeacherList().has_object_permission(
         rf, None, student_group_assignment.group
     )
-
     with pytest.raises(AttributeError):
         assert InTeacherList().has_object_permission(
             rf, None, student_group_assignment.group.group
@@ -68,11 +65,11 @@ def test_in_teacher_list_permission(
 
 
 @pytest.mark.django_db
-def test_in_teacher_list_permission_in_view(
+def test_inteacherlist_permission_in_view(
     client, student_group_assignment, teacher
 ):
+    """Test InTeacherList permission applied to REST endpoint."""
     assert teacher not in student_group_assignment.group.teacher.all()
-
     assert login_teacher(client, teacher)
 
     url = reverse(
@@ -82,7 +79,6 @@ def test_in_teacher_list_permission_in_view(
             student_group_assignment.assignment.questions.first().pk,
         ],
     )
-
     response = client.get(url)
 
     # 404 based on limited queryset

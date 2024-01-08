@@ -1,3 +1,4 @@
+import bleach
 from django_elasticsearch_dsl import Document
 from django_elasticsearch_dsl.fields import SearchAsYouTypeField, TextField
 from django_elasticsearch_dsl.registries import registry
@@ -8,6 +9,8 @@ from peerinst.models import Category
 
 @registry.register_document
 class CategoryDocument(Document):
+    """ElasticSearch document for Category model."""
+
     title = TextField(
         fields={
             "raw": SearchAsYouTypeField(
@@ -19,6 +22,14 @@ class CategoryDocument(Document):
             ),
         },
     )
+
+    def prepare_title(self, instance):
+        """Bleach on the way out."""
+        return bleach.clean(
+            instance.title,
+            tags=[],
+            strip=True,
+        ).strip()
 
     class Index:
         name = "categories"

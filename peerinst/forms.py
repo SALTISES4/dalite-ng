@@ -26,6 +26,7 @@ from .models import (
 )
 from .validators import (
     EnglishFrenchValidator,
+    MaxCharactersValidator,
     MinWordsValidator,
     NoProfanityValidator,
 )
@@ -68,6 +69,10 @@ class RichTextRationaleField(forms.CharField):
             4,
             _("Please provide a more detailed rationale for your choice."),
         ),
+        MaxCharactersValidator(
+            4000,
+            _("Please provide a less detailed rationale for your choice."),
+        ),
         NoProfanityValidator(
             0.7,
             _(
@@ -105,9 +110,7 @@ class FirstAnswerForm(forms.Form):
 
     def __init__(self, answer_choices, *args, **kwargs):
         choice_texts = [
-            mark_safe(
-                f"<div class='flex-label'><div><strong>{pair[0]}.</strong></div><div>{pair[1]}</div></div>"  # noqa E501
-            )
+            mark_safe(f"<strong>{pair[0]}.</strong> {pair[1]}")  # noqa E501
             for pair in answer_choices
         ]
         self.base_fields["first_answer_choice"].choices = enumerate(
@@ -117,7 +120,6 @@ class FirstAnswerForm(forms.Form):
 
 
 class RationaleOnlyForm(forms.Form):
-
     error_css_class = "validation-error"
 
     rationale = RichTextRationaleField()
@@ -149,7 +151,10 @@ class ReviewAnswerForm(forms.Form):
         show_more_counters = []
         show_more_labels = []
         rationale_id_list = []
-        for i, (choice, label, rationales) in enumerate(rationale_choices):
+        texts = []
+        for i, (choice, label, rationales, text) in enumerate(
+            rationale_choices
+        ):
             rationales = [
                 (id_ if id_ is not None else "None", rationale)
                 for id_, rationale in rationales
@@ -175,6 +180,7 @@ class ReviewAnswerForm(forms.Form):
             answer_choices.append((choice, label))
             rationale_choice_fields.append(self[field_name])
             rationale_id_list.append(rationale_ids)
+            texts.append(text)
         self.fields["second_answer_choice"].choices = answer_choices
         self.rationale_groups = list(
             zip(
@@ -183,6 +189,7 @@ class ReviewAnswerForm(forms.Form):
                 show_more_counters,
                 show_more_labels,
                 rationale_id_list,
+                texts,
             )
         )
 
@@ -196,6 +203,7 @@ class ReviewAnswerForm(forms.Form):
                 _show_more_counter,
                 label,
                 rationale_ids,
+                _text,
             ) in self.rationale_groups:
                 shown_rationales.extend(
                     rationale_ids[i]
@@ -242,25 +250,6 @@ class SequentialReviewForm(forms.Form):
         else:
             raise forms.ValidationError(_("Please vote up or down."))
         return cleaned_data
-
-
-class AssignmentCreateForm(forms.ModelForm):
-    """Simple form to create a new Assignment"""
-
-    class Meta:
-        model = Assignment
-        fields = [
-            "identifier",
-            "title",
-            "description",
-            "intro_page",
-            "conclusion_page",
-        ]
-        widgets = {
-            "description": TinyMCE(),
-            "intro_page": TinyMCE(),
-            "conclusion_page": TinyMCE(),
-        }
 
 
 class AssignmentMultiselectForm(forms.Form):
@@ -389,7 +378,6 @@ class CategorySelectForm(forms.Form):
 
 
 class ReportSelectForm(forms.Form):
-
     student_groups = forms.ModelMultipleChoiceField(
         label=_("Choose which groups to include in report:"),
         widget=forms.CheckboxSelectMultiple,

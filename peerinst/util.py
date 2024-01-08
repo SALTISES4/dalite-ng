@@ -292,7 +292,7 @@ def question_search_function(
     or username.
     """
     """
-    is_old_query is True when query is sent from assignment or blink view
+    is_old_query is True when query is sent from assignment view
     """
     from peerinst.models import Question
 
@@ -511,7 +511,6 @@ def report_data_by_assignment(
         question_list = []
         d3_data = []
         for q in a.questions.order_by("assignmentquestions__rank"):
-
             answer_qs_question = answer_qs.filter(question_id=q.id)
 
             d_q = {}
@@ -761,14 +760,12 @@ def report_data_by_assignment(
 
 
 def report_data_transitions_dict(assignment_list, student_groups):
-
     from peerinst.models import Question
 
     student_transitions_by_q = {}
     for q in Question.objects.filter(
         assignment__identifier__in=assignment_list, type="PI"
     ):
-
         correct_answer_choices = get_correct_answer_choices(q)
 
         transitions = report_data_transitions(
@@ -789,7 +786,6 @@ def report_data_transitions_dict(assignment_list, student_groups):
 
 
 def report_data_by_student(assignment_list, student_groups):
-
     from peerinst.models import Question, Student
 
     # needs DRY
@@ -826,7 +822,6 @@ def report_data_by_student(assignment_list, student_groups):
     # aggregate results for each student
     for question, student_entries in list(student_transitions_by_q.items()):
         for student_entry in student_entries:
-
             student_obj = Student.objects.get(
                 student__username=student_entry["user_token"]
             )
@@ -853,7 +848,6 @@ def report_data_by_student(assignment_list, student_groups):
             else:
                 d_g[metric_label] = 0
         for question in question_list:
-
             try:
                 d_g[question] = student_gradebook_dict_by_q[student_obj][
                     question
@@ -991,7 +985,6 @@ def load_shown_rationales_from_ltievent_logs(day_of_logs):
     for e in event_logs.iterator():
         e_json = e.event_log
         if e_json["event_type"] == "save_problem_success":
-
             try:
                 try:
                     shown_for_answer = Answer.objects.get(
@@ -1138,7 +1131,6 @@ def populate_answer_start_time_from_ltievent_logs(day_of_logs, event_type):
         # we are ignoring save_problem_success events, as they have already
         # been handled
         if e_json["event_type"] == event_type:
-
             answer_obj = get_answer_corresponding_to_ltievent_log(
                 event_json=e_json
             )

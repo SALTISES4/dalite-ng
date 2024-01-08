@@ -1,163 +1,206 @@
 {% extends 'peerinst/question/base.html' %}
 
-{% load add_class bleach_html compress i18n static %}
+{% load bleach_html i18n %}
+
+{% block appbar %}
+  {% if user.teacher %}
+    {% if first_choice_label and second_choice_label or first_choice_label and question.type == 'RO' %}
+      <div class="m3-appbar">
+        <div class="mui-container">
+          <div class="icon-button-tray">
+            <md-icon-button
+              aria-label="{% trans 'Reset answers' %}"
+              href="{% if assignment %}{% url 'reset-question' assignment_id=assignment.pk question_id=question.id %}{% else %}{% url 'question-reset' question_id=question.id %}{% endif %}"
+              title="{% trans 'Reset answers' %}"
+              type="button"
+            >
+              <md-icon>restart_alt</md-icon>
+            </md-icon-button>
+            {% if access_teacher and assignment %}
+              <md-icon-button
+                aria-label="{% trans 'Return to assignment' %}"
+                href="{% url 'question-list' assignment_id=assignment.pk %}"
+                title="{% trans 'Return to assignment' %}"
+                type="button"
+              >
+                <md-icon>assignment</md-icon>
+              </md-icon-button>
+            {% endif %}
+            {% if question.user == user or user in question.collaborators.all %}
+              {% if question.is_editable %}
+                <md-icon-button
+                  aria-label="{% trans 'Update question' %}"
+                  href="{% url 'teacher:question-update' pk=question.id %}"
+                  title="{% trans 'Update question' %}"
+                  type="button"
+                >
+                  <md-icon>edit</md-icon>
+                </md-icon-button>
+              {% endif %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+{% endblock %}
 
 {% block body %}
-  <main>
-    <section>
-      <div class="meta-container">
+  <div class="mui-container">
+    {% block pretext %}{% endblock %}
 
-        <div class="container">
+    {% if assignment %}
+      <h1>{{ assignment.title }}</h1>
+    {% else %}
+      <h1>{% trans 'Question preview' %}</h1>
+    {% endif %}
 
-          {% block pretext %}{% endblock %}
-          <h1 class="mdc-typography--display3">{% trans 'Question' %}
-            <svg class="underline" width=150 height=4></svg>
-          </h1>
+    {% block extra_title %}{% endblock %}
 
-          {% if not user.student and assignment %}
-            <div class="admin-link">
-              {% if access_teacher %}
-                <a href="{% url 'question-list' assignment_id=assignment.pk %}">{% trans 'Back to assignment' %}</a>
-                {% if question.user == user or user in question.collaborators.all %}
-                  <span class="admin-link--padded">|</span><a href="{% url 'question-update' question.id %}">{% trans 'Edit question' %}</a>
-                {% endif %}
-              {% endif %}
-              {% if first_choice_label and second_choice_label or first_choice_label and question.type == 'RO' %}
-                <span class="admin-link--padded">|</span><a href="{% url 'reset-question' assignment_id=assignment.pk question_id=question.id %}">{% trans 'Reset answers' %}</a>
-              {% endif %}
-            </div>
-          {% endif %}
+    <div class="m3-question-card">
+      <h3>{{ question.title|bleach_html|safe }}</h3>
 
-          {% block extra_title %}{% endblock %}
+      <md-divider></md-divider>
 
-          <h2 class="mdc-typography--display1 mdc-theme--secondary">{{ question.title|bleach_html|safe }}</h2>
-
-          {% block messages %}
-            {% if messages %}
-              <ul class="messages">
-                {% for message in messages %}
-                  <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                {% endfor %}
-              </ul>
-            {% endif %}
-          {% endblock %}
-
-          <div class="mdc-typography--body1">
-            {{ question.text|bleach_html|safe }}
-          </div>
-
-          {% if question.image %}
-            <img class="question-image" src="{{ question.image.url }}" height="{{ question.image.height }}"
-              width="{{ question.image.width }}" alt="question.image_alt_text">
-          {% endif %}
-
-          {% if question.video_url %}
-            <div id="question-video">
-              <object class="question-image" width="640" height="390" data="{{ question.video_url }}"></object>
-            </div>
-          {% endif %}
-
-          {% block answers %}{% endblock %}
-
-          {% if form %}
-            {% if form.errors.first_answer_choice %}
-              {{ form.errors.first_answer_choice }}
-            {% endif %}
-            {% for error in form.non_field_errors %}
-              {{ error }}
+      {% block messages %}
+        {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+              <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
             {% endfor %}
-            {% block form %}
-              <form id="submit-answer-form" method="post">
-                {% csrf_token %}
-                {{ form.datetime_start }}
-                {% block inner_form %}
-                  <ul>
-                    {% for choice in form.first_answer_choice %}
-                      <li>
-                        <div class="mdc-form-field flex-align-top">
-                          <div class="mdc-radio" data-mdc-auto-init="MDCRadio">
-                            {{ choice.tag|add_class:"mdc-radio__native-control" }}
-                            <div class="mdc-radio__background">
-                              <div class="mdc-radio__outer-circle"></div>
-                              <div class="mdc-radio__inner-circle"></div>
-                            </div>
-                          </div>
-                          <label class="mdc-typography--body1" for="{{ choice.id_for_label }}">{{ choice.choice_label.strip|bleach_html|safe }}</label>
-                        </div>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                  {% if form.errors.rationale %}
-                    {{ form.errors.rationale }}
-                  {% endif %}
-                  {{ form.rationale }}
-                {% endblock %}
-                {% if not assignment_expired %}
-                  <div>
-                    <input id="answer-form"
-                      class="mdc-button mdc-button--raised padded-top"
-                      type="submit"
-                      value="{% block submit_button %}{% trans 'Next' %}{% endblock %}" />
-                  </div>
-                {% endif %}
-              </form>
-            {% endblock %}
-          {% endif %}
-        </div>
+          </ul>
+        {% endif %}
+      {% endblock %}
 
-        {% block extra_content %}{% endblock %}
-      </div>
+      <p>
+        {{ question.text|bleach_html|safe }}
+      </p>
 
-      {% if not access_lti_basic_client_key and assignment %}
-        <div class='nav-question'>
+      {% if question.image %}
+        <img class="question-image" src="{{ question.image.url }}" height="{{ question.image.height }}"
+          width="{{ question.image.width }}" alt="question.image_alt_text">
+      {% endif %}
 
-          {% if not assignment_first %}
-            <a class='prev-question' href="{% url 'navigate-assignment' assignment_id=assignment.pk question_id=question.id direction='prev' index='x' %}">
-              <i class="inline material-icons md-60 mdc-theme--primary">
-                keyboard_arrow_left
-              </i>
-            </a>
-          {% endif %}
-
-          <div class="nav-disks">
-            {% for q in group_assignment.questions %}
-              <a href="{% url 'navigate-assignment' assignment_id=assignment.pk question_id=q.id direction='goto' index=forloop.counter0 %}">
-                <svg height="12" width="20">
-                  {% if q.id == question.id %}
-                    <circle class="pointer" cx="10" cy="6" r="5" fill="#54c0db" stroke="#54c0db" ></circle>
-                  {% else %}
-                    <circle class="pointer" cx="10" cy="6" r="5" fill="white" stroke="#54c0db"></circle>
-                  {% endif %}
-                </svg>
-              </a>
-            {% endfor %}
-          </div>
-
-          {% if assignment_last %}
-            {% if not assignment_expired and second_choice_label or first_choice_label and question.type == "RO" %}
-              <a class='next-question mdc-button mdc-button--raised' href="{% url 'finish-assignment' %}" id="finish-button">
-                {% trans 'Finish' %}
-              </a>
-            {% endif %}
-          {% else %}
-            <a class='next-question' href="{% url 'navigate-assignment' assignment_id=assignment.pk question_id=question.id direction='next' index='x' %}">
-              <i class="inline material-icons md-60  mdc-theme--primary">
-                keyboard_arrow_right
-              </i>
-            </a>
-          {% endif %}
-
+      {% if question.video_url %}
+        <div id="question-video">
+          <object class="question-image" width="640" height="390" data="{{ question.video_url }}"></object>
         </div>
       {% endif %}
 
-    </section>
-  </main>
+      {% block answers %}{% endblock %}
+
+      {% if form %}
+
+        {% if form.errors.first_answer_choice %}
+          {{ form.errors.first_answer_choice }}
+        {% endif %}
+
+        {% for error in form.non_field_errors %}
+          {{ error }}
+        {% endfor %}
+
+        {% block form %}
+          <form id="submit-answer-form" method="post">
+            {% csrf_token %}
+            {{ form.datetime_start }}
+            {% block inner_form %}
+
+              <div class="m3-radio-group" role="radiogroup" aria-label="{% trans 'First answer choice' %}">
+                {% for choice in form.first_answer_choice %}
+                  <div class="m3-radio-label">
+                    <md-radio
+                      aria-label="{{ choice.choice_label.strip|bleach_html|safe }}"
+                      id="{{ choice.data.attrs.id }}"
+                      name="{{ choice.data.name }}"
+                      required="{{ choice.data.attrs.required }}"
+                      value="{{ choice.data.value }}">
+                    </md-radio>
+                    <label for="{{ choice.id_for_label }}">{{ choice.choice_label.strip|bleach_html|safe }}</label>
+                  </div>
+                {% endfor %}
+              </div>
+
+              <div class="rationale-field">
+                {% if form.errors.rationale %}
+                  {{ form.errors.rationale }}
+                {% endif %}
+                <span class="field-label">{% trans 'Your rationale *' %}</span>
+                {{ form.rationale }}
+              </div>
+            {% endblock %}
+
+            {% if not assignment_expired %}
+              <md-filled-button id="answer-form" type="submit">
+                {% block submit_button %}{% trans 'Next' %}{% endblock %}
+              </md-filled-button>
+            {% endif %}
+          </form>
+        {% endblock %}
+
+      {% endif %}
+
+      {% block extra_content %}{% endblock %}
+
+    </div>
+
+    {% if not access_lti_basic_client_key and assignment %}
+      <div class='nav-question'>
+
+        {% if not assignment_first %}
+          <a class='prev-question' href="{% url 'navigate-assignment' assignment_id=assignment.pk question_id=question.id direction='prev' index='x' %}">
+            <i class="inline material-icons md-60 mdc-theme--primary">
+              keyboard_arrow_left
+            </i>
+          </a>
+        {% endif %}
+
+        <div class="nav-disks">
+          {% for q in group_assignment.questions %}
+            <a href="{% url 'navigate-assignment' assignment_id=assignment.pk question_id=q.id direction='goto' index=forloop.counter0 %}">
+              <svg height="12" width="20">
+                {% if q.id == question.id %}
+                  <circle class="pointer" cx="10" cy="6" r="5" fill="#54c0db" stroke="#54c0db" ></circle>
+                {% else %}
+                  <circle class="pointer" cx="10" cy="6" r="5" fill="white" stroke="#54c0db"></circle>
+                {% endif %}
+              </svg>
+            </a>
+          {% endfor %}
+        </div>
+
+        {% if assignment_last %}
+          {% if not assignment_expired and second_choice_label or first_choice_label and question.type == "RO" %}
+            <a class='next-question mdc-button mdc-button--raised' href="{% url 'finish-assignment' %}" id="finish-button">
+              {% trans 'Finish' %}
+            </a>
+          {% endif %}
+        {% else %}
+          <a class='next-question' href="{% url 'navigate-assignment' assignment_id=assignment.pk question_id=question.id direction='next' index='x' %}">
+            <i class="inline material-icons md-60  mdc-theme--primary">
+              keyboard_arrow_right
+            </i>
+          </a>
+        {% endif %}
+
+      </div>
+    {% endif %}
+  </div>
 {% endblock %}
 
 {% block scripts %}
   {{ block.super }}
   <script nonce="{{ request.csp_nonce }}">
     window.addEventListener("load", function() {
+      // Patch to set initial value for radiogroup
+      {% for choice in form.first_answer_choice %}
+        {% if choice.data.selected %}
+          document.querySelector("#"+"{{ choice.data.attrs.id }}").click();
+        {% endif %}
+      {% endfor %}
+    });
+
+    window.addEventListener("load", function() {
+      // Fire alert prior to submit
       const finishButton = document.getElementById("finish-button");
       if (finishButton) {
         finishButton.addEventListener("click", function(evt) {

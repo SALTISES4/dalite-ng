@@ -30,13 +30,13 @@
                 </span>
                 <h4>{% trans 'My dashboard' %}</h4>
               </a>
-              <a href="{% url 'teacher' request.user.teacher.pk %}" class="quicklinks__block">
+              <a href="{% url 'teacher:library' request.user.teacher.pk %}" class="quicklinks__block">
                 <span>
                   <svg class="inline-svg">
-                    <use href="#assignments" />
+                    <use href="#library" />
                   </svg>
                 </span>
-                <h4>{% trans 'My account' %}</h4>
+                <h4>{% trans 'My library' %}</h4>
               </a>
               <a href="{% url 'teacher:search' %}" class="quicklinks__block">
                 <span>

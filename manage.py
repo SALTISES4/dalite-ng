@@ -10,6 +10,7 @@ def check_mismatches(name):
 
 
 try:
+    # Support PyMySQL
     import pymysql
 
     pymysql.install_as_MySQLdb()

@@ -1,4 +1,7 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions
+
+from tos.models import Consent
 
 
 class InOwnerList(permissions.BasePermission):
@@ -43,6 +46,8 @@ class InTeacherList(permissions.BasePermission):
 
 
 class IsAdminUserOrReadOnly(permissions.BasePermission):
+    """GET only access for non-staff users."""
+
     def has_permission(self, request, view):
         return bool(
             request.method in permissions.SAFE_METHODS
@@ -52,10 +57,30 @@ class IsAdminUserOrReadOnly(permissions.BasePermission):
 
 
 class IsNotStudent(permissions.BasePermission):
+    """User must not be a Student."""
+
     def has_permission(self, request, view):
         return not hasattr(request.user, "student")
 
 
 class IsTeacher(permissions.BasePermission):
+    """User must be a Teacher."""
+
     def has_permission(self, request, view):
+        return hasattr(request.user, "teacher")
+
+
+class IsTeacherWithTOSAccepted(permissions.BasePermission):
+    """User must be a Teacher and have accepted latest TOS."""
+
+    message = _(
+        "Content creation requires a Teacher account and accepting the Terms of Service"  # noqa E501
+    )
+
+    def has_permission(self, request, view):
+        if request.method.upper() in ["POST", "PATCH"]:
+            return hasattr(request.user, "teacher") and Consent.get(
+                request.user.username, "teacher"
+            )
+
         return hasattr(request.user, "teacher")

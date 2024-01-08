@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                         help_text="Reason for flagging a question.",
                         max_length=100,
                         unique=True,
-                        validators=[peerinst.models.question.no_hyphens],
+                        validators=[peerinst.models.no_hyphens],
                         verbose_name="Reason for flagging a question",
                     ),
                 ),

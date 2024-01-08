@@ -1,13 +1,54 @@
 import pytest
 from django.urls import reverse
-from faker import Faker
 from rest_framework import status
 
-from functional_tests.fixtures import realistic_assignment, realistic_questions
+from functional_tests.fixtures import (  # noqa
+    realistic_assignment,
+    realistic_questions,
+)
 from peerinst.tests.fixtures import *  # noqa
+from peerinst.tests.fixtures.student import login_student
 from peerinst.tests.fixtures.teacher import login_teacher
 
-fake = Faker()
+
+# View access
+@pytest.mark.django_db
+def test_search_login_required(client, teacher):
+    response = client.get(reverse("teacher:search"), follow=True)
+    assert "registration/login.html" in [t.name for t in response.templates]
+
+    response = client.get(reverse("question-search"))
+    assert response.status_code == 401
+
+    assert login_teacher(client, teacher)
+    response = client.get(reverse("teacher:search"))
+    assert response.status_code == 200
+
+    response = client.get(reverse("question-search"))
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_search_teacher_required(client, student):
+    assert login_student(client, student)
+    response = client.get(reverse("teacher:search"), follow=True)
+    assert response.status_code == 403
+
+    assert login_student(client, student)
+    response = client.get(reverse("question-search"))
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_search_template(client, teacher):
+    assert login_teacher(client, teacher)
+    response = client.get(reverse("teacher:search"))
+    assert "teacher/search.html" in [t.name for t in response.templates]
+
+
+@pytest.mark.django_db
+def test_teacherquestionupdateview_tos_required(client, teacher):
+    pass
 
 
 @pytest.mark.django_db

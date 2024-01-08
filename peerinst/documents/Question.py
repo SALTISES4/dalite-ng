@@ -1,5 +1,6 @@
+from string import capwords
+
 import bleach
-from django.contrib.auth.models import User
 from django.urls import reverse
 from django_elasticsearch_dsl import Document
 from django_elasticsearch_dsl.fields import (
@@ -28,9 +29,10 @@ from .analyzers import autocomplete, full_term, html_strip, trigram
 @registry.register_document
 class QuestionDocument(Document):
     """
+    ElasticSearch document for Question model.
+
     Notes:
-    - Need both autocomplete type matching, partial matching, and full-word
-      matching
+    - Need autocomplete type, partial, and full-word matching
     - Need to test on certain keywords: "phy", "physi", "tnagar",
       "adamsr three blocks" etc.
     - Consider "boosting" and multifields
@@ -133,14 +135,16 @@ class QuestionDocument(Document):
         return []
 
     def prepare_category(self, instance):
-        """Bleach"""
+        """Bleach and capitalize on the way out."""
         if instance.category:
             sorted_category_set = [
-                bleach.clean(
-                    c.title,
-                    tags=[],
-                    strip=True,
-                ).strip()
+                capwords(
+                    bleach.clean(
+                        c.title,
+                        tags=[],
+                        strip=True,
+                    ).strip()
+                )
                 for c in instance.category.all()
             ]
 
@@ -161,14 +165,16 @@ class QuestionDocument(Document):
         return {"score": d[0], "label": d[1]}
 
     def prepare_discipline(self, instance):
-        """Bleach"""
+        """Bleach and capitalize on the way out."""
         if instance.discipline:
             return {
-                "title": bleach.clean(
-                    instance.discipline.title,
-                    tags=[],
-                    strip=True,
-                ).strip()
+                "title": capwords(
+                    bleach.clean(
+                        instance.discipline.title,
+                        tags=[],
+                        strip=True,
+                    ).strip()
+                )
             }
         return {"title": ""}
 
@@ -218,10 +224,13 @@ class QuestionDocument(Document):
             "addable_assignments": reverse(
                 "REST:teacher-assignment-for-question", args=(instance.pk,)
             ),
+            "copy": reverse("teacher:question-copy", args=(instance.pk,)),
             "matrix": reverse("REST:question-matrix", args=(instance.pk,)),
             "rationales": reverse(
                 "REST:question-rationales", args=(instance.pk,)
             ),
+            "test": reverse("question-test", args=(instance.pk,)),
+            "update": reverse("teacher:question-update", args=(instance.pk,)),
         }
 
     def prepare_user(self, instance):
@@ -248,7 +257,7 @@ class QuestionDocument(Document):
         return super().get_queryset().select_related("discipline", "user")
 
     def get_instances_from_related(self, related_instance):
-        for model in [Category, Discipline, User]:
+        for model in [Category, Discipline]:
             if isinstance(related_instance, model):
                 return related_instance.question_set.all()
         for model in [AnswerChoice, QuestionFlag]:
@@ -273,5 +282,4 @@ class QuestionDocument(Document):
             Category,
             Discipline,
             QuestionFlag,
-            User,
         ]

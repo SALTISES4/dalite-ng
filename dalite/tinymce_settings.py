@@ -122,6 +122,7 @@ ENTITIES = (
 )
 
 TINYMCE_DEFAULT_CONFIG = {
+    "content_css": "/static/peerinst/css/tiny.min.css",
     "theme": "silver",
     "height": 300,
     "menubar": False,

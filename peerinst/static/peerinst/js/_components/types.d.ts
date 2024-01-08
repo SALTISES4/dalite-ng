@@ -1,5 +1,5 @@
 export type Assignment = {
-  editable: boolean;
+  is_editable: boolean;
   pk: string;
   question_pks: number[]; // eslint-disable-line camelcase
   title: string;
@@ -68,7 +68,6 @@ export type Question = {
   urls?: {
     add_answer_choices: string; // eslint-disable-line camelcase
     add_expert_rationales: string; // eslint-disable-line camelcase
-    add_new_question: string; // eslint-disable-line camelcase
     add_sample_answers: string; // eslint-disable-line camelcase
     copy_question: string; // eslint-disable-line camelcase
     fix: string;

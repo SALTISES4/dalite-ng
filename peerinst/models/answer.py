@@ -285,7 +285,9 @@ class AnswerVote(models.Model):
     """Vote on a rationale with attached fake attribution."""
 
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
-    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    assignment = models.ForeignKey(
+        Assignment, blank=True, null=True, on_delete=models.CASCADE
+    )
     user_token = models.CharField(max_length=100)
     fake_username = models.CharField(max_length=100)
     fake_country = models.CharField(max_length=100)

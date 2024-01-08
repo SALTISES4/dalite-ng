@@ -1,4 +1,6 @@
 __all__ = [
+    "check_assignment_id_is_valid",
+    "get_assignment_help_texts",
     "AssignmentViewSet",
     "CollectionViewSet",
     "DisciplineViewSet",
@@ -15,7 +17,7 @@ __all__ = [
     "StudentGroupUpdateView",
     "StudentReviewList",
     "TeacherAssignmentRecommendationViewSet",
-    "TeacherAssignmentViewSet",
+    "TeacherAssignmentCRUDViewSet",
     "TeacherCollectionRecommendationViewSet",
     "TeacherLibraryAssignmentViewSet",
     "TeacherLibraryCollectionViewSet",
@@ -28,7 +30,14 @@ __all__ = [
     "TeacherFeedbackThroughAnswerDetail",
     "TeacherSearch",
 ]
-from .content_creation.peerinst import TeacherQuestionCRUDViewSet  # noqa
+from .content_creation.peerinst import (  # noqa
+    TeacherAssignmentCRUDViewSet,
+    TeacherQuestionCRUDViewSet,
+)
+from .form_helpers import (  # noqa
+    check_assignment_id_is_valid,
+    get_assignment_help_texts,
+)
 from .library import (  # noqa
     TeacherLibraryAssignmentViewSet,
     TeacherLibraryCollectionViewSet,
@@ -57,7 +66,6 @@ from .views import (  # noqa
     StudentGroupAssignmentViewSet,
     StudentGroupUpdateView,
     StudentReviewList,
-    TeacherAssignmentViewSet,
     TeacherFeedbackDetail,
     TeacherFeedbackList,
     TeacherFeedbackThroughAnswerDetail,

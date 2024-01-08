@@ -75,8 +75,4 @@ def setup_periodic_tasks(sender, **kwargs):
             "task": "peerinst.tasks.clean_notifications",
             "schedule": crontab(hour=0, minute=0),
         },
-        "update_reputation_history": {
-            "task": "reputation.tasks.update_reputation_history",
-            "schedule": crontab(hour=0, minute=0),
-        },
     }

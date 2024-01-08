@@ -22,7 +22,6 @@ __all__ = [
     "student",
     "student_group_assignment",
     "student_new",
-    "student_reputation_with_criteria",
     "students",
     "teacher",
     "teachers",
@@ -56,5 +55,4 @@ from .peerinst_ import (
     undistributed_assignment,
 )
 from .quality_ import min_words_criterion, min_words_rules, quality_min_words
-from .reputation_ import student_reputation_with_criteria
 from .utils import assert_, browser, cookies, second_browser

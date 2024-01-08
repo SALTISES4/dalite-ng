@@ -28,7 +28,6 @@ from peerinst.models import (
 from peerinst.util import question_search_function
 from REST.pagination import SearchPagination
 from REST.permissions import (
-    InOwnerList,
     InTeacherList,
     IsAdminUserOrReadOnly,
     IsNotStudent,
@@ -59,36 +58,6 @@ class AssignmentViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Assignment.objects.all()
     renderer_classes = [JSONRenderer]
     serializer_class = AssignmentSerializer
-
-
-class TeacherAssignmentViewSet(viewsets.ModelViewSet):
-    """
-    A simple ViewSet for creating and viewing one's own
-    assignments and editing question order.
-    """
-
-    http_method_names = ["get", "patch", "post"]
-    permission_classes = [IsAuthenticated, IsTeacher, InOwnerList]
-    renderer_classes = [JSONRenderer]
-    serializer_class = AssignmentSerializer
-
-    def get_queryset(self):
-        return Assignment.objects.filter(owner=self.request.user)
-
-    @action(
-        detail=False,
-        methods=["get"],
-        url_path="addable-for-question/(?P<question_pk>[0-9]+)",
-    )
-    def for_question(self, request, question_pk=None):
-        # Return objects to which given question can be added for this teacher
-        question = get_object_or_404(Question, pk=question_pk)
-        queryset = self.get_queryset().exclude(questions=question)
-        pks = [a.pk for a in queryset if a.editable]
-        serializer = self.get_serializer(
-            queryset.filter(pk__in=pks), many=True, fields=["pk", "title"]
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class RecentStudentGroupAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
@@ -157,9 +126,7 @@ class MinimumResultsPagination(PageNumberPagination):
 
 
 class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    A simple ReadOnlyModelViewSet to return non-private collections.
-    """
+    """A simple ReadOnlyModelViewSet to return non-private collections."""
 
     pagination_class = MinimumResultsPagination
     permission_classes = [IsAuthenticated, IsTeacher]
@@ -173,9 +140,7 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class DisciplineViewSet(viewsets.ModelViewSet):
-    """
-    A simple ViewSet to serve list of current disciplines.
-    """
+    """A simple ViewSet to serve list of current disciplines."""
 
     permission_classes = [IsAuthenticated, IsNotStudent, IsAdminUserOrReadOnly]
     queryset = Discipline.objects.all()
@@ -244,7 +209,7 @@ class QuestionListViewSet(viewsets.ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
-        if self.get_object().assignment.editable:
+        if self.get_object().assignment.is_editable:
             return super().destroy(request, *args, **kwargs)
 
         raise PermissionDenied
@@ -334,7 +299,6 @@ class StudentReviewList(generics.ListAPIView):
         """
         return answers submitted by authenticated student
         """
-
         student = self.request.user
         return Answer.objects.filter(user_token=student.username)
 

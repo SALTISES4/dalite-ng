@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                         help_text="Enter the name of a new subject.",
                         max_length=100,
                         unique=True,
-                        validators=[peerinst.models.question.no_hyphens],
+                        validators=[peerinst.models.no_hyphens],
                         verbose_name="Subject name",
                     ),
                 ),

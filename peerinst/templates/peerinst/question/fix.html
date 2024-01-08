@@ -48,7 +48,7 @@
                   <dt>{% trans "Question flags" %}</dt>
 
                   <dd>
-                    {% if object.editable and request.user in object.owner.all %}
+                    {% if object.is_editable and request.user in object.owner.all %}
                       {% trans "However, you can edit this assignment to replace flagged questions." %}
                     {% else %}
                       {% trans "The best option is to fix whatever you can (look for 'Fix!' indicators) and then make a copy of the assignment.  In the new copy, you will be able to replace flagged questions." %}
@@ -60,7 +60,7 @@
                   <dt>{% trans "Missing answer choices" %}</dt>
 
                   <dd>
-                    {% if object.editable and request.user in object.owner.all %}
+                    {% if object.i_editable and request.user in object.owner.all %}
                       {% trans "If you are able to add the missing answer choices because you are the question author and the question is editable, great!  Otherwise, you can copy the problematic questions, fix them, and substitute for them by editing this assignment." %}
                     {% else %}
                       {% trans "If you are able to add the missing answer choices because you are the question author and the question is editable, great!  Otherwise, you will need to make a copy of this assignment and replace the problematic questions." %}

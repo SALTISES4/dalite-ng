@@ -42,13 +42,12 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_safe
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView, View
-from django.views.generic.edit import CreateView, FormView, UpdateView
+from django.views.generic.edit import FormView, UpdateView
 from django.views.generic.list import ListView
 from lti_provider.lti import LTI
 from pylti.common import post_message
 from tinymce.widgets import TinyMCE
 
-from blink.models import BlinkRound
 from dalite.views.errors import response_400, response_404
 from peerinst import admin, forms, models, rationale_choice
 from peerinst.admin_views import get_question_rationale_aggregates
@@ -71,6 +70,7 @@ from peerinst.models import (
     Category,
     Collection,
     Discipline,
+    Institution,
     NewUserRequest,
     Question,
     RationaleOnlyQuestion,
@@ -278,7 +278,6 @@ def welcome(request):
         if teacher_group:
             if teacher_group not in teacher.user.groups.all():
                 teacher.user.groups.add(teacher_group)
-        #  return HttpResponseRedirect(reverse("browse-database"))
         return HttpResponseRedirect(reverse("saltise:lobby"))
 
     elif Student.objects.filter(student=request.user).exists():
@@ -299,180 +298,6 @@ def access_denied_and_logout(request):
     raise PermissionDenied
 
 
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
-@user_passes_test(lambda u: hasattr(u, "teacher"))  # Teacher is required
-def browse_database(request):
-    return TemplateResponse(
-        request,
-        "peerinst/browse_database.html",
-        context={"static_url": settings.STATIC_URL},
-    )
-
-
-class AssignmentListView(LoginRequiredMixin, NoStudentsMixin, ListView):
-    """List of assignments used for debugging purposes."""
-
-    model = models.Assignment
-
-
-class AssignmentCreateView(LoginRequiredMixin, NoStudentsMixin, CreateView):
-    """View to create an assignment"""
-
-    model = models.Assignment
-    form_class = forms.AssignmentCreateForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        teacher = get_object_or_404(models.Teacher, user=self.request.user)
-        context["teacher"] = teacher
-        context["help_text"] = _(
-            "The assignment title may be displayed and \
-        should be informative. The assignment identifier is used as the \
-        keyword to access the assignment through a url.  It must be unique \
-        but does not need to be informative."
-        )
-        return context
-
-    def form_valid(self, form):
-        self.object = form.save()
-        teacher = get_object_or_404(models.Teacher, user=self.request.user)
-        form.instance.owner.add(teacher.user)
-        form.instance.save()
-        teacher.assignments.add(self.object)
-        teacher.save()
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse(
-            "assignment-update", kwargs={"assignment_id": self.object.pk}
-        )
-
-
-class AssignmentCopyView(AssignmentCreateView):
-    """View to create an assignment from existing."""
-
-    def get_initial(self, *args, **kwargs):
-        super().get_initial(*args, **kwargs)
-        assignment = get_object_or_404(
-            models.Assignment, pk=self.kwargs["assignment_id"]
-        )
-        initial = {
-            "title": _("Copy of ") + assignment.title,
-            "description": assignment.description,
-            "intro_page": assignment.intro_page,
-            "conclusion_page": assignment.conclusion_page,
-        }
-        return initial
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["help_text"] = _(
-            "Assignments cannot be modified once they \
-        contain student answers.  After providing a unique identifier below \
-        and submitting the form, a copy of this assignment will be made that \
-        can be edited."
-        )
-        return context
-
-    def get_object(self, queryset=None):
-        # Remove link on object to pk to dump object permissions
-        return None
-
-    # Custom save is needed to attach questions and user
-    def form_valid(self, form):
-        self.object = form.save()
-        assignment = get_object_or_404(
-            models.Assignment, pk=self.kwargs["assignment_id"]
-        )
-        for aq in assignment.assignmentquestions_set.all():
-            form.instance.questions.add(
-                aq.question, through_defaults={"rank": aq.rank}
-            )
-        form.instance.parent = assignment
-        form.instance.save()
-
-        return super().form_valid(form)
-
-
-class AssignmentUpdateView(LoginRequiredMixin, NoStudentsMixin, DetailView):
-    """
-    View for updating assignment question list.
-    Provides template only: POST operations are handled through REST api.
-    """
-
-    http_method_names = ["get"]
-    model = Assignment
-    template_name_suffix = "_detail"
-
-    def dispatch(self, *args, **kwargs):
-        # Check object permissions (to be refactored using mixin)
-        if (
-            self.request.user in self.get_object().owner.all()
-            or self.request.user.is_staff
-        ):
-            # Check for student answers
-            if not self.get_object().editable:
-                raise PermissionDenied
-            else:
-                return super().dispatch(*args, **kwargs)
-        else:
-            raise PermissionDenied
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        teacher = get_object_or_404(models.Teacher, user=self.request.user)
-        context["teacher"] = teacher
-        return context
-
-    def get_object(self):
-        return get_object_or_404(
-            models.Assignment, pk=self.kwargs["assignment_id"]
-        )
-
-
-class AssignmentEditView(LoginRequiredMixin, NoStudentsMixin, UpdateView):
-    """View for editing assignment title and meta-data."""
-
-    fields = ["title", "description", "intro_page", "conclusion_page"]
-    http_method_names = ["get", "post"]
-    model = models.Assignment
-    pk_url_kwarg = "assignment_id"
-    template_name_suffix = "_edit"
-
-    def dispatch(self, *args, **kwargs):
-        # Check object permissions (to be refactored using mixin)
-        if (
-            self.request.user in self.get_object().owner.all()
-            or self.request.user.is_staff
-        ):
-            # Check for student answers
-            if not self.get_object().editable:
-                raise PermissionDenied
-            else:
-                return super().dispatch(*args, **kwargs)
-        else:
-            raise PermissionDenied
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        teacher = get_object_or_404(models.Teacher, user=self.request.user)
-        context["teacher"] = teacher
-        return context
-
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.fields["description"].widget = TinyMCE()
-        form.fields["intro_page"].widget = TinyMCE()
-        form.fields["conclusion_page"].widget = TinyMCE()
-        return form
-
-    def get_success_url(self):
-        return reverse(
-            "assignment-update", kwargs={"assignment_id": self.object.pk}
-        )
-
-
 class QuestionListView(LoginRequiredMixin, NoStudentsMixin, ListView):
     """List of questions used for debugging purposes."""
 
@@ -488,102 +313,6 @@ class QuestionListView(LoginRequiredMixin, NoStudentsMixin, ListView):
     def get_context_data(self, **kwargs):
         context = ListView.get_context_data(self, **kwargs)
         context.update(assignment=self.assignment)
-        return context
-
-
-# Views related to Question
-class QuestionCreateView(
-    LoginRequiredMixin,
-    NoStudentsMixin,
-    ObjectPermissionMixin,
-    TOSAcceptanceRequiredMixin,
-    CreateView,
-):
-    """View to create a new question outside of admin."""
-
-    object_permission_required = "peerinst.add_question"
-    model = models.Question
-    fields = [
-        "title",
-        "text",
-        "type",
-        "image",
-        "image_alt_text",
-        "video_url",
-        "answer_style",
-        "category",
-        "discipline",
-        "collaborators",
-        "fake_attributions",
-        "sequential_review",
-        "rationale_selection_algorithm",
-        "grading_scheme",
-    ]
-
-    template_name = "peerinst/question/form.html"
-
-    # Custom save is needed to attach user to question
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
-
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.fields["text"].widget = TinyMCE()
-        return form
-
-    def get_success_url(self):
-        if self.object.type == "RO":
-            return reverse(
-                "sample-answer-form", kwargs={"question_id": self.object.pk}
-            )
-        else:
-            return reverse(
-                "answer-choice-form", kwargs={"question_id": self.object.pk}
-            )
-
-
-class QuestionCloneView(QuestionCreateView):
-    """View to create a question from existing."""
-
-    template_name = "peerinst/question/form.html"
-
-    def get_initial(self, *args, **kwargs):
-        super().get_initial(*args, **kwargs)
-        question = get_object_or_404(models.Question, pk=self.kwargs["pk"])
-        return {
-            "text": question.text,
-            "type": question.type,
-            "image": question.image,
-            "image_alt_text": question.image_alt_text,
-            "video_url": question.video_url,
-            "answer_style": question.answer_style,
-            "category": question.category.all(),
-            "discipline": question.discipline,
-            "fake_attributions": question.fake_attributions,
-            "sequential_review": question.sequential_review,
-            "rationale_selection_algorithm": question.rationale_selection_algorithm,
-            "grading_scheme": question.grading_scheme,
-        }
-
-    def get_object(self, queryset=None):
-        # Remove link on object to pk to dump object permissions
-        return None
-
-    # Custom save is needed to attach parent question to clone
-    def form_valid(self, form):
-        form.instance.parent = get_object_or_404(
-            models.Question, pk=self.kwargs["pk"]
-        )
-        if form.instance.type == "RO":
-            form.instance.second_answer_needed = False
-        return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            parent=get_object_or_404(models.Question, pk=self.kwargs["pk"])
-        )
         return context
 
 
@@ -778,7 +507,7 @@ def sample_answer_form_done(request, question_id):
                 for a in assignments:
                     if teacher.user in a.owner.all():
                         # Check for student answers
-                        if a.editable and question not in a.questions.all():
+                        if a.is_editable and question not in a.questions.all():
                             a.questions.add(question)
                     else:
                         raise PermissionDenied
@@ -790,97 +519,6 @@ def sample_answer_form_done(request, question_id):
             return response_400(request)
     else:
         return response_400(request)
-
-
-class DisciplineCreateView(
-    LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, CreateView
-):
-    """View to create a new discipline outside of admin."""
-
-    model = Discipline
-    fields = ["title"]
-
-    def get_success_url(self):
-        if self.request.GET.get("multiselect", False):
-            return reverse("disciplines-form", kwargs={"pk": self.object.pk})
-        else:
-            return reverse("discipline-form", kwargs={"pk": self.object.pk})
-
-
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
-@user_passes_test(teacher_tos_accepted_check, login_url="/tos/required/")
-def discipline_select_form(request, pk=None):
-    """
-    An AJAX view that simply renders the DisciplineSelectForm. Preselects
-    instance with pk, if given.
-    """
-    if pk:
-        form = forms.DisciplineSelectForm(
-            initial={"discipline": Discipline.objects.get(pk=pk)}
-        )
-    else:
-        form = forms.DisciplineSelectForm()
-
-    return TemplateResponse(
-        request, "peerinst/discipline_select_form.html", context={"form": form}
-    )
-
-
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
-def disciplines_select_form(request, pk=None):
-    """
-    AJAX view simply renders the DisciplinesSelectForm. Preselects instance
-    with teachers current set.
-    """
-
-    disciplines = request.user.teacher.disciplines.values_list("pk", flat=True)
-
-    if pk:
-        disciplines = Discipline.objects.filter(
-            Q(pk=pk) | Q(pk__in=disciplines)
-        )
-
-    form = forms.DisciplinesSelectForm(initial={"disciplines": disciplines})
-
-    return TemplateResponse(
-        request,
-        "peerinst/disciplines_select_form.html",
-        context={"form": form},
-    )
-
-
-class CategoryCreateView(
-    LoginRequiredMixin, NoStudentsMixin, TOSAcceptanceRequiredMixin, CreateView
-):
-    """View to create a new category outside of admin."""
-
-    model = Category
-    fields = ["title"]
-
-    def get_success_url(self):
-        return reverse("category-form", kwargs={"pk": self.object.pk})
-
-
-@login_required
-@user_passes_test(student_check, login_url="/access_denied_and_logout/")
-@user_passes_test(teacher_tos_accepted_check, login_url="/tos/required/")
-def category_select_form(request, pk=None):
-    """
-    AJAX view simply renders the CategorySelectForm. Preselects instance with
-    pk, if given.
-    """
-    if pk:
-        form = forms.CategorySelectForm(
-            initial={"category": [Category.objects.get(pk=pk)]}
-        )
-    else:
-        form = forms.CategorySelectForm()
-
-    return TemplateResponse(
-        request, "peerinst/category_select_form.html", context={"form": form}
-    )
 
 
 class QuestionMixin:
@@ -926,7 +564,7 @@ class QuestionMixin:
         return context
 
     def send_grade(self):
-        if not self.request.session.get("access_type") == StudentGroup.LTI:
+        if self.request.session.get("access_type") != StudentGroup.LTI:
             # We are running outside of a basic LTI context, so we don't need to
             # send a grade.
             return
@@ -1014,11 +652,12 @@ class QuestionFormView(QuestionMixin, FormView):
         """
         Log an event in a JSON format for each step in problem
         """
-
         # Add common fields to event data
         data.update(
-            assignment_id=self.assignment.pk,
-            assignment_title=self.assignment.title,
+            assignment_id=self.assignment.pk if self.assignment else None,
+            assignment_title=self.assignment.title
+            if self.assignment
+            else None,
             question_id=self.question.pk,
             question_text=self.question.text,
         )
@@ -1072,7 +711,8 @@ class QuestionFormView(QuestionMixin, FormView):
 
 
 class QuestionStartView(QuestionFormView):
-    """Render a question with or without answer choices depending on type.
+    """
+    Render a question with or without answer choices depending on type.
 
     The user can choose one answer and enter a rationale.
     """
@@ -1113,7 +753,11 @@ class QuestionReviewBaseView(QuestionFormView):
         # Make the choice of rationales deterministic, so rationales won't
         # change when reloading the page after clearing the session.
         rng = random.Random(
-            (self.user_token, self.assignment.pk, self.question.pk)
+            (
+                self.user_token,
+                self.assignment.pk if self.assignment else None,
+                self.question.pk,
+            )
         )
         try:
             self.rationale_choices = self.choose_rationales(
@@ -1129,7 +773,7 @@ class QuestionReviewBaseView(QuestionFormView):
 
     def mark_rationales_safe(self, escape_html):
         processor = escape if escape_html else mark_safe
-        for _choice, _label, rationales in self.rationale_choices:
+        for _choice, _label, rationales, _text in self.rationale_choices:
             rationales[:] = [
                 (
                     id,
@@ -1154,7 +798,7 @@ class QuestionReviewBaseView(QuestionFormView):
             self.mark_rationales_safe(escape_html=True)
             return
         fake_attributions = {}
-        for _choice, _label, rationales in self.rationale_choices:
+        for _choice, _label, rationales, _text in self.rationale_choices:
             attributed_rationales = []
             for id, text in rationales:
                 if id is None:
@@ -1221,7 +865,7 @@ class QuestionSequentialReviewView(QuestionReviewBaseView):
                     for id, rationale in rationales
                     if id is not None
                 ]
-                for choice, label, rationales in self.rationale_choices
+                for choice, label, rationales, text in self.rationale_choices
             )
         )
         self.current_rationale = rationale_sequence[0]
@@ -1295,7 +939,7 @@ class QuestionReviewView(QuestionReviewBaseView):
             },
             "rationales": [
                 {"id": id, "text": rationale}
-                for choice, label, rationales in self.rationale_choices
+                for choice, label, rationales, texts in self.rationale_choices
                 for id, rationale in rationales
                 if id is not None
             ],
@@ -1403,7 +1047,7 @@ class QuestionReviewView(QuestionReviewBaseView):
         """
         rationale_ids = [
             rationale[0]
-            for _, _, rationales in self.rationale_choices
+            for _, _, rationales, _ in self.rationale_choices
             for rationale in rationales
         ]
         shown_answers = (
@@ -1596,7 +1240,7 @@ def redirect_to_login_or_show_cookie_help(request):
     return redirect_to_login(request.get_full_path())
 
 
-def question(request, assignment_id, question_id):
+def question(request, question_id, assignment_id=None):
     """
     Load common question data and dispatch to the right question stage. This
     dispatcher loads the session state and relevant database objects. Based on
@@ -1606,14 +1250,16 @@ def question(request, assignment_id, question_id):
         return redirect_to_login_or_show_cookie_help(request)
 
     # Collect common objects required for the view
-    assignment = get_object_or_404(models.Assignment, pk=assignment_id)
+    assignment = get_object_or_none(models.Assignment, pk=assignment_id)
     question = get_object_or_404(models.Question, pk=question_id)
 
     # Reload question through proxy based on type, if needed
     if question.type == "RO":
         question = get_object_or_404(RationaleOnlyQuestion, pk=question_id)
 
-    custom_key = f"{str(assignment.pk)}:{str(question.pk)}"
+    custom_key = (
+        f"{str(assignment.pk) if assignment else 'test'}:{str(question.pk)}"
+    )
     stage_data = SessionStageData(request.session, custom_key)
     user_token = request.user.username
     view_data = {
@@ -1621,7 +1267,7 @@ def question(request, assignment_id, question_id):
         "assignment": assignment,
         "question": question,
         "user_token": user_token,
-        "answer_choices": question.get_choices(),
+        "answer_choices": question.get_choices_with_correct(),
         "custom_key": custom_key,
         "stage_data": stage_data,
         "answer": models.Answer.objects.filter(
@@ -1670,10 +1316,9 @@ def question(request, assignment_id, question_id):
 
 @login_required
 @user_passes_test(student_check, login_url="/access_denied_and_logout/")
-def reset_question(request, assignment_id, question_id):
+def reset_question(request, question_id, assignment_id=None):
     """Clear all answers from user (for testing)"""
-
-    assignment = get_object_or_404(models.Assignment, pk=assignment_id)
+    assignment = get_object_or_none(models.Assignment, pk=assignment_id)
     question = get_object_or_404(models.Question, pk=question_id)
     user_token = request.user.username
     answer = get_object_or_none(
@@ -1682,13 +1327,23 @@ def reset_question(request, assignment_id, question_id):
         question=question,
         user_token=user_token,
     )
-    answer.delete()
+    if answer:
+        answer.delete()
 
+    if assignment:
+        return HttpResponseRedirect(
+            reverse(
+                "question",
+                kwargs={
+                    "assignment_id": assignment.pk,
+                    "question_id": question.pk,
+                },
+            )
+        )
     return HttpResponseRedirect(
         reverse(
-            "question",
+            "question-test",
             kwargs={
-                "assignment_id": assignment.pk,
                 "question_id": question.pk,
             },
         )
@@ -1807,35 +1462,44 @@ class TeacherDetailView(TeacherBase, DetailView):
         )
         context["tos_timestamp"] = latest_teacher_consent.datetime
 
-        # Set all blink assignments, questions, and rounds for this teacher to
-        # inactive
-        for a in self.get_object().blinkassignment_set.all():
-            if a.active:
-                a.active = False
-                a.save()
-
-        for b in self.get_object().blinkquestion_set.all():
-            if b.active:
-                b.active = False
-                b.save()
-
-                open_rounds = BlinkRound.objects.filter(question=b).filter(
-                    deactivate_time__isnull=True
-                )
-
-                for open_round in open_rounds:
-                    open_round.deactivate_time = timezone.now()
-                    open_round.save()
-
         return context
 
 
 class TeacherUpdate(TeacherBase, UpdateView):
-    """View for user to update teacher properties"""
+    """
+    View for user to update teacher properties.
+
+    Passes as context typical Django ModelForm as well as raw
+    data needed to construct custom form (e.g. via MUI)
+    """
 
     model = Teacher
     fields = ["institutions", "disciplines"]
     template_name = "peerinst/teacher/form.html"
+
+    def get_success_url(self):
+        return self.request.GET.get(
+            "next",
+            reverse("teacher:dashboard", args=(self.request.user.teacher.pk,)),
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            disciplineOptions=list(Discipline.objects.values("pk", "title")),
+            disciplines=list(
+                self.request.user.teacher.disciplines.values_list(
+                    "pk", flat=True
+                )
+            ),
+            institutionOptions=list(Institution.objects.values("pk", "name")),
+            institutions=list(
+                self.request.user.teacher.institutions.values_list(
+                    "pk", flat=True
+                )
+            ),
+        )
+        return context
 
 
 class TeacherAssignments(TeacherBase, ListView):
@@ -2359,12 +2023,6 @@ def question_search(request):
 
         # Exclusions based on type of search
         q_qs = []
-        if type == "blink":
-            assignment = None
-            bq_qs = request.user.teacher.blinkquestion_set.all()
-            q_qs = [bq.question.id for bq in bq_qs]
-            form_field_name = "new_blink"
-
         if type == "assignment":
             assignment = Assignment.objects.get(
                 identifier=request.GET["assignment_identifier"]
@@ -2449,7 +2107,7 @@ def question_search(request):
         query_meta = {}
         for term in search_terms:
             query_term = question_search_function(
-                term, search_list, (type == "assignment" or type == "blink")
+                term, search_list, (type == "assignment")
             )
             query_term = query_term.exclude(id__in=q_qs).distinct()
 

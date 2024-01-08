@@ -4,21 +4,29 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from django.views.generic import DetailView, TemplateView
 
+from peerinst.mixins import TOSAcceptanceRequiredMixin
 from peerinst.models import Assignment
 from teacher.mixins import TeacherRequiredMixin
+from tos.models import Consent
 
 
-class AssignmentCreateView(TeacherRequiredMixin, TemplateView):
+class AssignmentCreateView(
+    TeacherRequiredMixin, TOSAcceptanceRequiredMixin, TemplateView
+):
+    """View to serve assignment create template."""
+
     http_method_names = ["get"]
     template_name = "teacher/assignment/create.html"
 
 
 class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
     """
-    Update view should account for three levels of editability:
-    - None at all: non-owners >>> redirect to view only
-    - Meta fields only: owners where assignment.editable is false
-    - All fields: owners where assignment.editable is true
+    View to serve assignment update template.
+
+    Should for three levels of editability:
+    - None at all: non-owners or owners refusing TOS > silently redirect to detail view
+    - Meta fields only: owners where assignment.is_editable is false
+    - All fields: owners where assignment.is_editable is true
     """
 
     http_method_names = ["get"]
@@ -31,8 +39,8 @@ class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
             # Try to get the object
             self.get_object()
             return super().get(request, *args, **kwargs)
-        except http.Http404 as e:
-            # Object is not in queryset, swallow error and redirect to detail view
+        except http.Http404:
+            # Object not in queryset, swallow error and redirect to detail view
             return HttpResponseRedirect(
                 reverse(
                     "teacher:assignment-detail",
@@ -41,10 +49,11 @@ class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
             )
 
     def get_queryset(self):
-        """
-        Limit access to a user's own assignments
-        """
-        return Assignment.objects.filter(owner=self.request.user)
+        """Check TOS status, then limit access to a user's own assignments."""
+        if not Consent.get(self.request.user.username, "teacher"):
+            return Assignment.objects.none()
+        else:
+            return Assignment.objects.filter(owner=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -52,23 +61,25 @@ class AssignmentUpdateView(TeacherRequiredMixin, DetailView):
         context.update(
             LTI_key=str(settings.LTI_BASIC_CLIENT_KEY),
             LTI_secret=str(settings.LTI_BASIC_CLIENT_SECRET),
-            LTI_launch_url=str("https://" + self.request.get_host() + "/lti/"),
+            LTI_launch_url=str(f"https://{self.request.get_host()}/lti/"),
             meta_editable_by_user=True,
             owner=[u.username for u in assignment.owner.all()],
-            questions_editable_by_user=assignment.editable,
+            questions_editable_by_user=assignment.is_editable,
         )
         return context
 
 
 class AssignmentDetailView(AssignmentUpdateView):
     """
-    Detail view should redirect to update view if accessed by owner
+    Detail view should redirect to update view if accessed by owner and TOS accepted
     """
 
     def get(self, request, *args, **kwargs):
         # Try to get the object, don't swallow errors
         self.object = self.get_object()
-        if request.user in self.object.owner.all():
+        if request.user in self.object.owner.all() and Consent.get(
+            request.user.username, "teacher"
+        ):
             return HttpResponseRedirect(
                 reverse(
                     "teacher:assignment-update",

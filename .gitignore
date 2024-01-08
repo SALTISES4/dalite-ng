@@ -20,6 +20,7 @@
 .tern-port
 .venv
 .dccache
+.ruff_cache
 /CACHE
 /dalite/local_settings.py
 /htmlcov

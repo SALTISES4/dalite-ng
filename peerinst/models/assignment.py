@@ -19,7 +19,6 @@ from peerinst.util import (
 )
 from peerinst.utils import format_time
 from quality.models import Quality
-from reputation.models import Reputation
 
 from .group import StudentGroup
 from .question import Question
@@ -85,9 +84,6 @@ class Assignment(models.Model):
     parent = models.ForeignKey(
         "Assignment", blank=True, null=True, on_delete=models.SET_NULL
     )
-    reputation = models.OneToOneField(
-        Reputation, blank=True, null=True, on_delete=models.SET_NULL
-    )
     created_on = models.DateTimeField(auto_now_add=True, null=True)
     last_modified = models.DateTimeField(auto_now=True, null=True)
 
@@ -140,7 +136,36 @@ class Assignment(models.Model):
         return sum(q.answer_count for q in self.questions.all())
 
     @property
-    def editable(self):
+    def is_deletable(self):
+        """
+        Logic for assignment deletion.
+
+        Assignments can be deleted only when:
+        - They are editable
+        - They have not been included in any collections
+        - They have not been bookmarked by other users
+        """
+        return (
+            self.is_editable
+            and self.collection_set.count() == 0
+            and self.teacher_set.exclude(user__in=self.owner.all()).count()
+            == 0
+        )
+
+    @property
+    def delete_validation_error(self):
+        return _("Assignment cannot be deleted")
+
+    @property
+    def is_editable(self):
+        """
+        Logic for assignment editing.
+
+        Assignments can be edited only when:
+        - There are no related student answers
+        - There are no related StudentGroupAssignment objects
+        - TODO: What about LTI assignments?
+        """
         return (
             not self.answer_set.filter(expert=False)
             .exclude(user_token__exact="")
@@ -163,8 +188,8 @@ class Assignment(models.Model):
 
 
 class AssignmentQuestions(models.Model):
-    assignment = models.ForeignKey(Assignment, models.DO_NOTHING)
-    question = models.ForeignKey(Question, models.DO_NOTHING)
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     rank = models.PositiveIntegerField(default=0)
 
     def __str__(self):
@@ -178,7 +203,7 @@ class AssignmentQuestions(models.Model):
 
 class StudentGroupAssignment(models.Model):
     group = models.ForeignKey(StudentGroup, on_delete=models.CASCADE)
-    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Assignment, on_delete=models.PROTECT)
     distribution_date = models.DateTimeField(
         editable=False, null=True, blank=True
     )
@@ -219,11 +244,9 @@ class StudentGroupAssignment(models.Model):
     def __str__(self):
         return f"{self.assignment} for {self.group}"
 
-    def _verify_order(self, order):
-        n = len(self.assignment.questions.all())
-
+    @staticmethod
+    def verify_order(order, n):
         err = None
-
         try:
             order_ = list(map(int, order.split(",")))
         except ValueError:
@@ -243,6 +266,11 @@ class StudentGroupAssignment(models.Model):
 
         return err
 
+    def _verify_order(self, order):
+        return StudentGroupAssignment.verify_order(
+            order, len(self.assignment.questions.all())
+        )
+
     def _modify_due_date(self, due_date):
         """
         Modifies the due date.
@@ -252,7 +280,7 @@ class StudentGroupAssignment(models.Model):
         due_date : str
             String in the format "%Y-%m-%dT%H:%M:%S(.%f)?"
 
-        Returns
+        Returns:
         -------
         err : Optional[str]
             Error message if there is any
@@ -273,9 +301,7 @@ class StudentGroupAssignment(models.Model):
             self.save()
             logger.info(
                 f"Student group assignment {self.pk}"
-                + " due date updated to {} from {}.".format(
-                    self.due_date, prev_due_date
-                )
+                + f" due date updated to {self.due_date} from {prev_due_date}."
             )
         return err
 
@@ -288,7 +314,7 @@ class StudentGroupAssignment(models.Model):
         order : str
             New order as a string of indices separated by commas
 
-        Returns
+        Returns:
         -------
         err : Optional[str]
             Error message if there is any
@@ -300,9 +326,7 @@ class StudentGroupAssignment(models.Model):
             self.save()
             logger.info(
                 f"Student group assignment {self.pk}"
-                + " order updated to {} from {}.".format(
-                    self.order, prev_order
-                )
+                + f" order updated to {self.order} from {prev_order}."
             )
         else:
             logger.error(err)
@@ -375,7 +399,7 @@ class StudentGroupAssignment(models.Model):
             Hostname of the server to be able to send emails (emails aren't
             sent if None)
 
-        Returns
+        Returns:
         -------
         err : Optional[str]
             Error message if there is any
@@ -414,7 +438,7 @@ class StudentGroupAssignment(models.Model):
         and the due date is sooner or equal to the number reminder days,
         the student notification is updated and an email if possibly sent.
 
-        Returns
+        Returns:
         -------
         err : Optional[str]
             Error message if there is any
@@ -458,7 +482,7 @@ class StudentGroupAssignment(models.Model):
     @property
     def student_progress(self):
         """
-        Returns
+        Returns:
         -------
         [
             {

@@ -2,16 +2,6 @@
 
 {% load i18n static %}
 
-{% block injected_apps %}
-  {{ block.super }}
-  <div id="navigation-app"></div>
-{% endblock %}
-
-{% block body %}
-  {{ block.super }}
-  {% csrf_token %}
-{% endblock %}
-
 {% block scripts %}
   {{ block.super }}
   <script nonce="{{ request.csp_nonce }}">
@@ -86,7 +76,7 @@
               {
                 title: "{% trans 'Profile' %}",
                 icon: "account_box",
-                url: "{% url 'teacher-update' request.user.teacher.pk %}",
+                url: "{% url 'teacher-update' request.user.teacher.pk %}?next={{ request.path }}",
               },
               {
                 title: "{% trans 'Password' %}",
@@ -94,12 +84,12 @@
                 url: "{% url 'password_change' %}"
               },
               {
-                title: "{% trans 'Email & notifications' %}",
+                title: "{% trans 'Notification settings' %}",
                 icon: "notifications",
-                url: "{% url 'tos:email_modify' 'teacher' %}"
+                url: "{% url 'tos:email_modify' 'teacher' %}?next={{ request.path }}"
               },
               {
-                title: "{% trans 'Terms of service' %}",
+                title: "{% trans 'Terms of Service' %}",
                 icon: "gavel",
                 url: "{% url 'tos:tos_modify' 'teacher' %}?next={{ request.path }}"
               },

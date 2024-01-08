@@ -3,8 +3,19 @@ from rest_framework import serializers
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     """
-    A ModelSerializer that takes an additional `fields` argument that controls
-    which fields should be displayed
+    ModelSerializer that allows dynamic filtering of fields via querystring.
+
+    Attributes:
+        fields: The fields to be included in the serialization.
+
+    Examples:
+        To include only specific fields in the serialization, pass the desired
+        fields as a list in the `fields` argument:
+
+        serializer = DynamicFieldsModelSerializer(fields=["field1", "field2"])
+
+        This will ensure that only the specified fields are included in the
+        serialized output.
     """
 
     def __init__(self, *args, **kwargs):
@@ -20,8 +31,9 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 
         # Add filter based on querystring
         if "request" in self.context:
-            requested_fields = self.context["request"].GET.getlist("field")
-            if requested_fields:
+            if requested_fields := self.context["request"].GET.getlist(
+                "field"
+            ):
                 allowed = set(requested_fields)
                 existing = set(self.fields)
                 for field_name in existing - allowed:

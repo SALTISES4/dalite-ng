@@ -13,6 +13,7 @@ from PIL import Image
 from rest_framework import serializers
 
 from peerinst.documents import CategoryDocument
+from peerinst.forms import RichTextRationaleField
 from peerinst.models import (
     Answer,
     AnswerChoice,
@@ -35,7 +36,7 @@ logger = logging.getLogger("REST")
 
 class CategorySerializer(DocumentSerializer):
     def to_representation(self, instance):
-        """Bleach on the way out"""
+        """Bleach and capitalize on the way out."""
         ret = super().to_representation(instance)
         ret["title"] = capwords(
             bleach.clean(ret["title"], tags=[], strip=True).strip()
@@ -49,7 +50,7 @@ class CategorySerializer(DocumentSerializer):
 
 class DisciplineSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
-        """Bleach on the way out"""
+        """Bleach and capitalize on the way out."""
         ret = super().to_representation(instance)
         ret["title"] = capwords(
             bleach.clean(ret["title"], tags=[], strip=True).strip()
@@ -71,15 +72,13 @@ class SampleAnswerSerializer(serializers.ModelSerializer):
     pk = serializers.IntegerField(read_only=False, required=False)
 
     def validate_rationale(self, value):
-        """
-        Check rationale <= 4000 characters
-        """
-        if len(value) > 4000:
-            raise serializers.ValidationError(_("Rationale text too long"))
+        """Run validators in peerinst/forms.py for RichTextRationaleField."""
+        for validator in RichTextRationaleField.default_validators:
+            validator(value)
         return value
 
     def to_representation(self, instance):
-        """Bleach on the way out"""
+        """Bleach on the way out."""
         ret = super().to_representation(instance)
         if "rationale" in ret and ret["rationale"]:
             ret["rationale"] = bleach.clean(
@@ -103,22 +102,17 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
     sample_answers = SampleAnswerSerializer(many=True)
 
     def validate(self, data):
-        """
-        Check correct answer choices have an expert rationale
-        """
-        if data["correct"]:
-            if (
-                "expert_answers" not in data
-                or len(data["expert_answers"]) == 0
-            ):
-                raise serializers.ValidationError(
-                    _(
-                        "An expert rationale is required for each correct answer choice"
-                    )
+        """Check correct answer choices have an expert rationale."""
+        if data["correct"] and (
+            "expert_answers" not in data or len(data["expert_answers"]) == 0
+        ):
+            raise serializers.ValidationError(
+                _(
+                    "An expert rationale is required for each correct answer choice"  # noqa E501
                 )
-        """
-        Check each answer choice has at least one sample rationale
-        """
+            )
+
+        """Check each answer choice has at least one sample rationale."""
         if len(data["sample_answers"]) == 0:
             raise serializers.ValidationError(
                 _("An sample rationale is required for each answer choice")
@@ -126,7 +120,7 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
         return data
 
     def to_representation(self, instance):
-        """Bleach on the way out"""
+        """Bleach on the way out."""
         ret = super().to_representation(instance)
         if "text" in ret and ret["text"]:
             ret["text"] = bleach.clean(
@@ -147,20 +141,38 @@ class AnswerChoiceSerializer(DynamicFieldsModelSerializer):
 
 
 class NullableM2MFormDataSerializer(serializers.SlugRelatedField):
+    """
+    Serializer for handling nullable many-to-many fields in form data.
+
+    Args:
+        data: The input data to be converted to internal value.
+
+    Returns:
+        The internal value of the many-to-many field, or None if data is "[]".
+    """
+
     def to_internal_value(self, data):
-        if data == "[]":
-            return None
-        return super().to_internal_value(data)
+        return None if data == "[]" else super().to_internal_value(data)
 
 
 class NullablePrimaryKeyFormDataSerializer(serializers.PrimaryKeyRelatedField):
+    """
+    Serializer for handling nullable primary key related fields in form data.
+
+    Args:
+        data: The input data to be converted to internal value.
+
+    Returns:
+        The internal value of the primary key field, or None if data is "null".
+    """
+
     def to_internal_value(self, data):
-        if data == "null":
-            return None
-        return super().to_internal_value(data)
+        return None if data == "null" else super().to_internal_value(data)
 
 
 class QuestionSerializer(DynamicFieldsModelSerializer):
+    """Question model serializer with dynamic field filtering via querystring."""
+
     answer_count = serializers.ReadOnlyField()
     answerchoice_set = AnswerChoiceSerializer(
         fields=[
@@ -171,6 +183,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "text",
         ],
         many=True,
+        required=False,
     )
     assignment_count = serializers.ReadOnlyField()
     category = CategorySerializer(many=True, read_only=True)
@@ -203,7 +216,9 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     flag_reasons = serializers.ReadOnlyField()
     frequency = serializers.ReadOnlyField(source="get_frequency")
     image = serializers.ImageField(
-        allow_empty_file=True, allow_null=True, required=False
+        allow_empty_file=True,
+        allow_null=True,
+        required=False,
     )
     is_editable = serializers.SerializerMethodField()
     is_not_flagged = serializers.ReadOnlyField()
@@ -215,6 +230,12 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
     matrix = serializers.ReadOnlyField(source="get_matrix")
     most_convincing_rationales = serializers.ReadOnlyField(
         source="get_most_convincing_rationales"
+    )
+    parent = NullablePrimaryKeyFormDataSerializer(
+        queryset=Question.objects.all(),
+        many=False,
+        allow_null=True,
+        required=False,
     )
     peer_impact = serializers.SerializerMethodField()
     urls = serializers.SerializerMethodField()
@@ -245,50 +266,39 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         return {"score": pi[0], "label": pi[1], "value": pi[2]}
 
     def get_urls(self, obj):
-        return {
-            "add_answer_choices": reverse(
-                "answer-choice-form", args=(obj.pk,)
-            ),
-            "add_expert_rationales": reverse(
-                "research-fix-expert-rationale", args=(obj.pk,)
-            ),
-            "add_new_question": reverse("question-create"),
-            "add_sample_answers": reverse(
-                "sample-answer-form", args=(obj.pk,)
-            ),
+        urls = {
             "addable_assignments": reverse(
                 "REST:teacher-assignment-for-question", args=(obj.pk,)
             ),
-            "copy_question": reverse("question-clone", args=(obj.pk,)),
-            "fix": reverse("question-fix", args=(obj.pk,)),
-            "matrix": reverse("REST:question-matrix", args=(obj.pk,)),
+            "copy": reverse("teacher:question-copy", args=(obj.pk,)),
+            "fix": reverse(
+                "question-fix", args=(obj.pk,)
+            ),  # TODO: Is this still needed?
             "rationales": reverse("REST:question-rationales", args=(obj.pk,)),
+            "test": reverse("question-test", args=(obj.pk,)),
             "update": reverse("teacher:question-update", args=(obj.pk,)),
         }
-
-    def validate_answerchoice_set(self, value):
-        """
-        Check at least two answer choices
-        """
-        if len(value) < 2:
-            raise serializers.ValidationError(
-                _("At least two answer choices are required")
+        if obj.type == "PI":
+            urls.update(
+                add_answer_choices=reverse(
+                    "answer-choice-form", args=(obj.pk,)
+                ),
+                add_expert_rationales=reverse(
+                    "research-fix-expert-rationale", args=(obj.pk,)
+                ),
+                add_sample_answers=reverse(
+                    "sample-answer-form", args=(obj.pk,)
+                ),
+                matrix=reverse("REST:question-matrix", args=(obj.pk,)),
             )
 
-        """
-        Check at least one answer choice is marked correct
-        """
-        if sum(x["correct"] for x in value) == 0:
-            raise serializers.ValidationError(
-                _("At least one answer choice must be correct")
-            )
-        return value
+        return urls
 
     def validate_image(self, value):
         ALLOWED_IMAGE_FORMATS = ["PNG", "GIF", "JPEG"]
-        ALLOWED_IMAGE_SIZE = 1e6
-
         if value:
+            ALLOWED_IMAGE_SIZE = 1e6
+
             with Image.open(value, formats=ALLOWED_IMAGE_FORMATS) as image:
                 image.load()
 
@@ -301,36 +311,138 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
 
                 if value.size > ALLOWED_IMAGE_SIZE:
                     raise serializers.ValidationError(
-                        f"Invalid image file size.  Max: {ALLOWED_IMAGE_SIZE/1e6} MB"
+                        f"Invalid image file size.  Max: {ALLOWED_IMAGE_SIZE/1e6} MB"  # noqa E501
                     )
-
         return value
 
     def validate_text(self, value):
-        """
-        Check stripped text length <= 8000
-        """
+        """Check stripped text length <= 8000."""
         text = bleach.clean(value, tags=[], strip=True).strip()
         if len(text) > 8000:
             raise serializers.ValidationError(_("Text too long"))
         return value
 
+    def validate(self, data):
+        """
+        - Validation logic is often included in Model.clean(), but DRF ignores.
+
+        - See discussion here https://github.com/encode/django-rest-framework/discussions/7850
+        - For now, we reproduce logic in serializer explicitly
+        - TODO: Consider how updates in Django admin should be handled since
+          serializer validation won't be run.
+        """
+        # Can't have image without image_alt_text; they must always be changed together  # noqa E501
+        if (
+            "image" in data
+            and data["image"]
+            and ("image_alt_text" not in data or not data["image_alt_text"])
+        ):
+            raise serializers.ValidationError(
+                _(
+                    "An alternative text for accessibility if is required if providing an image"  # noqa E501
+                )
+            )
+        # Can't have image and video_url
+        # - raise validation error if sent together
+        # - raise validation error if one sent with other existing on instance
+        if (
+            "image" in data
+            and "video_url" in data
+            and data["image"]
+            and data["video_url"]
+        ):
+            raise serializers.ValidationError(
+                _(
+                    "Only one of the image and video URL fields can be specified"  # noqa E501
+                )
+            )
+        if self.instance and (
+            (self.instance.video_url and "image" in data and data["image"])
+            or (
+                self.instance.image
+                and "video_url" in data
+                and data["video_url"]
+            )
+        ):
+            raise serializers.ValidationError(
+                _(
+                    "Only one of the image and video URL fields can be specified"  # noqa E501
+                )
+            )
+        # Only validate answerchoice_set if question type is PI,
+        # otherwise ensure empty
+        if self.instance:
+            if ("type" in data and data["type"] == "PI") or (
+                "type" not in data and self.instance.type == "PI"
+            ):
+                # Update logic - PI
+                if self.instance.answerchoice_set.count() < 2 and (
+                    "answerchoice_set" not in data
+                    or len(data["answerchoice_set"]) < 2
+                ):
+                    raise serializers.ValidationError(
+                        {
+                            "answerchoice_set": _(
+                                "At least two answer choices are required"
+                            )
+                        }
+                    )
+            else:
+                # Update logic - RO
+                data["answerchoice_set"] = []
+
+        elif "type" not in data or data["type"] == "PI":
+            # Create logic - PI
+            """
+            Check at least two answer choices
+            """
+            if (
+                "answerchoice_set" not in data
+                or len(data["answerchoice_set"]) < 2
+            ):
+                raise serializers.ValidationError(
+                    {
+                        "answerchoice_set": _(
+                            "At least two answer choices are required"
+                        )
+                    }
+                )
+
+            """
+            Check at least one answer choice is marked correct
+            """
+            if sum(x["correct"] for x in data["answerchoice_set"]) == 0:
+                raise serializers.ValidationError(
+                    {
+                        "answerchoice_set": _(
+                            "At least one answer choice must be correct"
+                        )
+                    }
+                )
+        else:
+            # Create logic - RO
+            data["answerchoice_set"] = []
+        return data
+
     def create(self, validated_data):
         answerchoice_data = validated_data.pop("answerchoice_set")
 
-        """Create question and attach user"""
+        """Attach user"""
         question = super().create(validated_data)
-        question.user = self.context["request"].user
-        question.save()
+        if "request" in self.context:
+            question.user = self.context["request"].user
 
         """Create answer choices, sample answers and expert rationales"""
         for i, data in enumerate(answerchoice_data, 1):
             sample_answers = data.pop("sample_answers")
 
-            if "expert_answers" in data:
-                expert_answers = data.pop("expert_answers")
-            else:
-                expert_answers = []
+            expert_answers = (
+                data.pop("expert_answers") if "expert_answers" in data else []
+            )
+
+            # By definition, pk cannot be passed on create
+            if "pk" in data:
+                data.pop("pk")
 
             AnswerChoice.objects.create(question=question, **data)
             for sample_answer in sample_answers:
@@ -348,34 +460,46 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                     rationale=expert_answer["rationale"],
                 )
 
+        """Create question"""
+        question.save()
+
         return question
 
     def update(self, question, validated_data):
-        """
-        If answerchoice_set is present:
-        - If pk is provided, instance will be updated
-        - If pk is missing, instance will be created
-        - If existing answerchoice is missing, it will be deleted with related models
-        - Same logic for sample and expert answers
-        """
         answerchoice_data = None
         if "answerchoice_set" in validated_data:
             answerchoice_data = validated_data.pop("answerchoice_set")
 
-        # Update question
-        for field in validated_data.keys():
-            if (
-                type(validated_data[field]) is list
-                or type(validated_data[field]) is tuple
-            ):
+        # Only owner can modify list of collaborators
+        if "collaborators_pk" in validated_data:
+            collaborators_pk = validated_data.pop("collaborators_pk")
+
+            if question.user == self.request.user:
+                question.collaborators.set(collaborators_pk)
+
+        # Cannot change parent
+        if "parent" in validated_data:
+            validated_data.pop("parent")
+
+        # Update remaining question fields
+        for field in validated_data:
+            if isinstance(validated_data[field], (list, tuple)):
                 _field = getattr(question, field)
                 _field.set(validated_data[field])
             else:
                 setattr(question, field, validated_data[field])
 
+        """Update question"""
         question.save()
 
         if answerchoice_data:
+            """
+            If answerchoice_set is present:
+            - If pk is provided, instance will be updated
+            - If pk is missing, instance will be created
+            - If existing answerchoice is missing, it will be deleted with related models
+            - Same logic for sample and expert answers
+            """
             existing_answerchoices = set(
                 question.answerchoice_set.values_list("pk", flat=True)
             )
@@ -383,10 +507,11 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             for i, data in enumerate(answerchoice_data, 1):
                 sample_answers = data.pop("sample_answers")
 
-                if "expert_answers" in data:
-                    expert_answers = data.pop("expert_answers")
-                else:
-                    expert_answers = []
+                expert_answers = (
+                    data.pop("expert_answers")
+                    if "expert_answers" in data
+                    else []
+                )
 
                 if "pk" in data:
                     # Update answer choice and related models
@@ -453,7 +578,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
                             rationale=expert_answer["rationale"],
                         )
 
-                    if len(to_create) > 0 or len(existing) > len(to_delete):
+                    if to_create or len(existing) > len(to_delete):
                         for pk in to_delete:
                             e = Answer.objects.get(pk=pk)
                             e.delete()
@@ -493,7 +618,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
         return question
 
     def to_representation(self, instance):
-        """Bleach on the way out"""
+        """Bleach on the way out."""
         ret = super().to_representation(instance)
         if "title" in ret:
             ret["title"] = bleach.clean(
@@ -539,6 +664,7 @@ class QuestionSerializer(DynamicFieldsModelSerializer):
             "most_convincing_rationales",
             "peer_impact",
             "rationale_selection_algorithm",
+            "parent",
             "pk",
             "text",
             "title",
@@ -582,6 +708,8 @@ class RankSerializer(serializers.ModelSerializer):
 
     def get_unique_together_validators(self):
         """
+        Override default.
+
         Have to override the unique_together constraint in order
         to support update as nested field in AssignmentSerializer
         """
@@ -597,11 +725,11 @@ class RankSerializer(serializers.ModelSerializer):
         assignment = validated_data["assignment"]
         question = validated_data["question"]
         if (
-            assignment.editable
+            assignment.is_editable
             and self.context["request"].user in assignment.owner.all()
         ):
-            if assignment.questions.all():
-                added_question = AssignmentQuestions.objects.create(
+            return (
+                AssignmentQuestions.objects.create(
                     assignment=assignment,
                     question=question,
                     rank=assignment.questions.aggregate(
@@ -609,13 +737,13 @@ class RankSerializer(serializers.ModelSerializer):
                     )["assignmentquestions__rank__max"]
                     + 1,
                 )
-            else:
-                added_question = AssignmentQuestions.objects.create(
+                if assignment.questions.all()
+                else AssignmentQuestions.objects.create(
                     assignment=assignment,
                     question=question,
                     rank=1,
                 )
-            return added_question
+            )
         raise PermissionDenied
 
     class Meta:
@@ -625,7 +753,7 @@ class RankSerializer(serializers.ModelSerializer):
 
 class AssignmentSerializer(DynamicFieldsModelSerializer):
     answer_count = serializers.ReadOnlyField()
-    editable = serializers.ReadOnlyField()
+    is_editable = serializers.ReadOnlyField()
     is_valid = serializers.ReadOnlyField()
     is_owner = serializers.SerializerMethodField()
     owner = UserSerializer(many=True, read_only=True)
@@ -662,7 +790,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
 
     def get_urls(self, obj):
         return {
-            "copy": reverse("assignment-copy", args=(obj.pk,)),
+            "copy": reverse("REST:teacher-assignment-copy", args=(obj.pk,)),
             "distribute": reverse(
                 "student-group-assignment-create", args=(obj.pk,)
             ),
@@ -694,7 +822,10 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
 
     def create(self, validated_data):
         """Attach user and add to teacher assignments"""
+        # TODO: Add check here that user is teacher?
         assignment = super().create(validated_data)
+
+        # TODO: Check that context has request, otherwise raise error or skip
         assignment.owner.add(self.context["request"].user)
         self.context["request"].user.teacher.assignments.add(assignment)
         return assignment
@@ -704,13 +835,13 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         Only used to reorder questions and change meta data.
         Adding/deleting questions is handled by serializer for through table.
         """
-        if "assignmentquestions_set" in validated_data:
-            if instance.editable:
-                for i, aq in enumerate(instance.assignmentquestions_set.all()):
-                    aq.rank = validated_data["assignmentquestions_set"][i][
-                        "rank"
-                    ]
-                    aq.save()
+        if (
+            "assignmentquestions_set" in validated_data
+            and instance.is_editable
+        ):
+            for i, aq in enumerate(instance.assignmentquestions_set.all()):
+                aq.rank = validated_data["assignmentquestions_set"][i]["rank"]
+                aq.save()
 
         for field in ["conclusion_page", "description", "intro_page", "title"]:
             if field in validated_data:
@@ -721,7 +852,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         return instance
 
     def to_representation(self, instance):
-        """Bleach on the way out"""
+        """Bleach on the way out."""
         ret = super().to_representation(instance)
         for field in ["conclusion_page", "description", "intro_page"]:
             if field in ret and ret[field]:
@@ -736,7 +867,7 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
         return ret
 
     def to_internal_value(self, data):
-        """Bleach on the way in"""
+        """Bleach on the way in."""
         ret = super().to_internal_value(data)
         for field in ["conclusion_page", "description", "intro_page"]:
             if field in ret and ret[field]:
@@ -756,8 +887,8 @@ class AssignmentSerializer(DynamicFieldsModelSerializer):
             "answer_count",  #
             "conclusion_page",
             "description",
-            "editable",
             "intro_page",
+            "is_editable",
             "is_owner",
             "is_valid",
             "owner",  #
@@ -791,7 +922,7 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
     )
     issueCount = serializers.SerializerMethodField()
     order = serializers.CharField(
-        max_length=1000
+        max_length=1000, required=False
     )  # Arbitrary upper limit as safeguard
     progress = serializers.SerializerMethodField()
     questionCount = serializers.SerializerMethodField()
@@ -844,6 +975,7 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
         return obj.get_absolute_url()
 
     def validate_assignment_pk(self, assignment):
+        """Check assignment is valid."""
         if not assignment.is_valid:
             logger.error(
                 f"Assignment {assignment} is not valid and cannot be distributed."
@@ -852,9 +984,7 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
         return assignment
 
     def validate_due_date(self, due_date):
-        """
-        Check due_date is in the future
-        """
+        """Check due_date is in the future."""
         if due_date < timezone.now():
             logger.error(f"Invalid due_date: {due_date}")
             raise serializers.ValidationError(
@@ -864,9 +994,18 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
 
     def validate_group_pk(self, student_group):
         """
-        Check that teacher owns group and that group is "assignable"
-        (see Teacher model)
+        Check that teacher owns group and that group is "assignable".
+
+        - See Teacher model
         """
+        if "request" not in self.context:
+            logger.error(
+                f"Cannot validate student group outside of a request: {student_group}"  # noqa
+            )
+            raise serializers.ValidationError(
+                "Cannot validate student group outside of a request."
+            )
+
         teacher = self.context["request"].user.teacher
 
         if (
@@ -879,27 +1018,39 @@ class StudentGroupAssignmentSerializer(DynamicFieldsModelSerializer):
         logger.error(f"Invalid student group: {student_group}")
         raise serializers.ValidationError("Invalid student group.")
 
-    def validate_order(self, data):
-        logger.info(f"Order: {data}")
-        # TODO: Reimplement custom validation in model through validators and update
-        # raise serializers.ValidationError("Invalid question order.")
-        return data
-
     def validate(self, data):
-        """
-        Impose unique_together on assignment and group
-        """
-        assignment = data["assignment"]
-        group = data["group"]
-        if StudentGroupAssignment.objects.filter(
+        """Check unique_together constraint on assignment and group."""
+        assignment = (
+            data["assignment"]
+            if "assignment" in data
+            else self.instance.assignment
+        )
+        group = data["group"] if "group" in data else self.instance.group
+        queryset = StudentGroupAssignment.objects.filter(
             assignment=assignment, group=group
-        ).exists():
+        )
+        if self.instance:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.exists():
             logger.error(
                 f"Assignment {assignment} already distributed to {group}."
             )
             raise serializers.ValidationError(
                 f"Assignment already distributed to {group}."
             )
+
+        """Check order."""
+        if "order" in data:
+            if self.instance:
+                if err := self.instance._verify_order(data["order"]):
+                    logger.error(err)
+                    raise serializers.ValidationError(err)
+            elif err := StudentGroupAssignment.verify_order(
+                data["order"], data["assignment"].questions.count()
+            ):
+                raise serializers.ValidationError(err)
+
         return data
 
     def create(self, validated_data):

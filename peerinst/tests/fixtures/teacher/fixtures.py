@@ -1,7 +1,8 @@
 import pytest
 from django.contrib.auth.models import Permission
 
-from ..tos import consent_to_tos, tos_teacher
+from peerinst.tests.fixtures.tos import consent_to_tos
+
 from .generators import add_teachers, new_teachers
 
 
@@ -13,6 +14,10 @@ def teacher(tos_teacher):
     teacher.user.user_permissions.add(
         Permission.objects.get(codename="add_question"),
         Permission.objects.get(codename="change_question"),
+        Permission.objects.get(codename="delete_question"),
+        Permission.objects.get(codename="add_assignment"),
+        Permission.objects.get(codename="change_assignment"),
+        Permission.objects.get(codename="delete_assignment"),
     )
     consent_to_tos(teacher, tos_teacher)
     return teacher
@@ -27,6 +32,10 @@ def teachers(tos_teacher):
         teacher.user.user_permissions.add(
             Permission.objects.get(codename="add_question"),
             Permission.objects.get(codename="change_question"),
+            Permission.objects.get(codename="delete_question"),
+            Permission.objects.get(codename="add_assignment"),
+            Permission.objects.get(codename="change_assignment"),
+            Permission.objects.get(codename="delete_assignment"),
         )
         consent_to_tos(teacher, tos_teacher)
     return teachers

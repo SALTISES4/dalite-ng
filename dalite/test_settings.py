@@ -35,6 +35,9 @@ PYLTI_CONFIG = {
     }
 }
 
+# ElasticSearch DSL
+ELASTICSEARCH_DSL_AUTOSYNC = False
+
 ROOT_URLCONF = "dalite.test_urls"
 
 try:

@@ -30,24 +30,14 @@ def dummy_paths():
 def old_patterns():
     return [
         path(
-            "browse/",
-            views.browse_database,
-            name="browse-database",
+            "question/test/<int:question_id>",
+            views.question,
+            name="question-test",
         ),
         path(
-            "assignment-list/",
-            views.AssignmentListView.as_view(),
-            name="assignment-list",
-        ),
-        path(
-            "question/create",
-            views.QuestionCreateView.as_view(),
-            name="question-create",
-        ),
-        path(
-            "question/clone/<int:pk>",
-            views.QuestionCloneView.as_view(),
-            name="question-clone",
+            "reset/<int:question_id>",
+            views.reset_question,
+            name="question-reset",
         ),
         path(
             "assignment/fix/<pk>",
@@ -65,46 +55,6 @@ def old_patterns():
             name="question-update",
         ),
         path(
-            "discipline/create",
-            views.DisciplineCreateView.as_view(),
-            name="discipline-create",
-        ),
-        path(
-            "discipline/form/<int:pk>",
-            views.discipline_select_form,
-            name="discipline-form",
-        ),
-        path(
-            "discipline/form",
-            views.discipline_select_form,
-            name="discipline-form",
-        ),
-        path(
-            "disciplines/form/<int:pk>",
-            views.disciplines_select_form,
-            name="disciplines-form",
-        ),
-        path(
-            "disciplines/form",
-            views.disciplines_select_form,
-            name="disciplines-form",
-        ),
-        path(
-            "category/create",
-            views.CategoryCreateView.as_view(),
-            name="category-create",
-        ),
-        path(
-            "category/form/<int:pk>",
-            views.category_select_form,
-            name="category-form",
-        ),
-        path(
-            "category/form",
-            views.category_select_form,
-            name="category-form",
-        ),
-        path(
             "answer-choice/form/<int:question_id>",
             views.answer_choice_form,
             name="answer-choice-form",
@@ -118,26 +68,6 @@ def old_patterns():
             "sample-answer/form/<int:question_id>/done",
             views.sample_answer_form_done,
             name="sample-answer-form-done",
-        ),
-        path(
-            "assignment/create",
-            views.AssignmentCreateView.as_view(),
-            name="assignment-create",
-        ),
-        path(
-            "assignment/copy/<assignment_id>",
-            views.AssignmentCopyView.as_view(),
-            name="assignment-copy",
-        ),
-        path(
-            "assignment/edit",
-            views.update_assignment_question_list,
-            name="assignment-edit-ajax",
-        ),
-        path(
-            "assignment/edit/<assignment_id>",
-            views.AssignmentEditView.as_view(),
-            name="assignment-edit",
         ),
         path(
             "assignment-search/",
@@ -322,11 +252,6 @@ def old_patterns():
 
 def group_patterns():
     return [
-        path(
-            "group/student-information/",
-            views.group.get_student_reputation,
-            name="group-details--student-information",
-        ),
         path(
             "group/<group_hash>/",
             views.group_details_page,

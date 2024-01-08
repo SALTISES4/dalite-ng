@@ -90,21 +90,8 @@ urlpatterns += i18n_patterns(
         "feedback/", include("user_feedback.urls", namespace="user_feedback")
     ),
     path("saltise/", include("saltise.urls", namespace="saltise")),
-    path("blink/", include("blink.urls", namespace="blink")),
     path("course-flow/", include("course_flow.urls", namespace="course_flow")),
     path("teacher/", include("teacher.urls", namespace="teacher")),
-    path(
-        "reputation/",
-        decorator_include(
-            (
-                csp_replace(FRAME_ANCESTORS=["*"]),
-                xframe_options_exempt,
-                lti_access_allowed,
-            ),
-            "reputation.urls",
-            namespace="reputation",
-        ),
-    ),
     path("quality/", include("quality.urls", namespace="quality")),
     path("tos/", include("tos.urls")),
     path("rest-api/", include("REST.urls", namespace="REST")),
@@ -141,11 +128,6 @@ urlpatterns += i18n_patterns(
                             ),
                         ]
                     ),
-                ),
-                path(
-                    "update/",
-                    peerinst_views.AssignmentUpdateView.as_view(),
-                    name="assignment-update",
                 ),
             ]
         ),

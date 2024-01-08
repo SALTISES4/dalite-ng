@@ -1,4 +1,0 @@
-channels[daphne] >= 4
-channels-redis >= 4
-cryptography >= 3.3
-django < 4

@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from REST import form_helpers, views
+from REST import views
 
 app_name = "REST"
 
@@ -59,7 +59,7 @@ TEACHER PATTERNS
 """
 peerinst_api.register(
     r"teacher/assignments",
-    views.TeacherAssignmentViewSet,
+    views.TeacherAssignmentCRUDViewSet,
     basename="teacher-assignment",
 ),
 peerinst_api.register(
@@ -158,12 +158,12 @@ urlpatterns = [
     # Form helpers
     path(
         "form-helpers/assignment/check-id/",
-        form_helpers.check_assignment_id_is_valid,
+        views.check_assignment_id_is_valid,
         name="assignment-check-id",
     ),
     path(
         "form-helpers/assignment/help-texts/",
-        form_helpers.get_assignment_help_texts,
+        views.get_assignment_help_texts,
         name="assignment-help-texts",
     ),
 ]

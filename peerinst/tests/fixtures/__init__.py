@@ -16,6 +16,7 @@ __all__ = [
     "disciplines",
     "first_answers_no_shown",
     "group",
+    "groups",
     "inactive_user",
     "new_teacher",
     "new_user",
@@ -54,7 +55,7 @@ from .assignment import (
     student_group_assignments,
 )
 from .collection import collection, collections
-from .group import group
+from .group import group, groups
 from .question import (
     add_answers,
     category,

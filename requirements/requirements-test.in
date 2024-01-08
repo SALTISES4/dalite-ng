@@ -5,7 +5,6 @@ ddt
 factory_boy
 Faker
 mixer
-mysqlclient
 mock
 pytest
 pytest-celery

@@ -127,9 +127,7 @@ class FeedbackReadSerialzer(serializers.ModelSerializer):
 
 
 class StudentGroupAssignmentAnswerSerializer(serializers.ModelSerializer):
-    """
-    A serializer to retrieve answers from a StudentGroupAssignment
-    """
+    """A serializer to retrieve answers from a StudentGroupAssignment."""
 
     answers = serializers.SerializerMethodField()
 
@@ -138,7 +136,6 @@ class StudentGroupAssignmentAnswerSerializer(serializers.ModelSerializer):
         Field will be a list of all answers for this StudentGroupAssignment for
         a single question
         """
-
         answers = (
             Answer.objects.filter(
                 user_token__in=[

@@ -32,13 +32,6 @@
       <script nonce="{{ request.csp_nonce }}">
         jQuery.migrateEnablePatches("self-closed-tags");
       </script>
-      <!-- * webcomponents -->
-      <script
-        src="https://unpkg.com/browse/@webcomponents/webcomponentsjs@2.6.0/webcomponents-loader.js"
-        integrity="sha384-d79el5czCrB9MIVLbOTAsdBPXLKL2FCaAZE2BSHZSSf2zZoB5BWZzpaccglhCblp"
-        crossorigin="anonymous"
-        type="application/json">
-      </script>
 
       <!-- Local resources -->
       <!-- * Icons -->
@@ -121,7 +114,7 @@
                 id="logo">
             {% endif %}
             {% if not user.student  %}
-              <a href="{% url 'browse-database' %}">
+              <a href="{% url 'teacher:search' %}">
                 <div id="custom-instance-header">
                   <span class="dalite-my">my</span><span class="dalite-dalite">Dalite</span>
                 </div>

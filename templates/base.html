@@ -21,13 +21,17 @@
       <!-- Javascript translations -->
       <script src="{% url 'javascript-catalog' %}"></script>
 
-      <!-- Fonts and styles -->
+      <!-- Fonts -->
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      />
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined"
       />
       <link
         rel="stylesheet"
@@ -45,9 +49,8 @@
         <style nonce="{{ request.csp_nonce }}">
           html {
             background-color: #EDF5FC;
-          }
-          body {
-            margin: 0px 0px 50px 0px;
+            font-family: 'Open Sans', sans-serif;
+            visibility: hidden;
           }
           #main {
             margin-left: 200px;
@@ -60,18 +63,31 @@
         <link href="{% static 'peerinst/css/cookie_law.min.css' %}" rel="stylesheet">
       {% endcompress %}
 
-      <!-- Apps -->
-      <script
-        src="{% static 'components/js/build/navigation.min.js' %}"
-        defer="true"
-      ></script>
+      <!-- Navigation app -->
+      {% compress js file navigation %}
+        <script
+          src="{% static 'components/js/build/navigation.min.js' %}"
+          defer="true"
+        ></script>
+      {% endcompress %}
+
+      <!-- Material web -->
+      {% compress css file material-web %}
+        <link href="{% static 'peerinst/css/material-web.min.css' %}" rel="stylesheet">
+      {% endcompress %}
+      {% compress js file material-web %}
+        <script type="module" src="{% static 'peerinst/js/material-web.min.js' %}"></script>
+      {% endcompress %}
+
       {% block apps %}{% endblock %}
     </head>
     <body>
-      {% block body %}{% endblock %}
-
       <div id="main">
-        {% block injected_apps %}{% endblock %}
+        {% block injected_apps %}
+          <div id="navigation-app"></div>
+        {% endblock %}
+        {% block appbar %}{% endblock %}
+        {% block body %}{% endblock %}
       </div>
 
       <!-- Cookie consent -->
@@ -118,6 +134,10 @@
       {% endif %}
 
       {% block scripts %}{% endblock %}
+
+      <script nonce="{{ request.csp_nonce }}">
+        window.addEventListener("load", () => {document.querySelector("html").style.visibility = "visible";});
+      </script>
     </body>
   </html>
 {% endtimezone %}

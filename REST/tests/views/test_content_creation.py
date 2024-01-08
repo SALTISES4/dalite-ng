@@ -13,7 +13,7 @@ from functional_tests.fixtures import (  # noqa
     realistic_assignment,
     realistic_questions,
 )
-from peerinst.models import Answer, Category, Question
+from peerinst.models import Answer, Question
 from peerinst.tests.fixtures import *  # noqa
 from peerinst.tests.fixtures.teacher import login_teacher
 
@@ -329,6 +329,8 @@ def test_teacherquestioncreateupdateviewset_create_with_categories(
     )
     data = json.loads(response.content)
 
+    print(response.content)
+
     assert response.status_code == status.HTTP_201_CREATED
     assert category.title in [x["title"] for x in data["category"]]
 
@@ -436,17 +438,16 @@ def test_teacherquestioncreateupdateviewset_create_and_remove_image_png(
                     "rb",
                 ).read(),
             ),
+            "image_alt_text": fake.sentence(),
             "answerchoice_set[0]correct": True,
             "answerchoice_set[0]text": fake.sentence(),
-            "answerchoice_set[0]sample_answers[0]rationale": fake.sentence(),
-            "answerchoice_set[0]expert_answers[0]rationale": fake.sentence(),
+            "answerchoice_set[0]sample_answers[0]rationale": fake.paragraph(),
+            "answerchoice_set[0]expert_answers[0]rationale": fake.paragraph(),
             "answerchoice_set[1]correct": False,
             "answerchoice_set[1]text": fake.sentence(),
-            "answerchoice_set[1]sample_answers[0]rationale": fake.sentence(),
+            "answerchoice_set[1]sample_answers[0]rationale": fake.paragraph(),
         },
     )
-
-    print(response.content)
 
     assert response.status_code == status.HTTP_201_CREATED
 
@@ -467,6 +468,70 @@ def test_teacherquestioncreateupdateviewset_create_and_remove_image_png(
     print(response.content)
 
     assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_create_with_video(client, teacher):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-question-create-update-list")
+    response = client.post(
+        url,
+        data={
+            "text": fake.paragraph(),
+            "title": fake.sentence(),
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [{"rationale": fake.paragraph()}],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
+            "video_url": "http://www.bad-domain.com",
+        },
+        content_type="application/json",
+    )
+
+    assert (
+        "Only urls starting with https:// are allowed"
+        in response.data["video_url"]
+    )
+    assert (
+        "www.bad-domain.com is not in the list of allowed domains: mydalite.org, courseflow.ca, phet.colorado.edu, youtube.com, youtube-nocookie.com, vimeo.com, docs.google.com, openstax.org, www.geogebra.org"
+        in response.data["video_url"]
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    response = client.post(
+        url,
+        data={
+            "text": fake.paragraph(),
+            "title": fake.sentence(),
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [{"rationale": fake.paragraph()}],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
+            "video_url": "https://youtube.com/some_video",
+        },
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_201_CREATED
 
 
 @pytest.mark.django_db
@@ -492,11 +557,11 @@ def test_teacherquestioncreateupdateviewset_create_image_svg(client, teacher):
             ),
             "answerchoice_set[0]correct": True,
             "answerchoice_set[0]text": fake.sentence(),
-            "answerchoice_set[0]sample_answers[0]rationale": fake.sentence(),
-            "answerchoice_set[0]expert_answers[0]rationale": fake.sentence(),
+            "answerchoice_set[0]sample_answers[0]rationale": fake.paragraph(),
+            "answerchoice_set[0]expert_answers[0]rationale": fake.paragraph(),
             "answerchoice_set[1]correct": False,
             "answerchoice_set[1]text": fake.sentence(),
-            "answerchoice_set[1]sample_answers[0]rationale": fake.sentence(),
+            "answerchoice_set[1]sample_answers[0]rationale": fake.paragraph(),
         },
     )
 
@@ -529,11 +594,11 @@ def test_teacherquestioncreateupdateviewset_create_image_large_file(
             ),
             "answerchoice_set[0]correct": True,
             "answerchoice_set[0]text": fake.sentence(),
-            "answerchoice_set[0]sample_answers[0]rationale": fake.sentence(),
-            "answerchoice_set[0]expert_answers[0]rationale": fake.sentence(),
+            "answerchoice_set[0]sample_answers[0]rationale": fake.paragraph(),
+            "answerchoice_set[0]expert_answers[0]rationale": fake.paragraph(),
             "answerchoice_set[1]correct": False,
             "answerchoice_set[1]text": fake.sentence(),
-            "answerchoice_set[1]sample_answers[0]rationale": fake.sentence(),
+            "answerchoice_set[1]sample_answers[0]rationale": fake.paragraph(),
         },
     )
 
@@ -561,6 +626,19 @@ def test_teacherquestioncreateupdateviewset_update_owned_editable_question(
         data={
             "text": text,
             "title": title,
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [{"rationale": fake.paragraph()}],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
         },
         content_type="application/json",
     )
@@ -570,6 +648,83 @@ def test_teacherquestioncreateupdateviewset_update_owned_editable_question(
     assert question.text == text
     assert question.title == title
     assert Question.objects.count() == count
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_update_collaborators_owner(
+    client, teachers, question
+):
+    assert login_teacher(client, teachers[0])
+    assert question.user == teachers[0].user
+    assert question.answer_set.count() == 0
+
+    url = reverse(
+        "REST:teacher-question-create-update-detail",
+        args=(question.pk,),
+    )
+    response = client.patch(
+        url,
+        data={
+            "collaborators_pk": [teachers[1].user.username],
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [{"rationale": fake.paragraph()}],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
+        },
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    question.refresh_from_db()
+    assert teachers[1].user in question.collaborators.all()
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_update_collaborators_collaborator(
+    client, teachers, question
+):
+    assert login_teacher(client, teachers[1])
+    assert question.user == teachers[0].user
+    assert question.answer_set.count() == 0
+    question.collaborators.add(teachers[1].user)
+
+    url = reverse(
+        "REST:teacher-question-create-update-detail",
+        args=(question.pk,),
+    )
+    response = client.patch(
+        url,
+        data={
+            "collaborators_pk": [teachers[2].user.username],
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [{"rationale": fake.paragraph()}],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
+        },
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    question.refresh_from_db()
+    assert teachers[1].user not in question.collaborators.all()
 
 
 @pytest.mark.django_db
@@ -590,6 +745,19 @@ def test_teacherquestioncreateupdateviewset_update_remove_categories(
         url,
         data={
             "category_pk": [],
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [{"rationale": fake.paragraph()}],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
         },
         content_type="application/json",
     )
@@ -1000,17 +1168,144 @@ def test_teacherquestioncreateupdateviewset_create_answer_rationale_too_long(
     )
 
     assert (
-        "Rationale text too long"
+        "Please provide a less detailed rationale for your choice."
         in response.data["answerchoice_set"][0]["expert_answers"][0][
             "rationale"
         ]
     )
     assert (
-        "Rationale text too long"
+        "Please provide a less detailed rationale for your choice."
         in response.data["answerchoice_set"][1]["sample_answers"][0][
             "rationale"
         ]
     )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_create_answer_rationale_profane(
+    client, teacher
+):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-question-create-update-list")
+    count = Question.objects.count()
+    response = client.post(
+        url,
+        data={
+            "text": fake.paragraph(),
+            "title": fake.sentence(),
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [
+                        {"rationale": "This question is fucking stupid."}
+                    ],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
+        },
+        content_type="application/json",
+    )
+
+    assert (
+        "The language filter has labeled this as possibly toxic or profane; please rephrase your rationale."
+        in response.data["answerchoice_set"][0]["expert_answers"][0][
+            "rationale"
+        ]
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_create_answer_rationale_too_short(
+    client, teacher
+):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-question-create-update-list")
+    count = Question.objects.count()
+    response = client.post(
+        url,
+        data={
+            "text": fake.paragraph(),
+            "title": fake.sentence(),
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [{"rationale": "Short"}],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
+        },
+        content_type="application/json",
+    )
+
+    assert (
+        "Please provide a more detailed rationale for your choice."
+        in response.data["answerchoice_set"][0]["expert_answers"][0][
+            "rationale"
+        ]
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Question.objects.count() == count
+
+
+@pytest.mark.django_db
+def test_teacherquestioncreateupdateviewset_create_answer_rationale_eng_fr(
+    client, teacher
+):
+    assert login_teacher(client, teacher)
+
+    url = reverse("REST:teacher-question-create-update-list")
+    count = Question.objects.count()
+    response = client.post(
+        url,
+        data={
+            "text": fake.paragraph(),
+            "title": fake.sentence(),
+            "answerchoice_set": [
+                {
+                    "correct": True,
+                    "text": fake.sentence(),
+                    "expert_answers": [
+                        {"rationale": "Yo tengo una pregunta dificil"}
+                    ],
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+                {
+                    "correct": False,
+                    "text": fake.sentence(),
+                    "sample_answers": [{"rationale": fake.paragraph()}],
+                },
+            ],
+        },
+        content_type="application/json",
+    )
+
+    assert (
+        "Please clarify what you've written."
+        in response.data["answerchoice_set"][0]["expert_answers"][0][
+            "rationale"
+        ]
+    )
+
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert Question.objects.count() == count
 
@@ -1032,6 +1327,7 @@ def test_teacherquestioncreateupdateviewset_delete_owned_editable_question(
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
     assert not Question.objects.filter(pk=question.pk).exists()
+    assert Question.objects.count() == count - 1
 
 
 @pytest.mark.django_db
