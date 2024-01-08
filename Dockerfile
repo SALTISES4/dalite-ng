@@ -22,7 +22,7 @@ COPY manage.py .
 COPY gulpfile.js .
 RUN npx gulp build
 
-FROM python:3.8
+FROM python:3.9
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 WORKDIR /code

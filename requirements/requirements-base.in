@@ -37,7 +37,7 @@ pymemcache
 pytz
 redis >= 4.3.6
 requests >= 2.31.0
-scipy >= 1.10.0rc1
+scipy >= 1.11.1
 sqlparse >= 0.4.4
 tldextract
 

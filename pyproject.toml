@@ -5,7 +5,7 @@ meta_viewport = true
 
 [tool.ruff]
 exclude = ["*/migrations/*"]
-target-version = "py38"
+target-version = "py39"
 line-length = 79
 
 [tool.ruff.extend-per-file-ignores]
