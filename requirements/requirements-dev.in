@@ -6,3 +6,4 @@ PyMySQL
 ruff
 
 -e ../Components
+# -e ../CourseFlow
