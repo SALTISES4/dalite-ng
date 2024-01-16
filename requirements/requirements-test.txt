@@ -379,6 +379,8 @@ pylti==0.7.0
     #   django-lti-provider
 pymemcache==4.0.0
     # via -r requirements/requirements-base.txt
+pymysql==1.1.0
+    # via -r requirements/requirements-test.in
 pynliner==0.8.0
     # via
     #   -r requirements/requirements-base.txt

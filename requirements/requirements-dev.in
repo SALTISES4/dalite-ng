@@ -2,7 +2,6 @@
 
 mypy
 pre-commit
-PyMySQL
 ruff
 
 -e ../Components

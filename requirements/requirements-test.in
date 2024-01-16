@@ -6,6 +6,7 @@ factory_boy
 Faker
 mixer
 mock
+PyMySQL
 pytest
 pytest-celery
 pytest-cov

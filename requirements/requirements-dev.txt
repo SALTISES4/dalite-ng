@@ -411,7 +411,7 @@ pylti==0.7.0
 pymemcache==4.0.0
     # via -r requirements/requirements-test.txt
 pymysql==1.1.0
-    # via -r requirements/requirements-dev.in
+    # via -r requirements/requirements-test.txt
 pynliner==0.8.0
     # via
     #   -r requirements/requirements-test.txt
