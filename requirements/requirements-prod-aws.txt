@@ -867,7 +867,9 @@ pymemcache==4.0.0 \
 pymysql==1.1.0 \
     --hash=sha256:4f13a7df8bf36a51e81dd9f3605fede45a4878fe02f9236349fd82a3f0612f96 \
     --hash=sha256:8969ec6d763c856f7073c4c64662882675702efcb114b4bcbb955aea3a069fa7
-    # via -r requirements/requirements-prod-aws.in
+    # via
+    #   -r requirements/requirements-base.txt
+    #   -r requirements/requirements-prod-aws.in
 pynliner==0.8.0 \
     --hash=sha256:32da16ed8ba1fec775909e39f0ffa8e6e02a674b889286c9a2370c3c03f617a5 \
     --hash=sha256:83e7dd4d48001bebbe0a648d7089e94e21ffb74c5af2f582c47d8793ffe8628e

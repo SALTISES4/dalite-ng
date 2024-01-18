@@ -34,6 +34,7 @@ pillow>=10.0.1
 pip-lock
 pyjwt
 pymemcache
+PyMySQL
 pytz
 redis >= 4.3.6
 requests >= 2.31.0
