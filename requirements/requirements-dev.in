@@ -4,5 +4,5 @@ mypy
 pre-commit
 ruff
 
--e ../Components
+# -e ../Components
 # -e ../CourseFlow
