@@ -30,7 +30,7 @@ elasticsearch<7.14.0
 future>0.18.2
 langdetect
 pandas
-pillow>=10.0.1
+pillow>=10.2.0
 pip-lock
 pyjwt
 pymemcache

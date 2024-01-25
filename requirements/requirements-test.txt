@@ -348,7 +348,7 @@ pandas==2.0.3
     # via
     #   -r requirements/requirements-base.txt
     #   saltise-course-flow
-pillow==10.0.1
+pillow==10.2.0
     # via -r requirements/requirements-base.txt
 pip-lock==2.11.0
     # via -r requirements/requirements-base.txt
