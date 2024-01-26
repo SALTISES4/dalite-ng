@@ -76,7 +76,7 @@ const scriptBuilds = [
       // "student",
       // "search",
       "index",
-      // "preview",
+      "preview",
       "question",
       "teacher",
       // "custom_elements",

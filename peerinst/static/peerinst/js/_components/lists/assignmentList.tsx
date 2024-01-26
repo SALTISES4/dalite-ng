@@ -35,7 +35,7 @@ import "@rmwc/menu/node_modules/@material/menu-surface/dist/mdc.menu-surface.css
 import "@rmwc/typography/node_modules/@material/typography/dist/mdc.typography.min.css";
 
 export type Assignment = {
-  is_editable: boolean;
+  is_editable: boolean; // eslint-disable-line camelcase
   is_valid: boolean; // eslint-disable-line camelcase
   pk: string;
   questions_basic?: ListedQuestion[]; // eslint-disable-line camelcase
