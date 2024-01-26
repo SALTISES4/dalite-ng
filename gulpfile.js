@@ -52,7 +52,7 @@ const styleBuilds = [
       // "main",
       // "mdc",
       // "rmwc",
-      // "cookie_law",
+      "cookie_law",
       // "error",
       // "search",
       // "landing_page",
