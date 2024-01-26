@@ -92,10 +92,10 @@ const scriptBuilds = [
     app: "tos",
     modules: ["email"],
   },
-  // {
-  //   app: "quality",
-  //   modules: ["edit"],
-  // },
+  {
+    app: "quality",
+    modules: ["edit"],
+  },
 ];
 
 function buildStyle(app, module) {
