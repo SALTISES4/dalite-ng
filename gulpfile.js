@@ -61,10 +61,10 @@ const styleBuilds = [
       "tiny",
     ],
   },
-  // {
-  //   app: "quality",
-  //   modules: ["edit"],
-  // },
+  {
+    app: "quality",
+    modules: ["edit"],
+  },
 ];
 
 const scriptBuilds = [
