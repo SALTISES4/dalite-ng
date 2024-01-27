@@ -492,7 +492,7 @@ ruff==0.1.6
     # via -r requirements/requirements-dev.in
 saltise-components==0.2.15
     # via -r requirements/requirements-test.txt
-saltise-course-flow==0.8.25
+saltise-course-flow==0.8.26
     # via -r requirements/requirements-test.txt
 saltise-user-feedback==1.1.2
     # via -r requirements/requirements-test.txt

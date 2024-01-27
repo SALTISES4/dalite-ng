@@ -1010,8 +1010,8 @@ s3transfer==0.6.2 \
 saltise-components==0.2.15 \
     --hash=sha256:fc7aed871fe983deab269fea9b3e321a725f3392e2130cd9cce6e454f76adad8
     # via -r requirements/requirements-base.txt
-saltise-course-flow==0.8.25 \
-    --hash=sha256:35f8d0518f716f7df8f7f8b688dc291c4a82f32f5f116d5533ee3c4abd334d40
+saltise-course-flow==0.8.26 \
+    --hash=sha256:4fa74e977b9054ef3701491e2701e938c2f1b099fa8386887a629ea68a8350ab
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==1.1.2 \
     --hash=sha256:c57647cb83ab8bcee43f2ddc5db586f5fc20db3fb9f7a6a09b9be01de2005303
