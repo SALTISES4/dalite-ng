@@ -42,7 +42,8 @@ scipy >= 1.10.0rc1
 sqlparse >= 0.4.4
 tldextract
 
-SALTISE_course_flow == 0.8.22
+# SALTISE_course_flow == 0.8.22
+git+https://github.com/SALTISES4/CourseFlow.git@program-analytics-export
 SALTISE_user_feedback
 SALTISE_components == 0.2.15
 
