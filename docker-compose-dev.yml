@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-#    platform: linux/amd64
+    platform: linux/amd64
     profiles:
       - dev
     command: python -X dev manage.py runserver 0.0.0.0:8000

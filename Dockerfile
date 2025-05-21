@@ -2,13 +2,6 @@
 # https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/
 # https://mherman.org/presentations/dockercon-2018
 
-
-FROM python:3.8 as requirements-builder
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-
-
 FROM node:16 AS static
 RUN mkdir /code
 WORKDIR /code
@@ -33,22 +26,20 @@ COPY .eslintrc.json ./
 COPY tsconfig.json ./
 COPY package*.json ./
 COPY gulpfile.js .
-RUN npm i
 
 # RUN npx gulp build
 
-FROM python:3.8 as builder
+FROM python:3.8-bullseye AS builder
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /code
+RUN ls
 RUN apt-get update && \
     apt-get install -y \
     vim \
     default-mysql-client \
     net-tools
-
-
 
 # still need node
 RUN apt-get update && \
@@ -71,7 +62,7 @@ RUN pip3 install --no-deps -r ./requirements/requirements-dev.txt
 RUN pip3 install factory-boy
 
 
-From builder AS prodcuer
+From builder AS producer
 
 COPY --from=static /code/analytics ./analytics
 COPY --from=static /code/blink ./blink
@@ -92,12 +83,14 @@ COPY --from=static /code/.eslintrc.json .
 COPY --from=static /code/tsconfig.json .
 COPY --from=static /code/package*.json .
 COPY --from=static /code/gulpfile.js .
-COPY --from=static /code/node_modules  .
 
+RUN echo "Working directory:" && pwd && echo "Contents:" && ls -la
+
+RUN npm i
 RUN npx gulp build
 
 RUN python3 manage.py collectstatic --clear --noinput --skip-checks
-RUN python3 manage.py compress
+# RUN python3 manage.py compress
 RUN mkdir emails
 
 # note this
