@@ -17,6 +17,8 @@
 
 services:
   live_app:
+    profiles:
+      - production
     image: mydalite
     container_name: live_app
     build:
@@ -37,6 +39,8 @@ services:
       - emails:/code/emails
 
   celery:
+    profiles:
+      - production
     image: mydalite
     container_name: celery
     depends_on:
@@ -55,11 +59,15 @@ services:
       - emails:/code/emails
 
   redis:
+    profiles:
+      - production
     image: redis:6
     container_name: redis
 
   # Database is created and populated by test_chrome runner
   test_app:
+    profiles:
+      - production
     image: mydalite
     container_name: test_app
     command: gunicorn dalite.wsgi:application --bind 0.0.0.0:8000
@@ -79,12 +87,16 @@ services:
       - emails:/code/emails
 
   memcached:
+    profiles:
+      - production
     image: memcached:latest
     container_name: memcached
     expose:
       - "11211"
 
   nginx:
+    profiles:
+      - production
     build: ./nginx
     container_name: nginx
     ports:
@@ -92,12 +104,14 @@ services:
       - 1338:8081
     depends_on:
       - live_app
-      - test_app
+   #  - test_app
     volumes:
       - static:/static
 
   # https://github.com/SeleniumHQ/docker-selenium/blob/trunk/docker-compose-v3.yml
   selenium-hub:
+    profiles:
+      - production
     image: selenium/hub:4.2.0-20220527
     container_name: selenium-hub
     ports:
@@ -110,6 +124,8 @@ services:
       - GRID_DEBUG=true
 
   chrome:
+    profiles:
+      - production
     image: selenium/node-chrome:4.2.0-20220527
     container_name: chrome
     shm_size: 2gb
@@ -129,6 +145,8 @@ services:
       - "41960:5900"
 
   firefox:
+    profiles:
+      - production
     image: selenium/node-firefox:4.2.0-20220527
     container_name: firefox
     shm_size: 2gb
@@ -148,6 +166,8 @@ services:
       - "41961:5900"
 
   edge:
+    profiles:
+      - production
     image: selenium/node-edge:4.2.0-20220527
     container_name: edge
     shm_size: 2gb
@@ -168,6 +188,8 @@ services:
 
   # The test services run all functional tests against the test_app live server
   test_chrome:
+    profiles:
+      - production
     build:
       context: .
       dockerfile: ./functional_tests/Dockerfile
@@ -188,6 +210,8 @@ services:
       - emails:/code/emails
 
   test_firefox:
+    profiles:
+      - production
     build:
       context: .
       dockerfile: ./functional_tests/Dockerfile
@@ -208,6 +232,8 @@ services:
       - emails:/code/emails
 
   test_edge:
+    profiles:
+      - production
     build:
       context: .
       dockerfile: ./functional_tests/Dockerfile

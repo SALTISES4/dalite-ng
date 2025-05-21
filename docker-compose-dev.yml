@@ -1,0 +1,79 @@
+services:
+  live_app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+#    platform: linux/amd64
+    profiles:
+      - dev
+    command: python -X dev manage.py runserver 0.0.0.0:8000
+    environment:
+      ALLOWED_HOST: nginx
+      DALITE_DB_HOST: db
+      DALITE_DB_NAME: dalite_ng
+      EMAIL_BACKEND: django.core.mail.backends.filebased.EmailBackend
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CHANNELS_REDIS_ADDRESS: redis
+      CHANNELS_REDIS_PORT: 6379
+      MEMCACHE_ADDRESS: memcached
+      DALITE_DB_PASSWORD: dalite_password123
+    depends_on:
+      - db
+    networks:
+      - ng-network
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./local_settings.py:/code/dalite/local_settings.py
+      - ./dalite:/code/dalite
+
+  celery:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    platform: linux/amd64
+    profiles:
+      - dev
+    networks:
+      - ng-network
+
+  redis:
+    profiles:
+      - dev
+    networks:
+      - ng-network
+
+  nginx:
+    profiles:
+      - dev
+    depends_on:
+      - live_app
+    networks:
+      - ng-network
+    ports:
+      - "8081:8081"
+      - "8080:8080"
+
+  memcached:
+    profiles:
+      - dev
+    networks:
+      - ng-network
+
+  db:
+    image: mariadb
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_DATABASE: dalite_ng
+      MYSQL_USER: dalite
+      MYSQL_PASSWORD: dalite_password123
+      MYSQL_ROOT_PASSWORD: root_password123
+    ports:
+      - "3306:3306"
+    networks:
+      - ng-network
+
+networks:
+  ng-network:
+    driver: bridge
