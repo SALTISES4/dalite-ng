@@ -56,6 +56,7 @@ RUN mkdir static
 
 COPY requirements ./requirements
 RUN python3 -m pip install --upgrade pip==23
+RUN pip install pip-tools
 # RUN pip3 install --no-deps -r ./requirements/requirements-prod-aws.txt
 RUN pip3 install --no-deps -r ./requirements/requirements-dev.txt
 # Temporary fix for upcoming lti_provider functional tests

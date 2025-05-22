@@ -6,6 +6,7 @@ from celery import Celery
 from celery.exceptions import OperationalError
 from celery.schedules import crontab
 from celery.utils.log import get_logger
+from celery.signals import task_failure
 
 logger = get_logger("peerinst-scheduled")
 
@@ -23,6 +24,15 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
 
+
+@task_failure.connect
+def handle_task_failure(sender=None, task_id=None, exception=None, args=None, kwargs=None, traceback=None, einfo=None, **kw):
+    logger.error(f"[TASK FAILURE] {sender.name} failed. ID={task_id}")
+    logger.error(f"Exception: {exception}")
+    logger.error(f"Args: {args}")
+    logger.error(f"Kwargs: {kwargs}")
+    logger.error(f"Traceback: {traceback}")
+    
 
 @app.task(bind=True)
 def debug_task(self):
@@ -57,7 +67,8 @@ def try_async(func):
                     list(available_workers.keys()), func.__name__
                 )
                 logger.info(info)
-                return func.delay(*args, **kwargs)
+                print('with func delay')
+                return func.apply_async(args=args, kwargs=kwargs)
             else:
                 info = "No celery workers available.  Executing {} synchronously.".format(  # noqa
                     func.__name__

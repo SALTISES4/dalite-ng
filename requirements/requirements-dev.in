@@ -1,5 +1,7 @@
 -r requirements-test.txt
 
+boto3
+django-ses>=3.5.0
 black
 django-sslserver
 flake8 == 5.0.4 # [1]

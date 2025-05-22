@@ -229,7 +229,8 @@ def sign_up(request):
                 )
                 + "\n\nCheers,"
                 "\nThe myDalite Team",
-                fail_silently=True,
+                # fail_silently=True,
+                fail_silently=False,
                 html_message=loader.render_to_string(
                     html_email_template_name,
                     context=email_context,

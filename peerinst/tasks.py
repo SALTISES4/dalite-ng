@@ -58,10 +58,29 @@ def send_mail_async(*args, **kwargs):
         logger.error(err)
 
 
-@try_async
+# @try_async
+# @shared_task
+# def mail_managers_async(*args, **kwargs):
+#     try:
+#         logger.info(f"Sending email:")
+#         result = mail_managers(*args, **kwargs)
+#         logger.info(f"Email send result: {result}")
+#     except Exception as e:
+#         logger.error("Failed to send email", exc_info=True)
+#         raise
+
 @shared_task
 def mail_managers_async(*args, **kwargs):
-    mail_managers(*args, **kwargs)
+    import time
+    logger.warning(f"[TASK STARTED] args={args}, kwargs={kwargs}")
+    time.sleep(2)
+    try:
+        result = mail_managers(*args, **kwargs)
+        logger.warning(f"[TASK COMPLETED] result={result}")
+        return result
+    except Exception as e:
+        logger.error("[TASK FAILED]", exc_info=True)
+        raise
 
 
 @try_async

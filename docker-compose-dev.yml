@@ -27,6 +27,8 @@ services:
     volumes:
       - ./local_settings.py:/code/dalite/local_settings.py
       - ./dalite:/code/dalite
+      - ./peerinst:/code/peerinst
+      - ./requirements:/code/requirements
 
   celery:
     build:
