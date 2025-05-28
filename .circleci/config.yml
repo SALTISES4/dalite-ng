@@ -79,7 +79,6 @@ jobs:
           key: venv-cache-{{ checksum "requirements/requirements-dev.txt" }}
           paths:
             - .venv
-      - force-debug
       - setup-nvm-node
       - run:
           name: install node modules
