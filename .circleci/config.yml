@@ -44,6 +44,12 @@ commands:
             nvm install
             nvm use
             node -v
+    force-debug:
+      - run:
+          name: Force failure for SSH debugging
+          command: |
+            echo "Intentional failure to allow SSH debugging"
+            exit 1
 
 jobs:
   setup:
@@ -71,6 +77,7 @@ jobs:
           key: venv-cache-{{ checksum "requirements/requirements-dev.txt" }}
           paths:
             - .venv
+      - force-debug
       - setup-nvm-node
       - run:
           name: install node modules
