@@ -151,6 +151,10 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - aws-cli/setup:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          aws-region: AWS_REGION
       - run:
           name: Set bucket and CloudFront ID by branch
           command: |
@@ -165,8 +169,13 @@ jobs:
               echo "no valid path to export"
               exit 1
             fi
-            
+      - run:
+          name: S3 Sync
+          command: |
             aws s3 sync /home/circleci/repo/static s3://$BUCKET_NAME
+      - run:
+          name: CF invalidate
+          command: |            
             aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DIST_ID --paths "/*"
 
 
