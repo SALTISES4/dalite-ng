@@ -44,9 +44,11 @@ commands:
             nvm install
             nvm use
             node -v
-    force-debug:
+  force-debug:
+    description: "Force failure for SSH debugging"
+    steps:
       - run:
-          name: Force failure for SSH debugging
+          name: just exit with code 1
           command: |
             echo "Intentional failure to allow SSH debugging"
             exit 1
