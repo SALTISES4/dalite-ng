@@ -13,7 +13,7 @@ executors:
     working_directory: ~/repo
   node-executor:
     docker:
-      - image: cimg/node:22.16.0
+      - image: cimg/node:16.20.2
     working_directory: ~/repo
   text-executor:
     docker:
@@ -100,7 +100,7 @@ jobs:
       - run:
           name: install node modules
           command: |
-            nvm use
+          #  nvm use
             node -v 
             npm install --no-optional
       - save_cache:
@@ -111,7 +111,7 @@ jobs:
       - run:
           name: Build node tasks via gulp
           command: |
-            nvm use
+          #  nvm use
             node -v 
             npx gulp build
       - persist_to_workspace:
