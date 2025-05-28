@@ -30,6 +30,17 @@ executors:
       image: ubuntu-2204:2023.10.1
     working_directory: ~/repo
 
+commands:
+  setup-nvm-node:
+    description: "Install and use Node.js via nvm"
+    steps:
+      - run:
+          name: Install and use Node.js 18 with NVM
+          command: |
+            export NVM_DIR="$HOME/.nvm"
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+            source "$NVM_DIR/nvm.sh"
+            nvm use
 
 jobs:
   setup:
@@ -48,6 +59,7 @@ jobs:
             . .venv/bin/activate
             python -m pip install --upgrade pip==23
             python -m pip install -r requirements/requirements-dev.txt --no-deps
+      - setup-nvm-node
       - run:
           name: install node modules
           command: npm install --no-optional
@@ -61,6 +73,7 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - setup-nvm-node
       - run:
           name: Gulp build
           command: npx gulp build
