@@ -9,7 +9,7 @@ orbs:
 executors:
   python-executor:
     docker:
-      - image: cimg/python:3.8.20-browsers
+      - image: cimg/python:3.8.20
     working_directory: ~/repo
   node-executor:
     docker:
@@ -100,7 +100,6 @@ jobs:
       - run:
           name: install node modules
           command: |
-          #  nvm use
             node -v 
             npm install --no-optional
       - save_cache:
@@ -111,7 +110,6 @@ jobs:
       - run:
           name: Build node tasks via gulp
           command: |
-          #  nvm use
             node -v 
             npx gulp build
       - persist_to_workspace:
