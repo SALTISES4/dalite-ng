@@ -8,9 +8,12 @@ orbs:
 
 executors:
   python-executor:
-    # i only need mariadb and memcached for tests, should i define a separate executor, does it matter?
     docker:
       - image: cimg/python:3.8.20-browsers
+    working_directory: ~/repo
+  node-executor:
+    docker:
+      - image: cimg/node
     working_directory: ~/repo
   text-executor:
     docker:
@@ -36,7 +39,7 @@ executors:
     working_directory: ~/repo
 
 commands:
-  setup-nvm-node:
+  setup-nvm-node: # don't know if need this any more, keep it for the test steps, if those don't need it, remove
     description: "Install and use Node.js via nvm"
     steps:
       - run:
@@ -64,11 +67,6 @@ jobs:
     executor: python-executor
     steps:
       - checkout
-      - run:
-          name: Install OS deps
-          command: |
-            sudo apt update
-            sudo apt install -y mariadb-client
       - restore_cache:
           name: Restore venv from cache
           keys:
@@ -85,7 +83,16 @@ jobs:
           key: venv-cache-{{ checksum "requirements/requirements-dev.txt" }}
           paths:
             - .venv
-      - setup-nvm-node
+      - persist_to_workspace:
+          root: .
+          paths:
+              - .
+
+  install-build-node: # do we actually need pip install for this?
+    executor: node-executor
+    steps:
+      - attach_workspace:
+          at: .
       - restore_cache:
           name: Restore node modules from cache
           keys:
@@ -101,23 +108,22 @@ jobs:
           key: node-modules-cache-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
-      - persist_to_workspace:
-          root: .
-          paths:
-              - .
-
-  build-assets:
-    executor: python-executor
-    steps:
-      - attach_workspace:
-          at: .
-      - setup-nvm-node
       - run:
           name: Build node tasks via gulp
           command: |
             nvm use
             node -v 
             npx gulp build
+      - persist_to_workspace:
+          root: .
+          paths:
+              - .
+
+  collect-and-compress-assets:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Setup local_settings.py
           command: |
@@ -178,6 +184,11 @@ jobs:
       - attach_workspace:
           at: .
       - run:
+          name: Install OS deps
+          command: |
+            sudo apt update
+            sudo apt install -y mariadb-client
+      - run:
           name: Run test suite
           command: |
             . .venv/bin/activate
@@ -188,6 +199,11 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - run:
+          name: Install OS deps
+          command: |
+            sudo apt update
+            sudo apt install -y mariadb-client
       - run:
           name: Run safety
           command: |
@@ -207,6 +223,11 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - run:
+          name: Install OS deps
+          command: |
+            sudo apt update
+            sudo apt install -y mariadb-client
       - run:
           name: Wait for DB
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 1m
@@ -243,7 +264,7 @@ workflows:
               only:
                 - staging
                 - test-cci
-      - build-assets:
+      - install-build-node:
           requires:
             - setup
           filters:
@@ -251,9 +272,17 @@ workflows:
               only:
                 - staging
                 - test-cci
+      - collect-and-compress-assets:
+          requires:
+            - install-build-node
+          filters:
+            branches:
+              only:
+                - staging
+                - test-cci
       - push-static-assets:
           requires:
-            - build-assets
+            - collect-and-compress-assets
           filters:
             branches:
               only:
