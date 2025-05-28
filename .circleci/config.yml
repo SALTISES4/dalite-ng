@@ -11,6 +11,10 @@ executors:
     # i only need mariadb and memcached for tests, should i define a separate executor, does it matter?
     docker:
       - image: cimg/python:3.8.20-browsers
+    working_directory: ~/repo
+  text-executor:
+    docker:
+      - image: cimg/python:3.8.20-browsers
         environment:
           DALITE_DB_PASSWORD: "test key"
           DALITE_DB_HOST: 127.0.0.1
@@ -46,8 +50,6 @@ commands:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             cd -
             nvm install
-            nvm use
-            node -v
   force-debug:
     description: "Force failure for SSH debugging"
     steps:
@@ -91,6 +93,7 @@ jobs:
       - run:
           name: install node modules
           command: |
+            nvm use
             node -v 
             npm install --no-optional
       - save_cache:
@@ -112,6 +115,7 @@ jobs:
       - run:
           name: Build node tasks via gulp
           command: |
+            nvm use
             node -v 
             npx gulp build
       - run:
@@ -167,10 +171,9 @@ jobs:
             aws cloudfront create-invalidation \
               --distribution-id $CLOUDFRONT_DIST_ID \
               --paths "/*"          
-          
 
   run-tests:
-    executor: python-executor
+    executor: text-executor
     steps:
       - attach_workspace:
           at: .
@@ -181,7 +184,7 @@ jobs:
             pytest --migrations --cov --create-db --reruns 1
 
   security-checks:
-    executor: python-executor
+    executor: text-executor
     steps:
       - attach_workspace:
           at: .
@@ -200,7 +203,7 @@ jobs:
           token-variable: SNYK_TOKEN
 
   migrate-db:
-    executor: python-executor
+    executor: text-executor
     steps:
       - attach_workspace:
           at: .
