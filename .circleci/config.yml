@@ -8,6 +8,7 @@ orbs:
 
 executors:
   python-executor:
+    # i only need mariadb and memcached for tests, should i define a separate executor, does it matter?
     docker:
       - image: cimg/python:3.8.20-browsers
         environment:
@@ -35,12 +36,14 @@ commands:
     description: "Install and use Node.js via nvm"
     steps:
       - run:
-          name: Install and use Node.js 18 with NVM
+          name: Install and use Node.js with NVM
           command: |
             export NVM_DIR="$HOME/.nvm"
             curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
             source "$NVM_DIR/nvm.sh"
+            nvm install
             nvm use
+            node -v
 
 jobs:
   setup:
