@@ -91,7 +91,7 @@ RUN npm i
 RUN npx gulp build
 
 RUN python3 manage.py collectstatic --clear --noinput --skip-checks
-# RUN python3 manage.py compress
+RUN python3 manage.py compress
 RUN mkdir emails
 
 # note this

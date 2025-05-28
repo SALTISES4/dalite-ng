@@ -1,14 +1,17 @@
 version: 2.1
+
 orbs:
   aws-s3: circleci/aws-s3@3.0
+  aws-ecr: circleci/aws-ecr@9.0.0
+  aws-cli: circleci/aws-cli@4.1.1
   snyk: snyk/snyk@1.2.3
-jobs:
-  build:
-    resource_class: medium
+
+executors:
+  python-executor:
     docker:
       - image: cimg/python:3.8.14-browsers
         environment:
-          DALITE_DB_PASSWORD: test key
+          DALITE_DB_PASSWORD: "test key"
           DALITE_DB_HOST: 127.0.0.1
           DALITE_DB_PORT: 3306
           MYSQL_ROOT_PASSWORD: mariadb
@@ -17,46 +20,48 @@ jobs:
           MYSQL_ALLOW_EMPTY_PASSWORD: true
           MYSQL_DATABASE: dalite_ng
           MYSQL_USER: dalite
-          MYSQL_PASSWORD: test key
+          MYSQL_PASSWORD: "test key"
           MYSQL_HOST: localhost
           MYSQL_ROOT_PASSWORD: mariadb
       - image: memcached
     working_directory: ~/repo
+  ecr-executor:
+    machine:
+      image: ubuntu-2204:2023.10.1
+    working_directory: ~/repo
+
+
+jobs:
+  setup:
+    executor: python-executor
     steps:
       - checkout
       - run:
-          name: OS setup
+          name: Install OS deps and dockerize
           command: |
             sudo apt update
-            sudo apt install mariadb-client
+            sudo apt install -y mariadb-client
       - run:
-          name: Create virtualenv and activate
+          name: Set up venv and install deps
           command: |
             python -m venv .venv
             . .venv/bin/activate
             python -m pip install --upgrade pip
-      - run:
-          name: Run safety
-          command: |
-            . .venv/bin/activate
-            python -m pip install safety
-            safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY -i 51619 -i 53048 -i 53298 -i 53299 -i 53301 -i 53302 -i 53303 -i 53304 -i 53305 -i 53306 -i 53307 -i 35462 -i 59062 -i 59473 -i 59956 -i 60223 -i 60224 -i 60225 -i 62105 -i 61893 -i 62451 -i 62452 -i 62556
-      - run:
-          name: Install packages
-          command: |
-            . .venv/bin/activate
             python -m pip install -r requirements/requirements-dev.txt --no-deps
-            python -m pip freeze
-            # python -m spacy download en_core_web_sm
             npm install --no-optional
-      - snyk/scan:
-          fail-on-issues: false
-          monitor-on-build: false
-          token-variable: SNYK_TOKEN
+      - persist_to_workspace:
+          root: .
+          paths:
+              - .
+
+  build-assets:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Gulp build
-          command: |
-            npx gulp build
+          command: npx gulp build
       - run:
           name: Setup local_settings.py
           command: |
@@ -68,28 +73,160 @@ jobs:
             echo 'EMAIL_SUBJECT_PREFIX = "SALTISE/S4 @ Dawson College: "' >> dalite/local_settings.py
             echo 'DEFAULT_FROM_EMAIL = "no-reply-SALTISES4@dawsoncollege.qc.ca"' >> dalite/local_settings.py
             echo 'EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"' >> dalite/local_settings.py
+      - persist_to_workspace:
+          root: .
+          paths:
+              - .
+
+  build-and-push-static-assets:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: .
       - run:
-          name: Waiting for db
-          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 1m
-      - run:
-          name: DB setup
-          command: |
-            . .venv/bin/activate
-            mysql --host=$DALITE_DB_HOST --port=$DALITE_DB_PORT -u root --password=$MYSQL_ROOT_PASSWORD -e "grant all privileges on test_dalite_ng.* to dalite@'%'"
-            ./manage.py migrate
-      - run:
-          name: Collect static content and compress
+          name: Collect and compress static assets
           command: |
             . .venv/bin/activate
             ./manage.py collectstatic -c
             ./manage.py compress
       - store_artifacts:
-          path: /home/circleci/repo/static
-      - aws-s3/sync:
-          from: /home/circleci/repo/static
-          to: 's3://staging-mydalite-static'
+          path: /home/circleci/static
       - run:
-          name: Run tests
+          name: Set bucket name
+          command: echo "export BUCKET_NAME=mydalite-${CIRCLE_BRANCH}-static" >> $BASH_ENV
+      - run:
+          name: Set bucket and CloudFront ID by branch
+          command: |
+            echo "export BUCKET_NAME=mydalite-${CIRCLE_BRANCH}-static" >> $BASH_ENV
+      
+            if [ "$CIRCLE_BRANCH" = "staging" ]; then
+              echo "export CLOUDFRONT_DIST_ID=E36YK874NXT85I" >> $BASH_ENV
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              echo "export CLOUDFRONT_DIST_ID=E1JVJOI16XF3U3" >> $BASH_ENV
+            else
+              echo "export CLOUDFRONT_DIST_ID=INVALID" >> $BASH_ENV
+            fi
+      - aws-s3/sync:
+          from: /home/circleci/static
+          to: s3://$BUCKET_NAME
+      - run:
+          name: Invalidate CloudFront cache
+          command: |
+            aws cloudfront create-invalidation \
+              --distribution-id $CLOUDFRONT_DIST_ID \
+              --paths "/*"          
+          
+
+  run-tests:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Run test suite
           command: |
             . .venv/bin/activate
             pytest --migrations --cov --create-db --reruns 1
+
+  security-checks:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Run safety
+          command: |
+            . .venv/bin/activate
+            python -m pip install safety
+            safety check -r requirements/requirements-prod-aws.txt --key=$SAFETY_API_KEY \
+              -i 51619 -i 53048 -i 53298 -i 53299 -i 53301 -i 53302 -i 53303 -i 53304 \
+              -i 53305 -i 53306 -i 53307 -i 35462 -i 59062 -i 59473 -i 59956 -i 60223 \
+              -i 60224 -i 60225 -i 62105 -i 61893 -i 62451 -i 62452 -i 62556
+      - snyk/scan:
+          fail-on-issues: false
+          monitor-on-build: false
+          token-variable: SNYK_TOKEN
+
+  migrate-db:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 1m
+      - run:
+          name: Migrate DB
+          command: |
+            . .venv/bin/activate
+            mysql --host=$DALITE_DB_HOST --port=$DALITE_DB_PORT -u root --password=$MYSQL_ROOT_PASSWORD \
+              -e "grant all privileges on test_dalite_ng.* to dalite@'%'"
+            ./manage.py migrate
+
+  run-bastion-server:
+    executor: ecr-executor
+    steps:
+      - checkout
+      - aws-cli/setup:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          aws-region: AWS_REGION
+      - aws-ecr/ecr-login
+      - run:
+          name: Pull and run container with custom command
+          command: |
+            docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/my-image:latest
+            docker run --rm $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/my-image:latest python /app/my_script.py
+
+workflows:
+  version: 2
+  full-pipeline:
+    jobs:
+      - setup
+      - build-assets:
+          requires:
+            - setup
+          filters:
+            branches:
+              only:
+                - staging
+                - test-cci
+      - build-and-push-static-assets:
+          requires:
+            - build-assets
+          filters:
+            branches:
+              only:
+                - staging
+                - test-cci
+                - test-cci                
+#      - migrate-db:
+#          requires:
+#            - setup
+#          filters:
+#            branches:
+#              only:
+#                - staging
+#      - security-checks:
+#          requires:
+#            - build-and-push-static-assets
+#          filters:
+#            branches:
+#              only:
+#                - staging
+#      - run-tests:
+#          requires:
+#            - build-and-push-static-assets
+#            - migrate-db
+#          filters:
+#            branches:
+#              only:
+#                - staging
+#      - run-bastion-server:
+#          requires:
+#            - run-tests
+#            - security-checks
+#          filters:
+#            branches:
+#              only:
+#                - staging

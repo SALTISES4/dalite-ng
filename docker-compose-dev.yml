@@ -26,9 +26,20 @@ services:
       - "8000:8000"
     volumes:
       - ./local_settings.py:/code/dalite/local_settings.py
-      - ./dalite:/code/dalite
+# modules
       - ./peerinst:/code/peerinst
+      - ./tos:/code/tos
+      - ./quality:/code/quality
+      - ./reputation:/code/reputation
+      - ./analytics:/code/analytics
+      - ./dalite:/code/dalite
       - ./requirements:/code/requirements
+      - ./blink:/code/blink
+      - ./peerinst:/code/peerinst
+      - ./static:/code/static
+      - ./templates:/code/templates
+      - ./REST:/code/REST
+      - ./node_modules:/code/node_modules
 
   celery:
     build:
