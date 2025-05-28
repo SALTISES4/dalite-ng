@@ -40,7 +40,7 @@ commands:
           command: |
             export NVM_DIR="$HOME/.nvm"
             curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-            source "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
             nvm install
             nvm use
             node -v
@@ -55,6 +55,10 @@ jobs:
           command: |
             sudo apt update
             sudo apt install -y mariadb-client
+      - restore_cache:
+          name: Restore venv from cache
+          keys:
+            - venv-cache-{{ checksum "requirements/requirements-dev.txt" }}
       - run:
           name: Set up venv
           command: |
@@ -62,6 +66,11 @@ jobs:
             . .venv/bin/activate
             python -m pip install --upgrade pip==23
             python -m pip install -r requirements/requirements-dev.txt --no-deps
+      - save_cache:
+          name: Save venv to cache
+          key: venv-cache-{{ checksum "requirements/requirements-dev.txt" }}
+          paths:
+            - .venv
       - setup-nvm-node
       - run:
           name: install node modules
