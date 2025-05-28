@@ -152,31 +152,23 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Set bucket name
-          command: echo "export BUCKET_NAME=mydalite-${CIRCLE_BRANCH}-static" >> $BASH_ENV
-      - run:
           name: Set bucket and CloudFront ID by branch
           command: |
             echo "export BUCKET_NAME=mydalite-${CIRCLE_BRANCH}-static" >> $BASH_ENV
 
-            if [ "$CIRCLE_BRANCH" = "staging" ]; then
+            if [ $CIRCLE_BRANCH == "staging" ]; then
               echo "export CLOUDFRONT_DIST_ID=E36YK874NXT85I" >> $BASH_ENV
-            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+            elif [ $CIRCLE_BRANCH = "master" ]; then
               echo "export CLOUDFRONT_DIST_ID=E1JVJOI16XF3U3" >> $BASH_ENV
             else
               echo "export CLOUDFRONT_DIST_ID=INVALID" >> $BASH_ENV
+              echo "no valid path to export"
+              exit 1
             fi
+            
+            aws s3 sync /home/circleci/repo/static s3://$BUCKET_NAME
+            aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DIST_ID --paths "/*"
 
-
-      - aws-s3/sync:
-          from: /home/circleci/repo/static
-          to: s3://$BUCKET_NAME
-      - run:
-          name: Invalidate CloudFront cache
-          command: |
-            aws cloudfront create-invalidation \
-              --distribution-id $CLOUDFRONT_DIST_ID \
-              --paths "/*"          
 
   run-tests:
     executor: text-executor
@@ -263,7 +255,6 @@ workflows:
             branches:
               only:
                 - staging
-                - test-cci
       - install-build-node:
           requires:
             - setup
@@ -271,7 +262,6 @@ workflows:
             branches:
               only:
                 - staging
-                - test-cci
       - collect-and-compress-assets:
           requires:
             - install-build-node
@@ -279,7 +269,6 @@ workflows:
             branches:
               only:
                 - staging
-                - test-cci
       - push-static-assets:
           requires:
             - collect-and-compress-assets
@@ -287,7 +276,6 @@ workflows:
             branches:
               only:
                 - staging
-                - test-cci
 #      - migrate-db:
 #          requires:
 #            - setup
