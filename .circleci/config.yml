@@ -36,6 +36,8 @@ commands:
     description: "Install and use Node.js via nvm"
     steps:
       - run:
+          command: cd ..
+      - run:
           name: Install and use Node.js with NVM
           command: |
             export NVM_DIR="$HOME/.nvm"
