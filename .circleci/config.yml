@@ -9,7 +9,7 @@ orbs:
 executors:
   python-executor:
     docker:
-      - image: cimg/python:3.8.14-browsers
+      - image: cimg/python:3.8.20-browsers
         environment:
           DALITE_DB_PASSWORD: "test key"
           DALITE_DB_HOST: 127.0.0.1
@@ -37,18 +37,20 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install OS deps and dockerize
+          name: Install OS deps
           command: |
             sudo apt update
             sudo apt install -y mariadb-client
       - run:
-          name: Set up venv and install deps
+          name: Set up venv
           command: |
             python -m venv .venv
             . .venv/bin/activate
-            python -m pip install --upgrade pip
+            python -m pip install --upgrade pip==23
             python -m pip install -r requirements/requirements-dev.txt --no-deps
-            npm install --no-optional
+      - run:
+          name: install node modules
+          command: npm install --no-optional
       - persist_to_workspace:
           root: .
           paths:
@@ -73,16 +75,6 @@ jobs:
             echo 'EMAIL_SUBJECT_PREFIX = "SALTISE/S4 @ Dawson College: "' >> dalite/local_settings.py
             echo 'DEFAULT_FROM_EMAIL = "no-reply-SALTISES4@dawsoncollege.qc.ca"' >> dalite/local_settings.py
             echo 'EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"' >> dalite/local_settings.py
-      - persist_to_workspace:
-          root: .
-          paths:
-              - .
-
-  build-and-push-static-assets:
-    executor: python-executor
-    steps:
-      - attach_workspace:
-          at: .
       - run:
           name: Collect and compress static assets
           command: |
@@ -90,7 +82,17 @@ jobs:
             ./manage.py collectstatic -c
             ./manage.py compress
       - store_artifacts:
-          path: /home/circleci/static
+          path: /home/circleci/repo/static
+      - persist_to_workspace:
+          root: .
+          paths:
+              - .
+
+  push-static-assets:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Set bucket name
           command: echo "export BUCKET_NAME=mydalite-${CIRCLE_BRANCH}-static" >> $BASH_ENV
@@ -107,7 +109,7 @@ jobs:
               echo "export CLOUDFRONT_DIST_ID=INVALID" >> $BASH_ENV
             fi
       - aws-s3/sync:
-          from: /home/circleci/static
+          from: /home/circleci/repo/static
           to: s3://$BUCKET_NAME
       - run:
           name: Invalidate CloudFront cache
@@ -182,7 +184,12 @@ workflows:
   version: 2
   full-pipeline:
     jobs:
-      - setup
+      - setup:
+          filters:
+            branches:
+              only:
+                - staging
+                - test-cci
       - build-assets:
           requires:
             - setup
@@ -191,7 +198,7 @@ workflows:
               only:
                 - staging
                 - test-cci
-      - build-and-push-static-assets:
+      - push-static-assets:
           requires:
             - build-assets
           filters:
