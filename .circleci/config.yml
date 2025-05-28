@@ -36,10 +36,9 @@ commands:
     description: "Install and use Node.js via nvm"
     steps:
       - run:
-          command: cd ..
-      - run:
           name: Install and use Node.js with NVM
           command: |
+            cd ..
             export NVM_DIR="$HOME/.nvm"
             (
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash 
