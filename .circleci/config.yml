@@ -155,12 +155,12 @@ jobs:
       - run:
           name: Set bucket and CloudFront ID by branch
           command: |
-            echo "export BUCKET_NAME=mydalite-${CIRCLE_BRANCH}-static" >> $BASH_ENV
-
             if [ $CIRCLE_BRANCH == "staging" ]; then
               echo "export CLOUDFRONT_DIST_ID=E36YK874NXT85I" >> $BASH_ENV
+              echo "export BUCKET_NAME=mydalite-staging-static" >> $BASH_ENV
             elif [ $CIRCLE_BRANCH = "master" ]; then
               echo "export CLOUDFRONT_DIST_ID=E1JVJOI16XF3U3" >> $BASH_ENV
+              echo "export BUCKET_NAME=mydalite-production-static" >> $BASH_ENV
             else
               echo "export CLOUDFRONT_DIST_ID=INVALID" >> $BASH_ENV
               echo "no valid path to export"
