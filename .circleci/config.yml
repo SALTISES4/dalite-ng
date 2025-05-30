@@ -261,6 +261,7 @@ workflows:
             branches:
               only:
                 - staging
+                - master
       - install-build-node:
           requires:
             - setup
@@ -268,6 +269,7 @@ workflows:
             branches:
               only:
                 - staging
+                - master
       - collect-and-compress-assets:
           requires:
             - install-build-node
@@ -275,6 +277,7 @@ workflows:
             branches:
               only:
                 - staging
+                - master
       - push-static-assets:
           requires:
             - collect-and-compress-assets
@@ -282,6 +285,7 @@ workflows:
             branches:
               only:
                 - staging
+                - master
 #      - migrate-db:
 #          requires:
 #            - setup
