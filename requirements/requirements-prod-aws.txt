@@ -389,7 +389,7 @@ rjsmin==1.2.0
     #   django-compressor
 s3transfer==0.6.0
     # via boto3
-saltise-course-flow==0.8.31
+saltise-course-flow==0.8.32
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==1.1.2
     # via -r requirements/requirements-base.txt
