@@ -26,6 +26,7 @@ services:
       - "8000:8000"
     volumes:
       - ./local_settings.py:/code/dalite/local_settings.py
+      - ./makefile:/code/makefile
 # modules
       - ./peerinst:/code/peerinst
       - ./tos:/code/tos
