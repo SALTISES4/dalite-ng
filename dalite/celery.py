@@ -60,14 +60,21 @@ def try_async(func):
 
         else:
             logger.info("Checking for available workers...")
-            available_workers = celery.current_app.control.inspect().active()
+            try:
+                available_workers = celery.current_app.control.inspect().active()
+            except Exception as e:
+                logger.warning(
+                    "Celery inspect failed ({}). Executing {} synchronously.".format(
+                        e, func.__name__
+                    )
+                )
+                return func(*args, **kwargs)
 
             if available_workers:
                 info = "Celery workers available ({}).  Executing {} asynchronously.".format(  # noqa
                     list(available_workers.keys()), func.__name__
                 )
                 logger.info(info)
-                print('with func delay')
                 return func.apply_async(args=args, kwargs=kwargs)
             else:
                 info = "No celery workers available.  Executing {} synchronously.".format(  # noqa
