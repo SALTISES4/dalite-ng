@@ -428,7 +428,7 @@ rjsmin==1.2.0
     # via
     #   -r requirements/requirements-base.txt
     #   django-compressor
-saltise-course-flow==0.8.43
+saltise-course-flow==0.8.44
     # via -r requirements/requirements-base.txt
 saltise-user-feedback==1.1.2
     # via -r requirements/requirements-base.txt
